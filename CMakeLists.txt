@@ -1,0 +1,67 @@
+#| sepiola - Open Source Online Backup Client
+#| Copyright (C) 2007, 2008  stepping stone GmbH
+#| 
+#| This program is free software; you can redistribute it and/or
+#| modify it under the terms of the GNU General Public License
+#| Version 2 as published by the Free Software Foundation.
+#| 
+#| This program is distributed in the hope that it will be useful,
+#| but WITHOUT ANY WARRANTY; without even the implied warranty of
+#| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#| GNU General Public License for more details.
+#| 
+#| You should have received a copy of the GNU General Public License
+#| along with this program; if not, write to the Free Software
+#| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+IF(NOT SSBACKUP_EXECUTABLE_NAME)
+  SET(SSBACKUP_EXECUTABLE_NAME sepiola)
+ENDIF(NOT SSBACKUP_EXECUTABLE_NAME)
+
+PROJECT(${SSBACKUP_EXECUTABLE_NAME})
+
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release)
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
+SET(Qt4_FIND_REQUIRED TRUE)
+INCLUDE(FindQt4)
+
+# Translatable source files
+FILE(GLOB_RECURSE translate_files src/*.cc src/*.hh src/*.ui)
+
+SET(CPACK_PACKAGE_NAME ${SSBACKUP_EXECUTABLE_NAME})
+SET(CPACK_PACKAGE_FULL_NAME ${SSBACKUP_APPLICATION_FULL_NAME})
+SET(CPACK_PACKAGE_VENDOR "stepping stone GmbH")
+SET(CPACK_PACKAGE_VERSION_MAJOR "1")
+SET(CPACK_PACKAGE_VERSION_MINOR "1")
+SET(CPACK_PACKAGE_VERSION_PATCH "5")
+SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+SET(CPACK_PACKAGE_EXECUTABLES ${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_FULL_NAME})
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README")
+
+# Has to be below the variables because they are accessed in the src/CMakeLists.txt
+ADD_SUBDIRECTORY(src)
+
+IF(Q_WS_WIN)
+	SET(CPACK_GENERATOR "NSIS")
+	SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/installer/win32-x86/" ${CMAKE_MODULE_PATH})
+	INCLUDE(CPack)
+ELSEIF(Q_WS_MAC)
+	ADD_CUSTOM_TARGET(package
+			  COMMAND rm -rf ${CMAKE_BINARY_DIR}/staging
+                          COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/staging -P cmake_install.cmake
+                          COMMAND hdiutil create -ov -srcfolder ${CMAKE_BINARY_DIR}/staging/${PROJECT_NAME} ${PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-Mac-universal.dmg)
+ELSE(Q_WS_WIN)
+	EXECUTE_PROCESS(COMMAND arch OUTPUT_VARIABLE ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+	SET(CPACK_GENERATOR "STGZ")
+	IF(ARCH MATCHES "64$")
+		SET(LINUX_NAME Linux-x86_64)
+	ELSE(ARCH MATCHES "64$")
+		SET(LINUX_NAME Linux-i386)
+	ENDIF(ARCH MATCHES "64$")
+	SET(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}-${LINUX_NAME})
+	SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/installer/linux/" ${CMAKE_MODULE_PATH})
+	INCLUDE(CPack)
+ENDIF(Q_WS_WIN)

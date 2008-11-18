@@ -1,0 +1,82 @@
+#| sepiola - Open Source Online Backup Client
+#| Copyright (C) 2007, 2008  stepping stone GmbH
+#| 
+#| This program is free software; you can redistribute it and/or
+#| modify it under the terms of the GNU General Public License
+#| Version 2 as published by the Free Software Foundation.
+#| 
+#| This program is distributed in the hope that it will be useful,
+#| but WITHOUT ANY WARRANTY; without even the implied warranty of
+#| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#| GNU General Public License for more details.
+#| 
+#| You should have received a copy of the GNU General Public License
+#| along with this program; if not, write to the Free Software
+#| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+
+
+Linux
+=====
+
+Requirements:
+   * Linux distribution with glibc 2.3 or later
+   * QT 4.0.0 or later
+   * CMake 2.4 or later
+   * GCC 4 C++ compiler, other C++ compilers may work too
+   * PATH must contain qmake and g++
+
+Requirements provided in the tools archive:
+   * rsync 2.6.9, unpatched
+   * getfacl/setfacl 2.2.47, unpatched
+   * openssh 4.7, unpatched
+   * putty 0.60, patched
+
+
+Mac OS X
+========
+
+Requirements:
+   * Mac OS X 10.3.9 or later
+   * QT 4.0.0 or later
+   * CMake 2.4 or later
+   * XCode 2.0 or later
+   * PATH must contain qmake and g++
+
+Requirements provided in the tools archive:
+   * rsync 2.6.9, unpatched
+   * openssh 4.7, unpatched
+   * putty 0.60, patched
+
+
+Windows
+=======
+
+Requirements:
+   * Windows 2000 or later
+   * QT 4.0.0 or later
+   * CMake 2.4 or later
+   * MinGW 3.4.2 or later
+   * PATH must contain qmake and MinGW bin directory
+
+Requirements provided in the tools archive:
+   * rsync 2.6.9, patched
+   * putty 0.60, patched
+   * SetACL 2.0.2.0, patched
+
+
+All platforms
+=============
+
+Compilation:
+   * Download a tools archive with precompiled tool binaries for your platform and sepiola version
+     from http://sepiola.sourceforge.net/.
+     A description how to compile the tools yourself will be added later.
+   * Extract the archive in the top level sepiola source directory.
+   * Create a subdirectory named "build" in the top level sepiola source directory.
+   * Change into the newly created directory.
+   * Execute "cmake .."
+   * Execute "make"
+   
+Installation:
+   * Execute "make install" in the top level sepiola source directory.
