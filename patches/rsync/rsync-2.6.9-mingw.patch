@@ -1,0 +1,2421 @@
+diff -urP rsync-2.6.9/cleanup.c rsync-2.6.9-mingw/cleanup.c
+--- rsync-2.6.9/cleanup.c	2006-10-15 17:43:26.000000000 +0200
++++ rsync-2.6.9-mingw/cleanup.c	2008-09-20 19:35:57.000000000 +0200
+@@ -30,6 +30,7 @@
+ extern int log_got_error;
+ extern char *partial_dir;
+ extern char *logfile_name;
++extern char** utf8_argv;
+ 
+ #ifdef HAVE_SIGACTION
+ static struct sigaction sigact;
+@@ -197,6 +198,8 @@
+ 		break;
+ 	}
+ 
++	if (utf8_argv) free(utf8_argv);
++
+ 	exit(code);
+ }
+ 
+diff -urP rsync-2.6.9/configure rsync-2.6.9-mingw/configure
+--- rsync-2.6.9/configure	2006-11-07 05:39:47.000000000 +0100
++++ rsync-2.6.9-mingw/configure	2008-09-20 19:35:57.000000000 +0200
+@@ -10466,184 +10466,6 @@
+ 
+ 
+ 
+-   { echo "$as_me:$LINENO: checking for socklen_t" >&5
+-echo $ECHO_N "checking for socklen_t... $ECHO_C" >&6; }
+-if test "${ac_cv_type_socklen_t+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-  cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-#include <sys/types.h>
+-#include <sys/socket.h>
+-
+-typedef socklen_t ac__type_new_;
+-int
+-main ()
+-{
+-if ((ac__type_new_ *) 0)
+-  return 0;
+-if (sizeof (ac__type_new_))
+-  return 0;
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-rm -f conftest.$ac_objext
+-if { (ac_try="$ac_compile"
+-case "(($ac_try" in
+-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+-  *) ac_try_echo=$ac_try;;
+-esac
+-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+-  (eval "$ac_compile") 2>conftest.er1
+-  ac_status=$?
+-  grep -v '^ *+' conftest.er1 >conftest.err
+-  rm -f conftest.er1
+-  cat conftest.err >&5
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } &&
+-	 { ac_try='test -z "$ac_c_werror_flag" || test ! -s conftest.err'
+-  { (case "(($ac_try" in
+-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+-  *) ac_try_echo=$ac_try;;
+-esac
+-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+-  (eval "$ac_try") 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; } &&
+-	 { ac_try='test -s conftest.$ac_objext'
+-  { (case "(($ac_try" in
+-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+-  *) ac_try_echo=$ac_try;;
+-esac
+-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+-  (eval "$ac_try") 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-  ac_cv_type_socklen_t=yes
+-else
+-  echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-	ac_cv_type_socklen_t=no
+-fi
+-
+-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+-fi
+-{ echo "$as_me:$LINENO: result: $ac_cv_type_socklen_t" >&5
+-echo "${ECHO_T}$ac_cv_type_socklen_t" >&6; }
+-if test $ac_cv_type_socklen_t = yes; then
+-  :
+-else
+-
+-      { echo "$as_me:$LINENO: checking for socklen_t equivalent" >&5
+-echo $ECHO_N "checking for socklen_t equivalent... $ECHO_C" >&6; }
+-      if test "${rsync_cv_socklen_t_equiv+set}" = set; then
+-  echo $ECHO_N "(cached) $ECHO_C" >&6
+-else
+-
+-         # Systems have either "struct sockaddr *" or
+-         # "void *" as the second argument to getpeername
+-         rsync_cv_socklen_t_equiv=
+-         for arg2 in "struct sockaddr" void; do
+-            for t in int size_t unsigned long "unsigned long"; do
+-               cat >conftest.$ac_ext <<_ACEOF
+-/* confdefs.h.  */
+-_ACEOF
+-cat confdefs.h >>conftest.$ac_ext
+-cat >>conftest.$ac_ext <<_ACEOF
+-/* end confdefs.h.  */
+-
+-#include <sys/types.h>
+-#include <sys/socket.h>
+-
+-                  int getpeername (int, $arg2 *, $t *);
+-
+-int
+-main ()
+-{
+-
+-                  $t len;
+-                  getpeername(0,0,&len);
+-
+-  ;
+-  return 0;
+-}
+-_ACEOF
+-rm -f conftest.$ac_objext
+-if { (ac_try="$ac_compile"
+-case "(($ac_try" in
+-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+-  *) ac_try_echo=$ac_try;;
+-esac
+-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+-  (eval "$ac_compile") 2>conftest.er1
+-  ac_status=$?
+-  grep -v '^ *+' conftest.er1 >conftest.err
+-  rm -f conftest.er1
+-  cat conftest.err >&5
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); } &&
+-	 { ac_try='test -z "$ac_c_werror_flag" || test ! -s conftest.err'
+-  { (case "(($ac_try" in
+-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+-  *) ac_try_echo=$ac_try;;
+-esac
+-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+-  (eval "$ac_try") 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; } &&
+-	 { ac_try='test -s conftest.$ac_objext'
+-  { (case "(($ac_try" in
+-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+-  *) ac_try_echo=$ac_try;;
+-esac
+-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+-  (eval "$ac_try") 2>&5
+-  ac_status=$?
+-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; }; then
+-
+-                  rsync_cv_socklen_t_equiv="$t"
+-                  break
+-
+-else
+-  echo "$as_me: failed program was:" >&5
+-sed 's/^/| /' conftest.$ac_ext >&5
+-
+-
+-fi
+-
+-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+-            done
+-         done
+-
+-         if test "x$rsync_cv_socklen_t_equiv" = x; then
+-            { { echo "$as_me:$LINENO: error: Cannot find a type to use in place of socklen_t" >&5
+-echo "$as_me: error: Cannot find a type to use in place of socklen_t" >&2;}
+-   { (exit 1); exit 1; }; }
+-         fi
+-
+-fi
+-
+-      { echo "$as_me:$LINENO: result: $rsync_cv_socklen_t_equiv" >&5
+-echo "${ECHO_T}$rsync_cv_socklen_t_equiv" >&6; }
+-
+-cat >>confdefs.h <<_ACEOF
+-#define socklen_t $rsync_cv_socklen_t_equiv
+-_ACEOF
+-
+-fi
+-
+-
+-
+ { echo "$as_me:$LINENO: checking for errno in errno.h" >&5
+ echo $ECHO_N "checking for errno in errno.h... $ECHO_C" >&6; }
+ if test "${rsync_cv_errno+set}" = set; then
+diff -urP rsync-2.6.9/configure.in rsync-2.6.9-mingw/configure.in
+--- rsync-2.6.9/configure.in	2006-11-07 05:39:47.000000000 +0100
++++ rsync-2.6.9-mingw/configure.in	2008-09-20 19:35:57.000000000 +0200
+@@ -354,8 +354,6 @@
+ AC_TYPE_GETGROUPS
+ AC_CHECK_MEMBERS([struct stat.st_rdev])
+ 
+-TYPE_SOCKLEN_T
+-
+ AC_CACHE_CHECK([for errno in errno.h],rsync_cv_errno, [
+     AC_TRY_COMPILE([#include <errno.h>],[int i = errno],
+ 	rsync_cv_errno=yes,rsync_cv_have_errno_decl=no)])
+diff -urP rsync-2.6.9/global.h rsync-2.6.9-mingw/global.h
+--- rsync-2.6.9/global.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/global.h	2008-09-20 19:36:01.000000000 +0200
+@@ -0,0 +1,318 @@
++/* This file is automatically generated with "make global". DO NOT EDIT */
++
++extern int fuzzy_basis;
++extern int delete_excluded;
++extern int stdout_format_has_i;
++extern char* sockopts;
++extern int copy_unsafe_links;
++extern char* logfile_format;
++extern int need_messages_from_generator;
++extern char* batch_name;
++extern int io_filesfrom_buflen;
++extern int preserve_executability;
++extern int copy_dest;
++extern int dry_run;
++extern char* dest_option;
++extern int compare_dest;
++extern int do_xfers;
++extern long block_size;
++extern int prune_empty_dirs;
++extern int am_generator;
++extern int remote_protocol;
++extern int no_flush;
++extern int curr_dir_depth;
++extern int sock_f_in;
++extern int iobuf_out_cnt;
++extern int am_sender;
++extern int do_compression;
++extern int io_error;
++extern int msg_fd_out;
++extern int kluge_around_eof;
++extern int logfile_format_has_i;
++extern int numeric_ids;
++extern int log_before_transfer;
++extern int max_delete;
++extern int defer_forwarding_messages;
++extern int io_timeout;
++extern int protocol_version;
++extern int cvs_exclude;
++extern int preserve_links;
++extern char* io_filesfrom_bp;
++extern int am_server;
++extern char io_filesfrom_lastchar;
++extern int recurse;
++extern int quiet;
++extern int verbose;
++extern int cleanup_got_literal;
++extern int eol_nulls;
++extern int whole_file;
++extern int preserve_devices;
++extern int default_af_hint;
++extern int safe_symlinks;
++extern int preserve_uid;
++extern int delay_updates;
++extern int sparse_files;
++extern int implied_dirs;
++extern char* iobuf_out;
++extern char io_filesfrom_buf[2048];
++extern char* password_file;
++extern unsigned int backup_dir_remainder;
++extern int do_progress;
++extern struct filter_list_struct filter_list;
++extern int copy_links;
++extern char curr_dir[MAXPATHLEN];
++extern int batch_fd;
++extern int local_server;
++extern int link_dest;
++extern int am_starting_up;
++extern char* backup_suffix;
++extern int io_multiplexing_out;
++extern int msg_fd_in;
++extern int ignore_errors;
++extern char backup_dir_buf[MAXPATHLEN];
++extern int filesfrom_fd;
++extern struct filter_list_struct server_filter_list;
++extern int always_checksum;
++extern int human_readable;
++extern int write_batch_monitor_in;
++extern int io_multiplexing_in;
++extern int preserve_gid;
++extern char* iobuf_in;
++extern char* shell_cmd;
++extern int delete_during;
++extern int backup_dir_len;
++extern int omit_dir_times;
++extern int rsync_port;
++extern int modify_window;
++extern int preserve_times;
++extern int ignore_times;
++extern char* stdout_format;
++extern int make_backups;
++extern int select_timeout;
++extern char* filesfrom_host;
++extern int update_only;
++extern unsigned int file_struct_len;
++extern int new_root_dir;
++extern int daemon_bwlimit;
++extern int sanitize_paths;
++extern int xfer_dirs;
++extern unsigned int curr_dir_len;
++extern int do_stats;
++extern char* rsync_path;
++extern int list_only;
++extern char* partial_dir;
++extern int io_filesfrom_f_out;
++extern int inplace;
++extern int ignore_non_existing;
++extern struct filter_list_struct cvs_filter_list;
++extern struct stats stats;
++extern int delete_mode;
++extern int relative_paths;
++extern int io_filesfrom_f_in;
++extern int write_batch;
++extern int allowed_lull;
++extern struct file_list* the_file_list;
++extern int active_filecnt;
++extern int one_file_system;
++extern char* backup_dir;
++extern int blocking_io;
++extern int def_compress_level;
++extern int am_root;
++extern int preserve_specials;
++extern int stdout_format_has_o_or_i;
++extern int size_only;
++extern int preserve_perms;
++extern int backup_suffix_len;
++extern int keep_partial;
++extern int output_motd;
++extern int checksum_seed;
++extern int daemon_over_rsh;
++extern int remove_source_files;
++extern int sock_f_out;
++extern int delete_before;
++extern int csum_length;
++extern int checksum_len;
++extern char* logfile_name;
++extern int ignore_existing;
++extern int batch_gen_fd;
++extern char* bind_address;
++extern int keep_dirlinks;
++extern int force_delete;
++extern int logfile_format_has_o_or_i;
++extern int am_daemon;
++extern char* files_from;
++extern int preserve_hard_links;
++extern char* tmpdir;
++extern int updating_basis_file;
++extern int log_got_error;
++extern int copy_dirlinks;
++extern struct chmod_mode_struct* chmod_modes;
++extern int write_batch_monitor_out;
++extern int ignore_timeout;
++extern int append_mode;
++extern char* config_file;
++extern int no_detach;
++extern int basis_dir_cnt;
++extern int delete_after;
++extern int read_batch;
++extern int bwlimit;
++
++const struct var_info_t global_var_info[] = {
++{ &fuzzy_basis, 0, sizeof(fuzzy_basis) },
++{ &delete_excluded, 0, sizeof(delete_excluded) },
++{ &stdout_format_has_i, 0, sizeof(stdout_format_has_i) },
++{ &sockopts, 1, 0 },
++{ &copy_unsafe_links, 0, sizeof(copy_unsafe_links) },
++{ &logfile_format, 1, 0 },
++{ &need_messages_from_generator, 0, sizeof(need_messages_from_generator) },
++{ &batch_name, 1, 0 },
++{ &io_filesfrom_buflen, 0, sizeof(io_filesfrom_buflen) },
++{ &preserve_executability, 0, sizeof(preserve_executability) },
++{ &copy_dest, 0, sizeof(copy_dest) },
++{ &dry_run, 0, sizeof(dry_run) },
++{ &dest_option, 1, 0 },
++{ &compare_dest, 0, sizeof(compare_dest) },
++{ &do_xfers, 0, sizeof(do_xfers) },
++{ &block_size, 0, sizeof(block_size) },
++{ &prune_empty_dirs, 0, sizeof(prune_empty_dirs) },
++{ &am_generator, 0, sizeof(am_generator) },
++{ &remote_protocol, 0, sizeof(remote_protocol) },
++{ &no_flush, 0, sizeof(no_flush) },
++{ &curr_dir_depth, 0, sizeof(curr_dir_depth) },
++{ &sock_f_in, 0, sizeof(sock_f_in) },
++{ &iobuf_out_cnt, 0, sizeof(iobuf_out_cnt) },
++{ &am_sender, 0, sizeof(am_sender) },
++{ &do_compression, 0, sizeof(do_compression) },
++{ &io_error, 0, sizeof(io_error) },
++{ &msg_fd_out, 0, sizeof(msg_fd_out) },
++{ &kluge_around_eof, 0, sizeof(kluge_around_eof) },
++{ &logfile_format_has_i, 0, sizeof(logfile_format_has_i) },
++{ &numeric_ids, 0, sizeof(numeric_ids) },
++{ &log_before_transfer, 0, sizeof(log_before_transfer) },
++{ &max_delete, 0, sizeof(max_delete) },
++{ &defer_forwarding_messages, 0, sizeof(defer_forwarding_messages) },
++{ &io_timeout, 0, sizeof(io_timeout) },
++{ &protocol_version, 0, sizeof(protocol_version) },
++{ &cvs_exclude, 0, sizeof(cvs_exclude) },
++{ &preserve_links, 0, sizeof(preserve_links) },
++{ &io_filesfrom_bp, 1, 0 },
++{ &am_server, 0, sizeof(am_server) },
++{ &io_filesfrom_lastchar, 0, sizeof(io_filesfrom_lastchar) },
++{ &recurse, 0, sizeof(recurse) },
++{ &quiet, 0, sizeof(quiet) },
++{ &verbose, 0, sizeof(verbose) },
++{ &cleanup_got_literal, 0, sizeof(cleanup_got_literal) },
++{ &eol_nulls, 0, sizeof(eol_nulls) },
++{ &whole_file, 0, sizeof(whole_file) },
++{ &preserve_devices, 0, sizeof(preserve_devices) },
++{ &default_af_hint, 0, sizeof(default_af_hint) },
++{ &safe_symlinks, 0, sizeof(safe_symlinks) },
++{ &preserve_uid, 0, sizeof(preserve_uid) },
++{ &delay_updates, 0, sizeof(delay_updates) },
++{ &sparse_files, 0, sizeof(sparse_files) },
++{ &implied_dirs, 0, sizeof(implied_dirs) },
++{ &iobuf_out, 1, 0 },
++{ &io_filesfrom_buf, 0, sizeof(io_filesfrom_buf) },
++{ &password_file, 1, 0 },
++{ &backup_dir_remainder, 0, sizeof(backup_dir_remainder) },
++{ &do_progress, 0, sizeof(do_progress) },
++{ &filter_list, 0, sizeof(filter_list) },
++{ &copy_links, 0, sizeof(copy_links) },
++{ &curr_dir, 0, sizeof(curr_dir) },
++{ &batch_fd, 0, sizeof(batch_fd) },
++{ &local_server, 0, sizeof(local_server) },
++{ &link_dest, 0, sizeof(link_dest) },
++{ &am_starting_up, 0, sizeof(am_starting_up) },
++{ &backup_suffix, 1, 0 },
++{ &io_multiplexing_out, 0, sizeof(io_multiplexing_out) },
++{ &msg_fd_in, 0, sizeof(msg_fd_in) },
++{ &ignore_errors, 0, sizeof(ignore_errors) },
++{ &backup_dir_buf, 0, sizeof(backup_dir_buf) },
++{ &filesfrom_fd, 0, sizeof(filesfrom_fd) },
++{ &server_filter_list, 0, sizeof(server_filter_list) },
++{ &always_checksum, 0, sizeof(always_checksum) },
++{ &human_readable, 0, sizeof(human_readable) },
++{ &write_batch_monitor_in, 0, sizeof(write_batch_monitor_in) },
++{ &io_multiplexing_in, 0, sizeof(io_multiplexing_in) },
++{ &preserve_gid, 0, sizeof(preserve_gid) },
++{ &iobuf_in, 1, 0 },
++{ &shell_cmd, 1, 0 },
++{ &delete_during, 0, sizeof(delete_during) },
++{ &backup_dir_len, 0, sizeof(backup_dir_len) },
++{ &omit_dir_times, 0, sizeof(omit_dir_times) },
++{ &rsync_port, 0, sizeof(rsync_port) },
++{ &modify_window, 0, sizeof(modify_window) },
++{ &preserve_times, 0, sizeof(preserve_times) },
++{ &ignore_times, 0, sizeof(ignore_times) },
++{ &stdout_format, 1, 0 },
++{ &make_backups, 0, sizeof(make_backups) },
++{ &select_timeout, 0, sizeof(select_timeout) },
++{ &filesfrom_host, 1, 0 },
++{ &update_only, 0, sizeof(update_only) },
++{ &file_struct_len, 0, sizeof(file_struct_len) },
++{ &new_root_dir, 0, sizeof(new_root_dir) },
++{ &daemon_bwlimit, 0, sizeof(daemon_bwlimit) },
++{ &sanitize_paths, 0, sizeof(sanitize_paths) },
++{ &xfer_dirs, 0, sizeof(xfer_dirs) },
++{ &curr_dir_len, 0, sizeof(curr_dir_len) },
++{ &do_stats, 0, sizeof(do_stats) },
++{ &rsync_path, 1, 0 },
++{ &list_only, 0, sizeof(list_only) },
++{ &partial_dir, 1, 0 },
++{ &io_filesfrom_f_out, 0, sizeof(io_filesfrom_f_out) },
++{ &inplace, 0, sizeof(inplace) },
++{ &ignore_non_existing, 0, sizeof(ignore_non_existing) },
++{ &cvs_filter_list, 0, sizeof(cvs_filter_list) },
++{ &stats, 0, sizeof(stats) },
++{ &delete_mode, 0, sizeof(delete_mode) },
++{ &relative_paths, 0, sizeof(relative_paths) },
++{ &io_filesfrom_f_in, 0, sizeof(io_filesfrom_f_in) },
++{ &write_batch, 0, sizeof(write_batch) },
++{ &allowed_lull, 0, sizeof(allowed_lull) },
++{ &the_file_list, 1, sizeof(*the_file_list) },
++{ &active_filecnt, 0, sizeof(active_filecnt) },
++{ &one_file_system, 0, sizeof(one_file_system) },
++{ &backup_dir, 1, 0 },
++{ &blocking_io, 0, sizeof(blocking_io) },
++{ &def_compress_level, 0, sizeof(def_compress_level) },
++{ &am_root, 0, sizeof(am_root) },
++{ &preserve_specials, 0, sizeof(preserve_specials) },
++{ &stdout_format_has_o_or_i, 0, sizeof(stdout_format_has_o_or_i) },
++{ &size_only, 0, sizeof(size_only) },
++{ &preserve_perms, 0, sizeof(preserve_perms) },
++{ &backup_suffix_len, 0, sizeof(backup_suffix_len) },
++{ &keep_partial, 0, sizeof(keep_partial) },
++{ &output_motd, 0, sizeof(output_motd) },
++{ &checksum_seed, 0, sizeof(checksum_seed) },
++{ &daemon_over_rsh, 0, sizeof(daemon_over_rsh) },
++{ &remove_source_files, 0, sizeof(remove_source_files) },
++{ &sock_f_out, 0, sizeof(sock_f_out) },
++{ &delete_before, 0, sizeof(delete_before) },
++{ &csum_length, 0, sizeof(csum_length) },
++{ &checksum_len, 0, sizeof(checksum_len) },
++{ &logfile_name, 1, 0 },
++{ &ignore_existing, 0, sizeof(ignore_existing) },
++{ &batch_gen_fd, 0, sizeof(batch_gen_fd) },
++{ &bind_address, 1, 0 },
++{ &keep_dirlinks, 0, sizeof(keep_dirlinks) },
++{ &force_delete, 0, sizeof(force_delete) },
++{ &logfile_format_has_o_or_i, 0, sizeof(logfile_format_has_o_or_i) },
++{ &am_daemon, 0, sizeof(am_daemon) },
++{ &files_from, 1, 0 },
++{ &preserve_hard_links, 0, sizeof(preserve_hard_links) },
++{ &tmpdir, 1, 0 },
++{ &updating_basis_file, 0, sizeof(updating_basis_file) },
++{ &log_got_error, 0, sizeof(log_got_error) },
++{ &copy_dirlinks, 0, sizeof(copy_dirlinks) },
++{ &chmod_modes, 1, sizeof(*chmod_modes) },
++{ &write_batch_monitor_out, 0, sizeof(write_batch_monitor_out) },
++{ &ignore_timeout, 0, sizeof(ignore_timeout) },
++{ &append_mode, 0, sizeof(append_mode) },
++{ &config_file, 1, 0 },
++{ &no_detach, 0, sizeof(no_detach) },
++{ &basis_dir_cnt, 0, sizeof(basis_dir_cnt) },
++{ &delete_after, 0, sizeof(delete_after) },
++{ &read_batch, 0, sizeof(read_batch) },
++{ &bwlimit, 0, sizeof(bwlimit) },
++{ NULL, 0, 0 }
++ };
+diff -urP rsync-2.6.9/io.c rsync-2.6.9-mingw/io.c
+--- rsync-2.6.9/io.c	2006-10-01 00:11:20.000000000 +0200
++++ rsync-2.6.9-mingw/io.c	2008-09-20 19:35:57.000000000 +0200
+@@ -65,25 +65,25 @@
+ int sock_f_in = -1;
+ int sock_f_out = -1;
+ 
+-static int io_multiplexing_out;
+-static int io_multiplexing_in;
+-static time_t last_io_in;
+-static time_t last_io_out;
+-static int no_flush;
+-
+-static int write_batch_monitor_in = -1;
+-static int write_batch_monitor_out = -1;
+-
+-static int io_filesfrom_f_in = -1;
+-static int io_filesfrom_f_out = -1;
+-static char io_filesfrom_buf[2048];
+-static char *io_filesfrom_bp;
+-static char io_filesfrom_lastchar;
+-static int io_filesfrom_buflen;
+-static int defer_forwarding_messages = 0;
+-static int select_timeout = SELECT_TIMEOUT;
+-static int active_filecnt = 0;
+-static OFF_T active_bytecnt = 0;
++int io_multiplexing_out;
++int io_multiplexing_in;
++time_t last_io_in;
++time_t last_io_out;
++int no_flush;
++
++int write_batch_monitor_in = -1;
++int write_batch_monitor_out = -1;
++
++int io_filesfrom_f_in = -1;
++int io_filesfrom_f_out = -1;
++char io_filesfrom_buf[2048];
++char *io_filesfrom_bp;
++char io_filesfrom_lastchar;
++int io_filesfrom_buflen;
++int defer_forwarding_messages = 0;
++int select_timeout = SELECT_TIMEOUT;
++int active_filecnt = 0;
++OFF_T active_bytecnt = 0;
+ 
+ static void read_loop(int fd, char *buf, size_t len);
+ 
+@@ -668,8 +668,8 @@
+ 	return s - fname;
+ }
+ 
+-static char *iobuf_out;
+-static int iobuf_out_cnt;
++char *iobuf_out;
++int iobuf_out_cnt;
+ 
+ void io_start_buffering_out(void)
+ {
+@@ -680,8 +680,8 @@
+ 	iobuf_out_cnt = 0;
+ }
+ 
+-static char *iobuf_in;
+-static size_t iobuf_in_siz;
++char *iobuf_in;
++size_t iobuf_in_siz;
+ 
+ void io_start_buffering_in(void)
+ {
+diff -urP rsync-2.6.9/lib/getaddrinfo.c rsync-2.6.9-mingw/lib/getaddrinfo.c
+--- rsync-2.6.9/lib/getaddrinfo.c	2006-10-27 23:14:28.000000000 +0200
++++ rsync-2.6.9-mingw/lib/getaddrinfo.c	2008-09-20 19:35:57.000000000 +0200
+@@ -531,7 +531,7 @@
+ 	int i, error = 0, h_error;
+ 	char *ap;
+ #ifndef INET6
+-	extern int h_errno;
++//	extern int h_errno;
+ #endif
+ 
+ 	top = NULL;
+diff -urP rsync-2.6.9/lib/getnameinfo.c rsync-2.6.9-mingw/lib/getnameinfo.c
+--- rsync-2.6.9/lib/getnameinfo.c	2006-11-04 08:22:00.000000000 +0100
++++ rsync-2.6.9-mingw/lib/getnameinfo.c	2008-09-20 19:35:57.000000000 +0200
+@@ -81,7 +81,7 @@
+ 	size_t servlen;
+ 	int flags;
+ {
+-	extern int h_errno;
++//	extern int h_errno;
+ 	struct afd *afd;
+ 	struct servent *sp;
+ 	struct hostent *hp;
+diff -urP rsync-2.6.9/main.c rsync-2.6.9-mingw/main.c
+--- rsync-2.6.9/main.c	2006-10-14 01:46:32.000000000 +0200
++++ rsync-2.6.9-mingw/main.c	2008-09-20 19:35:57.000000000 +0200
+@@ -75,6 +75,9 @@
+ int new_root_dir = 0;
+ mode_t orig_umask = 0;
+ struct file_list *the_file_list;
++char** utf8_argv = NULL;
++
++static char* argv0 = NULL;
+ 
+ /* There's probably never more than at most 2 outstanding child processes,
+  * but set it higher, just in case. */
+@@ -683,12 +686,85 @@
+ 	exit_cleanup(0);
+ }
+ 
++void receiver(int argc, char* argv[])
++{
++	int f_in;
++	int f_out;
++	struct file_list *flist;
++	char *local_name;
++	int pid;
++	int exit_code = 0;
++	int error_pipe[2];
++	struct var_info_t local_var_info[] = {
++		{ &f_in, 0, sizeof(f_in) },
++		{ &f_out, 0, sizeof(f_out) },
++		{ &flist, 1, sizeof(*flist) },
++		{ &local_name, 1, 0 },
++		{ &pid, 0, sizeof(pid) },
++		{ &exit_code, 0, sizeof(exit_code) },
++		{ &error_pipe, 0, sizeof(error_pipe) },
++		{ NULL, 0, 0 }
++	};
++	HANDLE hMapping = NULL;
++
++	sscanf(argv[2], "%p", &hMapping);
++	restoreVars(hMapping, local_var_info);
++
++	close(error_pipe[0]);
++	if (f_in != f_out)
++		close(f_out);
++
++	/* we can't let two processes write to the socket at one time */
++	close_multiplexing_out();
++
++	/* set place to send errors */
++	set_msg_fd_out(error_pipe[1]);
++
++	recv_files(f_in, flist, local_name);
++	io_flush(FULL_FLUSH);
++	handle_stats(f_in);
++
++	send_msg(MSG_DONE, "", 0);
++	io_flush(FULL_FLUSH);
++
++	/* Handle any keep-alive packets from the post-processing work
++	 * that the generator does. */
++	if (protocol_version >= 29) {
++		kluge_around_eof = -1;
++
++		/* This should only get stopped via a USR2 signal. */
++		while (read_int(f_in) == flist->count
++				&& read_shortint(f_in) == ITEM_IS_NEW) {}
++
++		rprintf(FERROR, "Invalid packet at end of run [%s]\n",
++			who_am_i());
++		exit_cleanup(RERR_PROTOCOL);
++	}
++
++		/* Finally, we go to sleep until our parent kills us with a
++		 * USR2 signal.  We sleep for a short time, as on some OSes
++		 * a signal won't interrupt a sleep! */
++		while (1)
++			msleep(20);
++}
+ 
+ static int do_recv(int f_in,int f_out,struct file_list *flist,char *local_name)
+ {
+ 	int pid;
+ 	int exit_code = 0;
+ 	int error_pipe[2];
++	struct var_info_t local_var_info[] = {
++		{ &f_in, 0, sizeof(f_in) },
++		{ &f_out, 0, sizeof(f_out) },
++		{ &flist, 1, sizeof(*flist) },
++		{ &local_name, 1, 0 },
++		{ &pid, 0, sizeof(pid) },
++		{ &exit_code, 0, sizeof(exit_code) },
++		{ &error_pipe, 0, sizeof(error_pipe) },
++		{ NULL, 0, 0 }
++	};
++	HANDLE hMapping;
++	char buf[64];
+ 
+ 	/* The receiving side mustn't obey this, or an existing symlink that
+ 	 * points to an identical file won't be replaced by the referent. */
+@@ -704,49 +780,9 @@
+ 
+ 	io_flush(NORMAL_FLUSH);
+ 
+-	if ((pid = do_fork()) == -1) {
+-		rsyserr(FERROR, errno, "fork failed in do_recv");
+-		exit_cleanup(RERR_IPC);
+-	}
+-
+-	if (pid == 0) {
+-		close(error_pipe[0]);
+-		if (f_in != f_out)
+-			close(f_out);
+-
+-		/* we can't let two processes write to the socket at one time */
+-		close_multiplexing_out();
+-
+-		/* set place to send errors */
+-		set_msg_fd_out(error_pipe[1]);
+-
+-		recv_files(f_in, flist, local_name);
+-		io_flush(FULL_FLUSH);
+-		handle_stats(f_in);
+-
+-		send_msg(MSG_DONE, "", 0);
+-		io_flush(FULL_FLUSH);
+-
+-		/* Handle any keep-alive packets from the post-processing work
+-		 * that the generator does. */
+-		if (protocol_version >= 29) {
+-			kluge_around_eof = -1;
+-
+-			/* This should only get stopped via a USR2 signal. */
+-			while (read_int(f_in) == flist->count
+-			    && read_shortint(f_in) == ITEM_IS_NEW) {}
+-
+-			rprintf(FERROR, "Invalid packet at end of run [%s]\n",
+-				who_am_i());
+-			exit_cleanup(RERR_PROTOCOL);
+-		}
+-
+-		/* Finally, we go to sleep until our parent kills us with a
+-		 * USR2 signal.  We sleep for a short time, as on some OSes
+-		 * a signal won't interrupt a sleep! */
+-		while (1)
+-			msleep(20);
+-	}
++	hMapping = saveVars(local_var_info);
++	sprintf(buf, "%p", hMapping);
++	pid = _spawnl(_P_NOWAIT, argv0, "rsync", "--receiver", buf, NULL);
+ 
+ 	am_generator = 1;
+ 	close_multiplexing_in();
+@@ -772,7 +808,8 @@
+ 	io_flush(FULL_FLUSH);
+ 
+ 	set_msg_fd_in(-1);
+-	kill(pid, SIGUSR2);
++	GenerateConsoleCtrlEvent(1, 0);
++
+ 	wait_process_with_flush(pid, &exit_code);
+ 	return exit_code;
+ }
+@@ -1182,7 +1219,7 @@
+ 	exit_cleanup(RERR_SIGNAL1);
+ }
+ 
+-static RETSIGTYPE sigusr2_handler(UNUSED(int val))
++RETSIGTYPE sigusr2_handler(UNUSED(int val))
+ {
+ 	if (!am_server)
+ 		output_summary();
+@@ -1278,6 +1315,7 @@
+ #ifdef HAVE_SIGACTION
+ # ifdef HAVE_SIGPROCMASK
+ 	sigset_t sigmask;
++	HANDLE hMapping;
+ 
+ 	sigemptyset(&sigmask);
+ # endif
+@@ -1293,6 +1331,9 @@
+ 	SIGACTMASK(SIGBUS, rsync_panic_handler);
+ #endif
+ 
++	argv0 = argv[0];
++	SetConsoleCtrlHandler(CtrlHandler, TRUE);
++
+ 	starttime = time(NULL);
+ 	am_root = (MY_UID() == 0);
+ 
+@@ -1311,6 +1352,15 @@
+ 	setlocale(LC_CTYPE, "");
+ #endif
+ 
++	if (argc == 3 && strcmp(argv[1], "--receiver") == 0)
++	{
++		receiver(argc, argv);
++		exit_cleanup(0);
++	}
++
++	get_utf8_arguments(&argc, &argv);
++	utf8_argv = argv;
++
+ 	if (!parse_arguments(&argc, (const char ***) &argv, 1)) {
+ 		/* FIXME: We ought to call the same error-handling
+ 		 * code here, rather than relying on getopt. */
+diff -urP rsync-2.6.9/Makefile.in rsync-2.6.9-mingw/Makefile.in
+--- rsync-2.6.9/Makefile.in	2006-10-24 17:09:57.000000000 +0200
++++ rsync-2.6.9-mingw/Makefile.in	2008-09-20 19:35:57.000000000 +0200
+@@ -26,9 +26,9 @@
+ .SUFFIXES:
+ .SUFFIXES: .c .o
+ 
+-HEADERS=byteorder.h config.h errcode.h proto.h rsync.h lib/pool_alloc.h
++HEADERS=byteorder.h config.h errcode.h proto.h global.h rsync.h lib/pool_alloc.h
+ LIBOBJ=lib/wildmatch.o lib/compat.o lib/snprintf.o lib/mdfour.o \
+-	lib/permstring.o lib/pool_alloc.o @LIBOBJS@
++	lib/permstring.o lib/pool_alloc.o mingw/mingw.o @LIBOBJS@
+ ZLIBOBJ=zlib/deflate.o zlib/inffast.o zlib/inflate.o zlib/inftrees.o \
+ 	zlib/trees.o zlib/zutil.o zlib/adler32.o zlib/compress.o zlib/crc32.o
+ OBJS1=rsync.o generator.o receiver.o cleanup.o sender.o exclude.o util.o \
+@@ -53,7 +53,7 @@
+ # note that the -I. is needed to handle config.h when using VPATH
+ .c.o:
+ @OBJ_SAVE@
+-	$(CC) -I. -I$(srcdir) $(CFLAGS) $(CPPFLAGS) -c $< @CC_SHOBJ_FLAG@
++	$(CC) -I. -I$(srcdir) $(CFLAGS) $(CPPFLAGS) -Imingw -Wno-unused -c $< @CC_SHOBJ_FLAG@
+ @OBJ_RESTORE@
+ 
+ all: rsync$(EXEEXT)
+@@ -70,7 +70,7 @@
+ 	$(MAKE) INSTALL_STRIP='-s' install
+ 
+ rsync$(EXEEXT): $(OBJS)
+-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LIBS) -lws2_32 -lntdll
+ 
+ $(OBJS): $(HEADERS)
+ 
+@@ -100,6 +100,10 @@
+ proto:
+ 	cd $(srcdir) && $(MAKE) -f prepare-source.mak proto.h
+ 
++export OBJS1 OBJS2 OBJS3
++global.h: prepare-source.mak $(OBJS1) $(OBJS2) $(OBJS3)
++	cd $(srcdir) && $(MAKE) -f prepare-source.mak global.h
++
+ clean: cleantests
+ 	rm -f *~ $(OBJS) $(TLS_OBJ) $(CHECK_PROGS) $(CHECK_OBJS)
+ 
+diff -urP rsync-2.6.9/mingw/arpa/inet.h rsync-2.6.9-mingw/mingw/arpa/inet.h
+--- rsync-2.6.9/mingw/arpa/inet.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/arpa/inet.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/grp.h rsync-2.6.9-mingw/mingw/grp.h
+--- rsync-2.6.9/mingw/grp.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/grp.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/mingw.c rsync-2.6.9-mingw/mingw/mingw.c
+--- rsync-2.6.9/mingw/mingw.c	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/mingw.c	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1,940 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <stddef.h>
++#include <stdarg.h>
++#include <time.h>
++#include <direct.h>
++
++#define DEF_REN 1
++#include "rsync.h"
++#include "mingw.h"
++
++extern int am_sender;
++extern int am_generator;
++
++char currentDir[MAXPATHLEN];
++
++BOOLEAN WINAPI RtlTimeToSecondsSince1970(PLARGE_INTEGER Time, PULONG ElapsedSeconds);
++
++#define TOUL(x) (ULONGLONG)(x)
++static const ULONGLONG WCEXE = TOUL('e') << 32 | TOUL('x') << 16 | TOUL('e');
++static const ULONGLONG WCBAT = TOUL('b') << 32 | TOUL('a') << 16 | TOUL('t');
++static const ULONGLONG WCCMD = TOUL('c') << 32 | TOUL('m') << 16 | TOUL('d');
++static const ULONGLONG WCCOM = TOUL('c') << 32 | TOUL('o') << 16 | TOUL('m');
++
++struct chmod_mode_struct {
++  struct chmod_mode_struct *next;
++  int ModeAND, ModeOR;
++  char flags;
++};
++
++#include "global.h"
++
++#define FILETIME_1970		(116444736000000000LL)	/* 100-nanoseconds between 1/1/1601 and 1/1/1970 */
++#define HECTONANOSEC_PER_SEC	(10000000)
++
++int not_implemented(const char* fun, const char* file, int line)
++{
++	rprintf(FINFO, "%s not implemented, called in %s at line %d\n", fun, file, line);
++	exit(43);
++
++	return 0;
++}
++
++int getuid()
++{
++	return 0;
++}
++
++int geteuid()
++{
++	return 0;
++}
++
++int pipe (int __pipedes[2])
++{
++	return _pipe(__pipedes, 65536, _O_BINARY);
++}
++
++int fcntl (int fd, int cmd, ...)
++{
++	switch (cmd)
++	{
++		case F_GETFL:     /* Get file status flags and file access modes */	
++			return 0;
++		case F_SETFL:     /* Set file status flags */
++			return 0;
++		default:
++		 	errno = EINVAL;
++		  rprintf(FINFO, "unimplemented fnctl\n");
++			return -1;
++	}
++
++	errno = ENOSYS;
++	rprintf(FINFO, "unimplemented fnctl\n");
++
++	return -1;
++}
++
++unsigned long long int makedev (unsigned int __major, unsigned int __minor)
++{
++	return ((__minor & 0xff) | ((__major & 0xfff) << 8)
++		| (((unsigned long long int) (__minor & ~0xff)) << 12)
++		| (((unsigned long long int) (__major & ~0xfff)) << 32));
++}
++
++int waitpid(int pid, int *stat_loc, int options)
++{
++	DWORD timeout = INFINITE;
++	if (options & WNOHANG) timeout = 0;
++	switch (WaitForSingleObject((HANDLE) pid, timeout))
++	{
++		case WAIT_TIMEOUT:
++			return 0;
++		case WAIT_FAILED:
++			return -1;
++		default:
++			GetExitCodeProcess((HANDLE) pid, (LPDWORD) stat_loc);
++			if (!WIFEXITED(*stat_loc)) *stat_loc = 0;
++			return pid;
++	}
++}
++
++int __select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
++{
++	struct timeval start_time;
++	struct timeval time;
++	int i = 0;
++	int fds = 0;
++	fd_set new_readfds;
++	fd_set new_writefds;
++	fd_set new_exceptfds;
++	DWORD bytesAvail = 0;
++
++	gettimeofday(&start_time, NULL);
++
++	FD_ZERO(&new_exceptfds);
++	FD_ZERO(&new_readfds);
++	FD_ZERO(&new_writefds);
++
++	for (;;)
++	{
++		if (readfds)
++		{
++			for (i = 0; i < nfds; i++)
++			{
++				if (FD_ISSET(i, readfds))
++				{
++					bytesAvail = 0;
++					if (PeekNamedPipe((HANDLE)_get_osfhandle(i), NULL, 0, NULL, &bytesAvail, NULL))
++					{
++						if (bytesAvail > 0)
++						{
++							FD_SET((unsigned) i, &new_readfds);
++							fds++;
++						}
++					}
++					else if (GetLastError() == ERROR_INVALID_FUNCTION || GetLastError() == ERROR_BROKEN_PIPE)
++					{
++						FD_SET((unsigned) i, &new_readfds);
++						fds++;
++					}
++					else
++					{
++						FD_SET((unsigned) i, &new_exceptfds);
++						fds++;
++					}
++				}
++			}
++		}
++
++		if (writefds)
++		{
++			for (i = 0; i < nfds; i++)
++			{
++				if (FD_ISSET(i, writefds))
++				{
++          IO_STATUS_BLOCK iosb;
++					struct FILE_PIPE_LOCAL_INFORMATION fpli;
++					if(NtQueryInformationFile ((HANDLE) _get_osfhandle(i), &iosb, &fpli, sizeof (fpli), FilePipeLocalInformation))
++					{
++						FD_SET((unsigned) i, &new_writefds);
++						fds++;
++					}
++					else if (fpli.WriteQuotaAvailable >= 4096)
++					{
++						FD_SET((unsigned) i, &new_writefds);
++						fds++;
++					}
++				}
++			}
++		}
++
++		if (fds > 0) break;
++
++		Sleep(10);
++
++		if (timeout != NULL)
++		{
++			gettimeofday(&time, NULL);
++			if (time.tv_sec - start_time.tv_sec > timeout->tv_sec || (time.tv_sec - start_time.tv_sec == timeout->tv_sec && time.tv_usec - start_time.tv_usec >= timeout->tv_usec)) break;
++		}
++	}
++
++	if (readfds != NULL)
++	{
++		 memcpy(readfds, &new_readfds, sizeof(fd_set));
++	}
++  if (writefds != NULL)
++	{
++	 memcpy(writefds, &new_writefds, sizeof(fd_set));
++	}
++  if (exceptfds != NULL)
++	{
++	 memcpy(exceptfds, &new_exceptfds, sizeof(fd_set));
++	}
++
++	return fds;
++}
++
++int gettimeofday (struct timeval *tv, void* tz)
++{
++	FILETIME fti;
++	LARGE_INTEGER li;
++	GetSystemTimeAsFileTime(&fti);
++	memcpy(&li, &fti, sizeof(FILETIME));
++
++	tv->tv_usec = (long) ((li.QuadPart / 10LL) % 1000000LL);
++	tv->tv_sec = (long) ((li.QuadPart - 116444736000000000LL) / 10000000LL);
++
++	return (0);
++}
++
++int __rename(const char *oldname, const char *newname)
++{
++	const wchar_t* oldWindowsName = unixToWindows(oldname);
++	const wchar_t* newWindowsName = unixToWindows(newname);
++
++	int result = _wrename(oldWindowsName, newWindowsName);
++	if (result && errno == EEXIST)
++	{
++		result = _wunlink(newWindowsName);
++		if (result) return result;
++		result = _wrename(oldWindowsName, newWindowsName);
++	}
++
++	return result;
++}
++
++int __mkdir (const char *path, mode_t mode)
++{
++	const wchar_t* windowsPath = unixToWindows(path);
++	if (_wmkdir(windowsPath)) {
++		return -1;
++	}
++	return _wchmod(windowsPath, mode);
++}
++
++BOOL WINAPI CtrlHandler(DWORD dwCtrlType)
++{
++	msleep(400);
++	if (dwCtrlType)
++	{
++		if (!am_sender && !am_generator )
++		{
++			sigusr2_handler(0);
++		}
++	}
++	else
++	{
++		exit_cleanup(RERR_SIGNAL);
++	}
++
++	return TRUE;
++}
++
++size_t sizeOfVars(const struct var_info_t* var_info)
++{
++	size_t result = 0;
++	size_t i;
++	char* var;
++	for (i = 0; var_info[i].var; i++)
++	{
++		if (var_info[i].is_pointer)
++		{
++			result += sizeof(int);
++			var = *((char**) var_info[i].var);
++			if (var == NULL) continue;
++
++			if (var_info[i].size)
++			{
++				result += var_info[i].size;							
++			}
++			else
++			{
++				result += strlen(var) + 1;
++			}
++		}
++		else
++		{
++			result += var_info[i].size;
++		}
++	}
++
++	return result;
++}
++
++/**
++ * Saves global and local variables described by global_var_info and local_var_info to shared memory.
++ */
++HANDLE saveVars(const struct var_info_t* local_var_info)
++{
++	HANDLE hMapping = NULL;
++	SECURITY_ATTRIBUTES securityAttributes = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
++	hMapping = CreateFileMapping(INVALID_HANDLE_VALUE, &securityAttributes, PAGE_READWRITE, 0, sizeOfVars(global_var_info) + sizeOfVars(local_var_info) + file_list_size(the_file_list), NULL);
++	void* shared = MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
++	char* sharedVar = shared;
++	char* var;
++	size_t varSize;
++	const struct var_info_t* var_info[] = { global_var_info, local_var_info, NULL };
++	size_t i, j;
++
++	if (verbose > 3) rprintf(FINFO, "copying variables to shared memory\n");
++
++	for (i = 0; var_info[i]; i++)
++	{
++		for (j = 0; var_info[i][j].var; j++)
++		{
++			if (var_info[i][j].is_pointer)
++			{
++				var = *((char**) var_info[i][j].var);
++				*((int*) sharedVar) = (var == NULL);
++				sharedVar += sizeof(int);
++
++				if (var == NULL) continue;
++
++				if (var_info[i][j].size)
++				{
++					varSize = var_info[i][j].size;
++				}
++				else
++				{
++					varSize = strlen(var) + 1;
++				}
++			}
++			else
++			{
++				var = var_info[i][j].var;
++				varSize = var_info[i][j].size;
++			}
++
++			memcpy(sharedVar, var, varSize);
++			sharedVar += varSize;
++		}
++	}
++
++	if (verbose > 3) rprintf(FINFO, "copying file list\n");
++  
++	save_file_list(sharedVar, the_file_list);
++
++	UnmapViewOfFile(shared);
++
++	if (verbose > 3) rprintf(FINFO, "variables copied\n");
++
++	return hMapping;
++}
++
++
++void restoreVars(HANDLE hMapping, const struct var_info_t* local_var_info)
++{
++	void* shared = MapViewOfFile(hMapping, FILE_MAP_ALL_ACCESS, 0, 0, 0);
++	char* sharedVar = shared;
++	char** varPointer;
++	char* var;
++	size_t varSize;
++	const struct var_info_t* var_info[] = { global_var_info, local_var_info, NULL };
++	size_t i, j;
++
++	if (verbose > 3) rprintf(FINFO, "restoring variables from shared memory\n");
++
++	for (i = 0; var_info[i]; i++ )
++	{
++		for (j = 0; var_info[i][j].var; j++)
++		{
++			if (var_info[i][j].is_pointer)
++			{
++				varPointer = (char**) var_info[i][j].var;
++				int isNull = *((int*) sharedVar);
++				sharedVar += sizeof(int);
++
++				if (isNull)
++				{
++					*varPointer = NULL;
++					continue;
++				}
++
++				if (var_info[i][j].size)
++				{
++					varSize = var_info[i][j].size;
++				}
++				else
++				{
++					varSize = strlen(sharedVar) + 1;
++				}
++				var = *varPointer = malloc(varSize);
++			}
++			else
++			{
++				var = var_info[i][j].var;
++				varSize = var_info[i][j].size;
++			}
++
++			memcpy(var, sharedVar, varSize);
++			sharedVar += varSize;
++		}
++	}
++
++	if (verbose > 3) rprintf(FINFO, "restoring file list\n");
++	restore_file_list(the_file_list, sharedVar);
++	free( local_var_info[2].var);
++	*((struct file_list**) local_var_info[2].var) = the_file_list;
++
++	UnmapViewOfFile(shared);
++	CloseHandle(hMapping);
++
++	if (verbose > 3) rprintf(FINFO, "variables restored\n");
++}
++
++size_t file_list_size(struct file_list* flist)
++{
++	size_t result = 0;
++	int i;
++	for (i = 0; i < flist->count; i++)
++	{
++		result += file_struct_size(flist->files[i]);
++	}
++
++	return result;
++}
++
++size_t file_struct_size(struct file_struct* file)
++{
++	size_t result = file_struct_len;
++	if (file->u.sum) result += strlen(file->u.sum) + 1;
++	if (file->basename) result += strlen(file->basename) + 1;
++	if (file->dirname) result += strlen(file->dirname) + 1;
++
++	return result;
++}
++
++size_t save_string(void** shared, const char* str)
++{
++	size_t len = 0;
++	if (str)
++	{
++		len = strlen(str) + 1;
++		memcpy(*shared, str, len);
++		*shared += len;
++	}
++
++	return len;
++}
++
++void restore_string(char** str, void** shared)
++{
++	size_t len;
++
++	if (*str)
++	{
++		len = strlen(*str) + 1;
++		memcpy(*str, *shared, len);
++		*shared += len;
++	}
++}
++
++void save_file_list(void* shared, struct file_list* flist)
++{
++	struct file_struct* file;
++	int i;
++	for (i = 0; i < flist->count; i++)
++	{
++		file = (struct file_struct*) shared;
++		memcpy(file, flist->files[i], file_struct_len);
++		shared += file_struct_len;
++		file->u.sum = (char*) save_string(&shared, flist->files[i]->u.sum);
++		file->basename = (char*) save_string(&shared, flist->files[i]->basename);
++		file->dirname = (char*) save_string(&shared, flist->files[i]->dirname);
++	}
++}
++
++void restore_file_list(struct file_list* flist, void* shared)
++{
++	struct file_struct* file;
++	void* pool;
++
++	flist->files = new_array(struct file_struct *, flist->malloced);
++	flist->file_pool = pool_create(FILE_EXTENT, 0,out_of_memory, POOL_INTERN);
++
++	size_t len;
++	int i;
++	for (i = 0; i < flist->count; i++)
++	{
++		file = (struct file_struct*) shared;
++
++		len = file_struct_len + (size_t) file->u.sum + (size_t) file->basename + (size_t) file->dirname;
++		flist->files[i] = pool_alloc(flist->file_pool, len, "restore_file_list");
++		memcpy(flist->files[i], shared, len);
++
++		if (file->u.sum) flist->files[i]->u.sum = (char*) flist->files[i] + file_struct_len;
++		if (file->basename) flist->files[i]->basename = (char*) flist->files[i] + file_struct_len + (size_t) file->u.sum;
++		if (file->dirname) flist->files[i]->dirname = (char*) flist->files[i] + file_struct_len + (size_t) file->u.sum + (size_t) file->basename;
++
++		shared += len;
++	}
++}
++
++char* __getcwd(char *buffer, int maxlen)
++{
++	wchar_t wbuf[MAXPATHLEN];
++	if (_wgetcwd(wbuf, maxlen) != NULL)
++	{
++		strcpy(buffer, windowsToUnix(wbuf));
++		return buffer;
++	}
++	else
++	{
++		return NULL;
++	}
++}
++
++int __open(const char *filename, int oflag, ...) 
++{
++	int mode = 0;
++
++	if (oflag & O_CREAT)
++	{
++		va_list arg;
++		va_start (arg, oflag);
++		mode = va_arg (arg, int);
++		va_end (arg);
++
++		return _wopen(unixToWindows(filename), oflag, mode);
++  }
++	else
++	{
++		return _wopen(unixToWindows(filename), oflag);
++	}
++}
++
++FILE *__fopen(const char *path, const char *mode)
++{
++	wchar_t wmode[16];
++	MultiByteToWideChar(CP_UTF8, 0, mode, -1, wmode, sizeof(wmode) / sizeof(wchar_t));
++	return _wfopen(unixToWindows(path), wmode);
++}
++
++/**
++ * The Windows implementation of _wstati64 does not support UNC paths.
++ * This function has been copied from the wine sources and modified.
++ */
++int __stati64(const char *unixPath, struct _stati64 *buf)
++{
++	wchar_t* path = unixToWindows(unixPath);
++  DWORD dw;
++  WIN32_FILE_ATTRIBUTE_DATA hfi;
++  unsigned short mode = S_IREAD;
++  int plen;
++
++  if (!GetFileAttributesExW(path, GetFileExInfoStandard, &hfi))
++  {
++      errno = ERROR_FILE_NOT_FOUND;
++      return -1;
++  }
++
++  memset(buf,0,sizeof(struct _stati64));
++
++  /* FIXME: rdev isn't drive num, despite what the docs says-what is it? */
++  if (iswalpha(*path))
++    buf->st_dev = buf->st_rdev = towupper(*path - 'A'); /* drive num */
++  else
++    buf->st_dev = buf->st_rdev = _getdrive() - 1;
++
++  plen = wcslen(path);
++
++  /* Dir, or regular file? */
++  if ((hfi.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ||
++      (path[plen-1] == '\\'))
++    mode |= (S_IFDIR | S_IEXEC);
++  else
++  {
++    mode |= S_IFREG;
++    /* executable? */
++    if (plen > 6 && path[plen-4] == '.')  /* shortest exe: "\x.exe" */
++    {
++      ULONGLONG ext = towlower(path[plen-1]) | (towlower(path[plen-2]) << 16) |
++                               ((ULONGLONG)towlower(path[plen-3]) << 32);
++      if (ext == WCEXE || ext == WCBAT || ext == WCCMD || ext == WCCOM)
++        mode |= S_IEXEC;
++    }
++  }
++
++  if (!(hfi.dwFileAttributes & FILE_ATTRIBUTE_READONLY))
++    mode |= S_IWRITE;
++
++  buf->st_mode  = mode;
++  buf->st_nlink = 1;
++  buf->st_size  = ((__int64)hfi.nFileSizeHigh << 32) + hfi.nFileSizeLow;
++  RtlTimeToSecondsSince1970((LARGE_INTEGER *)&hfi.ftLastAccessTime, &dw);
++  buf->st_atime = dw;
++  RtlTimeToSecondsSince1970((LARGE_INTEGER *)&hfi.ftLastWriteTime, &dw);
++  buf->st_mtime = buf->st_ctime = dw;
++
++  return 0;
++}
++
++int __unlink(const char *filename)
++{
++	return _wunlink(unixToWindows(filename));
++}
++
++int __rmdir(const char *dirname)
++{
++	return _wrmdir(unixToWindows(dirname));
++}
++
++int __chdir(const char *dirname)
++{
++	strcpy(currentDir, dirname);
++	return _wchdir(unixToWindows(dirname));
++}
++
++int __utime(const char *filename, struct _utimbuf *times)
++{
++	return _wutime(unixToWindows(filename), times);
++}
++
++/**
++ * Modified function from mingw.
++ */
++DIR* __opendir (const char* dir)
++{
++  _WDIR *nd;
++  unsigned int rc;
++  wchar_t szFullPath[MAX_PATH];
++	const wchar_t* szPath = unixToWindows(dir);
++  
++  errno = 0;
++
++  if (!dir)
++    {
++      errno = EFAULT;
++      return NULL;
++    }
++
++  if (dir[0] == '\0')
++    {
++      errno = ENOTDIR;
++      return NULL;
++    }
++
++  /* Attempt to determine if the given path really is a directory. */
++  rc = GetFileAttributesW(szPath);
++  if (rc == (unsigned int)-1)
++    {
++      /* call GetLastError for more error info */
++      errno = ENOENT;
++      return NULL;
++    }
++  if (!(rc & FILE_ATTRIBUTE_DIRECTORY))
++    {
++      /* Error, entry exists but not a directory. */
++      errno = ENOTDIR;
++      return NULL;
++    }
++
++  /* Make an absolute pathname.  */
++  _wfullpath (szFullPath, szPath, MAX_PATH);
++
++  /* Allocate enough space to store DIR structure and the complete
++   * directory path given. */
++  nd = (_WDIR *) malloc (sizeof (_WDIR) + (wcslen (szFullPath)
++             + wcslen (L"\\")
++             + wcslen (L"*") + 1)
++            * sizeof (wchar_t));
++
++  if (!nd)
++    {
++      /* Error, out of memory. */
++      errno = ENOMEM;
++      return NULL;
++    }
++
++ /* Create the search expression. */
++  wcscpy (nd->dd_name, szFullPath);
++
++  /* Add on a slash if the path does not end with one. */
++  if (nd->dd_name[0] != L'\0'
++      && wcsrchr (nd->dd_name, L'/') != nd->dd_name
++              + wcslen (nd->dd_name) - 1
++      && wcsrchr (nd->dd_name, L'\\') != nd->dd_name
++                     + wcslen (nd->dd_name) - 1)
++    {
++      wcscat (nd->dd_name, L"\\");
++    }
++
++  /* Add on the search pattern */
++  wcscat (nd->dd_name, L"*");
++
++  /* Initialize handle to -1 so that a premature closedir doesn't try
++   * to call _findclose on it. */
++  nd->dd_handle = -1;
++
++  /* Initialize the status. */
++  nd->dd_stat = 0;
++
++  /* Initialize the dirent structure. ino and reclen are invalid under
++   * Win32, and name simply points at the appropriate part of the
++   * findfirst_t structure. */
++  nd->dd_dir.d_ino = 0;
++  nd->dd_dir.d_reclen = 0;
++  nd->dd_dir.d_namlen = 0;
++  memset (nd->dd_dir.d_name, 0, FILENAME_MAX);
++
++  return (DIR*) nd;
++}
++
++int __closedir (DIR * dir)
++{
++	_WDIR* dirp = (_WDIR*) dir;
++
++  int rc;
++
++  errno = 0;
++  rc = 0;
++
++  if (!dirp)
++    {
++      errno = EFAULT;
++      return -1;
++    }
++
++  if (dirp->dd_handle != -1)
++    {
++      rc = _findclose (dirp->dd_handle);
++    }
++
++  /* Delete the dir structure. */
++  free (dirp);
++
++  return rc;
++}
++
++struct dirent * __readdir(DIR* dir)
++{
++	_WDIR* dirp = (_WDIR*) dir;
++	static struct dirent entry;
++
++  errno = 0;
++
++  /* Check for valid DIR struct. */
++  if (!dirp)
++    {
++      errno = EFAULT;
++      return NULL;
++    }
++
++  if (dirp->dd_stat < 0)
++    {
++      /* We have already returned all files in the directory
++       * (or the structure has an invalid dd_stat). */
++      return NULL;
++    }
++  else if (dirp->dd_stat == 0)
++    {
++      /* We haven't started the search yet. */
++      /* Start the search */
++      dirp->dd_handle = _wfindfirst (dirp->dd_name, &(dirp->dd_dta));
++
++      if (dirp->dd_handle == -1)
++  {
++    /* Whoops! Seems there are no files in that
++     * directory. */
++    dirp->dd_stat = -1;
++  }
++      else
++  {
++    dirp->dd_stat = 1;
++  }
++    }
++  else
++    {
++      /* Get the next search entry. */
++      if (_wfindnext (dirp->dd_handle, &(dirp->dd_dta)))
++  {
++    /* We are off the end or otherwise error. 
++       _findnext sets errno to ENOENT if no more file
++       Undo this. */ 
++    DWORD winerr = GetLastError ();
++    if (winerr == ERROR_NO_MORE_FILES)
++      errno = 0;  
++    _findclose (dirp->dd_handle);
++    dirp->dd_handle = -1;
++    dirp->dd_stat = -1;
++  }
++      else
++  {
++    /* Update the status to indicate the correct
++     * number. */
++    dirp->dd_stat++;
++  }
++    }
++
++  if (dirp->dd_stat > 0)
++    {
++      /* Successfully got an entry. Everything about the file is
++       * already appropriately filled in except the length of the
++       * file name. */
++			entry.d_ino = dirp->dd_dir.d_ino;
++			entry.d_reclen = dirp->dd_dir.d_reclen;
++			WideCharToMultiByte(CP_UTF8, 0, dirp->dd_dta.name, -1, entry.d_name, MAX_PATH, NULL, NULL);
++			entry.d_namlen = strlen(entry.d_name);
++			return &entry;
++    }
++
++  return NULL;
++}
++
++
++/**
++ * Converts paths of the form /x/some/path to \\?\x:\some\path.
++ */
++wchar_t* unixToWindows(const char* unixPath)
++{
++	static wchar_t windowsPath[2][MAXPATHLEN];
++  static int i = 0;
++
++  int pathLen = strlen(unixPath);
++	wchar_t* path;
++
++  i = (i + 1) % 2;
++	wcscpy(windowsPath[i], L"\\\\?\\");
++	if (strcmp(currentDir, "/") == 0 && ((pathLen == 1 && isalpha(unixPath[0])) || (pathLen > 1 && isalpha(unixPath[0]) && unixPath[1] == '/')))
++	{  // curentDir is / and unixPath of the form x or x/some/path
++		windowsPath[i][4] = unixPath[0];
++    windowsPath[i][5] = ':';
++		MultiByteToWideChar(CP_UTF8, 0, unixPath + 1, -1, windowsPath[i] + 6, MAXPATHLEN - 6);
++	}
++	else if ((pathLen == 2 && unixPath[0] == '/' && isalpha(unixPath[1])) || (pathLen > 2 && unixPath[0] == '/' && isalpha(unixPath[1]) && unixPath[2] == '/'))
++	{  // unixPath is of the form /x or /x/some/path
++		windowsPath[i][4] = unixPath[1];
++		windowsPath[i][5] = ':';
++		MultiByteToWideChar(CP_UTF8, 0, unixPath + 2, -1, windowsPath[i] + 6, MAXPATHLEN - 6);
++	}
++	else if (unixPath[0] == '/')
++	{  // unixPath is of the form /some/path
++    windowsPath[i][4] = L'A' + _getdrive() - 1;
++    windowsPath[i][5] = L':';
++		MultiByteToWideChar(CP_UTF8, 0, unixPath, -1, windowsPath[i] + 6, MAXPATHLEN - 6);
++	}
++	else
++	{  // unixPath if of the form some/path
++		_wgetcwd(windowsPath[i] + 4, MAXPATHLEN - 4);
++		if (wcslen(windowsPath[i]) > 6 && windowsPath[i][6] == L'?')
++		{
++      wmemmove(windowsPath[i], windowsPath[i] + 4, wcslen(windowsPath[i]) + 1);
++		}
++		if (windowsPath[i][wcslen(windowsPath[i]) - 1] != L'\\') wcscat(windowsPath[i], L"\\");
++		if (strcmp(unixPath, ".") != 0) MultiByteToWideChar(CP_UTF8, 0, unixPath, -1, windowsPath[i] + wcslen(windowsPath[i]), MAXPATHLEN - wcslen(windowsPath[i]));
++	}
++
++	wtrim_trailing_slashes(windowsPath[i]);
++
++	path = windowsPath[i];
++	while (*path)
++	{
++		if (*path == '/') *path = L'\\';
++		path++;
++	}
++
++	if (wcslen(windowsPath[i]) == 6 && iswalpha(windowsPath[i][4]) && windowsPath[i][5] == ':') wcscat(windowsPath[i], L"\\");
++
++	return windowsPath[i];
++}
++
++/*
++ * Convert paths of the form x:\some\path to /x/some/path.
++ */
++char* windowsToUnix(const wchar_t* windowsPath)
++{
++	static char unixPath[2][MAXPATHLEN];
++	static int i = 0;
++	char* path;
++
++  i = (i + 1) % 2;
++  WideCharToMultiByte(CP_UTF8, 0, windowsPath, -1, unixPath[i], MAX_PATH, NULL, NULL);
++	if (strlen(unixPath[i]) >= 2 && isalpha(unixPath[i][0]) && unixPath[i][1] == ':')
++	{  // path begins with x:
++		unixPath[i][1] = unixPath[i][0];
++		unixPath[i][0] = '/';
++	}
++	path = unixPath[i];
++	while (*path)
++	{
++		if (*path == '\\') *path = '/';
++		path++;
++	}
++
++	return unixPath[i];
++}
++
++void wtrim_trailing_slashes(wchar_t *name)
++{
++  int l;
++
++  /* Don't change empty string; and also we can't improve on
++   * "/" */
++
++  l = wcslen(name);
++  while (l > 1) {
++    if (name[--l] != '/')
++      break;
++    name[l] = '\0';
++  }
++}
++
++/**
++ * Retrieves the unicode command line encoded in UTF-8.
++ */
++void get_utf8_arguments(int* pargc, char*** pargv)
++{
++	int i, bytesWritten;
++  char* arg;
++  LPWSTR* arglist = CommandLineToArgvW(GetCommandLineW(), pargc);
++	size_t size = 0;
++
++	for (i = 0; i < *pargc; i++)
++	{
++		size += WideCharToMultiByte(CP_UTF8, 0, arglist[i], -1, NULL, 0, NULL, NULL);
++	}
++
++	*pargv = (char**) malloc(size + *pargc * sizeof(char**));
++	if (*pargv == NULL)
++	{
++		LocalFree(arglist);
++		out_of_memory("get_utf8_arguments");
++	}
++
++	arg = ((char*) *pargv) + *pargc * sizeof(char**);	
++ 	for (i = 0; i < *pargc; i++)
++  {
++		bytesWritten = WideCharToMultiByte(CP_UTF8, 0, arglist[i], -1, arg, size, NULL, NULL);
++		(*pargv)[i] = arg;
++    arg += bytesWritten;
++		size -= bytesWritten;
++  }
++
++  LocalFree(arglist);
++}
+diff -urP rsync-2.6.9/mingw/mingw.h rsync-2.6.9-mingw/mingw/mingw.h
+--- rsync-2.6.9/mingw/mingw.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/mingw.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1,262 @@
++#ifndef MINGW_H
++#define MINGW_H
++
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <sys/utime.h>
++#include <malloc.h>
++#include <stdio.h>
++#include <dirent.h>
++#include <windows.h>
++#include <wchar.h>
++
++
++#undef MAXPATHLEN
++#define MAXPATHLEN 4096
++#undef MAX_PATH
++#define MAX_PATH 4096
++
++
++#undef OFF_T
++#undef STRUCT_STAT
++#undef USE_STAT64_FUNCS
++#define OFF_T off64_t
++#define STRUCT_STAT struct _stati64
++#define USE_STAT64_FUNCS 1
++
++#define HAVE_SOCKADDR_STORAGE 1
++
++#define HAVE_WAITPID 1
++
++struct var_info_t
++{
++	void* var;
++	int is_pointer;
++	int size;
++};
++
++struct file_list;
++struct file_struct;
++
++#define stat64(...) __stati64(__VA_ARGS__)
++#define fstat64(...) _fstati64(__VA_ARGS__)
++
++#define utimbuf _utimbuf
++
++#define select(...) __select(__VA_ARGS__)
++
++int not_implemented(const char* fun, const char* file, int line);
++#define NOT_IMPLEMENTED(fun) not_implemented(fun, __FILE__, __LINE__)
++#define NOT_IMPLEMENTED2(rettype, fun) (rettype) not_implemented(fun, __FILE__, __LINE__)
++
++#define getgid(...) NOT_IMPLEMENTED("getgid")
++#define getgrgid(...) NOT_IMPLEMENTED2(struct group *, "getgrgid")
++#define getgrnam(...) NOT_IMPLEMENTED2(struct group *, "getgrnam")
++#define getpwnam(...) NOT_IMPLEMENTED2(struct passwd *, "getpwnam")
++#define setuid(...) NOT_IMPLEMENTED("getuid")
++#define setgid(...) NOT_IMPLEMENTED("getuid")
++#define kill(...) NOT_IMPLEMENTED("kill")
++#define wait3(...) NOT_IMPLEMENTED("wait3")
++#define getpass(...) NOT_IMPLEMENTED2(char*, "getpass")
++#define fork(...) NOT_IMPLEMENTED("fork")
++#define chroot(...) NOT_IMPLEMENTED("chroot")
++#define sleep(...) NOT_IMPLEMENTED("sleep")
++#define getpwuid(...) NOT_IMPLEMENTED2(struct passwd*, "getpwuid")
++#define minor(...) NOT_IMPLEMENTED("minor")
++#define major(...) NOT_IMPLEMENTED("major")
++
++#define openlog(...) NOT_IMPLEMENTED("openlog")
++#define closelog(...) NOT_IMPLEMENTED("closelog")
++#define syslog(...) NOT_IMPLEMENTED("syslog")
++#define chown(...) NOT_IMPLEMENTED("chown")
++#define symlink(...) NOT_IMPLEMENTED("symlink")
++
++RETSIGTYPE sigusr2_handler(int);
++
++#define EAI_BADHINTS  12
++#define EAI_PROTOCOL  13
++#define EAI_MAX   14
++
++#define AI_MASK   (AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST)
++
++#define S_ISUID	04000
++#define S_ISGID 02000
++
++#define WNOHANG 1
++#define SIGUSR1 10
++#define SIGUSR2 12
++
++#define FNDELAY 04000
++#define F_GETFL 3
++#define F_SETFL 4
++#define F_WRLCK 1
++#define F_SETLK 6
++
++#define SIGHUP    1
++#define SIGCHLD   17
++#define SIGPIPE   13
++
++#define	LOG_PID		0x01
++#define	LOG_WARNING	4
++#define	LOG_INFO	6
++
++#define	EAFNOSUPPORT	97
++#define EISCONN		106
++#define EINPROGRESS	115
++
++#define S_IXGRP 00010
++#define S_IXOTH 00001
++
++#define	IN_EXPERIMENTAL(a)	((((long int) (a)) & 0xf0000000) == 0xf0000000)
++
++#define WIFSIGNALED(status) \
++	(((signed char) (((status) & 0x7f) + 1) >> 1) > 0)
++
++#define SIGACTMASK(n,h)
++
++typedef unsigned int socklen_t;
++
++struct passwd
++{
++	char *pw_name;    /* Username.  */
++	char *pw_passwd;    /* Password.  */
++	unsigned int pw_uid;   /* User ID.  */
++	unsigned int pw_gid;   /* Group ID.  */
++	char *pw_gecos;   /* Real name.  */
++	char *pw_dir;     /* Home directory.  */
++	char *pw_shell;   /* Shell program.  */
++};
++
++struct group
++{
++	char *gr_name;    /* Group name.  */
++	char *gr_passwd;    /* Password.  */
++	unsigned int gr_gid;   /* Group ID.  */
++	char **gr_mem;    /* Member list. */
++};
++
++
++struct flock
++{
++	short int l_type; /* Type of lock: F_RDLCK, F_WRLCK, or F_UNLCK.  */
++	short int l_whence; /* Where `l_start' is relative to (like `lseek').  */
++	long int l_start;  /* Offset where the lock begins.  */
++	long int l_len;  /* Size of the locked area; zero means until EOF.  */
++	int l_pid;  /* Process holding the lock.  */
++};
++
++struct FILE_PIPE_LOCAL_INFORMATION {
++	ULONG NamedPipeType;
++	ULONG NamedPipeConfiguration;
++	ULONG MaximumInstances;
++	ULONG CurrentInstances;
++	ULONG InboundQuota;
++	ULONG ReadDataAvailable;
++	ULONG OutboundQuota;
++	ULONG WriteQuotaAvailable;
++	ULONG NamedPipeState;
++	ULONG NamedPipeEnd;
++};
++
++typedef struct _IO_STATUS_BLOCK {
++		union {
++				LONG Status;
++				PVOID Pointer;
++		};
++		ULONG_PTR Information;
++} IO_STATUS_BLOCK;
++
++typedef enum _FILE_INFORMATION_CLASS {
++	FileDirectoryInformation = 1,
++	FileFullDirectoryInformation,
++	FileBothDirectoryInformation,
++	FileBasicInformation,
++	FileStandardInformation,
++	FileInternalInformation,
++	FileEaInformation,
++	FileAccessInformation,
++	FileNameInformation,
++	FileRenameInformation,
++	FileLinkInformation,
++	FileNamesInformation,
++	FileDispositionInformation,
++	FilePositionInformation,
++	FileFullEaInformation,
++	FileModeInformation,
++	FileAlignmentInformation,
++	FileAllInformation,
++	FileAllocationInformation,
++	FileEndOfFileInformation,
++	FileAlternateNameInformation,
++	FileStreamInformation,
++	FilePipeInformation,
++	FilePipeLocalInformation,
++	FilePipeRemoteInformation,
++	FileMailslotQueryInformation,
++	FileMailslotSetInformation,
++	FileCompressionInformation,
++	FileObjectIdInformation,
++	FileCompletionInformation,
++	FileMoveClusterInformation,
++	FileQuotaInformation,
++	FileReparsePointInformation,
++	FileNetworkOpenInformation,
++	FileAttributeTagInformation,
++	FileTrackingInformation,
++	FileIdBothDirectoryInformation,
++	FileIdFullDirectoryInformation,
++	FileValidDataLengthInformation,
++	FileShortNameInformation,
++	FileMaximumInformation
++} FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
++
++
++HANDLE saveVars(const struct var_info_t* local_var_info);
++void restoreVars(HANDLE hMapping, const struct var_info_t* local_var_info);
++int waitpid(int pid, int *stat_loc, int options);
++BOOL WINAPI CtrlHandler(DWORD dwCtrlType);
++int gettimeofday (struct timeval *tv, void* tz);
++int fcntl (int fd, int cmd, ...);
++int pipe (int __pipedes[2]);
++int __select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
++char* __getcwd(char *buffer, int maxlen);
++int __mkdir (const char *path, mode_t mode);
++int __rename(const char *oldname, const char *newname);
++int __open(const char *filename, int oflag, ...);
++FILE* __fopen(const char *path, const char *mode);
++int __unlink(const char *filename);
++int __rmdir(const char *dirname);
++int __chdir(const char *dirname);
++int __utime(const char *filename, struct _utimbuf *times);
++DIR* __opendir (const char* dir);
++struct dirent* __readdir(DIR*);
++int __closedir(DIR*);
++int __stati64(const char *path, struct _stati64 *buffer);
++unsigned long long int makedev (unsigned int __major, unsigned int __minor);
++wchar_t* unixToWindows(const char* unixPath);
++char* windowsToUnix(const wchar_t* windowsPath);
++void wtrim_trailing_slashes(wchar_t *name);
++
++size_t file_list_size(struct file_list* flist);
++size_t file_struct_size(struct file_struct* file);
++size_t save_string(void** shared, const char* str);
++void save_file_list(void* shared, struct file_list* flist);
++void restore_file_list(struct file_list* flist, void* shared);
++
++int getuid();
++int geteuid();
++
++extern void out_of_memory(char *str);
++
++LONG __stdcall NtQueryInformationFile (HANDLE, IO_STATUS_BLOCK *, VOID *, DWORD, DWORD);
++
++#define getcwd(...) __getcwd(__VA_ARGS__)
++#define open(...) __open(__VA_ARGS__)
++#define chdir(...) __chdir(__VA_ARGS__)
++#define rmdir(...) __rmdir(__VA_ARGS__)
++#define unlink(...) __unlink(__VA_ARGS__)
++#define utime(...) __utime(__VA_ARGS__)
++
++void get_utf8_arguments(int* pargc, char*** pargv);
++
++#endif
+diff -urP rsync-2.6.9/mingw/netdb.h rsync-2.6.9-mingw/mingw/netdb.h
+--- rsync-2.6.9/mingw/netdb.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/netdb.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/netinet/in.h rsync-2.6.9-mingw/mingw/netinet/in.h
+--- rsync-2.6.9/mingw/netinet/in.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/netinet/in.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/netinet/in_systm.h rsync-2.6.9-mingw/mingw/netinet/in_systm.h
+--- rsync-2.6.9/mingw/netinet/in_systm.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/netinet/in_systm.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/netinet/ip.h rsync-2.6.9-mingw/mingw/netinet/ip.h
+--- rsync-2.6.9/mingw/netinet/ip.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/netinet/ip.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/netinet/tcp.h rsync-2.6.9-mingw/mingw/netinet/tcp.h
+--- rsync-2.6.9/mingw/netinet/tcp.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/netinet/tcp.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/pwd.h rsync-2.6.9-mingw/mingw/pwd.h
+--- rsync-2.6.9/mingw/pwd.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/pwd.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mingw/syslog.h rsync-2.6.9-mingw/mingw/syslog.h
+--- rsync-2.6.9/mingw/syslog.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mingw/syslog.h	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1 @@
++
+diff -urP rsync-2.6.9/mkglobal.awk rsync-2.6.9-mingw/mkglobal.awk
+--- rsync-2.6.9/mkglobal.awk	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw/mkglobal.awk	2008-09-20 19:35:57.000000000 +0200
+@@ -0,0 +1,84 @@
++# generate global variables
++
++function add_global(type, name)
++{
++  if (match(name, /^\*/))
++    global[substr(name, 2)] = type "*"
++  else
++    global[name] = type
++}
++
++BEGIN {
++  FS="[ \t=;]"
++  print "/* This file is automatically generated with \"make global\". DO NOT EDIT */"
++  print ""
++}
++
++/^static|^extern|^typedef/ {
++  next;
++}
++
++!/^[A-Za-z][A-Za-z0-9_]* / {
++  next;
++}
++
++/^struct [a-z_*]+ [a-zA-Z_*]+[ \t]*([=;]|$)/ {
++  add_global("struct " $2, $3)
++  next
++}
++
++/^struct/ {
++  next
++}
++
++/^unsigned [a-z_*]+ [a-zA-Z_*]+[ \t]*([=;]|$)/ {
++  add_global("unsigned " $2, $3)
++  next
++}
++
++/^[a-z*]+ [a-zA-Z_*]+[ \t]*([=;\[]|$)/ {
++  if (split($2, a, "[") == 1)
++    add_global($1,a[1])
++  else if (!match(a[1], /^\*/))
++    add_global($1 "[" a[2],a[1]);
++  next
++}
++
++#/^[a-z]+ [a-zA-Z_]+[ \t]*$/ {
++#  add_global($1,$2)
++#  next
++#}
++
++END {
++  for (name in global)
++  {
++    type = global[name]
++    if (match(type, /\]$/))
++    {
++      split(type, a, /\[|\]/)
++      printf "extern %s %s;\n", a[1], name "[" a[2] "]"
++    }
++    else
++      printf "extern %s %s;\n", type, name
++  }
++
++  print ""
++
++  print "const struct var_info_t global_var_info[] = {"
++  first = 1
++  for (name in global)
++  {
++    type = global[name]
++
++    if (type == "char*")
++      printf "{ &%s, 1, 0 },\n", name
++    else if (match(type, /\*$/))
++      printf "{ &%s, 1, sizeof(*%s) },\n", name, name
++    else if (match(type, /\]$/))
++      printf "{ &%s, 0, sizeof(%s) },\n", name, name
++    else
++      printf "{ &%s, 0, sizeof(%s) },\n", name, name
++  }
++  print "{ NULL, 0, 0 }"
++  print " };"
++}
+diff -urP rsync-2.6.9/pipe.c rsync-2.6.9-mingw/pipe.c
+--- rsync-2.6.9/pipe.c	2006-05-30 00:56:58.000000000 +0200
++++ rsync-2.6.9-mingw/pipe.c	2008-09-20 19:35:57.000000000 +0200
+@@ -46,55 +46,87 @@
+  **/
+ pid_t piped_child(char **command, int *f_in, int *f_out)
+ {
+-	pid_t pid;
+-	int to_child_pipe[2];
+-	int from_child_pipe[2];
++	SECURITY_ATTRIBUTES saAttr;
++	HANDLE hChildStdinRd = 0;
++	HANDLE hChildStdinWr = 0;
++	HANDLE hChildStdoutRd = 0;
++	HANDLE hChildStdoutWr = 0;
++	BOOL bFuncRetn;
++	char buf[1024];
++	char** args;
+ 
+ 	if (verbose >= 2) {
+ 		print_child_argv(command);
+ 	}
+ 
+-	if (fd_pair(to_child_pipe) < 0 || fd_pair(from_child_pipe) < 0) {
++	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
++	saAttr.bInheritHandle = TRUE;
++	saAttr.lpSecurityDescriptor = NULL;
++
++	if (! CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 65536))
++	{
+ 		rsyserr(FERROR, errno, "pipe");
+ 		exit_cleanup(RERR_IPC);
+ 	}
++	SetHandleInformation( hChildStdoutRd, HANDLE_FLAG_INHERIT, 0);
+ 
+-	pid = do_fork();
+-	if (pid == -1) {
+-		rsyserr(FERROR, errno, "fork");
++	if (! CreatePipe(&hChildStdinRd, &hChildStdinWr, &saAttr, 65536))
++	{
++		rsyserr(FERROR, errno, "pipe");
+ 		exit_cleanup(RERR_IPC);
+ 	}
++	SetHandleInformation( hChildStdinWr, HANDLE_FLAG_INHERIT, 0);
+ 
+-	if (pid == 0) {
+-		if (dup2(to_child_pipe[0], STDIN_FILENO) < 0 ||
+-		    close(to_child_pipe[1]) < 0 ||
+-		    close(from_child_pipe[0]) < 0 ||
+-		    dup2(from_child_pipe[1], STDOUT_FILENO) < 0) {
+-			rsyserr(FERROR, errno, "Failed to dup/close");
+-			exit_cleanup(RERR_IPC);
++	memset(buf, 0, sizeof(buf)/sizeof(char));
++	args=command;
++	while (*args)
++	{
++		if (strlen(buf) + strlen(*args) + 3 < sizeof(buf)/sizeof(char))
++		{
++			strcat(buf, "\"");
++			strcat(buf, *args);
++			strcat(buf, "\" ");
+ 		}
+-		if (to_child_pipe[0] != STDIN_FILENO)
+-			close(to_child_pipe[0]);
+-		if (from_child_pipe[1] != STDOUT_FILENO)
+-			close(from_child_pipe[1]);
+-		umask(orig_umask);
+-		set_blocking(STDIN_FILENO);
+-		if (blocking_io > 0)
+-			set_blocking(STDOUT_FILENO);
+-		execvp(command[0], command);
+-		rsyserr(FERROR, errno, "Failed to exec %s", command[0]);
+-		exit_cleanup(RERR_IPC);
++		args++;
+ 	}
+ 
+-	if (close(from_child_pipe[1]) < 0 || close(to_child_pipe[0]) < 0) {
++	PROCESS_INFORMATION piProcInfo;
++	STARTUPINFO siStartInfo;
++	ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
++	ZeroMemory( &siStartInfo, sizeof(STARTUPINFO) );
++	siStartInfo.cb = sizeof(STARTUPINFO);
++	siStartInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
++	siStartInfo.hStdOutput = hChildStdoutWr;
++	siStartInfo.hStdInput = hChildStdinRd;
++	siStartInfo.dwFlags |= STARTF_USESTDHANDLES;
++
++	 bFuncRetn = CreateProcess(NULL,
++			buf,     // command line
++			NULL,          // process security attributes
++			NULL,          // primary thread security attributes
++			TRUE,          // handles are inherited
++			0,             // creation flags
++			NULL,          // use parent's environment
++			NULL,          // use parent's current directory
++			&siStartInfo,  // STARTUPINFO pointer
++			&piProcInfo);  // receives PROCESS_INFORMATION
++
++	SetHandleInformation( hChildStdinWr, HANDLE_FLAG_INHERIT, 1);
++	SetHandleInformation( hChildStdoutRd, HANDLE_FLAG_INHERIT, 1);
++
++	SetHandleInformation( hChildStdinRd, HANDLE_FLAG_INHERIT, 0);
++	SetHandleInformation( hChildStdoutWr, HANDLE_FLAG_INHERIT, 0);
++
++	if (!CloseHandle(hChildStdoutWr) || !CloseHandle(hChildStdinRd))
++	{
+ 		rsyserr(FERROR, errno, "Failed to close");
+ 		exit_cleanup(RERR_IPC);
+ 	}
+ 
+-	*f_in = from_child_pipe[0];
+-	*f_out = to_child_pipe[1];
++	*f_in = _open_osfhandle((intptr_t) hChildStdoutRd, O_RDONLY);
++	*f_out = _open_osfhandle((intptr_t) hChildStdinWr, 0);
+ 
+-	return pid;
++	return (pid_t) piProcInfo.hProcess;
+ }
+ 
+ /* This function forks a child which calls child_main().  First,
+diff -urP rsync-2.6.9/popt/system.h rsync-2.6.9-mingw/popt/system.h
+--- rsync-2.6.9/popt/system.h	2004-06-09 23:41:21.000000000 +0200
++++ rsync-2.6.9-mingw/popt/system.h	2008-09-20 19:35:57.000000000 +0200
+@@ -2,6 +2,8 @@
+ #include "config.h"
+ #endif
+ 
++#include "mingw.h"
++
+ #include <ctype.h>
+ #include <errno.h>
+ #include <fcntl.h>
+diff -urP rsync-2.6.9/prepare-source.mak rsync-2.6.9-mingw/prepare-source.mak
+--- rsync-2.6.9/prepare-source.mak	2006-10-24 02:33:32.000000000 +0200
++++ rsync-2.6.9-mingw/prepare-source.mak	2008-09-20 19:35:57.000000000 +0200
+@@ -23,3 +23,7 @@
+ rsyncd.conf.5: rsyncd.conf.yo
+ 	yodl2man -o rsyncd.conf.5 rsyncd.conf.yo
+ 	-./tweak_manpage_dashes rsyncd.conf.5
++
++global.h: $(OBJS1:.o=.c)  $(OBJS2:.o=.c) $(OBJS3:.o=.c)
++	echo  $(OBJS1:.o=.c)  $(OBJS2:.o=.c) $(OBJS3:.o=.c)
++	cat $(OBJS1:.o=.c)  $(OBJS2:.o=.c) $(OBJS3:.o=.c) | awk -f mkglobal.awk >global.h
+diff -urP rsync-2.6.9/rsync.h rsync-2.6.9-mingw/rsync.h
+--- rsync-2.6.9/rsync.h	2006-10-24 05:31:30.000000000 +0200
++++ rsync-2.6.9-mingw/rsync.h	2008-09-20 19:35:57.000000000 +0200
+@@ -653,6 +653,8 @@
+ 
+ struct chmod_mode_struct;
+ 
++#include "mingw.h"
++
+ #include "byteorder.h"
+ #include "lib/mdfour.h"
+ #include "lib/wildmatch.h"
+@@ -888,3 +890,13 @@
+ #ifdef MAINTAINER_MODE
+ const char *get_panic_action(void);
+ #endif
++
++#define mkdir(...) __mkdir(__VA_ARGS__)
++
++#ifndef DEF_REN
++#define rename(...) __rename(__VA_ARGS__)
++#define fopen(...) __fopen(__VA_ARGS__)
++#define opendir(...) __opendir(__VA_ARGS__)
++#define readdir(...) __readdir(__VA_ARGS__)
++#define closedir(...) __closedir(__VA_ARGS__)
++#endif
+diff -urP rsync-2.6.9/token.c rsync-2.6.9-mingw/token.c
+--- rsync-2.6.9/token.c	2006-04-26 01:51:15.000000000 +0200
++++ rsync-2.6.9-mingw/token.c	2008-09-20 19:35:57.000000000 +0200
+@@ -27,7 +27,7 @@
+ extern int module_id;
+ extern int def_compress_level;
+ 
+-static int compression_level, per_file_default_level;
++int compression_level, per_file_default_level;
+ 
+ /* determine the compression level based on a wildcard filename list */
+ void set_compression(char *fname)
+diff -urP rsync-2.6.9/util.c rsync-2.6.9-mingw/util.c
+--- rsync-2.6.9/util.c	2006-10-14 22:31:33.000000000 +0200
++++ rsync-2.6.9-mingw/util.c	2008-09-20 19:35:57.000000000 +0200
+@@ -124,7 +124,7 @@
+ int set_modtime(char *fname, time_t modtime, mode_t mode)
+ {
+ #if !defined HAVE_LUTIMES || !defined HAVE_UTIMES
+-	if (S_ISLNK(mode))
++	if (S_ISLNK(mode) || S_ISDIR(mode))
+ 		return 1;
+ #endif
+ 

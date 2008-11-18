@@ -1,0 +1,12 @@
+diff -ur putty-0.60/ssh.c putty-0.60-maxwinsize/ssh.c
+--- putty-0.60/ssh.c	2007-02-17 23:33:11.000000000 +0100
++++ putty-0.60-maxwinsize/ssh.c	2007-08-17 09:38:29.000000000 +0200
+@@ -462,7 +462,7 @@
+ 
+ #define SSH1_BUFFER_LIMIT 32768
+ #define SSH_MAX_BACKLOG 32768
+-#define OUR_V2_WINSIZE 16384
++#define OUR_V2_WINSIZE INT_MAX
+ #define OUR_V2_MAXPKT 0x4000UL
+ 
+ /* Maximum length of passwords/passphrases (arbitrary) */

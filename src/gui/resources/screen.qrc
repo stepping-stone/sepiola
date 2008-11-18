@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/main" >
+        <file>about.png</file>
+        <file>backup.png</file>
+        <file>exit.png</file>
+        <file>logfile.png</file>
+        <file>logo_puzzle.png</file>
+        <file>logo_stepping_stone.png</file>
+        <file>restore.png</file>
+        <file>splash.png</file>
+        <file>settings.png</file>
+    </qresource>
+</RCC>

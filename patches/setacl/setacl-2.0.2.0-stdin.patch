@@ -1,0 +1,120 @@
+diff -urb setacl-orig/baseclasses/CSetACL.cpp setacl/baseclasses/CSetACL.cpp
+--- setacl-orig/baseclasses/CSetACL.cpp	2008-06-19 17:59:42.000000000 +0200
++++ setacl/baseclasses/CSetACL.cpp	2008-06-21 18:07:17.000000000 +0200
+@@ -26,6 +26,8 @@
+ 
+ 
+ #include "CSetACL.h"
++#include <io.h>
++#include <fcntl.h>
+ 
+ 
+ //////////////////////////////////////////////////////////////////////
+@@ -169,7 +171,7 @@
+ 	// Initialize the buffer
+ 	ZeroMemory (bBuffer, nBufferSize);
+ 
+-	if (sObjectPath.GetLength () >= 1 && (nObjectType == SE_FILE_OBJECT || nObjectType == SE_SERVICE || nObjectType == SE_PRINTER || nObjectType == SE_REGISTRY_KEY || nObjectType == SE_LMSHARE))
++	if (nObjectType == SE_FILE_OBJECT || nObjectType == SE_SERVICE || nObjectType == SE_PRINTER || nObjectType == SE_REGISTRY_KEY || nObjectType == SE_LMSHARE)
+ 	{
+ 		m_sObjectPath	=	sObjectPath;
+ 		m_nObjectType	=	nObjectType;
+@@ -856,12 +858,6 @@
+ {
+ 	DWORD	nError;
+ 
+-	// Was the object path set?
+-	if (m_sObjectPath.IsEmpty ())
+-	{
+-		return RTN_ERR_OBJECT_NOT_SET;
+-	}
+-
+ 	// Check the type and version of the OS we are running on
+ 	OSVERSIONINFO osviVersion;
+ 
+@@ -1580,8 +1576,24 @@
+ 
+ 	if (m_nObjectType == SE_FILE_OBJECT)
+ 	{
++		if (m_sObjectPath == TEXT("\\\\?\\"))
++		{
++			_setmode( _fileno( stdin ), _O_BINARY );
++			CStdioFile stdinFile(stdin);
++			nError = 0;
++			CString sLine;			
++			while (!nError && stdinFile.ReadString(sLine))
++			{                 
++				sLine.TrimRight(TEXT ("\r\n"));				
++				SetObject(TEXT ("\\\\?\\") + sLine, SE_FILE_OBJECT);
++				nError = RecurseDirs (m_sObjectPath, &CSetACL::ListSD);
++			}
++		}
++		else
++		{
+ 		nError =	RecurseDirs (m_sObjectPath, &CSetACL::ListSD);
+ 	}
++	}
+ 	else if (m_nObjectType == SE_REGISTRY_KEY)
+ 	{
+ 		nError =	RecurseRegistry (m_sObjectPath, &CSetACL::ListSD);
+@@ -1850,6 +1862,9 @@
+ 			}
+ 		}
+ 
++		DWORD nFind3	=	sSDDL.ReverseFind (TEXT (','));
++		SetFileAttributes(sObjectPath, _tcstoul( sSDDL.Mid(nFind3 + 1), 0, 16 ));
++		
+ 		// Set the SD on the object
+ 		csdSD				=	new CSD (this);
+ 		nError			=	csdSD->SetSD (sObjectPath.GetBuffer (sObjectPath.GetLength () + 1), nObjectType, siSecInfo, paclDACL, paclSACL, psidOwner, psidGroup);
+@@ -2741,6 +2756,7 @@
+ 	CString								sDACLControl;
+ 	CString								sSACLControl;
+ 	CSD*									csdSD				=	NULL;
++	CString								sFileAttributes;
+ 
+ 	// Convert the object type to a string for storage
+ 	sObjectType.Format (TEXT ("%d"), m_nObjectType);
+@@ -2853,6 +2869,8 @@
+ 		sSACLControl	+=	TEXT (")");
+ 	}
+ 
++	sFileAttributes.Format(TEXT(",%x"), GetFileAttributes(sObjectPath));
++
+ 	// Which list format is requested: SDDL or our own?
+ 	if (m_nListFormat == LIST_SDDL)
+ 	{
+@@ -2870,11 +2888,11 @@
+ 		//
+ 		if (sObjectPath.Left (1) != TEXT ("\""))
+ 		{
+-			sLineOut		=	TEXT ("\"") + sObjectPath + TEXT ("\",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"");
++			sLineOut		=	TEXT ("\"") + sObjectPath + TEXT ("\",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"") + sFileAttributes;
+ 		}
+ 		else
+ 		{
+-			sLineOut		=	sObjectPath + TEXT (",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"");
++			sLineOut		=	sObjectPath + TEXT (",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"") + sFileAttributes;
+ 		}
+ 	}
+ 	else if (m_nListFormat == LIST_CSV)
+diff -urb setacl-orig/interface-cmdline/SetACL.cpp setacl/interface-cmdline/SetACL.cpp
+--- setacl-orig/interface-cmdline/SetACL.cpp	2004-01-16 11:23:08.000000000 +0100
++++ setacl/interface-cmdline/SetACL.cpp	2008-06-21 18:02:19.000000000 +0200
+@@ -248,8 +248,6 @@
+ 					return RTN_ERR_PARAMS;
+ 				}
+ 
+-				if (! sObjectName.IsEmpty ())
+-				{
+ 					if (oSetACL->SetObject (sObjectName, (SE_OBJECT_TYPE) nObjectType) != RTN_OK)
+ 					{
+ 						if (funcNotify)
+@@ -260,7 +258,6 @@
+ 						return RTN_ERR_PARAMS;
+ 					}
+ 				}
+-			}
+ 			else if (sArg.CompareNoCase (TEXT ("-actn")) == 0)
+ 			{
+ 				if (sParam.CompareNoCase (TEXT ("ace")) == 0)
