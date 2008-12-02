@@ -37,7 +37,7 @@ Rsync::Rsync() {}
 
 Rsync::~Rsync() {}
 
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors ) throw ( ProcessException )
 {
 	qDebug() << "Rsync::upload( " << items << ", " << src << ", " << destination << ", " << includePatternList << ", " << excludePatternList << " )";
 	Settings* settings = Settings::getInstance();
@@ -80,6 +80,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	}
 
 	createProcess( settings->getRsyncName() , arguments );
+	
 	start();
 
 	foreach ( QString item, items )
@@ -140,13 +141,19 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	qDebug() <<  QString::number( uploadedItems.size() ) << "files and/or directories processed";
 	emit infoSignal( tr( "%1 files and/or directories processed" ).arg( uploadedItems.size() ) );
 	waitForFinished();
-	QString standardErrors = readAllStandardError();
-	if ( standardErrors != "" )
-	{
-		qWarning() << "Error occurred while uploading: " + standardErrors;
-		if (errors) *errors = standardErrors;
+	if (this->isAlive()) {
+		QString standardErrors = readAllStandardError();
+		if ( standardErrors != "" )
+		{
+			qWarning() << "Error occurred while uploading: " + standardErrors;
+			if (errors) *errors = standardErrors;
+		}
+	} else {
+		if ( this->exitCode() != 0)
+		{
+			throw ProcessException( QObject::tr( "rsync exited with with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
+		}
 	}
-
 	return uploadedItems;
 }
 
@@ -220,17 +227,17 @@ QFileInfo Rsync::downloadSingleFile( const QString& source, const QString& desti
 	return downloadedItems.at( 0 );
 }
 
-QStringList Rsync::download( const QString& source, const QString& destination, bool compress )
+QStringList Rsync::download( const QString& source, const QString& destination, bool compress ) throw ( ProcessException )
 {
 	return download( source, destination, QStringList(), compress, true );
 }
 
-QStringList Rsync::download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal )
+QStringList Rsync::download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException )
 {
 	qDebug() << "Rsync::download( " << source << ", " << destination << ", ... )";
 
 	Settings* settings = Settings::getInstance();
-	QString src = settings->getUserName() + "@" + settings->getServerName() + ":" + source;
+	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + source;
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -290,6 +297,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 //	qDebug() << "Downloaded Items: " << downloadedItems;
 	emit infoSignal( tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() ) );
 	waitForFinished();
+	
 	QString errors = readAllStandardError();
 	if ( errors != "" )
 	{
@@ -297,6 +305,13 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		if ( emitErrorSignal )
 		{
 			throw ProcessException( tr ( "Error occurred while downloading: " ) + errors );
+		}
+	}
+	if (this->exitCode() != 0)
+	{
+		if ( emitErrorSignal )
+		{
+			throw ProcessException( QObject::tr( "rsync exited with with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(errors).arg(readAllStandardOutput().data()) );
 		}
 	}
 	return downloadedItems;
@@ -307,7 +322,7 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination )
 	qDebug() << "Rsync::downloadAllRestoreInfoFiles()";
 	Settings* settings = Settings::getInstance();
 
-	QString src = settings->getUserName() + "@" + settings->getServerName() + ":";
+	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":";
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -394,7 +409,7 @@ QStringList Rsync::getPrefixes()
 	arguments << getRsyncSshArguments();
 
 	// include backupRootFolder/*/
-	QString src = settings->getUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder();
+	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder();
 	arguments << "--include=/*/";
 	arguments << "--exclude=*";
 	arguments << src;
@@ -554,7 +569,7 @@ void Rsync::testUpload()
 	QStringList files;
 	files << "/tmp2/";
 	QString source = "/";
-	QString destination = settings->getUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
+	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
 	Rsync rsync;
 	QString errors;
 	rsync.upload( files, source, destination, QStringList(), QStringList(), false, false, &errors );

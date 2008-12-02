@@ -23,7 +23,6 @@
 /**
  * The RuntimeException class is used to indicate runtime errors
  * @author Dominic Sydler, sydler@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/06/11 14:09:12 $ $Revision: 1.2 $
  */
 class RuntimeException : public Exception
 {

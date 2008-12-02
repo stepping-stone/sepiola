@@ -26,7 +26,6 @@
 /**
  * The PatternDialog class provides a dialog for editing include or exclude patterns
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.4 $
  */
 class PatternDialog : public QDialog, private Ui::PatternDialog
 {

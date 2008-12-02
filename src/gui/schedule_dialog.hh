@@ -27,7 +27,6 @@
 /**
  * The ScheduleDialog class provides a dialog for scheduling a backup job
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/07/04 08:46:21 $ $Revision: 1.12 $
  */
 class ScheduleDialog : public QDialog, private Ui::ScheduleDialog
 {

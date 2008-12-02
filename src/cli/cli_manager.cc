@@ -177,7 +177,9 @@ void CliManager::runCli( int argc, char* argv[] )
 						this, SLOT( printInfoMessage( const QString& ) ) );
 	QObject::connect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
 						this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
+	QObject::connect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
+						this, SLOT( askForPassword() ) );
+	QObject::connect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
 						this, SLOT( askForPassword() ) );
 
 	// log file signals/slots
@@ -196,7 +198,9 @@ void CliManager::runCli( int argc, char* argv[] )
 							 this, SLOT( printInfoMessage( const QString& ) ) );
 	QObject::disconnect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
 							 this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
+	QObject::disconnect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
+							 this, SLOT( askForPassword() ) );
+	QObject::disconnect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
 							 this, SLOT( askForPassword() ) );
 
 	// log file signals/slots
@@ -229,8 +233,8 @@ void CliManager::askForPassword()
 	QString password = readPassword();
 
 	Settings* settings = Settings::getInstance();
-	settings->saveUserName( username );
-	settings->setPassword( password );
+	settings->saveServerUserName( username );
+	settings->setServerPassword( password );
 }
 
 QString CliManager::readPassword()

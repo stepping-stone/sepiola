@@ -24,7 +24,6 @@
 /**
  * The LoginException class is used to indicate a wrong password
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.3 $
  */
 class LoginException : public Exception
 {

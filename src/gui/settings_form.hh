@@ -30,7 +30,6 @@
 /**
  * The SettingsForm class is the form displaying the settings
  * @author Reto Aebersold, aebersold@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.17 $
  */
 class SettingsForm : public QWidget, private Ui::SettingsForm
 {

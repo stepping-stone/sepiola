@@ -30,7 +30,6 @@ using std::auto_ptr;
 /**
  * The RestoreThread class runs the restore process in its own thread
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 10:11:39 $ $Revision: 1.6 $
  */
 class RestoreThread : public QThread
 {

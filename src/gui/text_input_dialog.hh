@@ -26,7 +26,6 @@
 /**
  * The TextInputDialog class provides a dialog for inputing a text
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.4 $
  */
 class TextInputDialog : public QDialog, private Ui::TextInputDialog
 {

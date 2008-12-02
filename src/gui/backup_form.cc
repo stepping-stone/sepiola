@@ -24,17 +24,19 @@
 #include "gui/schedule_dialog.hh"
 #include "gui/pattern_dialog.hh"
 
+#include "utils/log_file_utils.hh"
+
 BackupForm::BackupForm ( QWidget *parent, MainModel *model ) : QWidget ( parent )
 {
 	setupUi ( this );
 
 	this->model = model;
 	this->localDirModel = this->model->getLocalDirModel();
-		this->treeView->setModel( localDirModel );
-		this->treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
-		this->treeView->setColumnWidth( 0, 300 );
-		QModelIndex index = localDirModel->index( QDir::rootPath() );
-		this->treeView->expand( index );
+	this->treeView->setModel( localDirModel );
+	this->treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
+	this->treeView->setColumnWidth( 0, 300 );
+	QModelIndex index = localDirModel->index( QDir::rootPath() );
+	this->treeView->expand( index );
 
 	Settings* settings = Settings::getInstance();
 	this->includePatternList = settings->getIncludePatternList();
@@ -136,6 +138,9 @@ QStringList BackupForm::getSelectedFilesAndDirs()
 {
 	QModelIndexList indexes = this->treeView->selectionModel()->selectedIndexes();
 	QStringList items;
+	// save current value of localDirModel->resolveSymlinks to reset after getting filePaths of the items
+	bool bkup_ResolveSymbolicLinks = localDirModel->resolveSymlinks();
+	localDirModel->setResolveSymlinks(false);
 	foreach ( QModelIndex index, indexes )
 	{
 		if ( index.column() == 0 )
@@ -143,6 +148,7 @@ QStringList BackupForm::getSelectedFilesAndDirs()
 			items << localDirModel->filePath( index );
 		}
 	}
+	localDirModel->setResolveSymlinks(bkup_ResolveSymbolicLinks);
 	return items;
 }
 

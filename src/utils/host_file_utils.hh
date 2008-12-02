@@ -25,7 +25,6 @@
  * The HostFileUtils class provides convenience methods for reading
  * and writing the host files for putty and open ssh
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/30 08:05:40 $ $Revision: 1.1 $
  */
 class HostFileUtils
 {

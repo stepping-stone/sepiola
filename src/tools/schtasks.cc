@@ -108,12 +108,16 @@ bool Schtasks::schedule(const QString& execName, const QString& cliArgument, con
 	if (password_ok) {
 		QStringList arguments = schtasksArguments;
 		arguments << "/ru" << username;
-		arguments << "/rp" << password;
+		//arguments << "/rp" << password;
 
 		deleteExistingTask(execName, cliArgument);
 		createProcess(SCHTASKS_NAME, arguments);
 		setProcessChannelMode(QProcess::MergedChannels);
 		start(); // this may cause an error if no job has been created before. let's ignore this message
+		waitForReadyRead();
+		readAll();
+		write((password+"\r\n").toUtf8());
+		waitForBytesWritten();
 		schtasks_success = true;
 		
 		QString lineData;
@@ -202,11 +206,15 @@ bool Schtasks::updateExistingTask(const QString& execName, const QString& cliArg
 			arguments << "/tn" << taskName;
 			arguments << "/tr" << "\"" + execName + "\" " + cliArgument;
 			arguments << "/ru" << username;
-			arguments << "/rp" << password;
+			//arguments << "/rp" << password;
 
 			createProcess(SCHTASKS_NAME, arguments);
 			setProcessChannelMode(QProcess::MergedChannels);
 			start(); // this may cause an error if no job has been created before. let's ignore this message
+			waitForReadyRead();
+			readAll();
+			write((password+"\r\n").toUtf8());
+			waitForBytesWritten();
 			schtasks_success = true;
 			
 			QString lineData;
@@ -289,7 +297,7 @@ bool Schtasks::getWindowsPassword(const QString& username, QString& password, co
 	QStringList schtasksArguments;
 	schtasksArguments << "/create";
 	schtasksArguments << "/tn" << taskName;
-	schtasksArguments << "/tr" << "\"" + settings->getApplicationName(); + "\" " + cliArgument;
+	schtasksArguments << "/tr" << "\"" + settings->getApplicationName() + "\"";
 	schtasksArguments << "/sc" << getTranslationForOnStart(locale);
 	
 	bool schtasks_success = false;
@@ -297,7 +305,7 @@ bool Schtasks::getWindowsPassword(const QString& username, QString& password, co
 	while (requery_password)
 	{
 		deleteExistingTask(taskName);
-		if (settings->getPassword().length() == 0)
+		if (settings->getClientPassword().length() == 0)
 		{
 			int result;
 			emit askForPassword(username, false, &result, msg);
@@ -306,11 +314,16 @@ bool Schtasks::getWindowsPassword(const QString& username, QString& password, co
 		if (requery_password) {
 			QStringList arguments = schtasksArguments;
 			arguments << "/ru" << username;
-			arguments << "/rp" << settings->getPassword().toLatin1();
+			//arguments << "/rp" << settings->getClientPassword().toLatin1();
 
 			createProcess(SCHTASKS_NAME, arguments);
 			setProcessChannelMode(QProcess::MergedChannels);
 			start(); // this may cause an error if no job has been created before. let's ignore this message
+			waitForReadyRead();
+			//readAll();
+			write((settings->getClientPassword()+"\r\n").toLatin1());
+			waitForBytesWritten();
+			
 			requery_password = false;
 			schtasks_success = true;
 			
@@ -325,7 +338,7 @@ bool Schtasks::getWindowsPassword(const QString& username, QString& password, co
 			if (lineData.contains(getTranslationForWARNING(locale) ) )
 			{
 				schtasks_success = false;
-				settings->setPassword("");
+				settings->setClientPassword("");
 				LogFileUtils::getInstance()->writeLog(lineData);
 				if (lineData.contains(getTranslationForWrongAccountInformation(locale) ) )
 				{
@@ -338,7 +351,7 @@ bool Schtasks::getWindowsPassword(const QString& username, QString& password, co
 			if (lineData.contains(getTranslationForERROR(locale) ) )
 			{
 				schtasks_success = false;
-				settings->setPassword("");
+				settings->setClientPassword("");
 				QString error = lineData.right(lineData.size()
 				        - lineData.indexOf(getTranslationForERROR(locale) ) );
 				qDebug() << error;
@@ -349,12 +362,12 @@ bool Schtasks::getWindowsPassword(const QString& username, QString& password, co
 	deleteExistingTask(taskName);
 	if (schtasks_success)
 	{
-		password = settings->getPassword().toLatin1();
+		password = settings->getClientPassword().toLatin1();
 		return true;
 	}
 	else
 	{
-		settings->setPassword("");
+		settings->setClientPassword("");
 		return false;
 	}
 }

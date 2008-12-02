@@ -26,7 +26,6 @@
 /**
  * The RemoteDirModel class represents a remote file system
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:15 $ $Revision: 1.14 $
  */
 class RemoteDirModel : public QStandardItemModel
 {

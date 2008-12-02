@@ -28,7 +28,6 @@
 /**
  * The PosixAcl class provides methods for using getfacl and setfacl tools
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 06:09:46 $ $Revision: 1.23 $
  */
 class PosixAcl : public AbstractMetadata, public Process
 {

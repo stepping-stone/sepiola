@@ -31,7 +31,6 @@ using std::auto_ptr;
  * The ToolFactory class provides methods for constructing real implementation object
  * based on the running operating system
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 10:12:56 $ $Revision: 1.11 $
  */
 class ToolFactory
 {

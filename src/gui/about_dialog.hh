@@ -24,11 +24,12 @@
 /**
  * The AboutDialog class provides a dialog showing information about the owner of the application
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.5 $
  */
 class AboutDialog : public QDialog, private Ui::AboutDialog
 {
 	Q_OBJECT
+	static const int MAX_IMAGE_HEIGHT;
+	static const int MAX_IMAGE_WIDTH;
 	
 public:
 

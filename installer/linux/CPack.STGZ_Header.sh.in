@@ -134,8 +134,30 @@ tail $use_new_tail_syntax +###CPACK_HEADER_LENGTH### "$0" | gunzip | (cd "${topl
 
 echo "Unpacking finished successfully"
 
+# install desktop icon
+sepiola_bin="${toplevel}/bin/@CPACK_SSBACKUP_EXECUTABLE_NAME@"
+reseller_icon="${toplevel}/resource/@CPACK_SSBACKUP_EXECUTABLE_NAME@.png"
+
+if [ "x${interactive}x" = "xTRUEx" ]
+then
+  echo ""
+  echo "Do you want to install a desktop-icon?"
+  read line leftover
+  cpack_install_desktop_icon=TRUE
+  case ${line} in
+    n* | N*)
+      cpack_install_desktop_icon=FALSE
+  esac
+
+  if [ "x${cpack_install_desktop_icon}x" = "xTRUEx" ]
+  then
+    xdg-icon-resource install --novendor --size 128 "${reseller_icon}"
+    printf "[Desktop Entry]\nVersion=1.0\nType=Application\nName=@CPACK_SSBACKUP_APPLICATION_FULL_NAME@\nComment=@CPACK_SSBACKUP_APPLICATION_FULL_NAME@\nTryExec=${sepiola_bin}\nExec=${sepiola_bin}\nIcon=@CPACK_SSBACKUP_EXECUTABLE_NAME@.png" > "${toplevel}/@CPACK_SSBACKUP_EXECUTABLE_NAME@.desktop"
+	xdg-desktop-icon install --novendor "${toplevel}/@CPACK_SSBACKUP_EXECUTABLE_NAME@.desktop"
+  fi
+fi
+
 # start application (needed to ensure updates of crontasks)
-sepiola_bin="${toplevel}/bin/sepiola"
 if [ -x "${sepiola_bin}" ]; then
   echo "starting \"${sepiola_bin}\""
   "${sepiola_bin}" -update

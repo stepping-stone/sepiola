@@ -31,7 +31,6 @@
 /**
  * The AbstractRsync class provides methods for using the rsync tool
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/07/15 10:06:26 $ $Revision: 1.42 $
  */
 class AbstractRsync : public AbstractProgress
 {

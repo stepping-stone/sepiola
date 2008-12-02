@@ -25,7 +25,6 @@
 /**
  * The Plink class provides methods for using the plink tool
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.25 $
  */
 class Plink : public AbstractSsh, public Process
 {

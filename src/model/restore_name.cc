@@ -51,3 +51,8 @@ bool RestoreName::operator<( const RestoreName& other) const
 {
 	return other.getDate() < this->getDate();
 }
+
+bool RestoreName::operator==( const RestoreName& other) const
+{
+	return other.getDate() == this->getDate();
+}

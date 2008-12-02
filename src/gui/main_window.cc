@@ -37,8 +37,10 @@ MainWindow::MainWindow ( MainModel *model ) : QMainWindow()
 						this, SLOT( showInformationMessageBox( QString ) ) );
 	QObject::connect( this->model, SIGNAL( showCriticalMessageBox( QString ) ),
 						this, SLOT( showCriticalMessageBox( QString ) ) );
-	QObject::connect( this->model, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SLOT( showPasswordDialog( const QString&, bool, int*, const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
+						this, SLOT( showServerPasswordDialog( const QString&, bool, int*, const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
+						this, SLOT( showClientPasswordDialog( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( this->model, SIGNAL( showProgressDialog( const QString& ) ),
 						this, SLOT( showProgressDialog( const QString& ) ) );
 	QObject::connect( this->model, SIGNAL( appendInfoMessage( const QString& ) ),
@@ -93,11 +95,14 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::showPasswordDialog( const QString& username, bool isUsernameEditable, int* result, const QString& msg )
+void MainWindow::showServerPasswordDialog( const QString& username, bool isUsernameEditable, int* result, const QString& msg )
 {
+	Settings* settings = Settings::getInstance();
 	PasswordDialog passwordDialog( username, isUsernameEditable );
 	QObject::connect( &passwordDialog, SIGNAL( abort() ),
 						this->model, SLOT( abortLogin() ) );
+	QObject::connect( &passwordDialog, SIGNAL( processPasswordReturnValues( const QString&, const QString&, bool ) ),
+						settings, SLOT( setServerUserNameAndPassword( const QString&, const QString&, bool ) ) );
 	if (msg != "")
 		passwordDialog.setDialogMessage(msg);
     int dialog_result = passwordDialog.exec(); 
@@ -106,7 +111,30 @@ void MainWindow::showPasswordDialog( const QString& username, bool isUsernameEdi
 		*result = dialog_result; 
 	}
 	QObject::disconnect( &passwordDialog, SIGNAL( abort() ),
-							 this->model, SIGNAL( abortLogin() ) );
+							this->model, SIGNAL( abortLogin() ) );
+	QObject::disconnect( &passwordDialog, SIGNAL( processPasswordReturnValues( const QString&, const QString&, bool ) ),
+							settings, SLOT( setServerUserNameAndPassword( const QString&, const QString&, bool ) ) );
+}
+
+void MainWindow::showClientPasswordDialog( const QString& username, bool isUsernameEditable, int* result, const QString& msg )
+{
+	Settings* settings = Settings::getInstance();
+	PasswordDialog passwordDialog( username, isUsernameEditable );
+	QObject::connect( &passwordDialog, SIGNAL( abort() ),
+						this->model, SLOT( abortLogin() ) );
+	QObject::connect( &passwordDialog, SIGNAL( processPasswordReturnValues( const QString&, const QString&, bool ) ),
+						settings, SLOT( setClientUserNameAndPassword( const QString&, const QString&, bool ) ) );
+	if (msg != "")
+		passwordDialog.setDialogMessage(msg);
+    int dialog_result = passwordDialog.exec(); 
+	if (result) 
+	{
+		*result = dialog_result; 
+	}
+	QObject::disconnect( &passwordDialog, SIGNAL( abort() ),
+							this->model, SIGNAL( abortLogin() ) );
+	QObject::disconnect( &passwordDialog, SIGNAL( processPasswordReturnValues( const QString&, const QString&, bool ) ),
+							settings, SLOT( setClientUserNameAndPassword( const QString&, const QString&, bool ) ) );
 }
 
 void MainWindow::showInformationMessageBox( const QString& message )

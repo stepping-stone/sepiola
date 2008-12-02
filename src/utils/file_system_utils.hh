@@ -24,7 +24,6 @@
 /**
  * The FileSystemUtils class provides convenience methods for file system specific tasks
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/07/14 10:29:53 $ $Revision: 1.8 $
  */
 class FileSystemUtils
 {

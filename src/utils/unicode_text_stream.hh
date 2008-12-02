@@ -22,7 +22,6 @@
 /**
  * The UnicodeTextStream class provides a text stream with a unicode codec
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.2 $
  */
 class UnicodeTextStream : public QTextStream
 {

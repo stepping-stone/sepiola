@@ -19,6 +19,7 @@
 #ifndef SETTINGS_HH
 #define SETTINGS_HH
 
+#include <QObject>
 #include <QFileInfo>
 #include <QSettings>
 #include <QString>
@@ -32,12 +33,12 @@
 /**
  * The Settings class is used to store and read all settings for this application
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/08/04 12:21:42 $ $Revision: 1.60 $
  */
-class Settings
+class Settings : public QObject
 {
+	Q_OBJECT
+	
 public:	
-
 	/**
 	 * True if the current operating system is Unix
 	 */
@@ -223,11 +224,13 @@ public:
 	QStringList getExcludePatternList();
 	void saveExcludePatternList( const QStringList& excludePatternList );
 	void saveBackupItemList( const QStringList& backupItems );
-	QString getUserName();
-	QString getPassword();
+	QString getClientPassword();
+	QString getServerUserName();
+	QString getServerPassword();
 	int getLanguageIndex();
-	void saveUserName( const QString& userName );
-	void setPassword( const QString& password );
+	void saveServerUserName( const QString& userName );
+	void setServerPassword( const QString& password );
+	void setClientPassword( const QString& password );
 	void saveLanguageIndex( const int& languageIndex );
 	QString getBackupPrefix();
 	void saveBackupPrefix( const QString& backupPrefix );
@@ -360,7 +363,7 @@ private:
 	
 	// writable
 	QString serverName;
-	QString userName;
+	QString serverUserName;
 	int languageIndex;
 	QString serverKey;
 	QString privatePuttyKey;
@@ -375,8 +378,14 @@ private:
 	QString resellerAddress;
 
 	// non persistent
-	QString password;
+	QString client_password;
+	QString server_password;
 	
+private slots:
+	void setServerUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable );
+	void setClientUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable );
+
+
 private:
 	Settings();
 	virtual ~Settings();
@@ -481,9 +490,14 @@ inline QStringList Settings::getBackupList()
 	return backupList;
 }
 
-inline QString Settings::getPassword()
+inline QString Settings::getServerPassword()
 {
-	return password;
+	return server_password;
+}
+
+inline QString Settings::getClientPassword()
+{
+	return client_password;
 }
 
 inline QString Settings::getApplicationName()
@@ -556,9 +570,9 @@ inline int Settings::getLanguageIndex()
 	return languageIndex;
 }
 
-inline QString Settings::getUserName()
+inline QString Settings::getServerUserName()
 {
-	return userName;
+	return serverUserName;
 }
 
 inline QString Settings::getBackupContentFileName()

@@ -57,7 +57,7 @@ bool initSettings(QCoreApplication* app)
 	QFileInfo configFile(applicationDirPath, CONFIG_FILE_NAME);
 	if ( !configFile.exists() )
 	{
-		qDebug() << "config file: " + applicationDirPath + "/" + CONFIG_FILE_NAME + " not found.";
+		qDebug() << "config file: " + configFile.absoluteFilePath() + " not found.";
 		return false;
 	}
 	Settings::getInstance()->loadSettings(configFile);

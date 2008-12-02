@@ -28,7 +28,6 @@
 /**
  * The Rsync class provides methods for using the rsync tool
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/07/15 10:06:26 $ $Revision: 1.48 $
  */
 class Rsync : public AbstractRsync, public Process
 {
@@ -52,7 +51,7 @@ public:
 	/**
 	 * @see AbstractRsync::upload( const QStringList& items, const QString& source, const QString& destination, const QString& includePattern, const QString& excludePattern, QString* errors )
 	 */
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* errors );
+	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* errors ) throw ( ProcessException );
 
 	/**
 	 * @see AbstractRsync::downloadFullBackup( const QString& backupName, const QString& destination )
@@ -150,8 +149,8 @@ private:
 	static void removeSymlinkString( QString* path );
 
 	QFileInfo downloadSingleFile( const QString& source, const QString& destination, const QFileInfo& fileName, bool compress, bool emitErrorSignal );
-	QStringList download( const QString& source, const QString& destination, bool compress);
-	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal );
+	QStringList download( const QString& source, const QString& destination, bool compress) throw ( ProcessException );
+	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException );
 };
 
 #endif

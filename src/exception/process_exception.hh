@@ -23,7 +23,6 @@
 /**
  * The ProcessException class is used to indicate errors of a process
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.3 $
  */
 class ProcessException : public Exception
 {

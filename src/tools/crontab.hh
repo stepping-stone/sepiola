@@ -28,7 +28,6 @@
 /**
  * The Crontab class provides methods for using the crontab scheduler
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/08/05 10:16:17 $ $Revision: 1.13 $
  */
 class Crontab : public AbstractScheduler, public Process
 {
@@ -85,7 +84,8 @@ public:
 private:
 	bool schedule( const QString& execName, const QString& cliArgument, const QString& timeSpecification );
 	QStringList readAllCrontabEntries();
-	bool writeAllCrontabEntries( const QStringList& crontabEntries );
+	bool writeCrontabEntries_Helper( QStringList& crontabEntries, QString& return_error );
+	bool writeAllCrontabEntries( QStringList& crontabEntries );
 	QStringList removeExistingBackupJob( const QStringList& existingEntries, const QString& execName,  const QString& cliArgument );
 	QStringList updateExistingBackupJob( const QStringList& existingEntries, const QString& execName,  const QString& cliArgument );
 	QStringList getExistingEntries();

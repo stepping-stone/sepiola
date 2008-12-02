@@ -50,7 +50,7 @@ SettingsForm::~SettingsForm()
 void SettingsForm::reload()
 {
 	Settings* settings = Settings::getInstance();
-	this->lineEditUsername->setText( settings->getUserName() );
+	this->lineEditUsername->setText( settings->getServerUserName() );
 	this->lineEditServer->setText( settings->getServerName() );
 	this->lineEditServerKey->setText( settings->getServerKey() );
 	this->lineEditBackupPrefix->setText( settings->getBackupPrefix() );
@@ -73,7 +73,7 @@ void SettingsForm::save()
 	if ( formChanged )
 	{
 		Settings* settings = Settings::getInstance();
-		settings->saveUserName( this->lineEditUsername->text() );
+		settings->saveServerUserName( this->lineEditUsername->text() );
 		settings->saveServerName( this->lineEditServer->text() );
 		settings->saveServerKey( this->lineEditServerKey->text() );
 		settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );

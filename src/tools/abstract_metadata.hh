@@ -28,7 +28,6 @@
 /**
  * The AbstractMetadata class provides methods for getting and setting file and directory meta data
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.9 $
  */
 class AbstractMetadata : public AbstractProgress
 {

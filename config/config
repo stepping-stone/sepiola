@@ -7,9 +7,9 @@ LockFileName=lock
 InlcudePatternFileName=includes
 ExcludePatternFileName=excludes
 LogFileName=sepiola.log
-LogDebugMessage=true
+LogDebugMessage=false
 MaxLogLines=10000
-RsyncTimeout=3600
+RsyncTimeout=43200
 
 [Server]
 ServerKey=e3:6d:87:79:1c:e3:0e:bc:ea:89:54:20:d9:2c:f5:cb

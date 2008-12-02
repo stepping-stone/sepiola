@@ -80,7 +80,7 @@ void BackupThread::run()
 
 		emit appendInfoMessage( tr( "Uploading files and directories" ) );
 		QString source = "/";
-		QString destination = settings->getUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
+		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
 
 		QString errors;
 		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( items, source, destination, includePatternList, excludePatternList, setDeleteFlag, false, &errors );
@@ -93,7 +93,7 @@ void BackupThread::run()
 
 		if ( processedItems.size() > 0 )
 		{
-			QString metaDataDir = settings->getUserName() + "@" + settings->getServerName() + ":" +
+			QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" +
 				settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName();
 			//auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
 
@@ -181,7 +181,7 @@ void BackupThread::prepareServerDirectories()
 	// create local directories and upload them
 	Settings* settings = Settings::getInstance();
 	QString source = settings->getApplicationDataDir();
-	QString destination = settings->getUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder();
+	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder();
 	QDir workingDir( settings->getApplicationDataDir() );
 	QString backupPrefixFolder = settings->getBackupPrefix();
 	workingDir.mkdir( backupPrefixFolder );

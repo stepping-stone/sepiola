@@ -26,7 +26,6 @@
 /**
  * The LogfileDialog class provides a dialog showing the log file
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.3 $
  */
 class LogfileForm : public QWidget, private Ui::LogfileForm
 {

@@ -17,14 +17,17 @@
 */
 
 #include <QSettings>
+#include <QObject>
 #include <QHostInfo>
 #include <QDir>
+#include <QDebug>
 #include <QCoreApplication>
 #include <QLocale>
 
 #include "settings/settings.hh"
 #include "utils/file_system_utils.hh"
 #include "utils/string_utils.hh"
+#include "utils/log_file_utils.hh"
 
 #ifdef Q_OS_UNIX
 	const bool Settings::IS_UNIX = true;
@@ -132,8 +135,10 @@ Settings* Settings::getInstance()
 
 void Settings::loadSettings( const QFileInfo& configFile, const QString& resellerAffix )
 {
+	qDebug() << "Settings::loadSettings: Loading settings from file <" << configFile.filePath() << ">";
 	QDir homeDir = QDir::home();
 	QString applicationDataDirName = "." + EXECUTABLE_NAME;
+	QString resellerSettingsFileName = configFile.absoluteFilePath() + resellerAffix;
 	if ( !homeDir.exists( applicationDataDirName ) )
 	{
 		homeDir.mkdir( applicationDataDirName );
@@ -141,11 +146,14 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	applicationDataDir = homeDir.absolutePath() + QDir::separator() + applicationDataDirName + QDir::separator();
 	applicationBinDir = configFile.absolutePath() + QDir::separator();
 	applicationSettings = new QSettings( configFile.absoluteFilePath(), QSettings::IniFormat );
-	userSettings = new QSettings( applicationDataDir + configFile.fileName(), QSettings::IniFormat );
-	/*if (QFile(applicationDataDir + configFile.fileName() + resellerAffix).exists())*/
-		resellerSettings = new QSettings( configFile.filePath() + resellerAffix, QSettings::IniFormat );
-	/*else
-		resellerSettings = 0;*/
+	resellerSettings =    new QSettings( resellerSettingsFileName, QSettings::IniFormat );
+	userSettings =        new QSettings( applicationDataDir + configFile.fileName(), QSettings::IniFormat );
+	
+	if (QFile(resellerSettingsFileName).exists()) {
+		qDebug() << "Loading reseller-settings from file <" + resellerSettings->fileName() + ">";
+	} else {
+		qDebug() << "reseller-config-file not found <" + resellerSettingsFileName + ">";
+	}
 
 	reloadSettings();
 	installDate = userSettings->value( SETTINGS_INSTALL_DATE ).toDateTime();
@@ -198,19 +206,22 @@ void Settings::reloadSettings()
 	setacl = StringUtils::encaps(applicationSettings->value( SETTINGS_SETACL ).toString(), "", SETTINGS_EXECUTABLE_EXTENSION);
 	applicationSettings->endGroup();
 
-	resellerAddress = resellerSettings->value( SETTINGS_RESELLER_ADDRESS, QObject::tr("reseller address (missing)") ).toString();
+	resellerAddress = resellerSettings->value( SETTINGS_GROUP_RESELLER + "/" + SETTINGS_RESELLER_ADDRESS, QObject::tr("reseller address (missing)") ).toString();
 
+	
+	resellerSettings->beginGroup( SETTINGS_GROUP_SERVER );
 	serverName = resellerSettings->value( SETTINGS_HOST, defaultServerName ).toString();
 	serverKey = resellerSettings->value( SETTINGS_SERVER_KEY, serverKey ).toString();
 	backupRootFolder=resellerSettings->value( SETTINGS_BACKUP_ROOT_FOLDER, backupRootFolder ).toString();
 	restoreRootFolder = resellerSettings->value( SETTINGS_RESTORE_ROOT_FOLDER, restoreRootFolder ).toString();
+	resellerSettings->endGroup();
 
-	applicationName = resellerSettings->value(SETTINGS_APPLICATION_FULL_NAME, applicationName).toString();
+	applicationName = resellerSettings->value(SETTINGS_GROUP_APPLICATION + "/" + SETTINGS_APPLICATION_FULL_NAME, applicationName).toString();
 	
 
 	
 	serverName = userSettings->value( SETTINGS_HOST, serverName ).toString();
-	userName = userSettings->value( SETTINGS_USERNAME ).toString();
+	serverUserName = userSettings->value( SETTINGS_USERNAME ).toString();
 	languageIndex = userSettings->value( SETTINGS_LANGUAGE ).toInt();
 
 	backupPrefix = userSettings->value( SETTINGS_BACKUP_PREFIX ).toString();
@@ -350,12 +361,34 @@ void Settings::saveBackupItemList( const QStringList& backupList )
 	}
 }
 
-void Settings::setPassword( const QString& password )
+void Settings::setServerPassword( const QString& password )
 {
-	if ( this->password != password )
+	if ( this->server_password != password )
 	{
-		this->password = password;
+		this->server_password = password;
 	}
+}
+
+void Settings::setClientPassword( const QString& password )
+{
+	if ( this->client_password != password )
+	{
+		this->client_password = password;
+	}
+}
+
+void Settings::setServerUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable )
+{
+	this->setServerPassword( password );
+	if ( isUsernameEditable )
+	{
+		this->saveServerUserName( userName );
+	}
+}
+
+void Settings::setClientUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable )
+{
+	this->setClientPassword( password );
 }
 
 void Settings::saveSchedulerDelay( const int& minutes )
@@ -394,11 +427,11 @@ void Settings::saveServerKey ( const QString& serverKey )
 	}
 }
 
-void Settings::saveUserName ( const QString &userName )
+void Settings::saveServerUserName ( const QString &userName )
 {
-	if ( this->userName != userName )
+	if ( this->serverUserName != userName )
 	{
-		this->userName = userName;
+		this->serverUserName = userName;
 		userSettings->setValue( SETTINGS_USERNAME, userName );
 		// delete the private key if the username has changed
 		savePrivatePuttyKey( "" );

@@ -45,6 +45,7 @@ QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE
 	QString aclFileName = settings->getApplicationDataDir() + settings->getTempMetadataFileName();
 	QStringList arguments;
 	arguments << "--absolute-names";
+	arguments << "--physical";
 	arguments << "-";
 	createProcess(settings->getGetfaclName(), arguments);
 	setStandardOutputFile(aclFileName);

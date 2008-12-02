@@ -26,7 +26,6 @@
 /**
  * The BackupForm class is the backup user interface.
  * @author Reto Aebersold, aebersold@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.15 $
  */
 class BackupForm : public QWidget, private Ui::BackupForm
 {

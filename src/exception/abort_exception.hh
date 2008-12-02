@@ -24,7 +24,6 @@
 /**
  * The AbortException class is used to indicate that the user wants to abort the process
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.2 $
  */
 class AbortException : public Exception
 {

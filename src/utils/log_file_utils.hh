@@ -28,7 +28,6 @@
  * The LogFileUtils class provides convenience methods for reading and writing the
  * user log file
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 06:00:01 $ $Revision: 1.6 $
  */
 class LogFileUtils : public QObject
 {

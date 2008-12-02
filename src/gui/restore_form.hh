@@ -29,7 +29,6 @@
 /**
  * The RestoreForm class is the restore user interface.
  * @author Reto Aebersold, aebersold@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.16 $
  */
 class RestoreForm : public QWidget, private Ui::RestoreForm
 {

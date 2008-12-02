@@ -32,7 +32,6 @@
  * the schtasks binary has been localized. The getTranslationFor* methods could be
  * enlarged if there is another localized binary.
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/07/04 08:52:02 $ $Revision: 1.19 $
  */
 class Schtasks : public AbstractScheduler, public Process
 {

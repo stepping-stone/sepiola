@@ -24,7 +24,6 @@
 /**
  * The CliManager class is used to start the application without a graphical user interface.
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/07/03 19:21:28 $ $Revision: 1.16 $
  */
 class CliManager : public QObject
 {

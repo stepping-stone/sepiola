@@ -27,7 +27,6 @@
 /**
  * The AbstractSsh class provides methods for using SSH
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.17 $
  */
 class AbstractSsh : public AbstractProgress
 {

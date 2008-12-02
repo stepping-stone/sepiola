@@ -31,7 +31,6 @@
 /**
  * The FileInfo class is used to hold a pair of owner and group identifier
  * @author Daniel Tschan, tschan@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.3 $
  */
 class FileInfo
 {
@@ -57,7 +56,6 @@ public:
 /**
  * The ExtendedFile class is used to set the owner and the group for a file or directory
  * @author Daniel Tschan, tschan@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.3 $
  */
 class ExtendedFile : public QFile
 {

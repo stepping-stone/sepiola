@@ -26,7 +26,7 @@
 ;General
 
   ;Name and file
-  Name "sepiola"
+  Name "@CPACK_PACKAGE_FULL_NAME@"
   OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
 
   ;Set compression
@@ -579,9 +579,29 @@ Section "Uninstall"
 @CPACK_NSIS_DELETE_DIRECTORIES@
 
   ;Remove the temporary application folder
-  RMDir /r "$TEMP\@CPACK_PACKAGE_FULL_NAME@"
+  RMDir /r "$TEMP\@CPACK_PACKAGE_NAME@"
   
   RMDir /r "$instdir\data"
+  ReadEnvStr $R7 "HOMEDRIVE"
+  ReadEnvStr $R8 "HOMEPATH"
+
+  ; remove folder %HOMEPATH%\.sepiola (or similar, depending on CPACK_PACKAGE_NAME)
+  ClearErrors
+  RMDir /r "$R7$R8\.@CPACK_PACKAGE_NAME@"
+  IfErrors LABEL_CouldNotDeleteSettingsDir LABEL_continue1
+  LABEL_CouldNotDeleteSettingsDir:
+  MessageBox MB_OK "Folder $R7$R8\.@CPACK_PACKAGE_NAME@ could not be removed."
+  ClearErrors
+  LABEL_continue1:
+
+  ;remove SCHTASKS tasks
+  ClearErrors
+  ExecShell "" "SCHTASKS" `/delete /tn "@CPACK_PACKAGE_FULL_NAME@" /f`
+  IfErrors LABEL_CouldNotDeleteSchTasks LABEL_continue2
+  LABEL_CouldNotDeleteSchTasks:
+  MessageBox MB_OK `Could not delete scheduled task SCHTASKS /delete /tn "@CPACK_PACKAGE_FULL_NAME@" /f.`
+  ClearErrors
+  LABEL_continue2:
 
   ;Remove the uninstaller itself.
   Delete "$INSTDIR\Uninstall.exe"

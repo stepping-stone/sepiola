@@ -27,7 +27,6 @@
 /**
  * The OutputDialog class provides a dialog supporting text output
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 10:09:43 $ $Revision: 1.12 $
  */
 class OutputDialog : public QDialog, private Ui::OutputDialog
 {

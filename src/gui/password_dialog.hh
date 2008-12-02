@@ -26,7 +26,6 @@
 /**
  * The PasswordDialog class provides a dialog asking for username and password
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/07/04 08:46:21 $ $Revision: 1.7 $
  */
 class PasswordDialog : public QDialog, private Ui::PasswordDialog
 {
@@ -48,7 +47,8 @@ public:
 
 signals:
 	void abort();
-
+	void processPasswordReturnValues(const QString& username, const QString& password, const bool isUsernameEditable);
+	
 private slots:
 	void on_btnOk_pressed();
 	void on_btnCancel_pressed();

@@ -34,7 +34,6 @@
 /**
  * The MainModel class the main model according to the MVC pattern
  * @author Reto Aebersold, aebersold@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/07/04 08:47:05 $ $Revision: 1.44 $
  */
 class MainModel : public QObject
 {
@@ -213,7 +212,8 @@ public:
 	void exit();
 
 signals:
-	void askForPassword( const QString& username, bool isUsernameEditable, int* result = 0, const QString& = "" );
+	void askForServerPassword( const QString& username, bool isUsernameEditable, int* result = 0, const QString& = "" );
+	void askForClientPassword( const QString& username, bool isUsernameEditable, int* result = 0, const QString& = "" );
 	void showInformationMessageBox( const QString& message );
 	void showCriticalMessageBox( const QString& message );
 	void updateStatusBarMessage ( const QString& message );

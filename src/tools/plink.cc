@@ -66,7 +66,7 @@ bool Plink::loginWithKey()
 
 	QStringList arguments;
 	arguments << "-i" << privatePuttyKeyFileName;
-	arguments << settings->getUserName() + "@" + settings->getServerName();
+	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	arguments << "sh -c 'echo " + LOGIN_ECHO_MESSAGE + "'";
 	createProcess( settings->getPlinkName(), arguments );
 	setProcessChannelMode( QProcess::MergedChannels );
@@ -96,7 +96,7 @@ bool Plink::assertCorrectFingerprint()
 	Settings* settings = Settings::getInstance();
 
 	QStringList arguments;
-	arguments << settings->getUserName() + "@" + settings->getServerName();
+	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	arguments << "sh -c \":\"";
 
 	createProcess( settings->getPlinkName(), arguments );
@@ -157,7 +157,7 @@ void Plink::uploadToMetaFolder( const QFileInfo& file, bool append )
 	qDebug() << "Plink::uploadToMetaFolder( " << file.absoluteFilePath() << ", " << append << " )";
 	Settings* settings = Settings::getInstance();
 
-	QString dest = settings->getUserName() + "@" + settings->getServerName();
+	QString dest = settings->getServerUserName() + "@" + settings->getServerName();
 
 	QStringList arguments;
 	arguments << "-i";
@@ -193,7 +193,7 @@ bool Plink::generateKeys( const QString& password )
 	QString authorizedKeyFileName = settings->getAuthorizedKeyFolderName() + settings->getAuthorizedKeyFileName();
 
 	QStringList arguments;
-	arguments << settings->getUserName() + "@" + settings->getServerName();
+	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	QString shellArguments;
 	arguments << "sh" << "-c";
 	shellArguments.append( "'echo " + LOGIN_ECHO_MESSAGE + ";" );
@@ -315,7 +315,7 @@ void Plink::testGenerateKeys()
 	QString username = "ssbackup";
 	QString password = "secret";
 	Settings* settings = Settings::getInstance();
-	settings->saveUserName( username );
+	settings->saveServerUserName( username );
 	settings->saveServerName( "localhost" );
 	Plink plink;
 	qDebug() << plink.generateKeys( password );

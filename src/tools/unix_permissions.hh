@@ -26,7 +26,6 @@
  * The UnixPermissions class provides methods for getting and setting Unix permissions.
  * This class is currently used for Mac OS X.
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 06:05:18 $ $Revision: 1.9 $
  */
 class UnixPermissions : public AbstractMetadata, public Process
 {

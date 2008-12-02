@@ -20,6 +20,7 @@
 
 #include "settings/settings.hh"
 #include "gui/password_dialog.hh"
+#include "utils/log_file_utils.hh"
 
 PasswordDialog::PasswordDialog( const QString& username, const bool& isUsernameEditable )
 {
@@ -44,11 +45,7 @@ void PasswordDialog::setDialogMessage(const QString& msg)
 
 void PasswordDialog::on_btnOk_pressed()
 {
-	Settings::getInstance()->setPassword( this->lineEditPassword->text() );
-	if ( isUsernameEditable )
-	{
-		Settings::getInstance()->saveUserName( this->lineEditUsername->text() );
-	}
+	emit processPasswordReturnValues(this->lineEditUsername->text(), this->lineEditPassword->text(), isUsernameEditable);
 	this->done(Accepted);
 }
 

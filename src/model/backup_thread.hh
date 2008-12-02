@@ -34,7 +34,6 @@ using std::auto_ptr;
 /**
  * The BackupThread class runs the backup process in its own thread
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 10:11:05 $ $Revision: 1.7 $
  */
 class BackupThread : public QThread
 {

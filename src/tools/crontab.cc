@@ -116,19 +116,18 @@ QStringList Crontab::readAllCrontabEntries()
 	return oldCrontabEntries;
 }
 
-bool Crontab::writeAllCrontabEntries( const QStringList& crontabEntries )
+bool Crontab::writeCrontabEntries_Helper( QStringList& crontabEntries, QString& return_error )
 {
-	qDebug() << "Crontab::writeAllCrontabEntries( " << crontabEntries << " )";
+	qDebug() << "Crontab::writeCrontabEntriesToFile( " << crontabEntries << " )";
 	Settings* settings = Settings::getInstance();
-	// write jobs line by line to a temporary file
-	// the QTemporaryFile destructor removes the temporary crontabFile
-	QTemporaryFile crontabFile;
-	if ( !crontabFile.open() )
+	
+	QTemporaryFile tmpFile;
+	if ( !tmpFile.open() )
 	{
-		emit errorSignal( QObject::tr( "Scheduling failed, because file %1 could not be written" ).arg( crontabFile.fileName() ) );
+		return_error = QObject::tr( "Scheduling failed, because file %1 could not be written" ).arg( tmpFile.fileName() );
 		return false;
 	}
-	QTextStream out( &crontabFile );
+	QTextStream out( &tmpFile );
 	foreach( QString crontabEntry, crontabEntries )
 	{
 		out << crontabEntry;
@@ -137,18 +136,48 @@ bool Crontab::writeAllCrontabEntries( const QStringList& crontabEntries )
 	out.flush();
 
 	QStringList arguments;
-	arguments << crontabFile.fileName();
+	arguments << tmpFile.fileName();
 	createProcess( CRONTAB_NAME, arguments );
 	start();
 	waitForFinished();
 	QString error = readAllStandardError();
-	if ( error == "" )
+	if ( error != "" )
 	{
-		emit infoSignal( QObject::tr( "Job has been scheduled." ) );
-		return true;
+		return_error = QObject::tr( "Scheduling failed. Reason is: " ) + error;
+		return false;
 	}
-	emit errorSignal( QObject::tr( "Scheduling failed. Reason is: " ) + error );
-	return false;
+	tmpFile.close();
+	return true;
+}
+
+bool Crontab::writeAllCrontabEntries( QStringList& crontabEntries )
+{
+	qDebug() << "Crontab::writeAllCrontabEntries( " << crontabEntries << " )";
+	// write jobs line by line to a temporary file
+	// the QTemporaryFile destructor removes the temporary crontabFile
+
+	QString error;
+	if ( writeCrontabEntries_Helper( crontabEntries, error ) )
+	{
+		// under some systems (f.ex. centos) there are additionally returned some comments when calling "crontab -l"
+		// these entries must be removed and the rest again inserted
+		int dn = readAllCrontabEntries().size() - crontabEntries.size();
+		if (dn > 0)
+		{
+			for (int i = 0; i < dn; i++)
+			{
+				crontabEntries.removeFirst();
+			}
+			writeCrontabEntries_Helper( crontabEntries, error );
+		}
+		emit infoSignal( QObject::tr( "Job has been scheduled." ) );
+		return true; // second insert is not relevant, so if first worked, return-value is true.
+	}
+	else
+	{
+		emit errorSignal( error );
+		return false;
+	}
 }
 
 bool Crontab::taskExists( const QString& execName,  const QString& cliArgument )

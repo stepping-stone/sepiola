@@ -27,7 +27,6 @@
 /**
  * The Exception class is the base class for all exceptions thrown by this application
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.6 $
  */
 class Exception : public std::exception
 {

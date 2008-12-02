@@ -25,7 +25,6 @@
 /**
  * The TestManager class is used to test the application while development
  * @author Daniel Tschan, tschan@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:16 $ $Revision: 1.5 $
  */
 class TestManager
 {

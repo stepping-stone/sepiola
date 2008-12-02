@@ -38,7 +38,6 @@
 /**
  * The MainWindow class is the main user interface.
  * @author Reto Aebersold, aebersold@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/07/04 08:47:05 $ $Revision: 1.24 $
  */
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
@@ -82,7 +81,8 @@ private:
 private slots:
 	void showInformationMessageBox( const QString& message );
 	void showCriticalMessageBox( const QString& message );
-	void showPasswordDialog( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
+	void showServerPasswordDialog( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
+	void showClientPasswordDialog( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
 	
 	void showProgressDialog( const QString& dialogTitle );
 	void appendInfoMessage( const QString& info );

@@ -32,7 +32,6 @@
  * the at binary has been localized. The getTranslationFor* methods could be
  * enlarged if there is another localized binary.
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/30 19:18:21 $ $Revision: 1.13 $
  */
 class At : public AbstractScheduler, public Process
 {

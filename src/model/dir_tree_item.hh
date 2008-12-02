@@ -25,7 +25,6 @@
 /**
  * The DirTreeItem class represents an item (file or directory) for the RemoteDirModel
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/06/18 14:02:57 $ $Revision: 1.9 $
  */
 class DirTreeItem : public QStandardItem
 {

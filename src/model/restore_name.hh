@@ -25,7 +25,6 @@
 /**
  * The RestoreName class represents a restore, containing the remote path to the backup and it's date
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: bsantschi $ $Date: 2008/04/25 05:42:15 $ $Revision: 1.4 $
  */
 class RestoreName
 {
@@ -65,6 +64,7 @@ public:
 	 * @param other another RestoreName object
 	 */
 	bool operator<( const RestoreName& other) const;
+	bool operator==( const RestoreName& other) const;
 		
 private:
 	QString absoluteDirName;

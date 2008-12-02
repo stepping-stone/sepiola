@@ -47,7 +47,14 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="3" >
-    <widget class="QTextEdit" name="textEditError" />
+    <widget class="QTextEdit" name="textEditError"> 
+     <property name="lineWrapMode" >
+      <enum>QTextEdit::NoWrap</enum>
+     </property>
+     <property name="readOnly" >
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item row="4" column="0" >
     <spacer>

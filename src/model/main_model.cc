@@ -51,7 +51,7 @@ void MainModel::keepSettings()
 	Settings* settings = Settings::getInstance();
 	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
 	QObject::connect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ) );
+						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
 						this, SLOT( infoDialog( const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -61,7 +61,7 @@ void MainModel::keepSettings()
 	settings->keepSettings();
 
 	QObject::disconnect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ) );
+						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
 						this, SLOT( infoDialog( const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -105,14 +105,14 @@ bool MainModel::initConnection()
 			isLoginAborted = false;
 			while( !isLoggedIn )
 			{
-				emit askForPassword( settings->getUserName(), true, 0, "" );
+				emit askForServerPassword( settings->getServerUserName(), true, 0, "" );
 				if ( isLoginAborted )
 				{
 					emit showCriticalMessageBox( tr( "Key has not been generated." ) );
 					return false;
 				}
 				try {
-					if( ssh->generateKeys( settings->getPassword() ) )
+					if( ssh->generateKeys( settings->getServerPassword() ) )
 					{
 						isLoggedIn = true;
 					}
@@ -210,7 +210,7 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
 
 	QObject::connect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ) );
+						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
 						this, SLOT( infoDialog( const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -227,7 +227,7 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 
 
 	QObject::disconnect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ) );
+						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
 						this, SLOT( infoDialog( const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -254,7 +254,7 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
 
 	QObject::connect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ) );
+						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
 						this, SLOT( infoDialog( const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -271,7 +271,7 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 	}
 
 	QObject::disconnect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ) );
+						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
 						this, SLOT( infoDialog( const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -299,7 +299,9 @@ QStringList MainModel::getPrefixes()
 
 QList<RestoreName> MainModel::getRestoreNames()
 {
+	QMap<QDate, RestoreName> backupNamesMap;
 	QList<RestoreName> backupNames;
+	bool wasError = false;
 	try
 	{
 		Settings* settings = Settings::getInstance();
@@ -307,33 +309,50 @@ QList<RestoreName> MainModel::getRestoreNames()
 		QStringList restoreInfoFiles = rsync->downloadAllRestoreInfoFiles( settings->getApplicationDataDir() );
 		foreach( QString restoreInfoFile, restoreInfoFiles )
 		{
+			qDebug() << "restoreInfoFile: (" + restoreInfoFile + ")";
 			QFile file( restoreInfoFile );
-			if ( !file.open( QIODevice::ReadOnly ) )
+			if ( file.open( QIODevice::ReadOnly ) )
 			{
-				emit showCriticalMessageBox( tr( "Can not open restore info file" ) );
-				return backupNames;
-			}
-			UnicodeTextStream in( &file );
-			QString dateTimeString = in.readLine();
-			QDate date;
-			if ( dateTimeString == MainModel::BACKUP_TIME_TODAY )
-			{
-				date = QDate::currentDate();
-			}
-			else
-			{
-				date = QDateTime::fromString( dateTimeString, MainModel::BACKUP_TIME_FORMAT ).date();
-			}
+				UnicodeTextStream in( &file );
+				QString dateTimeString = in.readLine();
+				QDate date;
+				if ( dateTimeString == MainModel::BACKUP_TIME_TODAY )
+				{
+					date = QDate::currentDate();
+				}
+				else
+				{
+					date = QDateTime::fromString( dateTimeString, MainModel::BACKUP_TIME_FORMAT ).date();
+				}
 
-			// extract path to backup (e.g. /.snapthots/daily.0 or /incoming )
-			QString backupName = restoreInfoFile;
-			backupName = backupName.mid( settings->getApplicationDataDir().length(), backupName.lastIndexOf( settings->getBackupPrefix() ) - settings->getApplicationDataDir().length() );
+				// extract path to backup (e.g. /.snapthots/daily.0 or /incoming )
+				QString backupName = restoreInfoFile;
+				backupName = backupName.mid( settings->getApplicationDataDir().length(), backupName.lastIndexOf( settings->getBackupPrefix() ) - settings->getApplicationDataDir().length() );
 
-			backupNames << RestoreName(  backupName, date );
+				//backupNamesSet << RestoreName(  backupName, date );
+				backupNamesMap.insert(date, RestoreName(  backupName, date ));
+			} 
+			else 
+			{
+				wasError = true;
+			}
 		}
-		rsync->deleteAllRestoreInfoFiles( settings->getApplicationDataDir() );
-
+		QMapIterator<QDate, RestoreName> it(backupNamesMap);
+		while (it.hasNext())
+		{
+			it.next();
+			backupNames << it.value();
+		}
 		qSort( backupNames.begin(), backupNames.end() );
+		if (wasError)
+		{
+			emit showCriticalMessageBox( tr( "Some restore info files could not be opened" ) );
+		}
+		else
+		{
+			rsync->deleteAllRestoreInfoFiles( settings->getApplicationDataDir() );
+		}
+		return backupNames;
 	}
 	catch ( ProcessException e )
 	{

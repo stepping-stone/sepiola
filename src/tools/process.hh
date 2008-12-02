@@ -28,7 +28,6 @@
 /**
  * The Process class provides the basic implementation for starting an external program
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/07/14 10:30:27 $ $Revision: 1.25 $
  */
 class Process
 {
@@ -124,6 +123,7 @@ protected:
 	void setTextModeEnabled( bool enabled );
 	void setReadChannel(QProcess::ProcessChannel channel);
 	QProcess::ProcessState state() const;
+	inline bool isAlive() { return (qProcess!=0); }
 
 private:
 	/**

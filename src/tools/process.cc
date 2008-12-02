@@ -22,6 +22,8 @@
 #include <QLocale>
 #include <QDebug>
 #include <QProcess>
+#include <QWaitCondition>
+#include <QMutex>
 
 #include "settings/settings.hh"
 #include "tools/process.hh"
@@ -56,10 +58,8 @@ void Process::createProcess(const QString& executableName, const QStringList& ar
 void Process::start() throw (ProcessException )
 {
 	assert(qProcess);
-	QString log_msg = "";
-	log_msg = log_msg.append("Started: ").append(executableName).append(" ").append(arguments.join(" "));
 	qDebug() << "Started: " << executableName << arguments;
-	LogFileUtils::getInstance()->writeLog(log_msg);
+	LogFileUtils::getInstance()->writeLog("Started: " + executableName + " " + arguments.join(" "));
 
 	qProcess->start(executableName, arguments);
 	if (qProcess->waitForStarted() )
@@ -80,7 +80,8 @@ void Process::setWorkingDirectory(const QString& directory)
 
 bool Process::blockingReadLine(QByteArray* byteArray, int msec)
 {
-	assert(qProcess);
+	//assert(qProcess);
+	if (!this->isAlive()) return false;
 	while ( !qProcess->canReadLine() )
 	{
 		if ( !qProcess->waitForReadyRead(msec) )
@@ -114,10 +115,14 @@ bool Process::blockingReadLine(QString* string, int msec)
 	{
 		*string = QString::fromUtf8(line);
 	}
+	else if ( Settings::IS_MAC )
+	{
+		QString inputString = QString::fromUtf8(line);
+		*string = inputString.normalized(QString::NormalizationForm_C);
+	}
 	else
 	{
-		QString inputString = QString::fromLocal8Bit(line);
-		*string = inputString.normalized(QString::NormalizationForm_C);
+		*string = QString::fromLocal8Bit(line);
 	}
 	return result;
 }

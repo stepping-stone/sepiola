@@ -27,7 +27,6 @@
 /**
  * The SetAcl class provides methods for using the setacl tool
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dtschan $ $Date: 2008/06/17 07:47:09 $ $Revision: 1.10 $
  */
 class SetAcl : public AbstractMetadata, public Process
 {

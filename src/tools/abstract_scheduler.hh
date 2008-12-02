@@ -28,7 +28,6 @@
 /**
  * The AbstractScheduler class provides methods for using a scheduler
  * @author Bruno Santschi, santschi@puzzle.ch
- * @version $Author: dsydler $ $Date: 2008/07/04 08:52:02 $ $Revision: 1.16 $
  */
 class AbstractScheduler : public AbstractProgress
 {
