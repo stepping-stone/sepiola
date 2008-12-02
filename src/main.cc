@@ -75,12 +75,12 @@ void messageHandler(QtMsgType type, const char *msg)
 		{
 		case QtDebugMsg:
 		case QtWarningMsg:
-			fprintf( stdout, message.toLocal8Bit());
+			fprintf( stdout, "%s", (const char*) message.toLocal8Bit());
 			fflush( stdout);
 			break;
 		case QtCriticalMsg:
 		case QtFatalMsg:
-			fprintf( stderr, message.toLocal8Bit());
+			fprintf( stderr, "%s", (const char*) message.toLocal8Bit());
 			fflush( stderr);
 			break;
 		}

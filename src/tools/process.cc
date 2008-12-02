@@ -139,7 +139,11 @@ void Process::terminate()
 	if (qProcess)
 	{
 		qProcess->kill();
-		qProcess->waitForFinished(10 * 1000);
+		int n = 0;
+		while (++n < 20 && qProcess->state() == QProcess::Running) {
+			qProcess->waitForFinished(500);
+			qDebug() << "waiting...";
+		}
 		delete qProcess;
 		qProcess = 0;
 	}

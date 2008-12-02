@@ -19,6 +19,8 @@
 #ifndef TOOL_FACTORY_HH
 #define TOOL_FACTORY_HH
 
+#include <memory>
+
 #include "settings/settings.hh"
 #include "tools/abstract_metadata.hh"
 #include "tools/abstract_rsync.hh"

@@ -28,8 +28,6 @@
 #include <QSize>
 #include <QPoint>
 
-#define macro_param_to_string(aStr) # aStr
-
 /**
  * The Settings class is used to store and read all settings for this application
  * @author Bruno Santschi, santschi@puzzle.ch

@@ -68,10 +68,9 @@ signals:
 
 private slots:
 	void on_btnCancel_pressed();
-
-private:
 	void flushCache();
 
+private:
 	bool isErrorVisible;
 	QTime lastUpdate;
 	QString outputCache;

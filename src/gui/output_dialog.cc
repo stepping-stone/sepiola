@@ -17,9 +17,12 @@
 */
 
 #include <QCloseEvent>
+#include <QTimer>
+#include <QDebug>
 
 #include "gui/output_dialog.hh"
 #include "settings/settings.hh"
+#include "utils/debug_timer.hh"
 
 OutputDialog::OutputDialog( const QString& title )
 {
@@ -39,12 +42,14 @@ OutputDialog::~OutputDialog()
 
 void OutputDialog::appendInfo( const QString& info )
 {
+	const int msecs_to_wait_for_flush = 500;
 	QTime currentTime = QTime::currentTime();
 	this->outputCache.append( info );
-	if ( this->lastUpdate <= currentTime.addSecs( -1 ) )
+	if ( this->lastUpdate.addMSecs(msecs_to_wait_for_flush) <= currentTime )
 	{
-		// update
-		flushCache();
+		// update, but only after a second, such that following messages ariving in the next second are also flushed
+		this->lastUpdate = QTime::currentTime();
+		QTimer::singleShot(msecs_to_wait_for_flush, this, SLOT(flushCache()));
 	}
 	else
 	{
@@ -56,7 +61,6 @@ void OutputDialog::appendInfo( const QString& info )
 void OutputDialog::flushCache()
 {
 	this->textEditOutput->append( this->outputCache  );
-	this->lastUpdate = QTime::currentTime();
 	this->outputCache.clear();
 }
 
@@ -74,6 +78,7 @@ void OutputDialog::appendError( const QString& error )
 void OutputDialog::on_btnCancel_pressed()
 {
 	emit abort();
+
 	this->btnClose->setEnabled(true);
 	this->btnCancel->setEnabled(false);
 }

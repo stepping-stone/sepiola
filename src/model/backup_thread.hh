@@ -19,6 +19,7 @@
 #ifndef BACKUP_THREAD_HH
 #define BACKUP_THREAD_HH
 
+#include <memory>
 #include <QFileInfo>
 #include <QList>
 #include <QPair>

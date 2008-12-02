@@ -19,6 +19,7 @@
 #ifndef RESTORE_THREAD_HH
 #define RESTORE_THREAD_HH
 
+#include <memory>
 #include <QThread>
 #include <QStringList>
 
