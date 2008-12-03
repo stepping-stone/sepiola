@@ -1,0 +1,24 @@
+diff -ur rsync-2.6.9/configure rsync-2.6.9-nolchown/configure
+--- rsync-2.6.9/configure	2006-11-07 05:39:47.000000000 +0100
++++ rsync-2.6.9-nolchown/configure	2008-11-25 12:07:25.000000000 +0100
+@@ -13476,7 +13476,7 @@
+ 
+ for ac_func in waitpid wait4 getcwd strdup chown chmod lchmod mknod mkfifo \
+     fchmod fstat ftruncate strchr readlink link utime utimes lutimes strftime \
+-    memmove lchown vsnprintf snprintf vasprintf asprintf setsid glob strpbrk \
++    memmove vsnprintf snprintf vasprintf asprintf setsid glob strpbrk \
+     strlcat strlcpy strtol mallinfo getgroups setgroups geteuid getegid \
+     setlocale setmode open64 lseek64 mkstemp64 mtrace va_copy __va_copy \
+     strerror putenv iconv_open locale_charset nl_langinfo \
+diff -ur rsync-2.6.9/configure.in rsync-2.6.9-nolchown/configure.in
+--- rsync-2.6.9/configure.in	2006-11-07 05:39:47.000000000 +0100
++++ rsync-2.6.9-nolchown/configure.in	2008-11-25 12:07:34.000000000 +0100
+@@ -524,7 +524,7 @@
+ AC_FUNC_ALLOCA
+ AC_CHECK_FUNCS(waitpid wait4 getcwd strdup chown chmod lchmod mknod mkfifo \
+     fchmod fstat ftruncate strchr readlink link utime utimes lutimes strftime \
+-    memmove lchown vsnprintf snprintf vasprintf asprintf setsid glob strpbrk \
++    memmove vsnprintf snprintf vasprintf asprintf setsid glob strpbrk \
+     strlcat strlcpy strtol mallinfo getgroups setgroups geteuid getegid \
+     setlocale setmode open64 lseek64 mkstemp64 mtrace va_copy __va_copy \
+     strerror putenv iconv_open locale_charset nl_langinfo \
