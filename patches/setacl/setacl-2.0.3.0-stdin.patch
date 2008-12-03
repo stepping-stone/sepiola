@@ -1,0 +1,1019 @@
+diff -urP setacl-2.0.3.0-sources/baseclasses/CSetACL.cpp setacl-2.0.3.0-patched/baseclasses/CSetACL.cpp
+--- setacl-2.0.3.0-sources/baseclasses/CSetACL.cpp	2008-05-06 21:43:02.000000000 +0200
++++ setacl-2.0.3.0-patched/baseclasses/CSetACL.cpp	2008-11-18 18:34:59.000000000 +0100
+@@ -26,6 +26,8 @@
+ 
+ 
+ #include "CSetACL.h"
++#include <io.h>
++#include <fcntl.h>
+ 
+ 
+ //////////////////////////////////////////////////////////////////////
+@@ -163,7 +165,7 @@
+ 	DWORD		nLocalPart;
+ 	HANDLE	hNetEnum;
+ 
+-	if (sObjectPath.GetLength () >= 1 && (nObjectType == SE_FILE_OBJECT || nObjectType == SE_SERVICE || nObjectType == SE_PRINTER || nObjectType == SE_REGISTRY_KEY || nObjectType == SE_LMSHARE))
++	if (nObjectType == SE_FILE_OBJECT || nObjectType == SE_SERVICE || nObjectType == SE_PRINTER || nObjectType == SE_REGISTRY_KEY || nObjectType == SE_LMSHARE)
+ 	{
+ 		m_sObjectPath	=	sObjectPath;
+ 		m_nObjectType	=	nObjectType;
+@@ -292,18 +294,17 @@
+ 	}
+ 
+ 	// Check if the log file already exists
+-	errno_t	nErr			=	0;
+ 	FILE*		fhTest		=	NULL;
+ 
+-	nErr	=	_tfopen_s (&fhTest, sLogFile, TEXT ("r"));
++	fhTest      = _tfopen (sLogFile, TEXT ("r"));
+ 	BOOL	fExists			=	(fhTest != NULL);
+ 
+ 	if (fhTest)	fclose (fhTest);
+ 
+ 	// Open the log file for appending. If it does not exist, it is created
+-	nErr	=	_tfopen_s (&m_fhLog, sLogFile, TEXT ("ab"));
++	m_fhLog	=	_tfopen (sLogFile, TEXT ("ab"));
+ 
+-	if (m_fhLog == NULL || nErr != 0)
++	if (m_fhLog == NULL)
+ 	{
+ 		LogMessage (TEXT ("ERROR: Opening log file: <") + sLogFile + TEXT ("> failed!"));
+ 
+@@ -903,12 +904,6 @@
+ {
+ 	DWORD	nError;
+ 
+-	// Was the object path set?
+-	if (m_sObjectPath.IsEmpty ())
+-	{
+-		return RTN_ERR_OBJECT_NOT_SET;
+-	}
+-
+ 	// Check the type and version of the OS we are running on
+ 	OSVERSIONINFO osviVersion;
+ 
+@@ -1603,10 +1598,9 @@
+ 	if (! m_sBackupRestoreFile.IsEmpty ())
+ 	{
+ 		// Open the output file
+-		errno_t	nErr	= 0;
+-		nErr	=	_tfopen_s (&m_fhBackupRestoreFile, m_sBackupRestoreFile, TEXT ("wb"));
++		m_fhBackupRestoreFile	=	_tfopen (m_sBackupRestoreFile, TEXT ("wb"));
+ 
+-		if (m_fhBackupRestoreFile != NULL && nErr == 0)
++		if (m_fhBackupRestoreFile != NULL)
+ 		{
+ 			// Write the unicode BOM (byte order mark)
+ 			WCHAR cBOM	=	0xFEFF;
+@@ -1620,7 +1614,23 @@
+ 
+ 	if (m_nObjectType == SE_FILE_OBJECT)
+ 	{
+-		nError =	RecurseDirs (m_sObjectPath, &CSetACL::ListSD);
++		if (m_sObjectPath.IsEmpty())
++		{
++			_setmode( _fileno( stdin ), _O_BINARY );
++			CStdioFile stdinFile(stdin);
++			nError = 0;
++			CString sLine;
++			while (!nError && stdinFile.ReadString(sLine))
++			{
++				sLine.TrimRight(TEXT ("\r\n"));
++				SetObject(TEXT ("\\\\?\\") + sLine, SE_FILE_OBJECT);
++				nError = RecurseDirs (m_sObjectPath, &CSetACL::ListSD);
++			}
++		}
++		else
++		{
++			nError =	RecurseDirs (m_sObjectPath, &CSetACL::ListSD);
++		}
+ 	}
+ 	else if (m_nObjectType == SE_REGISTRY_KEY)
+ 	{
+@@ -1657,7 +1667,6 @@
+ 	UINT						nRead				=	0;
+ 	CSD*						csdSD				=	NULL;
+ 	CString					sLineIn;
+-	errno_t					nErr				= 0;
+ 
+ 
+ 	// Was an input file specified?
+@@ -1674,9 +1683,9 @@
+ 	}
+ 
+ 	// Open input file for reading in binary mode
+-	nErr	=	_tfopen_s (&m_fhBackupRestoreFile, m_sBackupRestoreFile, TEXT ("rb"));
++	m_fhBackupRestoreFile	=	_tfopen (m_sBackupRestoreFile, TEXT ("rb"));
+ 
+-	if (m_fhBackupRestoreFile == NULL || nErr != 0)
++	if (m_fhBackupRestoreFile == NULL)
+ 	{
+ 		return RTN_ERR_OPEN_LOGFILE;
+ 	}
+@@ -1706,9 +1715,9 @@
+ 
+ 		// Reopen again in text mode
+ 		fclose (m_fhBackupRestoreFile);
+-		nErr	=	_tfopen_s (&m_fhBackupRestoreFile, m_sBackupRestoreFile, TEXT ("r"));
++		m_fhBackupRestoreFile	=	_tfopen (m_sBackupRestoreFile, TEXT ("r"));
+ 
+-		if (m_fhBackupRestoreFile == NULL || nErr != 0)
++		if (m_fhBackupRestoreFile == NULL)
+ 		{
+ 			return RTN_ERR_OPEN_LOGFILE;
+ 		}
+@@ -1891,6 +1900,9 @@
+ 			}
+ 		}
+ 
++		DWORD nFind3	=	sSDDL.ReverseFind (TEXT (','));
++		SetFileAttributes(sObjectPath, _tcstoul( sSDDL.Mid(nFind3 + 1), 0, 16 ));
++
+ 		// Set the SD on the object
+ 		csdSD				=	new CSD (this);
+ 		nError			=	csdSD->SetSD (sObjectPath.GetBuffer (sObjectPath.GetLength () + 1), nObjectType, siSecInfo, paclDACL, paclSACL, psidOwner, psidGroup);
+@@ -2787,6 +2799,8 @@
+ 	CString								sDACLControl;
+ 	CString								sSACLControl;
+ 	CSD*									csdSD				=	NULL;
++	DWORD								dwFileAttributes;
++	CString								sFileAttributes;
+ 
+ 	// Convert the object type to a string for storage
+ 	sObjectType.Format (TEXT ("%d"), m_nObjectType);
+@@ -2903,6 +2917,13 @@
+ 		sSACLControl	+=	TEXT (")");
+ 	}
+ 
++	dwFileAttributes = GetFileAttributes(sObjectPath);
++	if (sObjectPath.GetLength() == 7 && sObjectPath.Left(4) == "\\\\?\\" && isalpha(sObjectPath[4]) && sObjectPath.Right(2) == ":\\")
++	{
++		dwFileAttributes &= ~FILE_ATTRIBUTE_HIDDEN & ~FILE_ATTRIBUTE_SYSTEM;
++	}
++	sFileAttributes.Format(TEXT(",%x"), dwFileAttributes);
++
+ 	// Which list format is requested: SDDL or our own?
+ 	if (m_nListFormat == LIST_SDDL)
+ 	{
+@@ -2920,11 +2941,11 @@
+ 		//
+ 		if (sObjectPath.Left (1) != TEXT ("\""))
+ 		{
+-			sLineOut		=	TEXT ("\"") + sObjectPath + TEXT ("\",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"");
++			sLineOut		=	TEXT ("\"") + sObjectPath + TEXT ("\",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"") + sFileAttributes;
+ 		}
+ 		else
+ 		{
+-			sLineOut		=	sObjectPath + TEXT (",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"");
++			sLineOut		=	sObjectPath + TEXT (",") + sObjectType + TEXT (",\"") + sSDDL + TEXT ("\"") + sFileAttributes;
+ 		}
+ 	}
+ 	else if (m_nListFormat == LIST_CSV)
+Binary files setacl-2.0.3.0-sources/interface-cmdline/SetACL CMD.ncb and setacl-2.0.3.0-patched/interface-cmdline/SetACL CMD.ncb differ
+diff -urP setacl-2.0.3.0-sources/interface-cmdline/SetACL CMD.sln setacl-2.0.3.0-patched/interface-cmdline/SetACL CMD.sln
+--- setacl-2.0.3.0-sources/interface-cmdline/SetACL CMD.sln	1970-01-01 01:00:00.000000000 +0100
++++ setacl-2.0.3.0-patched/interface-cmdline/SetACL CMD.sln	2008-11-14 13:06:20.000000000 +0100
+@@ -0,0 +1,21 @@
++Microsoft Visual Studio Solution File, Format Version 8.00
++Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SetACL CMD", "SetACL.vcproj", "{9C65F5EC-D9BD-4A12-8BC0-4E1854C410A9}"
++	ProjectSection(ProjectDependencies) = postProject
++	EndProjectSection
++EndProject
++Global
++	GlobalSection(SolutionConfiguration) = preSolution
++		Debug = Debug
++		Release = Release
++	EndGlobalSection
++	GlobalSection(ProjectConfiguration) = postSolution
++		{9C65F5EC-D9BD-4A12-8BC0-4E1854C410A9}.Debug.ActiveCfg = Debug|Win32
++		{9C65F5EC-D9BD-4A12-8BC0-4E1854C410A9}.Debug.Build.0 = Debug|Win32
++		{9C65F5EC-D9BD-4A12-8BC0-4E1854C410A9}.Release.ActiveCfg = Release|Win32
++		{9C65F5EC-D9BD-4A12-8BC0-4E1854C410A9}.Release.Build.0 = Release|Win32
++	EndGlobalSection
++	GlobalSection(ExtensibilityGlobals) = postSolution
++	EndGlobalSection
++	GlobalSection(ExtensibilityAddIns) = postSolution
++	EndGlobalSection
++EndGlobal
+diff -urP setacl-2.0.3.0-sources/interface-cmdline/SetACL.cpp setacl-2.0.3.0-patched/interface-cmdline/SetACL.cpp
+--- setacl-2.0.3.0-sources/interface-cmdline/SetACL.cpp	2008-04-29 23:42:18.000000000 +0200
++++ setacl-2.0.3.0-patched/interface-cmdline/SetACL.cpp	2008-11-17 13:47:20.000000000 +0100
+@@ -249,8 +249,6 @@
+ 					return RTN_ERR_PARAMS;
+ 				}
+ 
+-				if (! sObjectName.IsEmpty ())
+-				{
+ 					if (oSetACL->SetObject (sObjectName, (SE_OBJECT_TYPE) nObjectType) != RTN_OK)
+ 					{
+ 						if (funcNotify)
+@@ -260,7 +258,6 @@
+ 
+ 						return RTN_ERR_PARAMS;
+ 					}
+-				}
+ 			}
+ 			else if (sArg.CompareNoCase (TEXT ("-actn")) == 0)
+ 			{
+diff -urP setacl-2.0.3.0-sources/interface-cmdline/SetACL.vcproj setacl-2.0.3.0-patched/interface-cmdline/SetACL.vcproj
+--- setacl-2.0.3.0-sources/interface-cmdline/SetACL.vcproj	2008-05-06 21:49:22.000000000 +0200
++++ setacl-2.0.3.0-patched/interface-cmdline/SetACL.vcproj	2008-11-11 11:04:17.000000000 +0100
+@@ -1,51 +1,24 @@
+ <?xml version="1.0" encoding="Windows-1252"?>
+ <VisualStudioProject
+ 	ProjectType="Visual C++"
+-	Version="9,00"
++	Version="7.10"
+ 	Name="SetACL CMD"
+-	ProjectGUID="{A7ED1C13-6D01-4A32-9F47-B32654B75D51}"
+-	RootNamespace="SetACL CMD"
+-	Keyword="MFCProj"
+-	TargetFrameworkVersion="131072"
+-	>
++	SccProjectName=""
++	SccLocalPath=""
++	Keyword="MFCProj">
+ 	<Platforms>
+ 		<Platform
+-			Name="Win32"
+-		/>
+-		<Platform
+-			Name="x64"
+-		/>
++			Name="Win32"/>
+ 	</Platforms>
+-	<ToolFiles>
+-	</ToolFiles>
+ 	<Configurations>
+ 		<Configuration
+ 			Name="Debug|Win32"
+ 			OutputDirectory=".\Debug"
+ 			IntermediateDirectory=".\Debug"
+ 			ConfigurationType="1"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+ 			UseOfMFC="1"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			CharacterSet="2"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-				TypeLibraryName=".\Debug/SetACL.tlb"
+-				HeaderFileName=""
+-			/>
++			ATLMinimizesCRunTimeLibraryUsage="FALSE"
++			CharacterSet="1">
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+@@ -53,495 +26,111 @@
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="1"
+ 				PrecompiledHeaderFile=".\Debug/SetACL.pch"
+-				AssemblerListingLocation=""
++				AssemblerListingLocation=".\Debug/"
++				ObjectFile=".\Debug/"
++				ProgramDataBaseFileName=".\Debug/"
+ 				BrowseInformation="1"
+-				WarningLevel="4"
+-				SuppressStartupBanner="true"
+-				Detect64BitPortabilityProblems="false"
+-				DebugInformationFormat="4"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCResourceCompilerTool"
+-				PreprocessorDefinitions="_DEBUG"
+-				Culture="1031"
+-			/>
++				WarningLevel="3"
++				SuppressStartupBanner="TRUE"
++				DebugInformationFormat="4"/>
+ 			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
++				Name="VCCustomBuildTool"/>
+ 			<Tool
+ 				Name="VCLinkerTool"
+ 				AdditionalDependencies="netapi32.lib mpr.lib"
+-				OutputFile="$(OutDir)\SetACL.exe"
+-				LinkIncremental="2"
+-				SuppressStartupBanner="true"
+-				GenerateDebugInformation="true"
++				OutputFile=".\Debug/SetACL.exe"
++				LinkIncremental="0"
++				SuppressStartupBanner="TRUE"
++				GenerateDebugInformation="TRUE"
++				ProgramDatabaseFile=".\Debug/SetACL.pdb"
+ 				SubSystem="1"
+-				RandomizedBaseAddress="1"
+-				DataExecutionPrevention="0"
+-				TargetMachine="1"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCManifestTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-				OutputFile="$(OutDir)/SetACL.bsc"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCAppVerifierTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-		<Configuration
+-			Name="Debug|x64"
+-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+-			ConfigurationType="1"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+-			UseOfMFC="1"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			CharacterSet="2"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
++				TargetMachine="1"/>
+ 			<Tool
+ 				Name="VCMIDLTool"
+-				TargetEnvironment="3"
+ 				TypeLibraryName=".\Debug/SetACL.tlb"
+-				HeaderFileName=""
+-			/>
++				HeaderFileName=""/>
+ 			<Tool
+-				Name="VCCLCompilerTool"
+-				Optimization="0"
+-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+-				BasicRuntimeChecks="3"
+-				RuntimeLibrary="1"
+-				PrecompiledHeaderFile=".\Debug/SetACL.pch"
+-				AssemblerListingLocation=""
+-				BrowseInformation="1"
+-				WarningLevel="3"
+-				SuppressStartupBanner="true"
+-				Detect64BitPortabilityProblems="false"
+-				DebugInformationFormat="3"
+-			/>
++				Name="VCPostBuildEventTool"/>
++			<Tool
++				Name="VCPreBuildEventTool"/>
+ 			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
++				Name="VCPreLinkEventTool"/>
+ 			<Tool
+ 				Name="VCResourceCompilerTool"
+ 				PreprocessorDefinitions="_DEBUG"
+-				Culture="1031"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLinkerTool"
+-				AdditionalDependencies="netapi32.lib mpr.lib"
+-				OutputFile="$(OutDir)\SetACL.exe"
+-				LinkIncremental="2"
+-				SuppressStartupBanner="true"
+-				GenerateDebugInformation="true"
+-				SubSystem="1"
+-				RandomizedBaseAddress="1"
+-				DataExecutionPrevention="0"
+-				TargetMachine="17"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCManifestTool"
+-			/>
++				Culture="1031"/>
+ 			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
++				Name="VCWebServiceProxyGeneratorTool"/>
+ 			<Tool
+-				Name="VCBscMakeTool"
+-				OutputFile="$(OutDir)/SetACL.bsc"
+-			/>
++				Name="VCXMLDataGeneratorTool"/>
+ 			<Tool
+-				Name="VCFxCopTool"
+-			/>
++				Name="VCWebDeploymentTool"/>
+ 			<Tool
+-				Name="VCAppVerifierTool"
+-			/>
++				Name="VCManagedWrapperGeneratorTool"/>
+ 			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
++				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+ 		</Configuration>
+ 		<Configuration
+ 			Name="Release|Win32"
+-			OutputDirectory="Release"
+-			IntermediateDirectory="Release"
++			OutputDirectory=".\Release"
++			IntermediateDirectory=".\Release"
+ 			ConfigurationType="1"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+ 			UseOfMFC="1"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			CharacterSet="2"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-				TypeLibraryName=".\Release/SetACL.tlb"
+-				HeaderFileName=""
+-			/>
++			ATLMinimizesCRunTimeLibraryUsage="FALSE"
++			CharacterSet="1">
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				Optimization="2"
+ 				InlineFunctionExpansion="1"
++				AdditionalIncludeDirectories="&quot;C:\Program Files\Microsoft Platform SDK for Windows XP SP2\Include&quot;"
+ 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+-				StringPooling="true"
++				StringPooling="TRUE"
+ 				RuntimeLibrary="0"
+-				EnableFunctionLevelLinking="true"
++				EnableFunctionLevelLinking="TRUE"
+ 				PrecompiledHeaderFile=".\Release/SetACL.pch"
+-				AssemblerListingLocation=""
++				AssemblerListingLocation=".\Release/"
++				ObjectFile=".\Release/"
++				ProgramDataBaseFileName=".\Release/"
+ 				BrowseInformation="1"
+-				WarningLevel="4"
+-				SuppressStartupBanner="true"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCResourceCompilerTool"
+-				PreprocessorDefinitions="NDEBUG"
+-				Culture="1031"
+-			/>
++				WarningLevel="3"
++				SuppressStartupBanner="TRUE"/>
+ 			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
++				Name="VCCustomBuildTool"/>
+ 			<Tool
+ 				Name="VCLinkerTool"
+ 				AdditionalOptions="/IGNORE:4089"
+ 				AdditionalDependencies="netapi32.lib mpr.lib"
+-				OutputFile="$(OutDir)\SetACL.exe"
+-				LinkIncremental="1"
+-				SuppressStartupBanner="true"
++				OutputFile=".\Release/SetACL.exe"
++				LinkIncremental="0"
++				SuppressStartupBanner="TRUE"
++				AdditionalLibraryDirectories="&quot;C:\Program Files\Microsoft Platform SDK for Windows XP SP2\Lib&quot;"
++				ProgramDatabaseFile=".\Release/SetACL.pdb"
+ 				SubSystem="1"
+-				RandomizedBaseAddress="1"
+-				DataExecutionPrevention="0"
+-				TargetMachine="1"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCManifestTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-				OutputFile="$(OutDir)/SetACL.bsc"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCAppVerifierTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-		<Configuration
+-			Name="Release|x64"
+-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+-			ConfigurationType="1"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+-			UseOfMFC="1"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			CharacterSet="2"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
++				TargetMachine="1"/>
+ 			<Tool
+ 				Name="VCMIDLTool"
+-				TargetEnvironment="3"
+ 				TypeLibraryName=".\Release/SetACL.tlb"
+-				HeaderFileName=""
+-			/>
+-			<Tool
+-				Name="VCCLCompilerTool"
+-				Optimization="2"
+-				InlineFunctionExpansion="1"
+-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+-				StringPooling="true"
+-				RuntimeLibrary="0"
+-				EnableFunctionLevelLinking="true"
+-				PrecompiledHeaderFile=".\Release/SetACL.pch"
+-				AssemblerListingLocation=""
+-				BrowseInformation="1"
+-				WarningLevel="4"
+-				SuppressStartupBanner="true"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
+-			<Tool
+-				Name="VCResourceCompilerTool"
+-				PreprocessorDefinitions="NDEBUG"
+-				Culture="1031"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLinkerTool"
+-				AdditionalOptions="/IGNORE:4089"
+-				AdditionalDependencies="netapi32.lib mpr.lib"
+-				OutputFile="$(OutDir)\SetACL.exe"
+-				LinkIncremental="1"
+-				SuppressStartupBanner="true"
+-				SubSystem="1"
+-				RandomizedBaseAddress="1"
+-				DataExecutionPrevention="0"
+-				TargetMachine="17"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCManifestTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCAppVerifierTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-		<Configuration
+-			Name="Debug - Code Analysis|Win32"
+-			OutputDirectory="$(ConfigurationName)"
+-			IntermediateDirectory="$(ConfigurationName)"
+-			ConfigurationType="1"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+-			UseOfMFC="1"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			CharacterSet="2"
+-			>
+-			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-				TypeLibraryName=".\Debug/SetACL.tlb"
+-				HeaderFileName=""
+-			/>
+-			<Tool
+-				Name="VCCLCompilerTool"
+-				Optimization="0"
+-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+-				BasicRuntimeChecks="3"
+-				RuntimeLibrary="1"
+-				PrecompiledHeaderFile=".\Debug/SetACL.pch"
+-				AssemblerListingLocation=""
+-				BrowseInformation="1"
+-				WarningLevel="4"
+-				SuppressStartupBanner="true"
+-				Detect64BitPortabilityProblems="false"
+-				DebugInformationFormat="4"
+-				EnablePREfast="true"
+-			/>
++				HeaderFileName=""/>
+ 			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
++				Name="VCPostBuildEventTool"/>
+ 			<Tool
+-				Name="VCResourceCompilerTool"
+-				PreprocessorDefinitions="_DEBUG"
+-				Culture="1031"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLinkerTool"
+-				AdditionalDependencies="netapi32.lib mpr.lib"
+-				OutputFile="$(OutDir)\SetACL.exe"
+-				LinkIncremental="2"
+-				SuppressStartupBanner="true"
+-				GenerateDebugInformation="true"
+-				SubSystem="1"
+-				RandomizedBaseAddress="1"
+-				DataExecutionPrevention="0"
+-				TargetMachine="1"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCManifestTool"
+-			/>
+-			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
+-			<Tool
+-				Name="VCBscMakeTool"
+-				OutputFile="$(OutDir)/SetACL.bsc"
+-			/>
+-			<Tool
+-				Name="VCFxCopTool"
+-			/>
+-			<Tool
+-				Name="VCAppVerifierTool"
+-			/>
+-			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
+-		</Configuration>
+-		<Configuration
+-			Name="Debug - Code Analysis|x64"
+-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+-			ConfigurationType="1"
+-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+-			UseOfMFC="1"
+-			ATLMinimizesCRunTimeLibraryUsage="false"
+-			CharacterSet="2"
+-			>
++				Name="VCPreBuildEventTool"/>
+ 			<Tool
+-				Name="VCPreBuildEventTool"
+-			/>
+-			<Tool
+-				Name="VCCustomBuildTool"
+-			/>
+-			<Tool
+-				Name="VCXMLDataGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCWebServiceProxyGeneratorTool"
+-			/>
+-			<Tool
+-				Name="VCMIDLTool"
+-				TargetEnvironment="3"
+-				TypeLibraryName=".\Debug/SetACL.tlb"
+-				HeaderFileName=""
+-			/>
+-			<Tool
+-				Name="VCCLCompilerTool"
+-				Optimization="0"
+-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+-				BasicRuntimeChecks="3"
+-				RuntimeLibrary="1"
+-				PrecompiledHeaderFile=".\Debug/SetACL.pch"
+-				AssemblerListingLocation=""
+-				BrowseInformation="1"
+-				WarningLevel="3"
+-				SuppressStartupBanner="true"
+-				Detect64BitPortabilityProblems="false"
+-				DebugInformationFormat="3"
+-			/>
+-			<Tool
+-				Name="VCManagedResourceCompilerTool"
+-			/>
++				Name="VCPreLinkEventTool"/>
+ 			<Tool
+ 				Name="VCResourceCompilerTool"
+-				PreprocessorDefinitions="_DEBUG"
+-				Culture="1031"
+-			/>
+-			<Tool
+-				Name="VCPreLinkEventTool"
+-			/>
+-			<Tool
+-				Name="VCLinkerTool"
+-				AdditionalDependencies="netapi32.lib mpr.lib"
+-				OutputFile="$(OutDir)\SetACL.exe"
+-				LinkIncremental="2"
+-				SuppressStartupBanner="true"
+-				GenerateDebugInformation="true"
+-				SubSystem="1"
+-				RandomizedBaseAddress="1"
+-				DataExecutionPrevention="0"
+-				TargetMachine="17"
+-			/>
+-			<Tool
+-				Name="VCALinkTool"
+-			/>
+-			<Tool
+-				Name="VCManifestTool"
+-			/>
++				PreprocessorDefinitions="NDEBUG"
++				Culture="1031"/>
+ 			<Tool
+-				Name="VCXDCMakeTool"
+-			/>
++				Name="VCWebServiceProxyGeneratorTool"/>
+ 			<Tool
+-				Name="VCBscMakeTool"
+-			/>
++				Name="VCXMLDataGeneratorTool"/>
+ 			<Tool
+-				Name="VCFxCopTool"
+-			/>
++				Name="VCWebDeploymentTool"/>
+ 			<Tool
+-				Name="VCAppVerifierTool"
+-			/>
++				Name="VCManagedWrapperGeneratorTool"/>
+ 			<Tool
+-				Name="VCPostBuildEventTool"
+-			/>
++				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+ 		</Configuration>
+ 	</Configurations>
+ 	<References>
+@@ -549,170 +138,67 @@
+ 	<Files>
+ 		<Filter
+ 			Name="Quellcodedateien"
+-			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+-			>
++			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+ 			<File
+-				RelativePath="..\baseclasses\CSetACL.cpp"
+-				>
+-				<FileConfiguration
+-					Name="Debug|Win32"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="0"
+-						PreprocessorDefinitions=""
+-						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
++				RelativePath="..\baseclasses\CSetACL.cpp">
+ 				<FileConfiguration
+-					Name="Debug|x64"
+-					>
++					Name="Debug|Win32">
+ 					<Tool
+ 						Name="VCCLCompilerTool"
+ 						Optimization="0"
+ 						PreprocessorDefinitions=""
+ 						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="2"
+-						PreprocessorDefinitions=""
+-						BrowseInformation="1"
+-					/>
++						BrowseInformation="1"/>
+ 				</FileConfiguration>
+ 				<FileConfiguration
+-					Name="Release|x64"
+-					>
++					Name="Release|Win32">
+ 					<Tool
+ 						Name="VCCLCompilerTool"
+ 						Optimization="2"
+ 						PreprocessorDefinitions=""
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
+-				<FileConfiguration
+-					Name="Debug - Code Analysis|Win32"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="0"
+-						PreprocessorDefinitions=""
+-						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
+-				<FileConfiguration
+-					Name="Debug - Code Analysis|x64"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="0"
+-						PreprocessorDefinitions=""
+-						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
++						BrowseInformation="1"/>
+ 				</FileConfiguration>
+ 			</File>
+ 			<File
+-				RelativePath="SetACL.cpp"
+-				>
++				RelativePath="SetACL.cpp">
+ 				<FileConfiguration
+-					Name="Debug|Win32"
+-					>
++					Name="Debug|Win32">
+ 					<Tool
+ 						Name="VCCLCompilerTool"
+ 						Optimization="0"
+ 						PreprocessorDefinitions=""
+ 						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
++						BrowseInformation="1"/>
+ 				</FileConfiguration>
+ 				<FileConfiguration
+-					Name="Debug|x64"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="0"
+-						PreprocessorDefinitions=""
+-						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					>
++					Name="Release|Win32">
+ 					<Tool
+ 						Name="VCCLCompilerTool"
+ 						Optimization="2"
+ 						PreprocessorDefinitions=""
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
+-				<FileConfiguration
+-					Name="Release|x64"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="2"
+-						PreprocessorDefinitions=""
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
+-				<FileConfiguration
+-					Name="Debug - Code Analysis|Win32"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="0"
+-						PreprocessorDefinitions=""
+-						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
+-				</FileConfiguration>
+-				<FileConfiguration
+-					Name="Debug - Code Analysis|x64"
+-					>
+-					<Tool
+-						Name="VCCLCompilerTool"
+-						Optimization="0"
+-						PreprocessorDefinitions=""
+-						BasicRuntimeChecks="3"
+-						BrowseInformation="1"
+-					/>
++						BrowseInformation="1"/>
+ 				</FileConfiguration>
+ 			</File>
+ 			<File
+-				RelativePath="SetACL.rc"
+-				>
++				RelativePath="SetACL.rc">
+ 			</File>
+ 		</Filter>
+ 		<Filter
+ 			Name="Header-Dateien"
+-			Filter="h;hpp;hxx;hm;inl"
+-			>
++			Filter="h;hpp;hxx;hm;inl">
+ 			<File
+-				RelativePath="..\baseclasses\CSetACL.h"
+-				>
++				RelativePath="..\baseclasses\CSetACL.h">
+ 			</File>
+ 			<File
+-				RelativePath="Resource.h"
+-				>
++				RelativePath="Resource.h">
+ 			</File>
+ 			<File
+-				RelativePath="SetACL.h"
+-				>
++				RelativePath="SetACL.h">
+ 			</File>
+ 		</Filter>
+ 		<Filter
+ 			Name="Ressourcendateien"
+-			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+-			>
++			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+ 		</Filter>
+ 	</Files>
+ 	<Globals>
