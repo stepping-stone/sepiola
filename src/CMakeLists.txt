@@ -258,9 +258,9 @@ ENDIF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/config_reseller")
 IF(Q_WS_WIN)
 	ADD_CUSTOM_TARGET(copy ALL
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink.exe ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/windows-i386/rsync.exe ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/windows-i386/SetACL.exe ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink-*.exe ${CMAKE_CURRENT_BINARY_DIR}/plink.exe
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/windows-i386/rsync-*.exe ${CMAKE_CURRENT_BINARY_DIR}/rsync.exe
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/windows-i386/setacl-*.exe ${CMAKE_CURRENT_BINARY_DIR}/setacl.exe
 	)
 
 	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
@@ -275,11 +275,11 @@ IF(Q_WS_WIN)
 ELSEIF(Q_WS_MAC)
 	ADD_CUSTOM_TARGET(copy ALL 
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config                             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/plink                 ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/plink-*               ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/ssh                   ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/ssh-*                 ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/rsync                 ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/rsync-*               ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${translation_binaries}                                         ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/src/icon/mac/${MACOSX_BUNDLE_ICON_FILE}   ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/Resources/${MACOSX_BUNDLE_ICON_FILE}
@@ -308,15 +308,15 @@ ELSE(Q_WS_WIN)
 	ENDIF(ARCH MATCHES "64$")
 	ADD_CUSTOM_TARGET(copy ALL 
 		COMMAND cp ${PROJECT_SOURCE_DIR}/config/config ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/plink ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/plink-* ${CMAKE_CURRENT_BINARY_DIR}/plink
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/plink
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/ssh ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/ssh-* ${CMAKE_CURRENT_BINARY_DIR}/ssh
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/ssh
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync-* ${CMAKE_CURRENT_BINARY_DIR}/rsync
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/rsync
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/getfacl ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/getfacl-* ${CMAKE_CURRENT_BINARY_DIR}/getfacl
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/getfacl
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/setfacl ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/setfacl-* ${CMAKE_CURRENT_BINARY_DIR}/setfacl
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/setfacl
 		
 		COMMAND cp ${PROJECT_SOURCE_DIR}/src/icon/linux/${LINUX_BUNDLE_ICON_FILE} ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png
