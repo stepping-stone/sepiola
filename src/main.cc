@@ -42,6 +42,7 @@
 #include "test/test_manager.hh"
 #include "utils/log_file_utils.hh"
 
+
 namespace
 {
 static const QString CONFIG_FILE_NAME = "config";

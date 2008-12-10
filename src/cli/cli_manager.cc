@@ -28,6 +28,10 @@
 #ifdef Q_OS_UNIX
 #include <termios.h>
 #endif
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 
 #include "cli/cli_manager.hh"
 #include "exception/login_exception.hh"
@@ -225,6 +229,7 @@ void CliManager::askForPassword()
 	QTextStream cin( stdin, QIODevice::ReadOnly );
 	QTextStream cout( stdout, QIODevice::WriteOnly );
 
+
 	cout << "Enter username: " << flush;
 	QString username;
 	cin >> username;
@@ -255,11 +260,24 @@ QString CliManager::readPassword()
 		}
 	#endif
 
+		// Turn echoing off and info not able to.
+	#ifdef Q_OS_WIN
+		HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+		DWORD fdwOldMode;
+		if (hStdin == INVALID_HANDLE_VALUE || !GetConsoleMode(hStdin, &fdwOldMode) || !SetConsoleMode(hStdin, fdwOldMode & ~ENABLE_ECHO_INPUT)) { 
+			qWarning() << QObject::tr("Caution: Cannot turn off the password echoing! Password will be shown when typed.");
+		}
+	#endif
+
 	// Read the password.
 	QString password;
 	QTextStream cin( stdin, QIODevice::ReadOnly );
 	cin >> password;
 
+	#ifdef Q_OS_WIN
+		SetConsoleMode(hStdin, fdwOldMode); 
+	#endif
+	
 	#ifdef Q_OS_UNIX
 		// Restore terminal.
 		(void) tcsetattr( 0, TCSAFLUSH, &oldTermios );
