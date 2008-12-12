@@ -137,6 +137,7 @@ echo "Unpacking finished successfully"
 # install desktop icon
 sepiola_bin="${toplevel}/bin/@CPACK_SSBACKUP_EXECUTABLE_NAME@"
 reseller_icon="${toplevel}/resource/@CPACK_SSBACKUP_EXECUTABLE_NAME@.png"
+linux_app_icon_resource_name = "steppingstone-sepiola_icon"
 
 if [ "x${interactive}x" = "xTRUEx" ]
 then
@@ -151,8 +152,8 @@ then
 
   if [ "x${cpack_install_desktop_icon}x" = "xTRUEx" ]
   then
-    xdg-icon-resource install --novendor --size 128 "${reseller_icon}"
-    printf "[Desktop Entry]\nVersion=1.0\nType=Application\nName=@CPACK_SSBACKUP_APPLICATION_FULL_NAME@\nComment=@CPACK_SSBACKUP_APPLICATION_FULL_NAME@\nTryExec=${sepiola_bin}\nExec=${sepiola_bin}\nIcon=@CPACK_SSBACKUP_EXECUTABLE_NAME@.png" > "${toplevel}/@CPACK_SSBACKUP_EXECUTABLE_NAME@.desktop"
+    xdg-icon-resource install forceupdate--novendor --size 128 "${reseller_icon}" ${linux_app_icon_resource_name}
+    printf "[Desktop Entry]\nVersion=1.0\nType=Application\nName=@CPACK_SSBACKUP_APPLICATION_FULL_NAME@\nComment=@CPACK_SSBACKUP_APPLICATION_FULL_NAME@\nTryExec=${sepiola_bin}\nExec=${sepiola_bin}\nIcon=@linux_app_icon_resource_name@" > "${toplevel}/@CPACK_SSBACKUP_EXECUTABLE_NAME@.desktop"
 	xdg-desktop-icon install --novendor "${toplevel}/@CPACK_SSBACKUP_EXECUTABLE_NAME@.desktop"
   fi
 fi
