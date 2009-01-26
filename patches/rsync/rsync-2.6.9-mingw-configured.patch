@@ -1,0 +1,754 @@
+diff -urN rsync-2.6.9/config.h rsync-2.6.9-configured/config.h
+--- rsync-2.6.9/config.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-configured/config.h	2009-01-26 15:21:11.000000000 +0100
+@@ -0,0 +1,547 @@
++/* config.h.  Generated from config.h.in by configure.  */
++/* config.h.in.  Generated from configure.in by autoheader.  */
++
++/* Define to 1 if link() can hard-link special files. */
++/* #undef CAN_HARDLINK_SPECIAL */
++
++/* Define to 1 if link() can hard-link symlinks. */
++/* #undef CAN_HARDLINK_SYMLINK */
++
++/* Define to 1 if chown modifies symlinks. */
++/* #undef CHOWN_MODIFIES_SYMLINK */
++
++/* Undefine if you don't want locale features. By default this is defined. */
++#define CONFIG_LOCALE 1
++
++/* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
++   systems. This function is required for `alloca.c' support on those systems.
++   */
++/* #undef CRAY_STACKSEG_END */
++
++/* Define to 1 if using `alloca.c'. */
++/* #undef C_ALLOCA */
++
++/* Define to the type of elements in the array set by `getgroups'. Usually
++   this is either `int' or `gid_t'. */
++#define GETGROUPS_T int
++
++/* Define to 1 if the `getpgrp' function requires zero arguments. */
++/* #undef GETPGRP_VOID */
++
++/* Define to 1 if you have `alloca', as a function or macro. */
++#define HAVE_ALLOCA 1
++
++/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
++   */
++/* #undef HAVE_ALLOCA_H */
++
++/* Define to 1 if you have the <arpa/inet.h> header file. */
++/* #undef HAVE_ARPA_INET_H */
++
++/* Define to 1 if you have the <arpa/nameser.h> header file. */
++/* #undef HAVE_ARPA_NAMESER_H */
++
++/* Define to 1 if you have the `asprintf' function. */
++/* #undef HAVE_ASPRINTF */
++
++/* Define to 1 if readdir() is broken */
++/* #undef HAVE_BROKEN_READDIR */
++
++/* Define to 1 if vsprintf has a C99-compatible return value */
++/* #undef HAVE_C99_VSNPRINTF */
++
++/* Define to 1 if you have the `chmod' function. */
++#define HAVE_CHMOD 1
++
++/* Define to 1 if you have the `chown' function. */
++/* #undef HAVE_CHOWN */
++
++/* Define to 1 if you have the <compat.h> header file. */
++/* #undef HAVE_COMPAT_H */
++
++/* Define to 1 if you have the "connect" function */
++/* #undef HAVE_CONNECT */
++
++/* Define to 1 if you have the <ctype.h> header file. */
++#define HAVE_CTYPE_H 1
++
++/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
++   */
++#define HAVE_DIRENT_H 1
++
++/* Define to 1 if errno is declared in errno.h */
++#define HAVE_ERRNO_DECL 1
++
++/* Define to 1 if you have the `fchmod' function. */
++/* #undef HAVE_FCHMOD */
++
++/* Define to 1 if you have the <fcntl.h> header file. */
++#define HAVE_FCNTL_H 1
++
++/* Define to 1 if you have the <float.h> header file. */
++#define HAVE_FLOAT_H 1
++
++/* Define to 1 if you have the `fstat' function. */
++#define HAVE_FSTAT 1
++
++/* Define to 1 if you have the `ftruncate' function. */
++#define HAVE_FTRUNCATE 1
++
++/* Define to 1 if you have the "getaddrinfo" function. */
++/* #undef HAVE_GETADDRINFO */
++
++/* Define to 1 if you have the `getcwd' function. */
++#define HAVE_GETCWD 1
++
++/* Define to 1 if you have the `getegid' function. */
++/* #undef HAVE_GETEGID */
++
++/* Define to 1 if you have the `geteuid' function. */
++/* #undef HAVE_GETEUID */
++
++/* Define to 1 if you have the `getgroups' function. */
++/* #undef HAVE_GETGROUPS */
++
++/* Define to 1 if you have the `getnameinfo' function. */
++/* #undef HAVE_GETNAMEINFO */
++
++/* Define to 1 if you have the `getpgrp' function. */
++/* #undef HAVE_GETPGRP */
++
++/* Define to 1 if gettimeofday() takes a time-zone arg */
++#define HAVE_GETTIMEOFDAY_TZ 1
++
++/* Define to 1 if you have the `glob' function. */
++/* #undef HAVE_GLOB */
++
++/* Define to 1 if you have the <glob.h> header file. */
++/* #undef HAVE_GLOB_H */
++
++/* Define to 1 if you have the <grp.h> header file. */
++/* #undef HAVE_GRP_H */
++
++/* Define to 1 if you have the <iconv.h> header file. */
++/* #undef HAVE_ICONV_H */
++
++/* Define to 1 if you have the `iconv_open' function. */
++/* #undef HAVE_ICONV_OPEN */
++
++/* Define to 1 if you have the `inet_ntop' function. */
++/* #undef HAVE_INET_NTOP */
++
++/* Define to 1 if you have the `inet_pton' function. */
++/* #undef HAVE_INET_PTON */
++
++/* Define to 1 if you have the <inttypes.h> header file. */
++#define HAVE_INTTYPES_H 1
++
++/* Define to 1 if you have the <langinfo.h> header file. */
++/* #undef HAVE_LANGINFO_H */
++
++/* Define to 1 if you have the `lchmod' function. */
++/* #undef HAVE_LCHMOD */
++
++/* Define to 1 if you have the `lchown' function. */
++/* #undef HAVE_LCHOWN */
++
++/* Define to 1 if you have the <libcharset.h> header file. */
++/* #undef HAVE_LIBCHARSET_H */
++
++/* Define to 1 if you have the `inet' library (-linet). */
++/* #undef HAVE_LIBINET */
++
++/* Define to 1 if you have the `nsl' library (-lnsl). */
++/* #undef HAVE_LIBNSL */
++
++/* Define to 1 if you have the `nsl_s' library (-lnsl_s). */
++/* #undef HAVE_LIBNSL_S */
++
++/* Define to 1 if you have the `popt' library (-lpopt). */
++/* #undef HAVE_LIBPOPT */
++
++/* Define to 1 if you have the `resolv' library (-lresolv). */
++/* #undef HAVE_LIBRESOLV */
++
++/* Define to 1 if you have the `socket' library (-lsocket). */
++/* #undef HAVE_LIBSOCKET */
++
++/* Define to 1 if you have the <limits.h> header file. */
++#define HAVE_LIMITS_H 1
++
++/* Define to 1 if you have the `link' function. */
++/* #undef HAVE_LINK */
++
++/* Define to 1 if you have the `locale_charset' function. */
++/* #undef HAVE_LOCALE_CHARSET */
++
++/* Define to 1 if you have the <locale.h> header file. */
++#define HAVE_LOCALE_H 1
++
++/* Define to 1 if the type `long double' works and has more range or precision
++   than `double'. */
++#define HAVE_LONG_DOUBLE 1
++
++/* Define to 1 if the type `long double' works and has more range or precision
++   than `double'. */
++#define HAVE_LONG_DOUBLE_WIDER 1
++
++/* Define to 1 if you have the `lseek64' function. */
++#define HAVE_LSEEK64 1
++
++/* Define to 1 if you have the `lutimes' function. */
++/* #undef HAVE_LUTIMES */
++
++/* Define to 1 if you have the `mallinfo' function. */
++/* #undef HAVE_MALLINFO */
++
++/* Define to 1 if you have the <malloc.h> header file. */
++#define HAVE_MALLOC_H 1
++
++/* Define to 1 if you have the <mcheck.h> header file. */
++/* #undef HAVE_MCHECK_H */
++
++/* Define to 1 if you have the `memmove' function. */
++#define HAVE_MEMMOVE 1
++
++/* Define to 1 if you have the <memory.h> header file. */
++#define HAVE_MEMORY_H 1
++
++/* Define to 1 if you have the `mkfifo' function. */
++/* #undef HAVE_MKFIFO */
++
++/* Define to 1 if you have the `mknod' function. */
++/* #undef HAVE_MKNOD */
++
++/* Define to 1 if you have the `mkstemp64' function. */
++/* #undef HAVE_MKSTEMP64 */
++
++/* Define to 1 if you have the `mtrace' function. */
++/* #undef HAVE_MTRACE */
++
++/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
++/* #undef HAVE_NDIR_H */
++
++/* Define to 1 if you have the <netdb.h> header file. */
++/* #undef HAVE_NETDB_H */
++
++/* Define to 1 if you have the `nl_langinfo' function. */
++/* #undef HAVE_NL_LANGINFO */
++
++/* Define to 1 if you have the `open64' function. */
++/* #undef HAVE_OPEN64 */
++
++/* Define to 1 if you have the `putenv' function. */
++#define HAVE_PUTENV 1
++
++/* Define to 1 if you have the `readlink' function. */
++/* #undef HAVE_READLINK */
++
++/* Define to 1 if remote shell is remsh, not rsh */
++/* #undef HAVE_REMSH */
++
++/* Define to 1 if mkstemp() is available and works right */
++/* #undef HAVE_SECURE_MKSTEMP */
++
++/* Define to 1 if you have the `setgroups' function. */
++/* #undef HAVE_SETGROUPS */
++
++/* Define to 1 if you have the `setlocale' function. */
++#define HAVE_SETLOCALE 1
++
++/* Define to 1 if you have the `setmode' function. */
++#define HAVE_SETMODE 1
++
++/* Define to 1 if you have the `setsid' function. */
++/* #undef HAVE_SETSID */
++
++/* Define to 1 if you have the `sigaction' function. */
++/* #undef HAVE_SIGACTION */
++
++/* Define to 1 if you have the `sigprocmask' function. */
++/* #undef HAVE_SIGPROCMASK */
++
++/* Define to 1 if you have the `snprintf' function. */
++#define HAVE_SNPRINTF 1
++
++/* Do we have sockaddr_in6.sin6_scope_id? */
++/* #undef HAVE_SOCKADDR_IN6_SCOPE_ID */
++
++/* Do we have sockaddr_in.sin_len? */
++/* #undef HAVE_SOCKADDR_IN_LEN */
++
++/* Do we have sockaddr.sa_len? */
++/* #undef HAVE_SOCKADDR_LEN */
++
++/* Define to 1 if you have struct sockaddr_storage. */
++/* #undef HAVE_SOCKADDR_STORAGE */
++
++/* Do we have sockaddr_un.sun_len? */
++/* #undef HAVE_SOCKADDR_UN_LEN */
++
++/* Define to 1 if you have the "socketpair" function */
++/* #undef HAVE_SOCKETPAIR */
++
++/* Define to 1 if you have the <stdint.h> header file. */
++#define HAVE_STDINT_H 1
++
++/* Define to 1 if you have the <stdlib.h> header file. */
++#define HAVE_STDLIB_H 1
++
++/* Define to 1 if you have the `strcasecmp' function. */
++#define HAVE_STRCASECMP 1
++
++/* Define to 1 if you have the `strchr' function. */
++#define HAVE_STRCHR 1
++
++/* Define to 1 if you have the `strdup' function. */
++#define HAVE_STRDUP 1
++
++/* Define to 1 if you have the `strerror' function. */
++#define HAVE_STRERROR 1
++
++/* Define to 1 if you have the `strftime' function. */
++#define HAVE_STRFTIME 1
++
++/* Define to 1 if you have the <strings.h> header file. */
++#define HAVE_STRINGS_H 1
++
++/* Define to 1 if you have the <string.h> header file. */
++#define HAVE_STRING_H 1
++
++/* Define to 1 if you have the `strlcat' function. */
++/* #undef HAVE_STRLCAT */
++
++/* Define to 1 if you have the `strlcpy' function. */
++/* #undef HAVE_STRLCPY */
++
++/* Define to 1 if you have the `strpbrk' function. */
++#define HAVE_STRPBRK 1
++
++/* Define to 1 if you have the `strtol' function. */
++#define HAVE_STRTOL 1
++
++/* Define to 1 if you have struct stat64. */
++/* #undef HAVE_STRUCT_STAT64 */
++
++/* Define to 1 if `st_rdev' is member of `struct stat'. */
++#define HAVE_STRUCT_STAT_ST_RDEV 1
++
++/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
++   */
++/* #undef HAVE_SYS_DIR_H */
++
++/* Define to 1 if you have the <sys/fcntl.h> header file. */
++#define HAVE_SYS_FCNTL_H 1
++
++/* Define to 1 if you have the <sys/filio.h> header file. */
++/* #undef HAVE_SYS_FILIO_H */
++
++/* Define to 1 if you have the <sys/ioctl.h> header file. */
++/* #undef HAVE_SYS_IOCTL_H */
++
++/* Define to 1 if you have the <sys/mode.h> header file. */
++/* #undef HAVE_SYS_MODE_H */
++
++/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
++   */
++/* #undef HAVE_SYS_NDIR_H */
++
++/* Define to 1 if you have the <sys/param.h> header file. */
++#define HAVE_SYS_PARAM_H 1
++
++/* Define to 1 if you have the <sys/select.h> header file. */
++/* #undef HAVE_SYS_SELECT_H */
++
++/* Define to 1 if you have the <sys/socket.h> header file. */
++/* #undef HAVE_SYS_SOCKET_H */
++
++/* Define to 1 if you have the <sys/stat.h> header file. */
++#define HAVE_SYS_STAT_H 1
++
++/* Define to 1 if you have the <sys/time.h> header file. */
++#define HAVE_SYS_TIME_H 1
++
++/* Define to 1 if you have the <sys/types.h> header file. */
++#define HAVE_SYS_TYPES_H 1
++
++/* Define to 1 if you have the <sys/unistd.h> header file. */
++#define HAVE_SYS_UNISTD_H 1
++
++/* Define to 1 if you have the <sys/un.h> header file. */
++/* #undef HAVE_SYS_UN_H */
++
++/* Define to 1 if you have the <sys/wait.h> header file. */
++/* #undef HAVE_SYS_WAIT_H */
++
++/* Define to 1 if you have the `tcgetpgrp' function. */
++/* #undef HAVE_TCGETPGRP */
++
++/* Define to 1 if you have the <unistd.h> header file. */
++#define HAVE_UNISTD_H 1
++
++/* Define to 1 if you have the "struct utimbuf" type */
++#define HAVE_UTIMBUF 1
++
++/* Define to 1 if you have the `utime' function. */
++#define HAVE_UTIME 1
++
++/* Define to 1 if you have the `utimes' function. */
++/* #undef HAVE_UTIMES */
++
++/* Define to 1 if you have the <utime.h> header file. */
++#define HAVE_UTIME_H 1
++
++/* Define to 1 if `utime(file, NULL)' sets file's timestamp to the present. */
++#define HAVE_UTIME_NULL 1
++
++/* Define to 1 if you have the `vasprintf' function. */
++/* #undef HAVE_VASPRINTF */
++
++/* Define to 1 if you have the `va_copy' function. */
++/* #undef HAVE_VA_COPY */
++
++/* Define to 1 if you have the `vsnprintf' function. */
++#define HAVE_VSNPRINTF 1
++
++/* Define to 1 if you have the `wait4' function. */
++/* #undef HAVE_WAIT4 */
++
++/* Define to 1 if you have the `waitpid' function. */
++/* #undef HAVE_WAITPID */
++
++/* Define to 1 if you have the `__va_copy' function. */
++/* #undef HAVE___VA_COPY */
++
++/* true if you have IPv6 */
++/* #undef INET6 */
++
++/* Define to 1 if `major', `minor', and `makedev' are declared in <mkdev.h>.
++   */
++/* #undef MAJOR_IN_MKDEV */
++
++/* Define to 1 if `major', `minor', and `makedev' are declared in
++   <sysmacros.h>. */
++/* #undef MAJOR_IN_SYSMACROS */
++
++/* Define to 1 if makedev() takes 3 args */
++/* #undef MAKEDEV_TAKES_3_ARGS */
++
++/* Define to 1 if mknod() can create FIFOs. */
++/* #undef MKNOD_CREATES_FIFOS */
++
++/* Define to 1 if mknod() can create sockets. */
++/* #undef MKNOD_CREATES_SOCKETS */
++
++/* unprivileged group for unprivileged user */
++#define NOBODY_GROUP "nobody"
++
++/* unprivileged user--e.g. nobody */
++#define NOBODY_USER "nobody"
++
++/* Define to the address where bug reports for this package should be sent. */
++#define PACKAGE_BUGREPORT ""
++
++/* Define to the full name of this package. */
++#define PACKAGE_NAME ""
++
++/* Define to the full name and version of this package. */
++#define PACKAGE_STRING ""
++
++/* Define to the one symbol short name of this package. */
++#define PACKAGE_TARNAME ""
++
++/* Define to the version of this package. */
++#define PACKAGE_VERSION ""
++
++/* Define as the return type of signal handlers (`int' or `void'). */
++#define RETSIGTYPE void
++
++/* location of configuration file for rsync server */
++#define RSYNCD_SYSCONF "/etc/rsyncd.conf"
++
++/* location of rsync on remote machine */
++#define RSYNC_PATH "rsync"
++
++/* default -e command */
++#define RSYNC_RSH "ssh"
++
++/* rsync release version */
++#define RSYNC_VERSION "2.6.9"
++
++/* Define to 1 if sockets need to be shutdown */
++/* #undef SHUTDOWN_ALL_SOCKETS */
++
++/* Define to 1 if "signed char" is a valid type */
++#define SIGNED_CHAR_OK 1
++
++/* The size of `int', as computed by sizeof. */
++#define SIZEOF_INT 4
++
++/* The size of `long', as computed by sizeof. */
++#define SIZEOF_LONG 4
++
++/* The size of `long long', as computed by sizeof. */
++#define SIZEOF_LONG_LONG 8
++
++/* The size of `off64_t', as computed by sizeof. */
++#define SIZEOF_OFF64_T 8
++
++/* The size of `off_t', as computed by sizeof. */
++#define SIZEOF_OFF_T 4
++
++/* The size of `short', as computed by sizeof. */
++#define SIZEOF_SHORT 2
++
++/* If using the C implementation of alloca, define if you know the
++   direction of stack growth for your system; otherwise it will be
++   automatically deduced at runtime.
++	STACK_DIRECTION > 0 => grows toward higher addresses
++	STACK_DIRECTION < 0 => grows toward lower addresses
++	STACK_DIRECTION = 0 => direction of growth unknown */
++/* #undef STACK_DIRECTION */
++
++/* Define to 1 if you have the ANSI C header files. */
++#define STDC_HEADERS 1
++
++/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
++#define TIME_WITH_SYS_TIME 1
++
++/* Define to 1 if your processor stores words with the most significant byte
++   first (like Motorola and SPARC, unlike Intel and VAX). */
++/* #undef WORDS_BIGENDIAN */
++
++/* Number of bits in a file offset, on hosts where this is settable. */
++/* #undef _FILE_OFFSET_BITS */
++
++/* Define _GNU_SOURCE so that we get all necessary prototypes */
++#define _GNU_SOURCE 1
++
++/* Define for large files, on AIX-style hosts. */
++/* #undef _LARGE_FILES */
++
++/* Define to `int' if <sys/types.h> doesn't define. */
++#define gid_t int
++
++/* Define to `__inline__' or `__inline' if that's what the C compiler
++   calls it, or to nothing if 'inline' is not supported under any name.  */
++#ifndef __cplusplus
++/* #undef inline */
++#endif
++
++/* Define to `int' if <sys/types.h> does not define. */
++/* #undef mode_t */
++
++/* Define to `long int' if <sys/types.h> does not define. */
++/* #undef off_t */
++
++/* Define to `int' if <sys/types.h> does not define. */
++/* #undef pid_t */
++
++/* Define to `unsigned int' if <sys/types.h> does not define. */
++/* #undef size_t */
++
++/* type to use in place of socklen_t if not defined */
++/* #undef socklen_t */
++
++/* Define to `int' if <sys/types.h> doesn't define. */
++#define uid_t int
+diff -urN rsync-2.6.9/lib/dummy rsync-2.6.9-configured/lib/dummy
+--- rsync-2.6.9/lib/dummy	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-configured/lib/dummy	2009-01-26 15:21:10.000000000 +0100
+@@ -0,0 +1,2 @@
++This is a dummy file to ensure that the lib directory gets created
++by configure when a VPATH is used.
+diff -urN rsync-2.6.9/Makefile rsync-2.6.9-configured/Makefile
+--- rsync-2.6.9/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-configured/Makefile	2009-01-26 15:21:10.000000000 +0100
+@@ -0,0 +1,187 @@
++# Makefile for rsync. This is processed by configure to produce the final
++# Makefile
++
++prefix=/usr/local
++datarootdir=${prefix}/share
++exec_prefix=${prefix}
++bindir=${exec_prefix}/bin
++mandir=${datarootdir}/man
++
++LIBS=
++CC=gcc -std=gnu99
++CFLAGS=-g -O2 -DHAVE_CONFIG_H -Wall -W -I./popt
++CPPFLAGS=
++EXEEXT=.exe
++LDFLAGS=
++
++INSTALLCMD=/bin/install -c
++INSTALLMAN=/bin/install -c
++
++srcdir=.
++
++SHELL=/bin/sh
++
++VERSION=@VERSION@
++
++.SUFFIXES:
++.SUFFIXES: .c .o
++
++HEADERS=byteorder.h config.h errcode.h proto.h global.h rsync.h lib/pool_alloc.h
++LIBOBJ=lib/wildmatch.o lib/compat.o lib/snprintf.o lib/mdfour.o \
++	lib/permstring.o lib/pool_alloc.o mingw/mingw.o  ${LIBOBJDIR}lib/inet_ntop$U.o ${LIBOBJDIR}lib/inet_pton$U.o ${LIBOBJDIR}lib/getaddrinfo$U.o ${LIBOBJDIR}lib/getnameinfo$U.o
++ZLIBOBJ=zlib/deflate.o zlib/inffast.o zlib/inflate.o zlib/inftrees.o \
++	zlib/trees.o zlib/zutil.o zlib/adler32.o zlib/compress.o zlib/crc32.o
++OBJS1=rsync.o generator.o receiver.o cleanup.o sender.o exclude.o util.o \
++	main.o checksum.o match.o syscall.o log.o backup.o
++OBJS2=options.o flist.o io.o compat.o hlink.o token.o uidlist.o socket.o \
++	fileio.o batch.o clientname.o chmod.o
++OBJS3=progress.o pipe.o
++DAEMON_OBJ = params.o loadparm.o clientserver.o access.o connection.o authenticate.o
++popt_OBJS=popt/findme.o  popt/popt.o  popt/poptconfig.o \
++	popt/popthelp.o popt/poptparse.o
++OBJS=$(OBJS1) $(OBJS2) $(OBJS3) $(DAEMON_OBJ) $(LIBOBJ) $(ZLIBOBJ) $(popt_OBJS)
++
++TLS_OBJ = tls.o syscall.o lib/compat.o lib/snprintf.o lib/permstring.o
++
++# Programs we must have to run the test cases
++CHECK_PROGS = rsync$(EXEEXT) tls$(EXEEXT) getgroups$(EXEEXT) getfsdev$(EXEEXT) \
++	trimslash$(EXEEXT) t_unsafe$(EXEEXT) wildtest$(EXEEXT)
++
++# Objects for CHECK_PROGS to clean
++CHECK_OBJS=getgroups.o getfsdev.o t_stub.o t_unsafe.o trimslash.o wildtest.o
++
++# note that the -I. is needed to handle config.h when using VPATH
++.c.o:
++#
++	$(CC) -I. -I$(srcdir) $(CFLAGS) $(CPPFLAGS) -Imingw -Wno-unused -c $< -o $@
++#
++
++all: rsync$(EXEEXT)
++
++install: all
++	-mkdir -p ${DESTDIR}${bindir}
++	${INSTALLCMD} ${INSTALL_STRIP} -m 755 rsync$(EXEEXT) ${DESTDIR}${bindir}
++	-mkdir -p ${DESTDIR}${mandir}/man1
++	-mkdir -p ${DESTDIR}${mandir}/man5
++	${INSTALLMAN} -m 644 $(srcdir)/rsync.1 ${DESTDIR}${mandir}/man1
++	${INSTALLMAN} -m 644 $(srcdir)/rsyncd.conf.5 ${DESTDIR}${mandir}/man5
++
++install-strip:
++	$(MAKE) INSTALL_STRIP='-s' install
++
++rsync$(EXEEXT): $(OBJS)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(LIBS) -lws2_32 -lntdll
++
++$(OBJS): $(HEADERS)
++
++tls$(EXEEXT): $(TLS_OBJ)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TLS_OBJ) $(LIBS)
++
++getgroups$(EXEEXT): getgroups.o
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ getgroups.o $(LIBS)
++
++getfsdev$(EXEEXT): getfsdev.o
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ getfsdev.o $(LIBS)
++
++TRIMSLASH_OBJ = trimslash.o syscall.o lib/compat.o lib/snprintf.o
++trimslash$(EXEEXT): $(TRIMSLASH_OBJ)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(TRIMSLASH_OBJ) $(LIBS)
++
++T_UNSAFE_OBJ = t_unsafe.o syscall.o util.o t_stub.o lib/compat.o lib/snprintf.o
++t_unsafe$(EXEEXT): $(T_UNSAFE_OBJ)
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(T_UNSAFE_OBJ) $(LIBS)
++
++gen:
++	cd $(srcdir) && $(MAKE) -f prepare-source.mak gen
++
++man:
++	cd $(srcdir) && $(MAKE) -f prepare-source.mak man
++
++proto:
++	cd $(srcdir) && $(MAKE) -f prepare-source.mak proto.h
++
++export OBJS1 OBJS2 OBJS3
++global.h: prepare-source.mak $(OBJS1) $(OBJS2) $(OBJS3)
++	cd $(srcdir) && $(MAKE) -f prepare-source.mak global.h
++
++clean: cleantests
++	rm -f *~ $(OBJS) $(TLS_OBJ) $(CHECK_PROGS) $(CHECK_OBJS)
++
++cleantests:
++	rm -rf ./testtmp*
++
++# We try to delete built files from both the source and build
++# directories, just in case somebody previously configured things in
++# the source directory.
++distclean: clean
++	rm -f Makefile config.h config.status
++	rm -f $(srcdir)/Makefile $(srcdir)/config.h $(srcdir)/config.status
++
++	rm -f config.cache config.log
++	rm -f $(srcdir)/config.cache $(srcdir)/config.log
++
++	rm -f shconfig $(srcdir)/shconfig
++
++# this target is really just for my use. It only works on a limited
++# range of machines and is used to produce a list of potentially
++# dead (ie. unused) functions in the code. (tridge)
++finddead:
++	nm *.o */*.o |grep 'U ' | awk '{print $$2}' | sort -u > nmused.txt
++	nm *.o */*.o |grep 'T ' | awk '{print $$3}' | sort -u > nmfns.txt
++	comm -13 nmused.txt nmfns.txt
++
++# 'check' is the GNU name, 'test' is the name for everybody else :-)
++.PHONY: check test
++
++test: check
++
++
++# There seems to be no standard way to specify some variables as
++# exported from a Makefile apart from listing them like this.
++
++# This depends on building rsync; if we need any helper programs it
++# should depend on them too.
++
++# We try to run the scripts with POSIX mode on, in the hope that will
++# catch Bash-isms earlier even if we're running on GNU.  Of course, we
++# might lose in the future where POSIX diverges from old sh.
++
++check: all $(CHECK_PROGS)
++	rsync_bin=`pwd`/rsync$(EXEEXT) $(srcdir)/runtests.sh
++
++wildtest.o: wildtest.c lib/wildmatch.c rsync.h
++wildtest$(EXEEXT): wildtest.o lib/compat.o
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ wildtest.o lib/compat.o $(popt_OBJS) $(LIBS)
++
++# This does *not* depend on building or installing: you can use it to
++# check a version installed from a binary or some other source tree,
++# if you want.
++
++installcheck: $(CHECK_PROGS)
++	POSIXLY_CORRECT=1 TOOLDIR=`pwd` rsync_bin="$(bindir)/rsync$(EXEEXT)" srcdir="$(srcdir)" $(srcdir)/runtests.sh
++
++# TODO: Add 'dist' target; need to know which files will be included
++
++# Run the SPLINT (Secure Programming Lint) tool.  <www.splint.org>
++.PHONY: splint
++splint:
++	splint +unixlib +gnuextensions -weak rsync.c
++
++
++rsync.dvi: doc/rsync.texinfo
++	texi2dvi -o $@ $<
++
++rsync.ps: rsync.dvi
++	dvips -ta4 -o $@ $<
++
++rsync.pdf: doc/rsync.texinfo
++	texi2dvi -o $@ --pdf $<
++
++
++doxygen:
++	cd $(srcdir) && rm dox/html/* && doxygen
++
++# for maintainers only
++doxygen-upload:
++	rsync -avzv $(srcdir)/dox/html/ --delete \
++	samba.org:/home/httpd/html/rsync/doxygen/head/
+diff -urN rsync-2.6.9/zlib/dummy rsync-2.6.9-configured/zlib/dummy
+--- rsync-2.6.9/zlib/dummy	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-configured/zlib/dummy	2009-01-26 15:21:10.000000000 +0100
+@@ -0,0 +1,2 @@
++This is a dummy file to ensure that the lib directory gets created
++by configure when a VPATH is used.
