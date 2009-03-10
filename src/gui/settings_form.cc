@@ -40,6 +40,10 @@ SettingsForm::SettingsForm ( QWidget *parent, MainModel *model ) : QWidget ( par
 				qWarning() << "Not expected button found";
 		}
 	}
+	QObject::connect( this->buttonBox, SIGNAL( accepted() ),
+						this, SLOT( save() ) );
+	QObject::connect( this->buttonBox, SIGNAL( rejected() ),
+						this, SLOT( reset() ) );
 	reload();
 }
 
@@ -61,10 +65,6 @@ void SettingsForm::reload()
 		this->comboBoxLanguage->addItem( language );
 	}
 	this->comboBoxLanguage->setCurrentIndex( settings->getLanguageIndex() );
-	QObject::connect( this->buttonBox, SIGNAL( accepted() ),
-						this, SLOT( save() ) );
-	QObject::connect( this->buttonBox, SIGNAL( rejected() ),
-						this, SLOT( reset() ) );
 	formChanged = false;
 }
 
@@ -87,6 +87,7 @@ void SettingsForm::save()
 
 void SettingsForm::reset()
 {
+	qDebug() << "SettingsForm::reset()";
 	if ( formChanged )
 	{
 		int answer = QMessageBox::warning ( this, tr ( "Unsaved settings" ),
@@ -97,6 +98,27 @@ void SettingsForm::reset()
 		{
 			case QMessageBox::Yes:
 				reload();
+				break;
+			default:
+				// do nothing
+				break;
+		}
+	}
+}
+
+void SettingsForm::onLeave()
+{
+	qDebug() << "SettingsForm::onLeave: Leaving SettingsForm";
+	if ( formChanged )
+	{
+		int answer = QMessageBox::warning ( this, tr ( "Unsaved settings" ),
+																		 tr ( "Your settings have been modified.\n"
+																					"Do you want to save the settings before leaving this view?" ),
+																		 QMessageBox::Yes | QMessageBox::No );
+		switch ( answer )
+		{
+			case QMessageBox::Yes:
+				save();
 				break;
 			default:
 				// do nothing

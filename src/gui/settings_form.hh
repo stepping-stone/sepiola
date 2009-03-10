@@ -49,6 +49,7 @@ public:
 	 * Reloads the settings values
 	 */
 	void reload();
+	void onLeave();
 	
 private:
 	MainModel *model;

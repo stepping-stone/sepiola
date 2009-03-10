@@ -151,14 +151,20 @@ void MainWindow::showCriticalMessageBox( const QString& message )
 
 void MainWindow::setFormIndex( FORM_INDEX index )
 {
+	qDebug() << "MainWindow::setFormIndex(" << index << ")";
 	switch( index )
 	{
 		case SETTINGS:
-			this->settingsForm->reload();
+			if (this->stackedLayout->currentIndex() != SETTINGS) {
+				this->settingsForm->reload();
+			}
 			break;
 		default:
 			// do nothing
 			break;
+	}
+	if (this->stackedLayout->currentIndex() == SETTINGS) {
+		((SettingsForm*)this->stackedLayout->currentWidget())->onLeave();
 	}
 	this->stackedLayout->setCurrentIndex( index );
 }
