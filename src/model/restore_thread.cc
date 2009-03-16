@@ -16,6 +16,8 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include <QMessageBox>
+
 #include "exception/process_exception.hh"
 #include "model/main_model.hh"
 #include "model/restore_thread.hh"
@@ -126,8 +128,21 @@ void RestoreThread::checkAbortState() throw ( AbortException )
 	}
 }
 
-void RestoreThread::abortRestoreProcess()
+bool RestoreThread::abortRestoreProcess()
 {
-	isAborted = true;
-	emit abort();
+	qDebug() << "RestoreThread::abortRestoreProcess()";
+	/*int answer = QMessageBox::question ( this, tr ( "Cancel restore process?" ),
+																			 tr ( "The restore process has not been finished.\nThis will cancel the restore process.\nAre you sure you want to cancel?" ),
+																			 QMessageBox::Yes | QMessageBox::No ); */
+	int answer = QMessageBox::Yes; // TODO: make working QMessageBox::question - request
+	switch ( answer )
+	{
+		case QMessageBox::Yes:
+			isAborted = true;
+			emit abort();
+			return true;
+		case QMessageBox::No:
+			return false;
+	}
+	return false;
 }

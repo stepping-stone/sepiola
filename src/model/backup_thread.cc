@@ -20,6 +20,7 @@
 #include <QDir>
 #include <QPair>
 #include <QSet>
+#include <QMessageBox>
 
 #include "exception/process_exception.hh"
 #include "exception/abort_exception.hh"
@@ -268,9 +269,24 @@ QString BackupThread::createCurrentBackupTimeFile()
 	return fileName;
 }
 
-void BackupThread::abortBackupProcess()
+bool BackupThread::abortBackupProcess()
 {
 	qDebug() << "BackupThread::abortBackupProcess()";
-	isAborted = true;
-	emit abort();
+	/*int answer = QMessageBox::question( this, tr ( "Cancel backup process?" ),
+																			 tr ( "The backup process has not been finished.\nThis will cancel the backup process.\n"
+																					 "Are you sure you want to cancel?" ),
+																			 QMessageBox::Yes | QMessageBox::No );*/
+	int answer = QMessageBox::Yes; // TODO: make working QMessageBox::question - request
+	switch ( answer )
+	{
+		case QMessageBox::Yes:
+			isAborted = true;
+			emit abort();
+			return true;
+			break;
+		case QMessageBox::No:
+			return false;
+			break;
+	}
+	return false;
 }

@@ -65,7 +65,7 @@ signals:
 	void abort();
 
 public slots:
-	void abortBackupProcess();
+	bool abortBackupProcess();
 
 protected:
 

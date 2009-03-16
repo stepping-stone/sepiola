@@ -64,7 +64,7 @@ public:
 	void closeEvent( QCloseEvent * event );
 
 signals:
-	void abort();
+	bool abort1();
 
 private slots:
 	void on_btnCancel_pressed();

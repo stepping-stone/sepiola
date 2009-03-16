@@ -77,10 +77,10 @@ void OutputDialog::appendError( const QString& error )
 
 void OutputDialog::on_btnCancel_pressed()
 {
-	emit abort();
-
-	this->btnClose->setEnabled(true);
-	this->btnCancel->setEnabled(false);
+	if (emit abort1()) {
+		this->btnClose->setEnabled(true);
+		this->btnCancel->setEnabled(false);
+	}
 }
 
 void OutputDialog::finished()

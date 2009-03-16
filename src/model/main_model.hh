@@ -223,7 +223,7 @@ signals:
 	void appendErrorMessage( const QString& message );
 	void finishProgressDialog();
 	void closeProgressDialog();
-	void abortProcess();
+	bool abortProcess();
 
 public slots:
 
@@ -270,7 +270,7 @@ public slots:
 	/**
 	 * Aborts the current process
 	 */
-	 void abortProcessSlot();
+	 bool abortProcessSlot();
 
 private:
 	QDirModel* localDirModel;
@@ -283,9 +283,9 @@ inline void MainModel::abortLogin()
 	this->isLoginAborted = true;
 }
 
-inline void MainModel::abortProcessSlot()
+inline bool MainModel::abortProcessSlot()
 {
-	emit abortProcess();
+	return(emit abortProcess());
 }
 
 #endif
