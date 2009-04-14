@@ -1,0 +1,840 @@
+<ui version="4.0" >
+ <class>OverviewForm</class>
+ <widget class="QWidget" name="OverviewForm" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>725</width>
+    <height>568</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QLabel" name="labelBackup" >
+       <property name="font" >
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text" >
+        <string>Overview</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxPatterns" >
+     <property name="title" >
+      <string>Backup space usage</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="spacing" >
+       <number>0</number>
+      </property>
+      <property name="topMargin" >
+       <number>3</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelSpaceAvailable" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize" >
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize" >
+         <size>
+          <width>16777215</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="frameShape" >
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow" >
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="scaledContents" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" >
+        <property name="horizontalSpacing" >
+         <number>6</number>
+        </property>
+        <property name="verticalSpacing" >
+         <number>3</number>
+        </property>
+        <item row="0" column="1" >
+         <widget class="QLabel" name="labelTextBackup" >
+          <property name="minimumSize" >
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QLabel" name="labelTextSnapshot" >
+          <property name="text" >
+           <string>Incremental backups</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" >
+         <widget class="QLabel" name="labelTextFree" >
+          <property name="text" >
+           <string>Free</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" >
+         <widget class="QLabel" name="labelTextQuota" >
+          <property name="text" >
+           <string>Quota</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2" >
+         <widget class="QLabel" name="labelSpacePercentBackup" >
+          <property name="text" >
+           <string>30%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" >
+         <widget class="QLabel" name="labelSpacePercentSnapshot" >
+          <property name="text" >
+           <string>35%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" >
+         <widget class="QLabel" name="labelSpacePercentFree" >
+          <property name="text" >
+           <string>35%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" >
+         <widget class="QLabel" name="labelSpaceBackup" >
+          <property name="minimumSize" >
+           <size>
+            <width>75</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>711 MB</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3" >
+         <widget class="QLabel" name="labelSpaceQuota" >
+          <property name="minimumSize" >
+           <size>
+            <width>75</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>2 GB</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3" >
+         <widget class="QLabel" name="labelSpaceSnapshot" >
+          <property name="minimumSize" >
+           <size>
+            <width>75</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>598 MB</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3" >
+         <widget class="QLabel" name="labelSpaceFree" >
+          <property name="minimumSize" >
+           <size>
+            <width>75</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>739 MB</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="4" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="4" >
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="3" column="0" colspan="5" >
+         <widget class="Line" name="line_3" >
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="4" >
+         <widget class="QLabel" name="labelInfoChangeQuota" >
+          <property name="text" >
+           <string>change quota under Settings</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" >
+         <widget class="QLabel" name="labelLegendBackup" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QLabel" name="labelLegendSnapshot" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QLabel" name="labelLegendFree" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBoxSchedule" >
+     <property name="title" >
+      <string>Backup schedule</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <property name="topMargin" >
+       <number>3</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelScheduleInfoTitleLastBackups" >
+        <property name="font" >
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text" >
+         <string>Last Backups</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="labelIconStatusLastBackup_0" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="pixmap" >
+           <pixmap/>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelStatusLastBackup_0" >
+          <property name="minimumSize" >
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_0" >
+          <property name="text" >
+           <string>30%</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QLabel" name="labelIconStatusLastBackup_1" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="pixmap" >
+           <pixmap/>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelStatusLastBackup_1" >
+          <property name="minimumSize" >
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_1" >
+          <property name="text" >
+           <string>30%</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QLabel" name="labelIconStatusLastBackup_2" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelStatusLastBackup_2" >
+          <property name="minimumSize" >
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_2" >
+          <property name="text" >
+           <string>30%</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QLabel" name="labelIconStatusLastBackup_3" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelStatusLastBackup_3" >
+          <property name="minimumSize" >
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_3" >
+          <property name="text" >
+           <string>30%</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QLabel" name="labelIconStatusLastBackup_4" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelStatusLastBackup_4" >
+          <property name="minimumSize" >
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_4" >
+          <property name="text" >
+           <string>30%</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelScheduleInfoTitleNextBackup" >
+        <property name="font" >
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text" >
+         <string>
+Next Backup</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" >
+        <item>
+         <widget class="QLabel" name="labelIconNextBackup" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize" >
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="frameShape" >
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="scaledContents" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelNextBackup" >
+          <property name="minimumSize" >
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text" >
+           <string>next Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateNextBackup" >
+          <property name="text" >
+           <string>30%</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0" >
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QPushButton" name="btnBackupNow" >
+       <property name="text" >
+        <string>B&amp;ackup now</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="resources/screen.qrc" />
+ </resources>
+ <connections/>
+</ui>
