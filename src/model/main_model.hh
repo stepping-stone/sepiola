@@ -135,25 +135,14 @@ public:
 	bool isSchedulingOnStartSupported();
 
 	/**
-	 * Schedules a backup job to run at a specific day and time
+	 * more general schedule method, based on ScheduleTask
 	 * @param items List of items to backup
 	 * @param includePatternList Pattern list for include files
 	 * @param excludePatternList Pattern list for exclude files
-	 * @param time time to start the job
-	 * @param days boolean array containing seven elements (days) with the value set to true for enabling the job at that day
+	 * @param scheduleRule ScheduledTask-object indicating type and information for scheduling
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
-	void schedule( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const QTime& time, const bool days[], const bool& setDeleteFlag );
-
-	/**
-	 * Schedules a backup job to run after booting
-	 * @param items List of items to backup
-	 * @param includePatternList Pattern list for include files
-	 * @param excludePatternList Pattern list for exclude files
-	 * @param minutesToDelay minutes to delay before starting after booting
-	 * @param setDeleteFlag indicates whether extraneous files should be deleted
-	 */
-	void schedule( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const int& minutesToDelay, const bool& setDeleteFlag );
+	void schedule( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const ScheduledTask& scheduleRule, const bool& setDeleteFlag );
 
 	/**
 	 * Gets all available restore names

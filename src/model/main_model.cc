@@ -190,7 +190,7 @@ bool MainModel::isSchedulingOnStartSupported()
 	return scheduler->isSchedulingOnStartSupported();
 }
 
-void MainModel::schedule(  const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const QTime& time, const bool days[], const bool& setDeleteFlag )
+void MainModel::schedule(  const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const ScheduledTask& scheduleRule, const bool& setDeleteFlag )
 {
 	showProgressDialogSlot( tr( "Verify connection" ) );
 	if ( initConnection() )
@@ -210,60 +210,28 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
 
 	QObject::connect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
+					  this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
-						this, SLOT( infoDialog( const QString& ) ) );
+					  this, SLOT( infoDialog( const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
-						this, SLOT( errorDialog( const QString& ) ) );
-
-	try
-	{
-		scheduler->scheduleTask( settings->getThisApplicationFullPathExecutable(), CliManager::SCHEDULE_ARGUMENT, time, days );
-	}
-	catch ( ProcessException e )
-	{
-		emit showCriticalMessageBox( e.what() );
-	}
-
-
-	QObject::disconnect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
-	QObject::disconnect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
-						this, SLOT( infoDialog( const QString& ) ) );
-	QObject::disconnect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
-						this, SLOT( errorDialog( const QString& ) ) );
-}
-
-void MainModel::schedule(  const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const int& delay, const bool& setDeleteFlag )
-{
-	showProgressDialogSlot( tr( "Verify connection" ) );
-	if ( initConnection() )
-	{
-		closeProgressDialogSlot();
-	}
-	else
-	{
-		closeProgressDialogSlot();
-		emit showCriticalMessageBox( tr( "Task has not been scheduled, because the connection could not be established" ) );
-		return;
-	}
-	Settings* settings = Settings::getInstance();
-	settings->saveBackupItemList( items );
-	settings->saveDeleteExtraneousItems( setDeleteFlag );
-
-	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
-
-	QObject::connect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
-	QObject::connect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
-						this, SLOT( infoDialog( const QString& ) ) );
-	QObject::connect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
-						this, SLOT( errorDialog( const QString& ) ) );
+					  this, SLOT( errorDialog( const QString& ) ) );
 
 	QString execName = settings->getThisApplicationFullPathExecutable();
 	try
 	{
-		scheduler->scheduleTask( execName, CliManager::SCHEDULE_ARGUMENT, delay );
+		switch (scheduleRule.getType()) {
+			case ScheduledTask::AT_WEEKDAYS_AND_TIME:
+				scheduler->scheduleTask( settings->getThisApplicationFullPathExecutable(), CliManager::SCHEDULE_ARGUMENT, scheduleRule.getTimeToRun(), scheduleRule.getWeekdaysArray().data() );
+				settings->saveScheduleRule(scheduleRule);
+				break;
+			case ScheduledTask::AFTER_BOOT:
+				scheduler->scheduleTask( execName, CliManager::SCHEDULE_ARGUMENT, scheduleRule.getMinutesAfterStartup() );
+				break;
+			case ScheduledTask::NEVER:
+				scheduler->deleteExistingTask( execName, CliManager::SCHEDULE_ARGUMENT );
+				break;
+		}
+		settings->saveScheduleRule(scheduleRule);
 	}
 	catch ( ProcessException e )
 	{
@@ -271,11 +239,11 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 	}
 
 	QObject::disconnect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
-						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
+						 this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
-						this, SLOT( infoDialog( const QString& ) ) );
+						 this, SLOT( infoDialog( const QString& ) ) );
 	QObject::disconnect( scheduler.get(), SIGNAL( errorSignal( const QString& ) ),
-						this, SLOT( errorDialog( const QString& ) ) );
+						 this, SLOT( errorDialog( const QString& ) ) );
 }
 
 QStringList MainModel::getPrefixes()
