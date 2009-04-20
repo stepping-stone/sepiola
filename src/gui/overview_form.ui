@@ -16,7 +16,7 @@
    <item>
     <layout class="QHBoxLayout" >
      <item>
-      <widget class="QLabel" name="labelBackup" >
+      <widget class="QLabel" name="labelTitle" >
        <property name="font" >
         <font>
          <pointsize>11</pointsize>
