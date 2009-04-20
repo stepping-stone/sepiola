@@ -116,7 +116,11 @@ bool CliManager::isUpdateOnlyApplication( int argc, char* argv[] )
 void CliManager::runSchedule()
 {
 	Settings* settings = Settings::getInstance();
-	int delay = settings->getSchedulerDelay();
+	
+	// int delay = settings->getSchedulerDelay();
+	int delay = settings->getScheduleRule().getMinutesAfterStartup();
+	// TODO qDebug() << "CliManager::runSchedule: delay aus scheduledTask herauslesen, wei geht das unter Linux (delay=0?)";
+	
 	bool deleteExtraneousItems = settings->getDeleteExtraneousItems();
 
 	if ( delay > 0 )
