@@ -42,18 +42,19 @@ class ScheduledTask
 		ScheduledTask(int minutesAfterStartup);
 
 		~ScheduledTask();
-		ScheduleTypeEnum getType();
+		ScheduleTypeEnum getType() const;
 		void setType(ScheduleTypeEnum type);
-		QSet<WeekdaysEnum> getWeekdays();
+		QSet<WeekdaysEnum> getWeekdays() const;
+		QVector<bool> getWeekdaysArray() const;
 		void setWeekdays(QSet<WeekdaysEnum> weekdays);
 		void clearWeekdays();
 		void addWeekday(WeekdaysEnum newWeekday);
-		QTime getTimeToRun();
+		QTime getTimeToRun() const;
 		void setTimeToRun(QTime timeToRun);
 		int getMinutesAfterStartup() const;
 		void setMinutesAfterStartup(int minutesAfterStartup);
-		QString toString();
-		bool equals(const ScheduledTask& scheduledTask);
+		QString toString() const;
+		bool equals(const ScheduledTask& scheduledTask) const;
 		
 		static QMap<WeekdaysEnum, QString> weekdayNames;
 

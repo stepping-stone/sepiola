@@ -67,7 +67,7 @@ ScheduledTask::ScheduledTask(int minutesAfterStartup)
 
 ScheduledTask::~ScheduledTask() {}
 
-ScheduledTask::ScheduleTypeEnum ScheduledTask::getType()
+ScheduledTask::ScheduleTypeEnum ScheduledTask::getType() const
 {
 	return this->type;
 }
@@ -77,9 +77,18 @@ void ScheduledTask::setType(ScheduledTask::ScheduleTypeEnum type)
 	this->type = type;
 }
 
-QSet<ScheduledTask::WeekdaysEnum> ScheduledTask::getWeekdays()
+QSet<ScheduledTask::WeekdaysEnum> ScheduledTask::getWeekdays() const
 {
 	return this->weekdays;
+}
+
+QVector<bool> ScheduledTask::getWeekdaysArray() const
+{
+	QVector<bool> days;
+	for (int i = 0; i < 7; i++) {
+		days.append(weekdays.contains((ScheduledTask::WeekdaysEnum)i));
+	}
+	return days;
 }
 
 void ScheduledTask::setWeekdays(QSet<WeekdaysEnum> weekdays)
@@ -97,7 +106,7 @@ void ScheduledTask::addWeekday(WeekdaysEnum newWeekday)
 	this->weekdays.insert(newWeekday);
 }
 
-QTime ScheduledTask::getTimeToRun()
+QTime ScheduledTask::getTimeToRun() const
 {
 	return this->timeToRun;
 }
@@ -117,7 +126,7 @@ void ScheduledTask::setMinutesAfterStartup(int minutesAfterStartup)
 	this->minutesAfterStartup = minutesAfterStartup;
 }
 
-QString ScheduledTask::toString()
+QString ScheduledTask::toString() const
 {
 	switch (this->type)
 	{
@@ -147,13 +156,13 @@ QString ScheduledTask::toString()
 	return "";
 }
 
-bool ScheduledTask::equals(const ScheduledTask& scheduledTask)
+bool ScheduledTask::equals(const ScheduledTask& scheduledTask) const
 {
-	if (this->type == scheduledTask.getType()) {
+	if (this->getType() == scheduledTask.getType()) {
 		switch (type) {
 			case ScheduledTask::NEVER: return(true); break;
-			case ScheduledTask::AFTER_BOOT: return(this->minutesAfterStartup == scheduledTask.getMinutesAfterStartup()); break;
-			case ScheduledTask::AT_WEEKDAYS_AND_TIME: return(this->timeToRun == scheduledTask.getTimeToRun() && this->weekdays == scheduledTask.getWeekdays()); break;
+			case ScheduledTask::AFTER_BOOT: return(this->getMinutesAfterStartup() == scheduledTask.getMinutesAfterStartup()); break;
+			case ScheduledTask::AT_WEEKDAYS_AND_TIME: return(this->getTimeToRun() == scheduledTask.getTimeToRun() && this->getWeekdays() == scheduledTask.getWeekdays()); break;
 			default: return false;
 		}
 		return false;
