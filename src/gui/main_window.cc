@@ -83,6 +83,19 @@ MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::show() {
+	QWidget::show();	
+	Settings* settings = Settings::getInstance();
+	if ( settings->isInevitableSettingsMissing() )
+	{
+		MainWindow::setFormIndex( SETTINGS );
+		QMessageBox::information( this, tr("Missing Settings"), tr("Please fill in username (as provided by the backup-space provider) as well as the computername.") );
+	} else {
+		MainWindow::setFormIndex( OVERVIEW );
+	}
+}
+
+
 void MainWindow::showServerPasswordDialog( const QString& username, bool isUsernameEditable, int* result, const QString& msg )
 {
 	Settings* settings = Settings::getInstance();
