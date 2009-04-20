@@ -47,7 +47,7 @@ void Crontab::scheduleTask( const QString& execName, const QString& cliArgument,
 
 	if ( schedule( execName, cliArgument, "@reboot" ) )
 	{
-		Settings::getInstance()->saveSchedulerDelay( minutesToDelay );
+		Settings::getInstance()->saveScheduleRule( ScheduledTask( minutesToDelay ) );
 	}
 }
 
@@ -56,10 +56,12 @@ void Crontab::scheduleTask( const QString& execName, const QString& cliArgument,
 	qDebug() << "Crontab::setScheduleTask( " << execName << ", " << cliArgument << ", " << time << ", days )";
 
 	QString dayString;
+	QSet<ScheduledTask::WeekdaysEnum> wd;
 	for ( int i=0; i<7; i++ )
 	{
 		if ( days[i] )
 		{
+			wd.insert((ScheduledTask::WeekdaysEnum)i);
 			if ( dayString != "" )
 			{
 				dayString.append( "," );
@@ -74,7 +76,8 @@ void Crontab::scheduleTask( const QString& execName, const QString& cliArgument,
 	timeSpecification.append( " * * " );
 	timeSpecification.append( dayString );
 	schedule( execName, cliArgument, timeSpecification );
-	Settings::getInstance()->saveSchedulerDelay( 0 );
+	
+	Settings::getInstance()->saveScheduleRule(ScheduledTask(wd, time));
 }
 
 bool Crontab::updateExistingTask( const QString& execName, const QString& cliArgument )
