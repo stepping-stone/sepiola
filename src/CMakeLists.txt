@@ -137,6 +137,7 @@ QT4_WRAP_CPP(
 	gui/backup_form.hh 
 	gui/logfile_form.hh
 	gui/main_window.hh 
+	gui/overview_form.hh 
 	gui/restore_form.hh 
 	gui/schedule_dialog.hh
 	gui/settings_form.hh
@@ -161,6 +162,7 @@ QT4_WRAP_UI(
 	gui/backup_form.ui 
 	gui/logfile_form.ui
 	gui/main_window.ui 
+	gui/overview_form.ui 
 	gui/restore_form.ui 
 	gui/schedule_dialog.ui
 	gui/settings_form.ui 
@@ -183,6 +185,7 @@ SET(SOURCE_FILES
 	gui/backup_form.cc 
 	gui/logfile_form.cc
 	gui/main_window.cc 
+	gui/overview_form.cc 
 	gui/output_dialog.cc
 	gui/password_dialog.cc
 	gui/pattern_dialog.cc
@@ -196,6 +199,8 @@ SET(SOURCE_FILES
 	model/restore_name.cc
 	model/restore_thread.cc
 	model/remote_dir_model.cc
+	model/scheduled_task.cc
+	model/backup_task.cc
 	settings/settings.cc
 	test/test_manager.cc
 	tools/at.cc 
