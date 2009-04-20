@@ -61,7 +61,7 @@ public:
 	/**
 	 * Refreshes the overview of the last n and next planned backup
 	 */
-	void refreshLastBackupsOverview(int n = 3);
+	void refreshLastBackupsOverview();
 	
 
 private:
