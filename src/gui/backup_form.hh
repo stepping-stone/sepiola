@@ -69,6 +69,7 @@ private slots:
 	void on_btnDetails_pressed();
 	void setDetailsVisible( bool visible );
 	void refreshLocalDirModel();
+	void schedule();
 
 private:
 	MainModel* model;

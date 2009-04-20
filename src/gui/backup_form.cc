@@ -21,7 +21,6 @@
 #include <QShortcut>
 
 #include "gui/backup_form.hh"
-#include "gui/schedule_dialog.hh"
 #include "gui/pattern_dialog.hh"
 
 #include "utils/log_file_utils.hh"
@@ -45,6 +44,13 @@ BackupForm::BackupForm ( QWidget *parent, MainModel *model ) : QWidget ( parent 
 	this->lineEditExcludePattern->setText( patternListToString( excludePatternList ) );
 	setDetailsVisible( false );
 
+		// disable option "minutes after booting" if the scheduler does not support it
+	if ( !this->model->isSchedulingOnStartSupported() )
+	{
+		this->radioButtonMinutesAfterBooting->setEnabled( false );
+		this->spinBoxMinutesAfterBooting->setEnabled( false );
+	}
+
 	new QShortcut( Qt::Key_F5, this, SLOT( refreshLocalDirModel() ) );
 }
 
@@ -63,9 +69,48 @@ void BackupForm::on_btnSchedule_pressed()
 		return;
 
 	}
-	ScheduleDialog scheduleDialog( this->model, backupItems, includePatternList, excludePatternList );
-	scheduleDialog.exec();
+	/*ScheduleDialog scheduleDialog( this->model, backupItems, includePatternList, excludePatternList );
+	scheduleDialog.exec();*/
+	qDebug() << "going to schedule...";
+	this->schedule();
 }
+
+void BackupForm::schedule()
+{
+	if ( this->radioButtonDaily->isChecked() )
+	{
+		QTime time = this->timeEditTime->time();
+		QSet<ScheduledTask::WeekdaysEnum> wd;
+		if (this->checkBoxMonday->checkState() == Qt::Checked) wd.insert(ScheduledTask::MONDAY);
+		if (this->checkBoxTuesday->checkState() == Qt::Checked) wd.insert(ScheduledTask::TUESDAY);
+		if (this->checkBoxWednesday->checkState() == Qt::Checked) wd.insert(ScheduledTask::WEDNESDAY);
+		if (this->checkBoxThursday->checkState() == Qt::Checked) wd.insert(ScheduledTask::THURSDAY);
+		if (this->checkBoxFriday->checkState() == Qt::Checked) wd.insert(ScheduledTask::FRIDAY);
+		if (this->checkBoxSaturday->checkState() == Qt::Checked) wd.insert(ScheduledTask::SATURDAY);
+		if (this->checkBoxSunday->checkState() == Qt::Checked) wd.insert(ScheduledTask::SUNDAY);
+
+		bool validSelection = wd.size() > 0;;
+
+		if ( !validSelection )
+		{
+			this->model->infoDialog( tr( "Check at least one day" ) );
+			return;
+		}
+		bool setDeleteFlag = this->checkBoxDeleteExtraneous->checkState() == Qt::Checked;
+		this->model->schedule( getSelectedFilesAndDirs(), this->includePatternList, this->excludePatternList, ScheduledTask(wd, time), setDeleteFlag );
+	}
+	else if ( this->radioButtonMinutesAfterBooting->isChecked() )
+	{
+		int delay = this->spinBoxMinutesAfterBooting->value();
+		bool setDeleteFlag = this->checkBoxDeleteExtraneous->checkState() == Qt::Checked;
+		this->model->schedule( getSelectedFilesAndDirs(), this->includePatternList, this->excludePatternList, ScheduledTask(delay), setDeleteFlag );
+	}
+	else if ( this->radioButtonNoSchedule->isChecked() )
+	{
+		this->model->schedule( getSelectedFilesAndDirs(), this->includePatternList, this->excludePatternList, ScheduledTask(), FALSE );
+	}
+}
+
 
 void BackupForm::on_btnBackup_pressed()
 {
