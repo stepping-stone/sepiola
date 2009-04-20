@@ -28,6 +28,7 @@
 
 #include "ui_main_window.h"
 
+#include "gui/overview_form.hh"
 #include "gui/backup_form.hh"
 #include "gui/restore_form.hh"
 #include "gui/settings_form.hh"
@@ -53,15 +54,17 @@ public:
 	 * Destroys the MainWindow
 	 */
 	virtual ~MainWindow();
+	void show();
 
 signals:
 	void rejectPasswordDialog();
 	void writeLog( const QString& message );
 
 private:
-	enum FORM_INDEX { BACKUP, RESTORE, SETTINGS, LOGFILE };
+	enum FORM_INDEX { OVERVIEW, BACKUP, RESTORE, SETTINGS, LOGFILE };
 	QStackedLayout *stackedLayout;
 	MainModel* model;
+	OverviewForm* overviewForm;
 	BackupForm* backupForm;
 	RestoreForm* restoreForm;
 	SettingsForm* settingsForm;
@@ -73,6 +76,7 @@ private:
 	void readSettings();
 	void closeEvent ( QCloseEvent *event );
 	void setFormIndex( FORM_INDEX index );
+	void showOverviewForm();
 	void showBackupForm();
 	void showRestoreForm();
 	void showSettingsForm();
@@ -90,11 +94,13 @@ private slots:
 	void finishProgressDialog();
 	void closeProgressDialog();
 		
+	void on_actionOverview_triggered();
 	void on_actionBackup_triggered();
 	void on_actionRestore_triggered();
 	void on_actionSettings_triggered();
 	void on_actionLogfile_triggered();
 	void on_actionAbout_triggered();
+	void on_btnOverview_clicked();
 	void on_btnBackup_clicked();
 	void on_btnRestore_clicked();
 	void on_btnSettings_clicked();
