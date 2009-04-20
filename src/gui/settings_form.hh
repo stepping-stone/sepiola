@@ -49,7 +49,7 @@ public:
 	 * Reloads the settings values
 	 */
 	void reload();
-	void onLeave();
+	bool onLeave();
 	
 private:
 	MainModel *model;
