@@ -7,7 +7,7 @@ LockFileName=lock
 InlcudePatternFileName=includes
 ExcludePatternFileName=excludes
 LogFileName=sepiola.log
-LogDebugMessage=false
+LogDebugMessage=true
 MaxLogLines=10000
 RsyncTimeout=43200
 
@@ -21,6 +21,7 @@ RestoreRootFolder=.snapshots/
 MetadataFileName=metadata
 BackupContentFileName=backupContent
 BackupTimeFileName=backupTime
+BackupQuotaFileName=backupSize
 AuthorizedKeyFolderName=.ssh/
 AuthorizedKeyFileName=authorized_keys
 
