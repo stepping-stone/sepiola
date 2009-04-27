@@ -70,6 +70,10 @@ private slots:
 	void setDetailsVisible( bool visible );
 	void refreshLocalDirModel();
 	void schedule();
+	
+signals:	
+	void updateOverviewFormScheduleInfo();
+	void updateOverviewFormLastBackupsInfo();
 
 private:
 	MainModel* model;

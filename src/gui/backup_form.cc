@@ -22,6 +22,7 @@
 
 #include "gui/backup_form.hh"
 #include "gui/pattern_dialog.hh"
+#include "model/scheduled_task.hh"
 
 #include "utils/log_file_utils.hh"
 
@@ -50,8 +51,27 @@ BackupForm::BackupForm ( QWidget *parent, MainModel *model ) : QWidget ( parent 
 		this->radioButtonMinutesAfterBooting->setEnabled( false );
 		this->spinBoxMinutesAfterBooting->setEnabled( false );
 	}
-
+	ScheduledTask rule = settings->getScheduleRule();
+	switch (rule.getType()) {
+		case ScheduleRule::NEVER: this->radioButtonNoSchedule->setChecked(true); break;
+		case ScheduleRule::AFTER_BOOT: this->radioButtonMinutesAfterBooting->setChecked(true); break;
+		case ScheduleRule::AT_WEEKDAYS_AND_TIME: this->radioButtonDaily->setChecked(true); break;
+	}
+	this->spinBoxMinutesAfterBooting->setValue(rule.getMinutesAfterStartup());
+	this->checkBoxMonday->setChecked(rule.getWeekdays().contains(ScheduleRule::MONDAY));
+	this->checkBoxTuesday->setChecked(rule.getWeekdays().contains(ScheduleRule::TUESDAY));
+	this->checkBoxWednesday->setChecked(rule.getWeekdays().contains(ScheduleRule::WEDNESDAY));
+	this->checkBoxThursday->setChecked(rule.getWeekdays().contains(ScheduleRule::THURSDAY));
+	this->checkBoxFriday->setChecked(rule.getWeekdays().contains(ScheduleRule::FRIDAY));
+	this->checkBoxSaturday->setChecked(rule.getWeekdays().contains(ScheduleRule::SATURDAY));
+	this->checkBoxSunday->setChecked(rule.getWeekdays().contains(ScheduleRule::SUNDAY));
+	this->timeEditTime->setTime(rule.getTimeToRun());
+	
 	new QShortcut( Qt::Key_F5, this, SLOT( refreshLocalDirModel() ) );
+	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ),
+					  parent, SIGNAL ( updateOverviewFormScheduleInfo() ) );
+	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ),
+					  parent, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
 }
 
 BackupForm::~BackupForm()
@@ -60,7 +80,7 @@ BackupForm::~BackupForm()
 void BackupForm::on_btnSchedule_pressed()
 {
 	QStringList backupItems = getSelectedFilesAndDirs();
-	if ( backupItems.size() == 0 )
+	if ( backupItems.size() == 0 && !this->radioButtonNoSchedule->isChecked() )
 	{
 		QMessageBox::information( this,
 									tr( "Empty backup list" ),
@@ -71,7 +91,6 @@ void BackupForm::on_btnSchedule_pressed()
 	}
 	/*ScheduleDialog scheduleDialog( this->model, backupItems, includePatternList, excludePatternList );
 	scheduleDialog.exec();*/
-	qDebug() << "going to schedule...";
 	this->schedule();
 }
 
@@ -80,14 +99,14 @@ void BackupForm::schedule()
 	if ( this->radioButtonDaily->isChecked() )
 	{
 		QTime time = this->timeEditTime->time();
-		QSet<ScheduledTask::WeekdaysEnum> wd;
-		if (this->checkBoxMonday->checkState() == Qt::Checked) wd.insert(ScheduledTask::MONDAY);
-		if (this->checkBoxTuesday->checkState() == Qt::Checked) wd.insert(ScheduledTask::TUESDAY);
-		if (this->checkBoxWednesday->checkState() == Qt::Checked) wd.insert(ScheduledTask::WEDNESDAY);
-		if (this->checkBoxThursday->checkState() == Qt::Checked) wd.insert(ScheduledTask::THURSDAY);
-		if (this->checkBoxFriday->checkState() == Qt::Checked) wd.insert(ScheduledTask::FRIDAY);
-		if (this->checkBoxSaturday->checkState() == Qt::Checked) wd.insert(ScheduledTask::SATURDAY);
-		if (this->checkBoxSunday->checkState() == Qt::Checked) wd.insert(ScheduledTask::SUNDAY);
+		QSet<ScheduleRule::Weekdays> wd;
+		if (this->checkBoxMonday->checkState() == Qt::Checked) wd.insert(ScheduleRule::MONDAY);
+		if (this->checkBoxTuesday->checkState() == Qt::Checked) wd.insert(ScheduleRule::TUESDAY);
+		if (this->checkBoxWednesday->checkState() == Qt::Checked) wd.insert(ScheduleRule::WEDNESDAY);
+		if (this->checkBoxThursday->checkState() == Qt::Checked) wd.insert(ScheduleRule::THURSDAY);
+		if (this->checkBoxFriday->checkState() == Qt::Checked) wd.insert(ScheduleRule::FRIDAY);
+		if (this->checkBoxSaturday->checkState() == Qt::Checked) wd.insert(ScheduleRule::SATURDAY);
+		if (this->checkBoxSunday->checkState() == Qt::Checked) wd.insert(ScheduleRule::SUNDAY);
 
 		bool validSelection = wd.size() > 0;;
 
@@ -109,6 +128,8 @@ void BackupForm::schedule()
 	{
 		this->model->schedule( getSelectedFilesAndDirs(), this->includePatternList, this->excludePatternList, ScheduledTask(), FALSE );
 	}
+	qDebug() << "BackupForm::schedule(): emit updateOverviewFormScheduleInfo()";
+	emit updateOverviewFormScheduleInfo();
 }
 
 
@@ -127,6 +148,7 @@ void BackupForm::on_btnBackup_pressed()
 	bool deleteExtraneous = this->checkBoxDeleteExtraneous->checkState() == Qt::Checked;
 	this->model->showProgressDialogSlot( tr( "Backup" ) );
 	this->model->backup( backupItems, includePatternList, excludePatternList, deleteExtraneous, false );
+	emit updateOverviewFormLastBackupsInfo();
 }
 
 void BackupForm::on_btnEditInclude_pressed()
