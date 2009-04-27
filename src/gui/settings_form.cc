@@ -42,6 +42,7 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	}
 	QObject::connect( this->buttonBox, SIGNAL( accepted() ), this, SLOT( save() ) );
 	QObject::connect( this->buttonBox, SIGNAL( rejected() ), this, SLOT( reset() ) );
+	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), parent, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
 	reload();
 }
 
@@ -56,7 +57,8 @@ void SettingsForm::reload()
 	this->lineEditServer->setText( settings->getServerName() );
 	this->lineEditServerKey->setText( settings->getServerKey() );
 	this->lineEditBackupPrefix->setText( settings->getBackupPrefix() );
-
+	this->spinBoxNOfShownLastBackups->setValue( settings->getNOfLastBackups() );
+	
 	this->comboBoxLanguage->clear();
 	foreach( QString language, settings->getSupportedLanguages() )
 	{
@@ -76,11 +78,13 @@ void SettingsForm::save()
 		settings->saveServerKey( this->lineEditServerKey->text() );
 		settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );
 		settings->saveLanguageIndex( this->comboBoxLanguage->currentIndex() );
+		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
 		
 // settings->saveNOfLastBackups(4);
 // settings->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::UNDEFINED));
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
+		emit updateOverviewFormLastBackupsInfo();
 		formChanged = false;
 	}
 }
@@ -152,6 +156,11 @@ void SettingsForm::on_comboBoxLanguage_currentIndexChanged( int languageIndex )
 void SettingsForm::on_lineEditBackupPrefix_textEdited( QString backupPrefix )
 {
 	formChanged = true;
+}
+
+void SettingsForm::on_spinBoxNOfShownLastBackups_valueChanged( int i )
+{
+	formChanged = (i != Settings::getInstance()->getNOfLastBackups());
 }
 
 void SettingsForm::on_btnDefaultServer_pressed()

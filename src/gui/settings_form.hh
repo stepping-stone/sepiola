@@ -54,6 +54,9 @@ public:
 private:
 	MainModel *model;
 	bool formChanged;
+	
+signals:
+	void updateOverviewFormLastBackupsInfo();
 
 private slots:
 	void save();
@@ -66,6 +69,7 @@ private slots:
 	void on_lineEditServerKey_textEdited ( QString serverKey );
 	void on_lineEditBackupPrefix_textEdited( QString backupPrefix );
 	void on_comboBoxLanguage_currentIndexChanged ( int languageIndex );
+	void on_spinBoxNOfShownLastBackups_valueChanged( int i );
 };
 
 #endif
