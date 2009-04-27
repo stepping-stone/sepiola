@@ -139,7 +139,6 @@ QT4_WRAP_CPP(
 	gui/main_window.hh 
 	gui/overview_form.hh 
 	gui/restore_form.hh 
-	gui/schedule_dialog.hh
 	gui/settings_form.hh
 	gui/text_input_dialog.hh
 	gui/password_dialog.hh 
@@ -164,7 +163,6 @@ QT4_WRAP_UI(
 	gui/main_window.ui 
 	gui/overview_form.ui 
 	gui/restore_form.ui 
-	gui/schedule_dialog.ui
 	gui/settings_form.ui 
 	gui/text_input_dialog.ui
 	gui/password_dialog.ui 
@@ -190,7 +188,6 @@ SET(SOURCE_FILES
 	gui/password_dialog.cc
 	gui/pattern_dialog.cc
 	gui/restore_form.cc 
-	gui/schedule_dialog.cc
 	gui/settings_form.cc
 	gui/text_input_dialog.cc
 	model/backup_thread.cc
