@@ -130,7 +130,13 @@ public:
 	 * @return all available prefixes on the server
 	 */
 	 virtual QStringList getPrefixes() = 0;
-
+	 
+	 /**
+	  * Reads int-values from the provided quota-file on the server
+	  * @return QList<int> of values from the quota-file
+	 */
+	 virtual QList<int> getServerQuotaValues() = 0;
+	 
 public slots:
 	virtual void abort() = 0;
 };
