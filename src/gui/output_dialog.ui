@@ -15,15 +15,15 @@
   <property name="windowTitle" >
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" >
-   <item row="0" column="0" colspan="3" >
+  <layout class="QVBoxLayout" >
+   <item>
     <widget class="QLabel" name="labelInfo" >
      <property name="text" >
       <string>Info:</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3" >
+   <item>
     <widget class="QTextEdit" name="textEditOutput" >
      <property name="lineWrapMode" >
       <enum>QTextEdit::NoWrap</enum>
@@ -33,7 +33,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3" >
+   <item>
     <widget class="QLabel" name="labelError" >
      <property name="font" >
       <font>
@@ -46,8 +46,8 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="3" >
-    <widget class="QTextEdit" name="textEditError"> 
+   <item>
+    <widget class="QTextEdit" name="textEditError" >
      <property name="lineWrapMode" >
       <enum>QTextEdit::NoWrap</enum>
      </property>
@@ -56,38 +56,49 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" >
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>151</width>
-       <height>27</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="4" column="1" >
-    <widget class="QPushButton" name="btnCancel" >
-     <property name="enabled" >
-      <bool>true</bool>
-     </property>
-     <property name="text" >
-      <string>&amp;Cancel</string>
+   <item>
+    <widget class="QProgressBar" name="progressBar" >
+     <property name="value" >
+      <number>24</number>
      </property>
     </widget>
    </item>
-   <item row="4" column="2" >
-    <widget class="QPushButton" name="btnClose" >
-     <property name="enabled" >
-      <bool>false</bool>
-     </property>
-     <property name="text" >
-      <string>C&amp;lose</string>
-     </property>
-    </widget>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCancel" >
+       <property name="enabled" >
+        <bool>true</bool>
+       </property>
+       <property name="text" >
+        <string>&amp;Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClose" >
+       <property name="enabled" >
+        <bool>false</bool>
+       </property>
+       <property name="text" >
+        <string>C&amp;lose</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -100,12 +111,12 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>348</x>
-     <y>317</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>199</x>
-     <y>170</y>
+     <x>20</x>
+     <y>20</y>
     </hint>
    </hints>
   </connection>
