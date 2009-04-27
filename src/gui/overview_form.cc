@@ -43,21 +43,10 @@ OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( paren
 
 	this->model = model;
 
-
-	// build some data for testing purposes only
-	QSet<ScheduledTask::WeekdaysEnum> wd;
-	wd.insert( ScheduledTask::MONDAY );
-	wd.insert( ScheduledTask::TUESDAY );
-	wd.insert( ScheduledTask::TUESDAY ); // and once more for testing
-	wd.insert( ScheduledTask::FRIDAY );
-	myTask.setType( ScheduledTask::AT_WEEKDAYS_AND_TIME );
-	myTask.setWeekdays( wd );
-	myTask.setTimeToRun( QTime::currentTime() );
-	qDebug() << myTask.toString();
-
 	// refresh form
 	this->refreshSpaceStatistic();
 	this->refreshLastBackupsOverview();
+	this->refreshScheduleOverview();
 
 }
 
@@ -71,6 +60,7 @@ void OverviewForm::on_btnBackupNow_pressed()
 
 void OverviewForm::refreshLastBackupsOverview()
 {
+	qDebug() << "OverviewForm::refreshLastBackupsOverview()";
 	Settings* settings = Settings::getInstance();
 	QStringList fieldnames_status;
 	fieldnames_status << "labelIconStatusLastBackup_%1" << "labelStatusLastBackup_%1" << "labelDateLastBackup_%1";
@@ -105,11 +95,17 @@ void OverviewForm::refreshLastBackupsOverview()
 			lab_date->setText( lastBackup.getDateTime().toString() );
 		}
 	}
-	// fill information on next scheduled backup into form
-	if ( myTask.getType() != ScheduledTask::NEVER )
+}
+
+void OverviewForm::refreshScheduleOverview()
+{
+	// fills information on next scheduled backup into form
+	qDebug() << "OverviewForm::refreshScheduleOverview()";
+	ScheduledTask myTask = Settings::getInstance()->getScheduleRule();
+	if ( myTask.getType() != ScheduleRule::NEVER )
 	{
 		this->labelNextBackup->setText( QObject::tr( "Scheduled" ) );
-		this->labelDateNextBackup->setText( this->myTask.toString() );
+		this->labelDateNextBackup->setText( myTask.toString() );
 	}
 	else
 	{
@@ -124,39 +120,69 @@ void OverviewForm::refreshLastBackupsOverview()
 */
 void OverviewForm::refreshSpaceStatistic()
 {
-	/** TODO: get quota from Mainmodel */
-	int quota = 5120, backup = 2403, snapshot = 1830;
-	this->labelSpaceAvailable->setPixmap( this->getSpaceVisualization( quota, backup, snapshot ) );
-	// The following 3 lines could also be in the constructor
-	this->labelLegendBackup->setPixmap( this->getSpaceVisualization( 100, 100, 0, 16, 1 ) );
-	this->labelLegendSnapshot->setPixmap( this->getSpaceVisualization( 100, 0, 100, 16, 1 ) );
-	this->labelLegendFree->setPixmap( this->getSpaceVisualization( 100, 0, 0, 16, 1 ) );
-
+	qDebug() << "OverviewForm::refreshSpaceStatistic()";
+	QList<int> quotaValues = this->model->getServerQuota();
 	// definition of formats for output
 	QString format_percent = QString( "%1\%" ), format_MB = QString( "%1 MB" ), format_GB = QString( "%1 GB" ), format_TB = QString( "%1 TB" );
-	int precision_MB = 0, precision_GB = 1, precision_TB = 2;
 	QStringList sizeNames; sizeNames << "Backup" << "Snapshot" << "Free" << "Quota";
-	QList<float> sizes; sizes << backup << snapshot << ( quota - backup - snapshot ) << quota;
+	int precision_MB = 0, precision_GB = 1, precision_TB = 2;
+	
+	int quota, backup, snapshot;
+	qDebug() << "OverviewForm::refreshSpaceStatistic(): quotaValues.size()" << quotaValues.size();
+	if (quotaValues.size() == 3) {
+		quota = quotaValues.at(0);
+		backup = quotaValues.at(1);
+		snapshot = quotaValues.at(2);
+		this->labelSpaceAvailable->setPixmap( this->getSpaceVisualization( quota, backup, snapshot ) );
+		
+		// The following 3 lines could also be in the constructor
+		this->labelLegendBackup->setPixmap( this->getSpaceVisualization( 100, 100, 0, 16, 1 ) );
+		this->labelLegendSnapshot->setPixmap( this->getSpaceVisualization( 100, 0, 100, 16, 1 ) );
+		this->labelLegendFree->setPixmap( this->getSpaceVisualization( 100, 0, 0, 16, 1 ) );
 
-	// set field-text of all space-fields
-	for ( int i = 0; i < sizeNames.size(); i++ )
-	{
-		QLabel * el_abs = this->findChild<QLabel *>( QString( "labelSpace" ) + sizeNames[i] );
-		QLabel * el_percent = this->findChild<QLabel *>( QString( "labelSpacePercent" ) + sizeNames[i] );
-		if ( el_abs != 0 )
+		QList<float> sizes; sizes << backup << snapshot << ( quota - backup - snapshot ) << quota;
+	
+		// set field-text of all space-fields
+		for ( int i = 0; i < sizeNames.size(); i++ )
 		{
-			if ( sizes[i] >= 1024 * 1024 )
-				el_abs->setText( format_TB.arg( sizes[i] / 1024 / 1024, 0, 'f', precision_TB ) );
-			else if ( sizes[i] >= 1024 )
-				el_abs->setText( format_GB.arg( sizes[i] / 1024, 0, 'f', precision_GB ) );
-			else
-				el_abs->setText( format_MB.arg( sizes[i], 0, 'f', precision_MB ) );
+			QLabel * el_abs = this->findChild<QLabel *>( QString( "labelSpace" ) + sizeNames[i] );
+			QLabel * el_percent = this->findChild<QLabel *>( QString( "labelSpacePercent" ) + sizeNames[i] );
+			if ( el_abs != 0 )
+			{
+				if ( sizes[i] >= 1024 * 1024 )
+					el_abs->setText( format_TB.arg( sizes[i] / 1024 / 1024, 0, 'f', precision_TB ) );
+				else if ( sizes[i] >= 1024 )
+					el_abs->setText( format_GB.arg( sizes[i] / 1024, 0, 'f', precision_GB ) );
+				else
+					el_abs->setText( format_MB.arg( sizes[i], 0, 'f', precision_MB ) );
+			}
+			if ( el_percent != 0 )
+			{
+				el_percent->setText( format_percent.arg( 100.0f*sizes[i] / sizes[sizes.size()-1], 0, 'f', 1 ) );
+			}
 		}
-		if ( el_percent != 0 )
+	} else {
+		QPixmap emptyPixmap;
+		this->labelSpaceAvailable->setPixmap( emptyPixmap );
+		this->labelLegendBackup->setPixmap( emptyPixmap );
+		this->labelLegendSnapshot->setPixmap( emptyPixmap );
+		this->labelLegendFree->setPixmap( emptyPixmap );
+
+		// set field-text of all space-fields
+		for ( int i = 0; i < sizeNames.size(); i++ )
 		{
-			el_percent->setText( format_percent.arg( 100.0f*sizes[i] / sizes[sizes.size()-1], 0, 'f', 1 ) );
+			QLabel * el_abs = this->findChild<QLabel *>( QString( "labelSpace" ) + sizeNames[i] );
+			QLabel * el_percent = this->findChild<QLabel *>( QString( "labelSpacePercent" ) + sizeNames[i] );
+			if ( el_abs != 0 )
+			{
+				el_abs->setText( QObject::tr("N/A") );
+			}
+			if ( el_percent != 0 )
+			{
+				el_percent->setText( QObject::tr("N/A") );
+			}
 		}
-	}
+	}		
 }
 
 /**

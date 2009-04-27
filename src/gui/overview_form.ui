@@ -370,12 +370,36 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBoxSchedule" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Minimum" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="baseSize" >
+      <size>
+       <width>1</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="title" >
       <string>Backup schedule</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="flat" >
+      <bool>false</bool>
+     </property>
+     <property name="checkable" >
+      <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" >
       <property name="spacing" >
        <number>6</number>
+      </property>
+      <property name="sizeConstraint" >
+       <enum>QLayout::SetMinimumSize</enum>
       </property>
       <property name="topMargin" >
        <number>3</number>
@@ -819,7 +843,7 @@ Next Backup</string>
     </layout>
    </item>
    <item>
-    <spacer>
+    <spacer name="bottomSpacer" >
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>

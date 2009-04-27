@@ -53,16 +53,21 @@ public:
 	 */
 	bool isInitialized();
 	
+public slots:
 	/**
-	 * Refreshes the graphical quota-statistics
+ 	 * Refreshes the graphical quota-statistics
 	 */
 	void refreshSpaceStatistic();
 	
 	/**
-	 * Refreshes the overview of the last n and next planned backup
+	 * Refreshes the overview of the last n backups
 	 */
 	void refreshLastBackupsOverview();
 	
+	/**
+	 * Refreshes the overview of the scheduled backup
+	 */
+	void refreshScheduleOverview();
 
 private:
 	QPixmap getSpaceVisualization(int quota, int used, int snapshot, int imgH=16, int imgW=1000);
@@ -80,7 +85,6 @@ private:
 	QRgb COLOR_BACKUP;
 	QRgb COLOR_SNAPSHOT;
 	QRgb COLOR_FREE;
-	ScheduledTask myTask;
 };
 
 #endif
