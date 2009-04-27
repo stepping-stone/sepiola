@@ -22,8 +22,7 @@
 
 #include "model/scheduled_task.hh"
 
-
-QMap<ScheduledTask::WeekdaysEnum, QString> ScheduledTask::weekdayNames;
+QMap<ScheduleRule::Weekdays, QString> ScheduledTask::weekdayNames;
 
 /**
  * Constructor for "Never"-Scheduler
@@ -31,14 +30,14 @@ QMap<ScheduledTask::WeekdaysEnum, QString> ScheduledTask::weekdayNames;
 ScheduledTask::ScheduledTask()
 {
 //ScheduledTask::hallo = 1;
-	this->weekdayNames.insert(MONDAY, QObject::tr("Monday"));
-	this->weekdayNames.insert(TUESDAY, QObject::tr("Tuesday"));
-	this->weekdayNames.insert(WEDNESDAY, QObject::tr("Wednesday"));
-	this->weekdayNames.insert(THURSDAY, QObject::tr("Thursday"));
-	this->weekdayNames.insert(FRIDAY, QObject::tr("Friday"));
-	this->weekdayNames.insert(SATURDAY, QObject::tr("Saturday"));
-	this->weekdayNames.insert(SUNDAY, QObject::tr("Sunday"));
-	this->setType(NEVER);
+	this->weekdayNames.insert(ScheduleRule::MONDAY, QObject::tr("Monday"));
+	this->weekdayNames.insert(ScheduleRule::TUESDAY, QObject::tr("Tuesday"));
+	this->weekdayNames.insert(ScheduleRule::WEDNESDAY, QObject::tr("Wednesday"));
+	this->weekdayNames.insert(ScheduleRule::THURSDAY, QObject::tr("Thursday"));
+	this->weekdayNames.insert(ScheduleRule::FRIDAY, QObject::tr("Friday"));
+	this->weekdayNames.insert(ScheduleRule::SATURDAY, QObject::tr("Saturday"));
+	this->weekdayNames.insert(ScheduleRule::SUNDAY, QObject::tr("Sunday"));
+	this->setType(ScheduleRule::NEVER);
 	this->clearWeekdays();
 	this->setTimeToRun(QTime());
 	this->setMinutesAfterStartup(-1);
@@ -47,10 +46,10 @@ ScheduledTask::ScheduledTask()
 /**
  * Constructor for Weekdays-Scheduler
  */
-ScheduledTask::ScheduledTask(QSet<WeekdaysEnum> weekdays, QTime timeToRun)
+ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> weekdays, QTime timeToRun)
 {
 	ScheduledTask();
-	this->setType(ScheduledTask::AT_WEEKDAYS_AND_TIME);
+	this->setType(ScheduleRule::AT_WEEKDAYS_AND_TIME);
 	this->setWeekdays(weekdays);
 	this->setTimeToRun(timeToRun);
 }
@@ -61,23 +60,34 @@ ScheduledTask::ScheduledTask(QSet<WeekdaysEnum> weekdays, QTime timeToRun)
 ScheduledTask::ScheduledTask(int minutesAfterStartup)
 {
 	ScheduledTask();
-	this->setType(AFTER_BOOT);
+	this->setType(ScheduleRule::AFTER_BOOT);
 	this->setMinutesAfterStartup(minutesAfterStartup);
 }
 
+/**
+ * Copy-constructor
+ */
+ScheduledTask::ScheduledTask(const ScheduledTask& task)
+{
+	this->type = task.getType();
+	this->weekdays = task.getWeekdays();
+	this->timeToRun = task.getTimeToRun();
+	this->minutesAfterStartup = task.getMinutesAfterStartup();
+}
+	
 ScheduledTask::~ScheduledTask() {}
 
-ScheduledTask::ScheduleTypeEnum ScheduledTask::getType() const
+ScheduleRule::ScheduleType ScheduledTask::getType() const
 {
 	return this->type;
 }
 
-void ScheduledTask::setType(ScheduledTask::ScheduleTypeEnum type)
+void ScheduledTask::setType(ScheduleRule::ScheduleType type)
 {
 	this->type = type;
 }
 
-QSet<ScheduledTask::WeekdaysEnum> ScheduledTask::getWeekdays() const
+QSet<ScheduleRule::Weekdays> ScheduledTask::getWeekdays() const
 {
 	return this->weekdays;
 }
@@ -86,14 +96,23 @@ QVector<bool> ScheduledTask::getWeekdaysArray() const
 {
 	QVector<bool> days;
 	for (int i = 0; i < 7; i++) {
-		days.append(weekdays.contains((ScheduledTask::WeekdaysEnum)i));
+		days.append(weekdays.contains((ScheduleRule::Weekdays)i));
 	}
 	return days;
 }
 
-void ScheduledTask::setWeekdays(QSet<WeekdaysEnum> weekdays)
+void ScheduledTask::setWeekdays(QSet<ScheduleRule::Weekdays> weekdays)
 {
 	this->weekdays = weekdays;
+}
+
+void ScheduledTask::setWeekdays(QSet<int> weekdaysInt)
+{
+	QList<int> wdIntList = weekdaysInt.toList();
+	weekdays.clear();
+	for (int i = 0; i < wdIntList.size(); i++) {
+		weekdays.insert((ScheduleRule::Weekdays)wdIntList.at(i));
+	}
 }
 
 void ScheduledTask::clearWeekdays()
@@ -101,7 +120,7 @@ void ScheduledTask::clearWeekdays()
 	this->weekdays.clear();
 }
 
-void ScheduledTask::addWeekday(WeekdaysEnum newWeekday)
+void ScheduledTask::addWeekday(ScheduleRule::Weekdays newWeekday)
 {
 	this->weekdays.insert(newWeekday);
 }
@@ -130,11 +149,11 @@ QString ScheduledTask::toString() const
 {
 	switch (this->type)
 	{
-		case NEVER: { return QString(QObject::tr("never")); break; }
-		case AT_WEEKDAYS_AND_TIME:
+		case ScheduleRule::NEVER: { return QString(QObject::tr("never")); break; }
+		case ScheduleRule::AT_WEEKDAYS_AND_TIME:
 		{
 			QString tok = ", ";
-			QList<WeekdaysEnum> wdList = weekdays.toList();
+			QList<ScheduleRule::Weekdays> wdList = weekdays.toList();
 			qStableSort(wdList.begin(), wdList.end());
 			QString wdStr = "";
 			for (int i = 0; i < wdList.size(); i++)
@@ -145,9 +164,9 @@ QString ScheduledTask::toString() const
 			return QObject::tr("on %1 at %2").arg(wdStr, this->timeToRun.toString("hh:mm"));
 			break;
 		}
-		case AFTER_BOOT:
+		case ScheduleRule::AFTER_BOOT:
 		{
-			return QObject::tr("%1 minutes after starup").arg(this->minutesAfterStartup);
+			return QObject::tr("%1 minutes after startup").arg(this->minutesAfterStartup);
 			break;
 		}
 		default:
@@ -160,13 +179,33 @@ bool ScheduledTask::equals(const ScheduledTask& scheduledTask) const
 {
 	if (this->getType() == scheduledTask.getType()) {
 		switch (type) {
-			case ScheduledTask::NEVER: return(true); break;
-			case ScheduledTask::AFTER_BOOT: return(this->getMinutesAfterStartup() == scheduledTask.getMinutesAfterStartup()); break;
-			case ScheduledTask::AT_WEEKDAYS_AND_TIME: return(this->getTimeToRun() == scheduledTask.getTimeToRun() && this->getWeekdays() == scheduledTask.getWeekdays()); break;
+			case ScheduleRule::NEVER: return(true); break;
+			case ScheduleRule::AFTER_BOOT: return(this->getMinutesAfterStartup() == scheduledTask.getMinutesAfterStartup()); break;
+			case ScheduleRule::AT_WEEKDAYS_AND_TIME: return(this->getTimeToRun() == scheduledTask.getTimeToRun() && this->getWeekdays() == scheduledTask.getWeekdays()); break;
 			default: return false;
 		}
 		return false;
 	} else {
 		return false;
 	}
+}
+
+QDataStream &operator<<(QDataStream &out, const ScheduledTask& sched)
+{
+	out << sched.getType() << sched.getWeekdays() << sched.getTimeToRun() << sched.getMinutesAfterStartup();
+	return(out);
+}
+
+QDataStream &operator>>(QDataStream &in, ScheduledTask& sched)
+{
+	int type;
+	QSet<int> weekdays;
+	QTime timeToRun;
+	int minutesAfterStartup;
+	in >> type >> weekdays >> timeToRun >> minutesAfterStartup;
+	sched.setType((ScheduleRule::ScheduleType)type);
+	sched.setWeekdays(weekdays);
+	sched.setTimeToRun(timeToRun);
+	sched.setMinutesAfterStartup(minutesAfterStartup);
+	return(in);
 }

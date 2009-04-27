@@ -23,32 +23,36 @@
 #include <QStringList>
 #include <QDebug>
 #include <QMetaType>
+#include <QVariant>
 
 #include "tools/abstract_rsync.hh"
 #include "exception/abort_exception.hh"
 
-
+namespace ScheduleRule {
+enum ScheduleType
+{ AFTER_BOOT, AT_WEEKDAYS_AND_TIME, NEVER};
+enum Weekdays
+{ MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY};
+}
 
 class ScheduledTask
 {
 	public:
-		enum ScheduleTypeEnum
-		{ AFTER_BOOT, AT_WEEKDAYS_AND_TIME, NEVER};
-		enum WeekdaysEnum
-		{ MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY};
 
 		ScheduledTask();
-		ScheduledTask(QSet<WeekdaysEnum> weekdays, QTime timeToRun);
+		ScheduledTask(const ScheduledTask& task);
+		ScheduledTask(QSet<ScheduleRule::Weekdays> weekdays, QTime timeToRun);
 		ScheduledTask(int minutesAfterStartup);
 
 		~ScheduledTask();
-		ScheduleTypeEnum getType() const;
-		void setType(ScheduleTypeEnum type);
-		QSet<WeekdaysEnum> getWeekdays() const;
+		ScheduleRule::ScheduleType getType() const;
+		void setType(ScheduleRule::ScheduleType type);
+		QSet<ScheduleRule::Weekdays> getWeekdays() const;
 		QVector<bool> getWeekdaysArray() const;
-		void setWeekdays(QSet<WeekdaysEnum> weekdays);
+		void setWeekdays(QSet<ScheduleRule::Weekdays> weekdays);
+		void setWeekdays(QSet<int> weekdaysInt);
 		void clearWeekdays();
-		void addWeekday(WeekdaysEnum newWeekday);
+		void addWeekday(ScheduleRule::Weekdays newWeekday);
 		QTime getTimeToRun() const;
 		void setTimeToRun(QTime timeToRun);
 		int getMinutesAfterStartup() const;
@@ -56,14 +60,19 @@ class ScheduledTask
 		QString toString() const;
 		bool equals(const ScheduledTask& scheduledTask) const;
 		
-		static QMap<WeekdaysEnum, QString> weekdayNames;
+		static QMap<ScheduleRule::Weekdays, QString> weekdayNames;
 
 	private:
-		ScheduleTypeEnum type;
-		QSet<WeekdaysEnum> weekdays;
+		ScheduleRule::ScheduleType type;
+		QSet<ScheduleRule::Weekdays> weekdays;
 		QTime timeToRun;
 		int minutesAfterStartup;
 };
+QDataStream &operator<<(QDataStream &out, const ScheduledTask& sched);
+QDataStream &operator>>(QDataStream &in, ScheduledTask& sched);
+
 Q_DECLARE_METATYPE(ScheduledTask);
+Q_DECLARE_METATYPE(ScheduleRule::ScheduleType);
+Q_DECLARE_METATYPE(ScheduleRule::Weekdays);
 
 #endif /*SCHEDULEDTASK_H_*/
