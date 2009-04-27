@@ -205,6 +205,7 @@ class Settings : public QObject
 		QString getTempMetadataFileName();
 		QString getBackupContentFileName();
 		QString getBackupTimeFileName();
+		QString getBackupQuotaFileName();
 		QString getAuthorizedKeyFolderName();
 		QString getAuthorizedKeyFileName();
 
@@ -296,6 +297,7 @@ class Settings : public QObject
 		static const QString SETTINGS_METADATA_FILE_NAME;
 		static const QString SETTINGS_BACKUP_CONTENT_FILE_NAME;
 		static const QString SETTINGS_BACKUP_TIME_FILE_NAME;
+		static const QString SETTINGS_BACKUP_QUOTA_FILE_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FOLDER_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FILE_NAME;
 
@@ -377,6 +379,8 @@ class Settings : public QObject
 		QString metadataFileName;
 		QString backupContentFileName;
 		QString backupTimeFileName;
+		QString backupQuotaFileName;
+
 		QString authorizedKeyFolderName;
 		QString authorizedKeyFileName;
 
@@ -407,6 +411,7 @@ class Settings : public QObject
 		// [GUI]
 		int nOfLastBackups;
 		static const int MAX_SAVED_LAST_BACKUPS; // immutable
+		static const int DEFAULT_NUM_OF_LAST_BACKUPS; // immutable
 
 		// [AppData]
 		QList<BackupTask> lastBackups;
@@ -478,6 +483,11 @@ inline QString Settings::getPrivateOpenSshKey()
 inline QString Settings::getBackupTimeFileName()
 {
 	return backupTimeFileName;
+}
+
+inline QString Settings::getBackupQuotaFileName()
+{
+	return backupQuotaFileName;
 }
 
 inline QString Settings::getLogFileName()
