@@ -21,6 +21,7 @@
 #include "cli/cli_manager.hh"
 #include "exception/login_exception.hh"
 #include "model/backup_thread.hh"
+#include "model/backup_task.hh"
 #include "model/dir_tree_item.hh"
 #include "model/main_model.hh"
 #include "model/remote_dir_model.hh"
@@ -171,16 +172,21 @@ void MainModel::backup( const QStringList& items, const QStringList& includePatt
 						this, SIGNAL( finishProgressDialog() ) );
 	QObject::connect( this, SIGNAL( abortProcess() ),
 						backupThread, SLOT( abortBackupProcess() ) );
+	qDebug() << "MainModel::backup: startInCurrentThread=" << startInCurrentThread;
 	if ( startInCurrentThread )
 	{
 		// signals are not connected with QCoreApplication and multiple threads
 		// but in CLI mode we do not need an own thread
 		backupThread->startInCurrentThread();
+		Settings::getInstance()->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::UNDEFINED));
 	}
 	else
 	{
 		backupThread->start();
 		//TODO: disconnect signal/slot connections
+		BackupTask bkup(QDateTime::currentDateTime(), BackupTask::UNDEFINED);
+		Settings::getInstance()->addLastBackup(bkup);
+		qDebug() << "MainModel::backup: bkup=" << bkup.toString();
 	}
 }
 
@@ -220,14 +226,13 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 	try
 	{
 		switch (scheduleRule.getType()) {
-			case ScheduledTask::AT_WEEKDAYS_AND_TIME:
+			case ScheduleRule::AT_WEEKDAYS_AND_TIME:
 				scheduler->scheduleTask( settings->getThisApplicationFullPathExecutable(), CliManager::SCHEDULE_ARGUMENT, scheduleRule.getTimeToRun(), scheduleRule.getWeekdaysArray().data() );
-				settings->saveScheduleRule(scheduleRule);
 				break;
-			case ScheduledTask::AFTER_BOOT:
+			case ScheduleRule::AFTER_BOOT:
 				scheduler->scheduleTask( execName, CliManager::SCHEDULE_ARGUMENT, scheduleRule.getMinutesAfterStartup() );
 				break;
-			case ScheduledTask::NEVER:
+			case ScheduleRule::NEVER:
 				scheduler->deleteExistingTask( execName, CliManager::SCHEDULE_ARGUMENT );
 				break;
 		}
@@ -263,6 +268,26 @@ QStringList MainModel::getPrefixes()
 		emit showCriticalMessageBox( e.what() );
 	}
 	return prefixes;
+}
+
+QList<int> MainModel::getServerQuota()
+{
+	qDebug() << "MainModel::getServerQuota()";
+	QList<int> quota;
+	if( !initConnection() )
+	{
+		return quota;
+	}
+	try
+	{
+		auto_ptr<AbstractRsync> rsync = ToolFactory::getRsyncImpl();
+		quota = rsync->getServerQuotaValues();
+	}
+	catch ( ProcessException e )
+	{
+		emit showCriticalMessageBox( e.what() );
+	}
+	return quota;
 }
 
 QList<RestoreName> MainModel::getRestoreNames()

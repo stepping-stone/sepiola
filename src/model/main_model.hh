@@ -155,6 +155,12 @@ public:
 	 * @return a list of prefix names
 	 */
 	QStringList getPrefixes();
+	
+	 /**
+	 * Reads int-values from the provided quota-file on the server
+	 * @return QList<int> of values from the quota-file
+	  */
+	QList<int> getServerQuota();
 
 	/**
 	 * Restores all items
