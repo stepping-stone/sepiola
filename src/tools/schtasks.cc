@@ -57,12 +57,7 @@ void Schtasks::scheduleTask( const QString& execName, const QString& cliArgument
 	schtasksArguments << "\"" + execName + "\" " + cliArgument;
 	schtasksArguments << "/sc";
 	schtasksArguments << getTranslationForOnStart( locale );
-	if ( schedule( execName, cliArgument, schtasksArguments, locale ) )
-	{
-		ScheduledTask sr = settings->getScheduleRule();
-		sr.setMinutesAfterStartup( minutesToDelay );
-		settings->saveScheduleRule(sr);
-	}
+	schedule( execName, cliArgument, schtasksArguments, locale );
 }
 
 void Schtasks::scheduleTask( const QString& execName, const QString& cliArgument, const QTime& time, const bool days[] )
@@ -71,12 +66,12 @@ void Schtasks::scheduleTask( const QString& execName, const QString& cliArgument
 	Settings* settings = Settings::getInstance();
 	QLocale locale = getSchtasksBinaryLocale();
 	QString dayString;
-	QSet<ScheduledTask::WeekdaysEnum> wd;
+	QSet<ScheduleRule::Weekdays> wd;
 	for ( int i = 0; i < 7; i++ )
 	{
 		if ( days[i] )
 		{
-			wd.insert((ScheduledTask::WeekdaysEnum)i);
+			wd.insert((ScheduleRule::Weekdays)i);
 			if ( dayString != "" )
 			{
 				dayString.append( "," );
@@ -93,8 +88,6 @@ void Schtasks::scheduleTask( const QString& execName, const QString& cliArgument
 	schtasksArguments << "/st" << time.toString( "HH:mm:ss" );
 	schtasksArguments << "/d" << dayString;
 	schedule( execName, cliArgument, schtasksArguments, locale );
-	
-	settings->saveScheduleRule(ScheduledTask(wd, time));
 }
 
 bool Schtasks::schedule( const QString& execName, const QString& cliArgument, const QStringList& schtasksArguments,

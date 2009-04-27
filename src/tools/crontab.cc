@@ -44,11 +44,7 @@ void Crontab::scheduleTask( const QString& execName, const QString& cliArgument,
 		emit errorSignal( QObject::tr( "Scheduling failed, because no vixie cron has been found" ) );
 		return;
 	}
-
-	if ( schedule( execName, cliArgument, "@reboot" ) )
-	{
-		Settings::getInstance()->saveScheduleRule( ScheduledTask( minutesToDelay ) );
-	}
+	schedule( execName, cliArgument, "@reboot" );
 }
 
 void Crontab::scheduleTask( const QString& execName, const QString& cliArgument, const QTime& time, const bool days[] )
@@ -56,12 +52,12 @@ void Crontab::scheduleTask( const QString& execName, const QString& cliArgument,
 	qDebug() << "Crontab::setScheduleTask( " << execName << ", " << cliArgument << ", " << time << ", days )";
 
 	QString dayString;
-	QSet<ScheduledTask::WeekdaysEnum> wd;
+	QSet<ScheduleRule::Weekdays> wd;
 	for ( int i=0; i<7; i++ )
 	{
 		if ( days[i] )
 		{
-			wd.insert((ScheduledTask::WeekdaysEnum)i);
+			wd.insert((ScheduleRule::Weekdays)i);
 			if ( dayString != "" )
 			{
 				dayString.append( "," );
@@ -76,8 +72,6 @@ void Crontab::scheduleTask( const QString& execName, const QString& cliArgument,
 	timeSpecification.append( " * * " );
 	timeSpecification.append( dayString );
 	schedule( execName, cliArgument, timeSpecification );
-	
-	Settings::getInstance()->saveScheduleRule(ScheduledTask(wd, time));
 }
 
 bool Crontab::updateExistingTask( const QString& execName, const QString& cliArgument )
