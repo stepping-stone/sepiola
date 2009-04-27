@@ -22,9 +22,11 @@
 #include <QByteArray>
 #include <QString>
 #include <QFile>
+#include <QIODevice>
 #include <QDir>
 #include <QCoreApplication>
 #include <QTextCodec>
+#include <QTextStream>
 
 #include "model/restore_name.hh"
 #include "settings/settings.hh"
@@ -438,6 +440,33 @@ QStringList Rsync::getPrefixes()
 	waitForFinished();
 	return prefixes;
 }
+
+QList<int> Rsync::getServerQuotaValues()
+{
+	qDebug() << "Rsync::getServerQuotaValues()";
+	Settings* settings = Settings::getInstance();
+	QString src = settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName() + "/";
+	QString dst = settings->getApplicationDataDir();
+	QFileInfo quotaFileInfo = dst + this->downloadSingleFile( src, dst, settings->getBackupQuotaFileName(), true, true ).fileName();
+	QList<int> sizes;
+	if (quotaFileInfo.isFile()) {
+ 		QFile quotaFile(quotaFileInfo.absoluteFilePath());
+		if (quotaFile.open(QIODevice::ReadOnly))
+		{
+			int quota, backup, snapshot;
+			QTextStream in(&quotaFile);
+			in >> quota >> backup >> snapshot;
+			sizes.clear();
+			sizes << quota << backup << snapshot;
+		} else {
+			sizes.clear();
+		}
+	} else {
+		sizes.clear();
+	}
+	return sizes;
+}
+
 
 QStringList Rsync::getRsyncGeneralArguments()
 {

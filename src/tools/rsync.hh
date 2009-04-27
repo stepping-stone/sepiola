@@ -98,7 +98,12 @@ public:
 		*/
 	 QStringList getPrefixes();
 
-	/**
+	 /**
+	  * @see AbstractRsync::getServerQuotaValues()
+	  */
+	 QList<int> getServerQuotaValues();
+	
+	 /**
 	 * Tests the getPrefixes method
 	 * @see getPrefixes()
 	 */
