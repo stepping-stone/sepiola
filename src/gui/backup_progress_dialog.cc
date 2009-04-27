@@ -36,11 +36,11 @@ BackupProgress::BackupProgress( const QString& title )
 	this->lastUpdate = QTime::currentTime();
 }
 
-OutputDialog::~OutputDialog()
+BackupProgress::~BackupProgress()
 {
 }
 
-void OutputDialog::appendInfo( const QString& info )
+void BackupProgress::appendInfo( const QString& info )
 {
 	const int msecs_to_wait_for_flush = 500;
 	QTime currentTime = QTime::currentTime();
@@ -58,13 +58,13 @@ void OutputDialog::appendInfo( const QString& info )
 	}
 }
 
-void OutputDialog::flushCache()
+void BackupProgress::flushCache()
 {
 	this->textEditOutput->append( this->outputCache  );
 	this->outputCache.clear();
 }
 
-void OutputDialog::appendError( const QString& error )
+void BackupProgress::appendError( const QString& error )
 {
 	if ( !this->isErrorVisible )
 	{
@@ -75,7 +75,7 @@ void OutputDialog::appendError( const QString& error )
 	this->textEditError->append( error  );
 }
 
-void OutputDialog::on_btnCancel_pressed()
+void BackupProgress::on_btnCancel_pressed()
 {
 	if (emit abort1()) {
 		this->btnClose->setEnabled(true);
@@ -83,14 +83,14 @@ void OutputDialog::on_btnCancel_pressed()
 	}
 }
 
-void OutputDialog::finished()
+void BackupProgress::finished()
 {
 	flushCache();
 	this->btnClose->setEnabled( true );
 	this->btnCancel->setEnabled( false );
 }
 
-void OutputDialog::closeEvent( QCloseEvent * event )
+void BackupProgress::closeEvent( QCloseEvent * event )
 {
 	if (!this->btnClose->isEnabled()) event->ignore();
 }
