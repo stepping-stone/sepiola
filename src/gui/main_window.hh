@@ -60,6 +60,9 @@ signals:
 	void rejectPasswordDialog();
 	void writeLog( const QString& message );
 
+	void updateOverviewFormScheduleInfo();
+	void updateOverviewFormLastBackupsInfo();
+
 private:
 	enum FORM_INDEX { OVERVIEW, BACKUP, RESTORE, SETTINGS, LOGFILE };
 	QStackedLayout *stackedLayout;
@@ -93,7 +96,7 @@ private slots:
 	void appendErrorMessage( const QString& error );
 	void finishProgressDialog();
 	void closeProgressDialog();
-		
+	
 	void on_actionOverview_triggered();
 	void on_actionBackup_triggered();
 	void on_actionRestore_triggered();

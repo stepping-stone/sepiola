@@ -27,6 +27,7 @@
 MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 {
 	setupUi( this );
+	this->outputDialog = 0;
 	Settings* settings = Settings::getInstance();
 	resize( settings->getWindowSize() );
 	move( settings->getWindowPosition() );
@@ -63,12 +64,17 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 				break;
 		}
 	}
-	this->overviewForm = new OverviewForm( 0, this->model );
-	this->backupForm = new BackupForm( 0, this->model );
-	this->restoreForm = new RestoreForm( 0, this->model );
-	this->settingsForm = new SettingsForm( 0, this->model );
-	this->logfileForm = new LogfileForm( 0, this->model );
+	this->overviewForm = new OverviewForm( this, this->model );
+	this->backupForm = new BackupForm( this, this->model );
+	this->restoreForm = new RestoreForm( this, this->model );
+	this->settingsForm = new SettingsForm( this, this->model );
+	this->logfileForm = new LogfileForm( this, this->model );
 
+	
+	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ), overviewForm, SLOT ( refreshScheduleOverview() ) );
+	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
+
+	
 	stackedLayout = new QStackedLayout( frameMain );
 	stackedLayout->addWidget( overviewForm );
 	stackedLayout->addWidget( backupForm );
@@ -276,12 +282,18 @@ void MainWindow::showProgressDialog( const QString& title )
 
 void MainWindow::appendInfoMessage( const QString& info )
 {
-	outputDialog->appendInfo( info );
+	qDebug() << "MainWindow::appendInfoMessage(" << info << ")";
+	if (outputDialog != 0) {
+		outputDialog->appendInfo( info );
+	}
 }
 
 void MainWindow::appendErrorMessage( const QString& error )
 {
-	outputDialog->appendError( error );
+	qDebug() << "MainWindow::appendErrorMessage(" << error << ")";
+	if (outputDialog != 0) {
+		outputDialog->appendError( error );
+	}
 }
 
 void MainWindow::finishProgressDialog()
