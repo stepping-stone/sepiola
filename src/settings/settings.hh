@@ -71,7 +71,7 @@ class Settings : public QObject
 		 * @param applicationName name of the application
 		 * @param configFile the configuration file
 		 */
-		void loadSettings( const QFileInfo& configFile, const QString& resellerAffix = "_reseller", const QString& resellerAffix = "_appData" );
+		void loadSettings( const QFileInfo& configFile, const QString& resellerAffix = "_reseller", const QString& appDataAffix = "_appData" );
 
 		/**
 		 * Reloads all settings
