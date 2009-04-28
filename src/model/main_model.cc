@@ -178,13 +178,13 @@ void MainModel::backup( const QStringList& items, const QStringList& includePatt
 		// signals are not connected with QCoreApplication and multiple threads
 		// but in CLI mode we do not need an own thread
 		backupThread->startInCurrentThread();
-		Settings::getInstance()->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::UNDEFINED));
+		Settings::getInstance()->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::STATUS_UNDEFINED));
 	}
 	else
 	{
 		backupThread->start();
 		//TODO: disconnect signal/slot connections
-		BackupTask bkup(QDateTime::currentDateTime(), BackupTask::UNDEFINED);
+		BackupTask bkup(QDateTime::currentDateTime(), BackupTask::STATUS_UNDEFINED);
 		Settings::getInstance()->addLastBackup(bkup);
 		qDebug() << "MainModel::backup: bkup=" << bkup.toString();
 	}

@@ -32,7 +32,7 @@ class BackupTask
 {
 	public:
 		enum StatusEnum
-		{ OK, WARNING, ERROR, UNDEFINED };
+		{ STATUS_OK, STATUS_WARNING, STATUS_ERROR, STATUS_UNDEFINED };
 		BackupTask();
 		BackupTask( const BackupTask& newBackupTask );
 		BackupTask( const QDateTime& backupTime, BackupTask::StatusEnum status );

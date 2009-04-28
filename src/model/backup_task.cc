@@ -27,7 +27,7 @@ QMap<BackupTask::StatusEnum, QString> BackupTask::map_statusText;
 BackupTask::BackupTask()
 {
 	this->setDateTime( QDateTime() );
-	this->setStatus( BackupTask::UNDEFINED );
+	this->setStatus( BackupTask::STATUS_UNDEFINED );
 }
 
 BackupTask::BackupTask( const BackupTask& newBackupTask )
@@ -59,10 +59,10 @@ QString BackupTask::getStatusText( BackupTask::StatusEnum status )
 {
 	if ( map_statusText.size() == 0 )
 	{
-		map_statusText.insert( OK, QObject::tr( "<font color=\"green\">Successful</font>" ) );
-		map_statusText.insert( WARNING, QObject::tr( "<font color=\"orange\">Warnings</font>" ) );
-		map_statusText.insert( ERROR, QObject::tr( "<font color=\"red\">Failed</font>" ) );
-		map_statusText.insert( UNDEFINED, QObject::tr( "undefined" ) );
+		map_statusText.insert( BackupTask::STATUS_OK, QObject::tr( "<font color=\"green\">Successful</font>" ) );
+		map_statusText.insert( BackupTask::STATUS_WARNING, QObject::tr( "<font color=\"orange\">Warnings</font>" ) );
+		map_statusText.insert( BackupTask::STATUS_ERROR, QObject::tr( "<font color=\"red\">Failed</font>" ) );
+		map_statusText.insert( BackupTask::STATUS_UNDEFINED, QObject::tr( "undefined" ) );
 	}
 	return map_statusText.value( status );
 }
