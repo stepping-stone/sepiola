@@ -54,8 +54,6 @@ void SettingsForm::reload()
 {
 	Settings* settings = Settings::getInstance();
 	this->lineEditUsername->setText( settings->getServerUserName() );
-	this->lineEditServer->setText( settings->getServerName() );
-	this->lineEditServerKey->setText( settings->getServerKey() );
 	this->lineEditBackupPrefix->setText( settings->getBackupPrefix() );
 	this->spinBoxNOfShownLastBackups->setValue( settings->getNOfLastBackups() );
 	
@@ -74,14 +72,12 @@ void SettingsForm::save()
 	{
 		Settings* settings = Settings::getInstance();
 		settings->saveServerUserName( this->lineEditUsername->text() );
-		settings->saveServerName( this->lineEditServer->text() );
-		settings->saveServerKey( this->lineEditServerKey->text() );
 		settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );
 		settings->saveLanguageIndex( this->comboBoxLanguage->currentIndex() );
 		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
 		
 // settings->saveNOfLastBackups(4);
-// settings->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::UNDEFINED));
+// settings->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::STATUS_UNDEFINED));
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
 		emit updateOverviewFormLastBackupsInfo();
@@ -138,16 +134,6 @@ void SettingsForm::on_lineEditUsername_textEdited( QString username )
 	formChanged = true;
 }
 
-void SettingsForm::on_lineEditServer_textEdited( QString serverName )
-{
-	formChanged = true;
-}
-
-void SettingsForm::on_lineEditServerKey_textEdited( QString serverKey )
-{
-	formChanged = true;
-}
-
 void SettingsForm::on_comboBoxLanguage_currentIndexChanged( int languageIndex )
 {
 	formChanged = true;
@@ -161,18 +147,6 @@ void SettingsForm::on_lineEditBackupPrefix_textEdited( QString backupPrefix )
 void SettingsForm::on_spinBoxNOfShownLastBackups_valueChanged( int i )
 {
 	formChanged = (i != Settings::getInstance()->getNOfLastBackups());
-}
-
-void SettingsForm::on_btnDefaultServer_pressed()
-{
-	this->lineEditServer->setText( Settings::getInstance()->getDefaultServerName() );
-	formChanged = true;
-}
-
-void SettingsForm::on_btnDefaultServerKey_pressed()
-{
-	this->lineEditServerKey->setText( Settings::getInstance()->getDefaultServerKey() );
-	formChanged = true;
 }
 
 void SettingsForm::on_btnDefaultPrefix_pressed()

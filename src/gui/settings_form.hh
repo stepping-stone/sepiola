@@ -61,12 +61,8 @@ signals:
 private slots:
 	void save();
 	void reset();
-	void on_btnDefaultServer_pressed();
-	void on_btnDefaultServerKey_pressed();
 	void on_btnDefaultPrefix_pressed();
 	void on_lineEditUsername_textEdited ( QString username );
-	void on_lineEditServer_textEdited ( QString serverName );
-	void on_lineEditServerKey_textEdited ( QString serverKey );
 	void on_lineEditBackupPrefix_textEdited( QString backupPrefix );
 	void on_comboBoxLanguage_currentIndexChanged ( int languageIndex );
 	void on_spinBoxNOfShownLastBackups_valueChanged( int i );
