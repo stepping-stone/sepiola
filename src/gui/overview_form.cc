@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <QPicture>
 #include <QLabel>
+#include <QMessageBox>
 #include <QImageReader>
 #include <math.h>
 
@@ -56,6 +57,7 @@ OverviewForm::~OverviewForm()
 
 void OverviewForm::on_btnBackupNow_pressed()
 {
+	QMessageBox::information( this, tr( "Backup" ), tr( "Not implemented yet, unclear which items to backup" ));
 }
 
 void OverviewForm::refreshLastBackupsOverview()
@@ -69,11 +71,11 @@ void OverviewForm::refreshLastBackupsOverview()
 	// fill map with a pixmap for each status
 	QMap<BackupTask::StatusEnum, QPixmap> status_pixmap;
 	img.load( ":/main/sign_ok.svg" );
-	status_pixmap.insert( BackupTask::OK, QPixmap::fromImage( img ) );
+	status_pixmap.insert( BackupTask::STATUS_OK, QPixmap::fromImage( img ) );
 	img.load( ":/main/sign_error.svg" );
-	status_pixmap.insert( BackupTask::ERROR, QPixmap::fromImage( img ) );
+	status_pixmap.insert( BackupTask::STATUS_ERROR, QPixmap::fromImage( img ) );
 	img.load( ":/main/sign_warning.svg" );
-	status_pixmap.insert( BackupTask::WARNING, QPixmap::fromImage( img ) );
+	status_pixmap.insert( BackupTask::STATUS_WARNING, QPixmap::fromImage( img ) );
 	QList<BackupTask> lastBackups = settings->getLastBackups();
 	int n = std::min( settings->getNOfLastBackups(), lastBackups.size() );
 	// fill status-content of last backups into form
