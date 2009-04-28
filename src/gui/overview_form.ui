@@ -445,9 +445,6 @@
           <property name="frameShadow" >
            <enum>QFrame::Plain</enum>
           </property>
-          <property name="pixmap" >
-           <pixmap/>
-          </property>
           <property name="scaledContents" >
            <bool>true</bool>
           </property>
@@ -509,9 +506,6 @@
           </property>
           <property name="frameShadow" >
            <enum>QFrame::Plain</enum>
-          </property>
-          <property name="pixmap" >
-           <pixmap/>
           </property>
           <property name="scaledContents" >
            <bool>true</bool>

@@ -224,16 +224,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCheckBox" name="checkBoxDeleteExtraneous" >
-        <property name="text" >
-         <string>Delete extraneous files and directories</string>
-        </property>
-        <property name="checked" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>

@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>382</height>
+    <height>432</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -149,7 +149,7 @@ CH-3007 Bern</string>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>161</width>
        <height>20</height>
@@ -163,7 +163,9 @@ CH-3007 Bern</string>
       <string>&amp;OK</string>
      </property>
      <property name="icon" >
-      <iconset/>
+      <iconset>
+       <normaloff/>
+      </iconset>
      </property>
     </widget>
    </item>
