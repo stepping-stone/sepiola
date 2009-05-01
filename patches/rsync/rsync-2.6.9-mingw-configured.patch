@@ -1,6 +1,6 @@
-diff -urN rsync-2.6.9/config.h rsync-2.6.9-configured/config.h
---- rsync-2.6.9/config.h	1970-01-01 01:00:00.000000000 +0100
-+++ rsync-2.6.9-configured/config.h	2009-01-26 15:21:11.000000000 +0100
+diff -urP rsync-2.6.9-mingw/config.h rsync-2.6.9-mingw-configured/config.h
+--- rsync-2.6.9-mingw/config.h	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw-configured/config.h	2009-05-01 08:53:54.000000000 +0200
 @@ -0,0 +1,547 @@
 +/* config.h.  Generated from config.h.in by configure.  */
 +/* config.h.in.  Generated from configure.in by autoheader.  */
@@ -549,15 +549,15 @@ diff -urN rsync-2.6.9/config.h rsync-2.6.9-configured/config.h
 +
 +/* Define to `int' if <sys/types.h> doesn't define. */
 +#define uid_t int
-diff -urN rsync-2.6.9/lib/dummy rsync-2.6.9-configured/lib/dummy
---- rsync-2.6.9/lib/dummy	1970-01-01 01:00:00.000000000 +0100
-+++ rsync-2.6.9-configured/lib/dummy	2009-01-26 15:21:10.000000000 +0100
+diff -urP rsync-2.6.9-mingw/lib/dummy rsync-2.6.9-mingw-configured/lib/dummy
+--- rsync-2.6.9-mingw/lib/dummy	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw-configured/lib/dummy	2009-05-01 08:53:54.000000000 +0200
 @@ -0,0 +1,2 @@
 +This is a dummy file to ensure that the lib directory gets created
 +by configure when a VPATH is used.
-diff -urN rsync-2.6.9/Makefile rsync-2.6.9-configured/Makefile
---- rsync-2.6.9/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ rsync-2.6.9-configured/Makefile	2009-01-26 15:21:10.000000000 +0100
+diff -urP rsync-2.6.9-mingw/Makefile rsync-2.6.9-mingw-configured/Makefile
+--- rsync-2.6.9-mingw/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw-configured/Makefile	2009-05-01 09:03:05.000000000 +0200
 @@ -0,0 +1,187 @@
 +# Makefile for rsync. This is processed by configure to produce the final
 +# Makefile
@@ -662,7 +662,7 @@ diff -urN rsync-2.6.9/Makefile rsync-2.6.9-configured/Makefile
 +	cd $(srcdir) && $(MAKE) -f prepare-source.mak proto.h
 +
 +export OBJS1 OBJS2 OBJS3
-+global.h: prepare-source.mak $(OBJS1) $(OBJS2) $(OBJS3)
++global:
 +	cd $(srcdir) && $(MAKE) -f prepare-source.mak global.h
 +
 +clean: cleantests
@@ -746,9 +746,9 @@ diff -urN rsync-2.6.9/Makefile rsync-2.6.9-configured/Makefile
 +doxygen-upload:
 +	rsync -avzv $(srcdir)/dox/html/ --delete \
 +	samba.org:/home/httpd/html/rsync/doxygen/head/
-diff -urN rsync-2.6.9/zlib/dummy rsync-2.6.9-configured/zlib/dummy
---- rsync-2.6.9/zlib/dummy	1970-01-01 01:00:00.000000000 +0100
-+++ rsync-2.6.9-configured/zlib/dummy	2009-01-26 15:21:10.000000000 +0100
+diff -urP rsync-2.6.9-mingw/zlib/dummy rsync-2.6.9-mingw-configured/zlib/dummy
+--- rsync-2.6.9-mingw/zlib/dummy	1970-01-01 01:00:00.000000000 +0100
++++ rsync-2.6.9-mingw-configured/zlib/dummy	2009-05-01 08:53:54.000000000 +0200
 @@ -0,0 +1,2 @@
 +This is a dummy file to ensure that the lib directory gets created
 +by configure when a VPATH is used.
