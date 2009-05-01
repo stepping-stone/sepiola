@@ -557,8 +557,8 @@ diff -urP rsync-2.6.9-mingw/lib/dummy rsync-2.6.9-mingw-configured/lib/dummy
 +by configure when a VPATH is used.
 diff -urP rsync-2.6.9-mingw/Makefile rsync-2.6.9-mingw-configured/Makefile
 --- rsync-2.6.9-mingw/Makefile	1970-01-01 01:00:00.000000000 +0100
-+++ rsync-2.6.9-mingw-configured/Makefile	2009-05-01 08:54:17.000000000 +0200
-@@ -0,0 +1,186 @@
++++ rsync-2.6.9-mingw-configured/Makefile	2009-05-01 09:03:05.000000000 +0200
+@@ -0,0 +1,187 @@
 +# Makefile for rsync. This is processed by configure to produce the final
 +# Makefile
 +
@@ -661,6 +661,7 @@ diff -urP rsync-2.6.9-mingw/Makefile rsync-2.6.9-mingw-configured/Makefile
 +proto:
 +	cd $(srcdir) && $(MAKE) -f prepare-source.mak proto.h
 +
++export OBJS1 OBJS2 OBJS3
 +global:
 +	cd $(srcdir) && $(MAKE) -f prepare-source.mak global.h
 +
