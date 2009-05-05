@@ -144,6 +144,7 @@ QT4_WRAP_CPP(
 	gui/password_dialog.hh 
 	gui/pattern_dialog.hh
 	gui/output_dialog.hh 
+	gui/traffic_progress_dialog.hh 
 	model/backup_thread.hh
 	model/main_model.hh
 	model/restore_thread.hh
@@ -168,6 +169,7 @@ QT4_WRAP_UI(
 	gui/password_dialog.ui 
 	gui/pattern_dialog.ui
 	gui/output_dialog.ui
+	gui/traffic_progress_dialog.ui 
 )
 
 QT4_ADD_RESOURCES(
@@ -183,7 +185,8 @@ SET(SOURCE_FILES
 	gui/backup_form.cc 
 	gui/logfile_form.cc
 	gui/main_window.cc 
-	gui/overview_form.cc 
+	gui/overview_form.cc
+	gui/traffic_progress_dialog.cc
 	gui/output_dialog.cc
 	gui/password_dialog.cc
 	gui/pattern_dialog.cc
