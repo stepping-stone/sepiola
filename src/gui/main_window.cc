@@ -27,7 +27,7 @@
 MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 {
 	setupUi( this );
-	this->outputDialog = 0;
+	this->progressDialog = 0;
 	Settings* settings = Settings::getInstance();
 	resize( settings->getWindowSize() );
 	move( settings->getWindowPosition() );
@@ -39,14 +39,6 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 	QObject::connect( this->model, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ), this, SLOT( showServerPasswordDialog( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( this->model, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ), this, SLOT( showClientPasswordDialog( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( this->model, SIGNAL( showProgressDialog( const QString& ) ), this, SLOT( showProgressDialog( const QString& ) ) );
-	QObject::connect( this->model, SIGNAL( appendInfoMessage( const QString& ) ), this, SLOT( appendInfoMessage( const QString& ) ) );
-	QObject::connect( this->model, SIGNAL( appendErrorMessage( const QString& ) ), this, SLOT( appendErrorMessage( const QString& ) ) );
-	QObject::connect( this->model, SIGNAL( finishProgressDialog() ), this, SLOT( finishProgressDialog() ) );
-	QObject::connect( this->model, SIGNAL( closeProgressDialog() ), this, SLOT( closeProgressDialog() ) );
-
-	// log file signals/slots
-	QObject::connect( this->model, SIGNAL( appendInfoMessage( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
-	QObject::connect( this->model, SIGNAL( appendErrorMessage( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
 
 	if ( settings->isReinstalled() )
 	{
@@ -72,6 +64,7 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 
 	
 	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ), overviewForm, SLOT ( refreshScheduleOverview() ) );
+	QObject::connect( model, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 
 	
@@ -274,37 +267,55 @@ void MainWindow::closeEvent( QCloseEvent *event )
 
 void MainWindow::showProgressDialog( const QString& title )
 {
-	outputDialog = new OutputDialog( title );
-	QObject::connect( outputDialog, SIGNAL( abort() ), this->model, SLOT( abortProcessSlot() ) );
-	outputDialog->show();
+	qDebug() << "MainWindow::showProgressDialog(" << title << ")";
+	progressDialog = new TrafficProgressDialog( title );
+	QObject::connect( progressDialog, SIGNAL( abort() ), this->model, SLOT( abortProcessSlot() ) );
+	QObject::connect( this->model, SIGNAL( appendInfoMessage( const QString& ) ), progressDialog, SLOT( appendInfo( const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( appendErrorMessage( const QString& ) ), progressDialog, SLOT( appendError( const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( finishProgressDialog() ), this, SLOT( finishProgressDialog() ) );
+	QObject::connect( this->model, SIGNAL( closeProgressDialog() ), this, SLOT( closeProgressDialog() ) );
+
+	// log file signals/slots
+	QObject::connect( this->model, SIGNAL( outputInfoFileProcessed( const QString& ) ), progressDialog, SLOT( displayInfoFilename( const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( appendInfoMessage( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( appendErrorMessage( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
+	progressDialog->show();
 	QApplication::processEvents();
 }
 
-void MainWindow::appendInfoMessage( const QString& info )
+/*void MainWindow::appendInfoMessage( const QString& info )
 {
 	qDebug() << "MainWindow::appendInfoMessage(" << info << ")";
-	if (outputDialog != 0) {
-		outputDialog->appendInfo( info );
+	if (progressDialog != 0) {
+		progressDialog->appendInfo( info );
 	}
-}
+}*/
 
-void MainWindow::appendErrorMessage( const QString& error )
+/*void MainWindow::updateFileProcessedInfo( const QString& filename )
+{
+	qDebug() << "MainWindow::updateFileProcessedInfo(" << filename << ")";
+	if (progressDialog != 0) {
+		progressDialog->displayInfoFilename( filename );
+	}
+}*/
+
+/*void MainWindow::appendErrorMessage( const QString& error )
 {
 	qDebug() << "MainWindow::appendErrorMessage(" << error << ")";
-	if (outputDialog != 0) {
-		outputDialog->appendError( error );
+	if (progressDialog != 0) {
+		progressDialog->appendError( error );
 	}
-}
+}*/
 
 void MainWindow::finishProgressDialog()
 {
-	outputDialog->finished();
+	progressDialog->finished();
 	QApplication::processEvents();
 }
 
 void MainWindow::closeProgressDialog()
 {
-	outputDialog->done( 0 );
+	progressDialog->done( 0 );
 	QApplication::processEvents();
 }
 

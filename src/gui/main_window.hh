@@ -33,7 +33,7 @@
 #include "gui/restore_form.hh"
 #include "gui/settings_form.hh"
 #include "gui/logfile_form.hh"
-#include "gui/output_dialog.hh"
+#include "gui/traffic_progress_dialog.hh"
 #include "model/main_model.hh"
 
 /**
@@ -73,7 +73,7 @@ private:
 	SettingsForm* settingsForm;
 	LogfileForm* logfileForm;
 	QSplashScreen* splashScreen;
-	OutputDialog* outputDialog;
+	TrafficProgressDialog* progressDialog;
 
 	void writeSettings();
 	void readSettings();
@@ -92,9 +92,10 @@ private slots:
 	void showClientPasswordDialog( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
 	
 	void showProgressDialog( const QString& dialogTitle );
-	void appendInfoMessage( const QString& info );
+/*	void appendInfoMessage( const QString& info );
+	void updateFileProcessedInfo(const QString& filename );
 	void appendErrorMessage( const QString& error );
-	void finishProgressDialog();
+*/	void finishProgressDialog();
 	void closeProgressDialog();
 	
 	void on_actionOverview_triggered();
