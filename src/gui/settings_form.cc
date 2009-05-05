@@ -75,9 +75,6 @@ void SettingsForm::save()
 		settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );
 		settings->saveLanguageIndex( this->comboBoxLanguage->currentIndex() );
 		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
-		
-// settings->saveNOfLastBackups(4);
-// settings->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::STATUS_UNDEFINED));
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
 		emit updateOverviewFormLastBackupsInfo();
