@@ -27,7 +27,9 @@
 DirTreeItem::DirTreeItem( const QString& path, const QFileIconProvider& iconProvider )
 {
 	setEditable(false);
-
+	this->setCheckable(true);
+	this->setCheckState(Qt::Unchecked);
+			
 	this->absoluteName = path;
 	QFileInfo fileInfo( path );
 

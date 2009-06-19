@@ -20,7 +20,7 @@
 #include <QDir>
 #include <QPair>
 #include <QSet>
-#include <QMessageBox>
+#include <QDateTime>
 
 #include "exception/process_exception.hh"
 #include "exception/abort_exception.hh"
@@ -32,7 +32,20 @@
 #include "utils/file_system_utils.hh"
 #include "utils/log_file_utils.hh"
 #include "utils/unicode_text_stream.hh"
+#include "utils/datetime_utils.hh"
+#include "utils/progress_task.hh"
 
+const QString BackupThread::TASKNAME_PREPARE_DIRECTORIES = "preparing server directories";
+const QString BackupThread::TASKNAME_ESTIMATE_BACKUP_SIZE = "estimate backup size";
+const QString BackupThread::TASKNAME_FILE_UPLOAD = "file upload";
+const QString BackupThread::TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT = "download current backup content file";
+const QString BackupThread::TASKNAME_UPLOAD_METADATA = "upload metadata";
+const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
+
+
+/**
+ * deprecated
+ */
 BackupThread::BackupThread( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag )
 {
 	isAborted = false;
@@ -40,25 +53,71 @@ BackupThread::BackupThread( const QStringList& items, const QStringList& include
 	this->includePatternList = includePatternList;
 	this->excludePatternList = excludePatternList;
 	this->setDeleteFlag = setDeleteFlag;
+	this->backupStartDateTime = QDateTime(); // null-Time
+	this->backupCurrentStatus = ConstUtils::STATUS_UNDEFINED;
+	
+	// TODO adjust the given values for subtask steps and durations
+	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
+	pt.appendTask(TASKNAME_PREPARE_DIRECTORIES, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
+	pt.appendTask(TASKNAME_ESTIMATE_BACKUP_SIZE, DateTimeUtils::getDateTimeFromSecs(3 /* time for dry run */), 30 /* steps??? */);
+	pt.appendTask(TASKNAME_FILE_UPLOAD, DateTimeUtils::getDateTimeFromSecs(100), 250/* enter bytes to upload */);
+	pt.appendTask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
+	pt.appendTask(TASKNAME_UPLOAD_METADATA, DateTimeUtils::getDateTimeFromSecs(2), 1 /* steps??? */);
+	pt.appendTask(TASKNAME_METAINFO, DateTimeUtils::getDateTimeFromSecs(2), 1);
+	currentTaskNr = 0;
+	
 
 	rsync = ToolFactory::getRsyncImpl();
 	QObject::connect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
-						this, SIGNAL( appendInfoMessage( const QString& ) ) );
+					  this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::connect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
-						this, SIGNAL( appendErrorMessage( const QString& ) ) );
-	QObject::connect( this, SIGNAL( abort() ),
-						rsync.get(), SLOT( abort() ) );
-	connect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
+					  this, SIGNAL( errorSignal( const QString& ) ) );
+	QObject::connect( rsync.get(), SIGNAL( trafficInfoSignal( const QString&, float, quint64, quint64 ) ),
+					  this, SLOT( rsyncUploadProgressHandler( const QString&, float, quint64, quint64 ) ) );
+	QObject::connect( this, SIGNAL( abort_rsync() ), rsync.get(), SLOT( abort() ) );
+	QObject::connect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
+}
+
+BackupThread::BackupThread( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag )
+{
+	isAborted = false;
+	this->includeRules = includeRules;
+	this->setDeleteFlag = setDeleteFlag;
+	this->backupStartDateTime = QDateTime(); // null-Time
+	this->backupCurrentStatus = ConstUtils::STATUS_UNDEFINED;
+	
+	// TODO adjust the given values for subtask steps and durations
+	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
+	pt.appendTask(TASKNAME_PREPARE_DIRECTORIES, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
+	pt.appendTask(TASKNAME_ESTIMATE_BACKUP_SIZE, DateTimeUtils::getDateTimeFromSecs(3 /* time for dry run */), 30 /* steps??? */);
+	pt.appendTask(TASKNAME_FILE_UPLOAD, DateTimeUtils::getDateTimeFromSecs(100), 250/* enter bytes to upload */);
+	pt.appendTask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
+	pt.appendTask(TASKNAME_UPLOAD_METADATA, DateTimeUtils::getDateTimeFromSecs(2), 1 /* steps??? */);
+	pt.appendTask(TASKNAME_METAINFO, DateTimeUtils::getDateTimeFromSecs(2), 1);
+	currentTaskNr = 0;
+	
+
+	rsync = ToolFactory::getRsyncImpl();
+	QObject::connect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
+					  this, SIGNAL( infoSignal( const QString& ) ) );
+	QObject::connect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
+					  this, SIGNAL( errorSignal( const QString& ) ) );
+	QObject::connect( rsync.get(), SIGNAL( trafficInfoSignal( const QString&, float, quint64, quint64 ) ),
+					  this, SLOT( rsyncUploadProgressHandler( const QString&, float, quint64, quint64 ) ) );
+	QObject::connect( this, SIGNAL( abort_rsync() ), rsync.get(), SLOT( abort() ) );
+	QObject::connect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
 BackupThread::~BackupThread()
 {
 	qDebug() << "BackupThread::~BackupThread()";
 	QObject::disconnect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
-							 this, SIGNAL( appendInfoMessage( const QString& ) ) );
+						 this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::disconnect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
-							 this, SIGNAL( appendErrorMessage( const QString& ) ) );
-	QObject::disconnect( this, SIGNAL( abort() ),
+						 this, SIGNAL( errorSignal( const QString& ) ) );
+	QObject::disconnect( rsync.get(), SIGNAL( trafficInfoSignal( const QString&, float, quint64, quint64 ) ),
+						 this, SLOT( rsyncUploadProgressHandler( const QString&, float, quint64, quint64 ) ) );
+	QObject::disconnect( this, SIGNAL( abort_rsync() ),
 							 rsync.get(), SLOT( abort() ) );
 }
 
@@ -70,27 +129,39 @@ void BackupThread::startInCurrentThread()
 void BackupThread::run()
 {
 	qDebug() << "BackupThread::run()";
+	ProgressTask* subPt;
 	bool failed = false;
+	this->setLastBackupState(ConstUtils::STATUS_UNDEFINED);
 	try
 	{
 		checkAbortState();
 		Settings* settings = Settings::getInstance();
-		emit appendInfoMessage( tr( "Creating/validating server directories" ) );
+		emit infoSignal( tr( "Creating/validating server directories" ) );
+		
+		this->pt.debugIsCorrectCurrentTask(TASKNAME_PREPARE_DIRECTORIES);
 		prepareServerDirectories();
 		checkAbortState();
 
-		emit appendInfoMessage( tr( "Uploading files and directories" ) );
+		QString errors;
 		QString source = "/";
 		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
-
-		QString errors;
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( items, source, destination, includePatternList, excludePatternList, setDeleteFlag, false, &errors );
+		this->pt.debugIsCorrectCurrentTask(TASKNAME_ESTIMATE_BACKUP_SIZE);
+		emit infoSignal( tr( "Estimating backup size" ) );
+		quint64 backupSize = this->estimateBackupSize( source, destination );
+		qDebug() << "calculated literal data:" << backupSize;
+		if ((subPt = this->pt.getSubtask(TASKNAME_ESTIMATE_BACKUP_SIZE)) != 0) subPt->setTerminated(true);
+		
+		
+		this->pt.debugIsCorrectCurrentTask(TASKNAME_FILE_UPLOAD);
+		emit infoSignal( tr( "Uploading files and directories" ) );
+		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, false, &errors );
 		if ( errors != "" )
 		{
 			failed = true;
-			emit appendErrorMessage( errors );
+			emit errorSignal( errors );
 		}
 		checkAbortState();
+		if ((subPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD)) != 0) subPt->setTerminated(true);
 
 		if ( processedItems.size() > 0 )
 		{
@@ -99,20 +170,26 @@ void BackupThread::run()
 			//auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
 
 			// backup content file list
+			this->pt.debugIsCorrectCurrentTask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT);
 			FileSystemUtils::removeFile( settings->getApplicationDataDir() + settings->getBackupContentFileName() );
-			emit appendInfoMessage( tr( "Preparing meta data" ) );
-			emit appendInfoMessage( tr( "Getting backup content meta data" ) );
+			
+			emit infoSignal( tr( "Getting backup content meta data" ) );
 			QFileInfo currentBackupContentFile = rsync->downloadCurrentBackupContentFile( settings->getApplicationDataDir(), false );
 			checkAbortState();
+			if ((subPt = this->pt.getSubtask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT)) != 0) subPt->setTerminated(true);
+			
+			emit infoSignal( tr( "Uploading backup content meta data" ) );
+			this->pt.debugIsCorrectCurrentTask(TASKNAME_UPLOAD_METADATA);
 			updateBackupContentFile( currentBackupContentFile, processedItems );
-			emit appendInfoMessage( tr( "Uploading backup content meta data" ) );
 			//ssh->uploadToMetaFolder( currentBackupContentFile, false );
 			rsync->upload( currentBackupContentFile, metaDataDir, true );
 			//FileSystemUtils::removeFile( currentBackupContentFile );
 			checkAbortState();
+			if ((subPt = this->pt.getSubtask(TASKNAME_UPLOAD_METADATA)) != 0) subPt->setTerminated(true);
 
 			// backup time file
-			emit appendInfoMessage( tr( "Uploading backup info data" ) );
+			emit infoSignal( tr( "Uploading backup info data" ) );
+			this->pt.debugIsCorrectCurrentTask(TASKNAME_METAINFO);
 			QString currentBackupTimeFile = createCurrentBackupTimeFile();
 			//ssh->uploadToMetaFolder( currentBackupTimeFile, false );
 			rsync->upload( currentBackupTimeFile, metaDataDir, true );
@@ -122,63 +199,125 @@ void BackupThread::run()
 			// permission file
 			FileSystemUtils::removeFile( settings->getApplicationDataDir() + settings->getMetadataFileName() );
 			FileSystemUtils::removeFile( settings->getApplicationDataDir() + settings->getTempMetadataFileName() );
-			emit appendInfoMessage( tr( "Getting permission meta data" ) );
+			emit infoSignal( tr( "Getting permission meta data" ) );
 			auto_ptr< AbstractMetadata > metadata = ToolFactory::getMetadataImpl();
 			QObject::connect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
-								this, SIGNAL( appendInfoMessage( const QString& ) ) );
+							  this, SIGNAL( infoSignal( const QString& ) ) );
 			QObject::connect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
-								this, SIGNAL( appendErrorMessage( const QString& ) ) );
+							  this, SIGNAL( errorSignal( const QString& ) ) );
 			QFileInfo currentMetadataFileName = rsync->downloadCurrentMetadata( settings->getApplicationDataDir(), false );
 			checkAbortState();
 			QFileInfo newMetadataFileName = metadata->getMetadata( processedItems );
 			checkAbortState();
 			metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, processedItems );
 			checkAbortState();
-			emit appendInfoMessage( tr( "Uploading permission meta data" ) );
+			emit infoSignal( tr( "Uploading permission meta data" ) );
 			//ssh->uploadToMetaFolder( currentMetadataFileName, false );
 			rsync->upload( currentMetadataFileName, metaDataDir, true );
 			checkAbortState();
+			if ((subPt = this->pt.getSubtask(TASKNAME_METAINFO)) != 0) { subPt->addFixpointNow(subPt->getNumberOfSteps()); subPt->setTerminated(true); }
+			updateInformationToDisplay();
+
 			//FileSystemUtils::removeFile( currentMetadataFileName );
 			//FileSystemUtils::removeFile( newMetadataFileName );
 			QObject::disconnect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
-								this, SIGNAL( appendInfoMessage( const QString& ) ) );
+								 this, SIGNAL( infoSignal( const QString& ) ) );
 			QObject::disconnect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
-								this, SIGNAL( appendErrorMessage( const QString& ) ) );
+								 this, SIGNAL( errorSignal( const QString& ) ) );
 			if( !failed )
 			{
-				emit appendInfoMessage( tr( "Backup succeeded." ) );
+				emit infoSignal( tr( "Backup succeeded." ) );
+				this->setLastBackupState(ConstUtils::STATUS_OK);
 			}
 		}
 	}
 	catch ( ProcessException e )
 	{
 		failed = true;
-		emit appendErrorMessage( e.what() );
+		emit errorSignal( e.what() );
+		this->setLastBackupState(ConstUtils::STATUS_ERROR);
+		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
+		emit finalStatusSignal( ConstUtils::STATUS_ERROR );
 	}
 	catch ( AbortException e )
 	{
-		emit appendInfoMessage( tr( "Backup aborted." ) );
-		emit appendErrorMessage( e.what() );
+		emit infoSignal( tr( "Backup aborted." ) );
+		emit errorSignal( e.what() );
+		this->setLastBackupState(ConstUtils::STATUS_ERROR);
+		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
+		emit finalStatusSignal( ConstUtils::STATUS_ERROR );
 	}
 	if ( failed )
 	{
-		emit appendInfoMessage( tr( "Backup failed." ) );
+		emit infoSignal( tr( "Backup failed." ) );
+		this->setLastBackupState(ConstUtils::STATUS_ERROR);
+		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
+		emit finalStatusSignal( ConstUtils::STATUS_ERROR );
+	} else {
+		this->setLastBackupState(ConstUtils::STATUS_OK);
+		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_OK )";
+		emit finalStatusSignal( ConstUtils::STATUS_OK );
 	}
 	emit finishProgressDialog();
+	emit updateOverviewFormLastBackupsInfo();
 }
 
 void BackupThread::checkAbortState() throw ( AbortException )
 {
 	if ( isRunning() && isAborted )
 	{
+		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		throw AbortException( tr( "Backup has been aborted" ) );
 	}
+}
+
+void BackupThread::setLastBackupState(ConstUtils::StatusEnum newStatus)
+{
+	qDebug() << "BackupThread::setLastBackupState(" << (int)newStatus << ")";
+	Settings* settings = Settings::getInstance();
+	if (this->backupStartDateTime == QDateTime() ) // new Backup
+	{
+		this->backupStartDateTime = QDateTime::currentDateTime();
+		this->backupCurrentStatus = newStatus;
+	} else {
+		// backupState cannot become "better", e.g. go from WARNINGS to OK during one backup
+		this->backupCurrentStatus = (ConstUtils::StatusEnum)std::max( (int)newStatus, (int)(this->backupCurrentStatus) );
+	}
+	settings->addLastBackup( BackupTask(this->backupStartDateTime, this->backupCurrentStatus) ); // overwrites the lastTask if its time is equal to the passed BackupTask's backupTime
+}
+
+ConstUtils::StatusEnum BackupThread::getLastBackupState()
+{
+	return this->backupCurrentStatus;
+}
+
+void BackupThread::rsyncUploadProgressHandler(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten) {
+	ProgressTask* mySubPt = this->pt.getCurrentTask();
+	StringPairList vars = StringPairList();
+	if (mySubPt->getName()==TASKNAME_FILE_UPLOAD || mySubPt->getName()==TASKNAME_UPLOAD_METADATA)
+	{
+		mySubPt->addFixpointNow(bytesWritten);
+		vars.append( QPair<QString,QString>(tr("current file"), filename) );
+		vars.append( QPair<QString,QString>(tr("traffic / transferred")+":", StringUtils::bytesToReadableStr((double)traffic,"B/s") + " / " + StringUtils::bytesToReadableStr((double)bytesWritten+bytesRead, "B")) );
+		vars.append( QPair<QString,QString>(tr("estimated remaining time")+":", mySubPt->getRootTask()->getEstimatedTimeLeftString()) );
+	}
+	updateInformationToDisplay(vars);
+}
+
+void BackupThread::updateInformationToDisplay(StringPairList vars)
+{
+	ProgressTask* mySubPt = this->pt.getCurrentTask();
+	emit progressSignal(QObject::tr(mySubPt->getName().toUtf8().data()), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 }
 
 
 void BackupThread::prepareServerDirectories()
 {
-	qDebug() << "BackupThread::prepareServerDirectories()";
+	const QString infoText = QObject::tr("creating server directories");
+	ProgressTask * mySubPt = this->pt.getCurrentTask();
+	this->pt.debugIsCorrectCurrentTask(TASKNAME_PREPARE_DIRECTORIES);
+	mySubPt->setNumberOfSteps(3); 
+	mySubPt->addFixpointNow(0);
 	// create local directories and upload them
 	Settings* settings = Settings::getInstance();
 	QString source = settings->getApplicationDataDir();
@@ -188,7 +327,13 @@ void BackupThread::prepareServerDirectories()
 	workingDir.mkdir( backupPrefixFolder );
 	QDir backupPrefixDir( settings->getApplicationDataDir() + settings->getBackupPrefix() );
 	checkAbortState();
+	mySubPt->addFixpointNow(1);
+	
+	StringPairList vars;
+	vars.append(QPair<QString,QString>(tr("current task"), infoText));
+	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 
+	
 	//AbstractRsync* rsync = ToolFactory::getRsyncImpl();
 	QString errors;
 	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, &errors );
@@ -198,11 +343,31 @@ void BackupThread::prepareServerDirectories()
 	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, &errors );
 	checkAbortState();
 	//delete rsync;
-
+	mySubPt->addFixpointNow(2);
+	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
+	
 	// delete local directories
 	backupPrefixDir.rmdir( settings->getMetaFolderName() );
 	backupPrefixDir.rmdir( settings->getBackupFolderName() );
 	workingDir.rmdir( backupPrefixFolder );
+	mySubPt->addFixpointNow(3);
+	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
+	mySubPt->setTerminated(true);
+}
+
+/**
+ * estimates the backup size by running rsync with option --only-write-batch ans updates the progressTask's stepNumber to this size.
+ */
+quint64 BackupThread::estimateBackupSize( const QString& src, const QString& destination ) {
+	QString errors;
+	ProgressTask * mySubPt = this->pt.getCurrentTask();
+	StringPairList vars;
+	vars.append(QPair<QString,QString>(tr("current task"), mySubPt->getName()));
+	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
+	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, setDeleteFlag, false, &errors );
+	ProgressTask* uploadPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD);
+	if (uploadPt != 0) uploadPt->setNumberOfSteps(uploadSize);
+	return uploadSize;
 }
 
 void BackupThread::updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList )
@@ -269,24 +434,15 @@ QString BackupThread::createCurrentBackupTimeFile()
 	return fileName;
 }
 
-bool BackupThread::abortBackupProcess()
+void BackupThread::abortBackupProcess()
 {
 	qDebug() << "BackupThread::abortBackupProcess()";
-	/*int answer = QMessageBox::question( this, tr ( "Cancel backup process?" ),
-																			 tr ( "The backup process has not been finished.\nThis will cancel the backup process.\n"
-																					 "Are you sure you want to cancel?" ),
-																			 QMessageBox::Yes | QMessageBox::No );*/
-	int answer = QMessageBox::Yes; // TODO: make working QMessageBox::question - request
-	switch ( answer )
-	{
-		case QMessageBox::Yes:
-			isAborted = true;
-			emit abort();
-			return true;
-			break;
-		case QMessageBox::No:
-			return false;
-			break;
-	}
-	return false;
+	isAborted = true;
+	this->setLastBackupState(ConstUtils::STATUS_ERROR);
+	emit terminate();
+	emit finalStatusSignal( this->getLastBackupState() );
+	
+	this->wait();
+	emit abort_rsync();
+	emit updateOverviewFormLastBackupsInfo();
 }

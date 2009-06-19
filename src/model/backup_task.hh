@@ -25,23 +25,22 @@
 
 #include "tools/abstract_rsync.hh"
 #include "exception/abort_exception.hh"
+#include "utils/const_utils.hh"
 
 
 
 class BackupTask
 {
 	public:
-		enum StatusEnum
-		{ STATUS_OK, STATUS_WARNING, STATUS_ERROR, STATUS_UNDEFINED };
 		BackupTask();
 		BackupTask( const BackupTask& newBackupTask );
-		BackupTask( const QDateTime& backupTime, BackupTask::StatusEnum status );
+		BackupTask( const QDateTime& backupTime, ConstUtils::StatusEnum status );
 		~BackupTask();
 
-		static QString getStatusText( BackupTask::StatusEnum status );
+		static QString getStatusText( ConstUtils::StatusEnum status );
 		QString getStatusText() const;
-		StatusEnum getStatus() const;
-		void setStatus( const StatusEnum& status );
+		ConstUtils::StatusEnum getStatus() const;
+		void setStatus( const ConstUtils::StatusEnum& status );
 		QDateTime getDateTime() const;
 		void setDateTime( const QDateTime& backupTime );
 		QString toString() const;
@@ -50,8 +49,8 @@ class BackupTask
 
 	private:
 		QDateTime backupTime;
-		StatusEnum status;
-		static QMap<StatusEnum, QString> map_statusText;
+		ConstUtils::StatusEnum status;
+		static QMap<ConstUtils::StatusEnum, QString> map_statusText;
 };
 
 #endif /*BACKUPTASK_H_*/

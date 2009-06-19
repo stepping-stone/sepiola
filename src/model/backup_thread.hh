@@ -29,6 +29,9 @@
 
 #include "tools/abstract_rsync.hh"
 #include "exception/abort_exception.hh"
+#include "model/backup_task.hh"
+#include "utils/progress_task.hh"
+#include "utils/string_utils.hh"
 
 using std::auto_ptr;
 
@@ -49,6 +52,7 @@ public:
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
 	BackupThread( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag );
+	BackupThread( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag );
 
 	/**
 	 * Destroys the BackupThread
@@ -56,16 +60,24 @@ public:
 	virtual ~BackupThread();
 
 	void startInCurrentThread();
-
+	void setLastBackupState(ConstUtils::StatusEnum status);
+	ConstUtils::StatusEnum getLastBackupState();
+	
 signals:
 	void showCriticalMessageBox( const QString& message );
-	void appendInfoMessage( const QString& message );
-	void appendErrorMessage( const QString& message );
 	void finishProgressDialog();
-	void abort();
+	void abort_rsync();
+	void updateOverviewFormLastBackupsInfo();
+	void infoSignal( const QString& text );
+	void errorSignal( const QString& text );
+
+	void progressSignal( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos = StringPairList());
+	void finalStatusSignal( ConstUtils::StatusEnum status );
 
 public slots:
-	bool abortBackupProcess();
+	void rsyncUploadProgressHandler(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten);
+	void updateInformationToDisplay(StringPairList vars = StringPairList());
+	void abortBackupProcess();
 
 protected:
 
@@ -75,17 +87,29 @@ protected:
 	void run();
 
 private:
+	static const QString TASKNAME_PREPARE_DIRECTORIES;
+	static const QString TASKNAME_ESTIMATE_BACKUP_SIZE;
+	static const QString TASKNAME_FILE_UPLOAD;
+	static const QString TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT;
+	static const QString TASKNAME_UPLOAD_METADATA;
+	static const QString TASKNAME_METAINFO;
 	void checkAbortState() throw ( AbortException );
 	void prepareServerDirectories();
+	quint64 estimateBackupSize( const QString& src, const QString& destination );
 	void updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList );
 	QString createCurrentBackupTimeFile();
 
 	auto_ptr< AbstractRsync > rsync;
 	bool isAborted;
 	QStringList items;
+	QHash<QString,bool> includeRules;
 	QStringList includePatternList;
 	QStringList excludePatternList;
 	bool setDeleteFlag;
+	QDateTime backupStartDateTime;
+	ConstUtils::StatusEnum backupCurrentStatus;
+	ProgressTask pt;
+	int currentTaskNr;
 };
 
 #endif

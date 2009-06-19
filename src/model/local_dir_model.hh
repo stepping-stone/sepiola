@@ -16,47 +16,34 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef REMOTE_DIR_MODEL_HH
-#define REMOTE_DIR_MODEL_HH
+#ifndef LOCAL_DIR_MODEL_HH
+#define LOCAL_DIR_MODEL_HH
 
-#include <QStandardItem>
+#include <QDirModel>
+#include <QDir>
 #include <QStringList>
-#include <QFileInfo>
+#include <QSet>
 
 /**
  * The RemoteDirModel class represents a remote file system
- * @author Bruno Santschi, santschi@puzzle.ch
+ * @author Dominic Sydler, sydler@puzzle.ch
+ * @source http://www.qtcentre.org/forum/f-qt-programming-2/t-qdirmodelqtreeview-and-checkable-items-6957.html
  */
-class RemoteDirModel : public QStandardItemModel
+
+class LocalDirModel : public QDirModel
 {
-public:
-
-	/**
-	 * Constructs a RemoteDirModel with the given items
-	 * @param backupContent list of files and directories
-	 */
-	RemoteDirModel( QStringList backupContent );
-
-	/**
-	 * Destroys the RemoteDirModel
-	 */
-	virtual ~RemoteDirModel();
+public:	
+	LocalDirModel(const QStringList & nameFilters, QDir::Filters filters, QDir::SortFlags sort, QObject * parent = 0);
+	~LocalDirModel();
 	
 	Qt::ItemFlags flags(const QModelIndex& index) const;
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 	const QHash<QString,bool>& getSelectionRules() { return selectionRules; };
 	
-	private:
-		QHash<QString,bool> selectionRules;
+private:
+	QHash<QString,bool> selectionRules;
 };
 
-QString sortKey(QString file);
-
-inline bool fileLessThan(const QString& file1, const QString& file2)
-{
-	return QString::localeAwareCompare(sortKey(file1), sortKey(file2)) < 0;
-}
-
-#endif
+#endif /* LOCAL_DIR_MODEL_HH */
 

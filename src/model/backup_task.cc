@@ -21,13 +21,13 @@
 
 #include "model/backup_task.hh"
 
-QMap<BackupTask::StatusEnum, QString> BackupTask::map_statusText;
+QMap<ConstUtils::StatusEnum, QString> BackupTask::map_statusText;
 
 
 BackupTask::BackupTask()
 {
 	this->setDateTime( QDateTime() );
-	this->setStatus( BackupTask::STATUS_UNDEFINED );
+	this->setStatus( ConstUtils::STATUS_UNDEFINED );
 }
 
 BackupTask::BackupTask( const BackupTask& newBackupTask )
@@ -36,7 +36,7 @@ BackupTask::BackupTask( const BackupTask& newBackupTask )
 	status = newBackupTask.status;
 }
 
-BackupTask::BackupTask( const QDateTime& backupTime, BackupTask::StatusEnum status )
+BackupTask::BackupTask( const QDateTime& backupTime, ConstUtils::StatusEnum status )
 {
 	BackupTask();
 	this->setStatus( status );
@@ -55,14 +55,14 @@ void BackupTask::setDateTime( const QDateTime& backupTime )
 	this->backupTime = backupTime;
 }
 
-QString BackupTask::getStatusText( BackupTask::StatusEnum status )
+QString BackupTask::getStatusText( ConstUtils::StatusEnum status )
 {
 	if ( map_statusText.size() == 0 )
 	{
-		map_statusText.insert( BackupTask::STATUS_OK, QObject::tr( "<font color=\"green\">Successful</font>" ) );
-		map_statusText.insert( BackupTask::STATUS_WARNING, QObject::tr( "<font color=\"orange\">Warnings</font>" ) );
-		map_statusText.insert( BackupTask::STATUS_ERROR, QObject::tr( "<font color=\"red\">Failed</font>" ) );
-		map_statusText.insert( BackupTask::STATUS_UNDEFINED, QObject::tr( "undefined" ) );
+		map_statusText.insert( ConstUtils::STATUS_OK, QObject::tr( "<font color=\"green\">Successful</font>" ) );
+		map_statusText.insert( ConstUtils::STATUS_WARNING, QObject::tr( "<font color=\"orange\">Warnings</font>" ) );
+		map_statusText.insert( ConstUtils::STATUS_ERROR, QObject::tr( "<font color=\"red\">Failed</font>" ) );
+		map_statusText.insert( ConstUtils::STATUS_UNDEFINED, QObject::tr( "undefined" ) );
 	}
 	return map_statusText.value( status );
 }
@@ -70,11 +70,11 @@ QString BackupTask::getStatusText() const
 {
 	return getStatusText( this->status );
 }
-BackupTask::StatusEnum BackupTask::getStatus() const
+ConstUtils::StatusEnum BackupTask::getStatus() const
 {
 	return( this->status );
 }
-void BackupTask::setStatus( const BackupTask::StatusEnum& status )
+void BackupTask::setStatus( const ConstUtils::StatusEnum& status )
 {
 	this->status = status;
 }

@@ -16,8 +16,6 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QMessageBox>
-
 #include "exception/process_exception.hh"
 #include "model/main_model.hh"
 #include "model/restore_thread.hh"
@@ -34,6 +32,9 @@ RestoreThread::RestoreThread( const QString& backupName, const QString& destinat
 	init();
 }
 
+/**
+ * deprecated
+ */
 RestoreThread::RestoreThread( const QString& backupName, const QStringList& items, const QString& destination )
 {
 	this->isCustomRestore = true;
@@ -43,13 +44,22 @@ RestoreThread::RestoreThread( const QString& backupName, const QStringList& item
 	init();
 }
 
+RestoreThread::RestoreThread( const QString& backupName, const QHash<QString,bool>& selectionRules, const QString& destination )
+{
+	this->isCustomRestore = true;
+	this->backupName = backupName;
+	this->selectionRules = selectionRules;
+	this->destination = destination;
+	init();
+}
+
 RestoreThread::~RestoreThread()
 {
 	qDebug() << "RestoreThread::~RestoreThread()";
 	QObject::disconnect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
-							 this, SIGNAL( appendInfoMessage( const QString& ) ) );
+						 this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::disconnect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
-							 this, SIGNAL( appendErrorMessage( const QString& ) ) );
+						 this, SIGNAL( errorSignal( const QString& ) ) );
 	QObject::disconnect( this, SIGNAL( abort() ),
 							 rsync.get(), SLOT( abort() ) );
 }
@@ -59,9 +69,9 @@ void RestoreThread::init()
 	isAborted = false;
 	rsync = ToolFactory::getRsyncImpl();
 	QObject::connect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
-						this, SIGNAL( appendInfoMessage( const QString& ) ) );
+					  this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::connect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
-						this, SIGNAL( appendErrorMessage( const QString& ) ) );
+					  this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::connect( this, SIGNAL( abort() ),
 						rsync.get(), SLOT( abort() ) );
 	connect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
@@ -71,31 +81,31 @@ void RestoreThread::run()
 {
 	try
 	{
-		emit appendInfoMessage( tr( "Downloading files and/or directories ..." ) );
+		emit infoSignal( tr( "Downloading files and/or directories ..." ) );
 		QStringList downloadedItems;
 		if ( isCustomRestore )
 		{
-			downloadedItems = rsync->downloadCustomBackup( backupName, items, destination );
+			downloadedItems = rsync->downloadCustomBackup( backupName, selectionRules, destination );
 		}
 		else
 		{
 			downloadedItems = rsync->downloadFullBackup( backupName, destination );
 		}
 		checkAbortState();
-		emit appendInfoMessage( tr( "Applying Metadata" ) );
+		emit infoSignal( tr( "Applying Metadata" ) );
 		applyMetadata( backupName, downloadedItems, destination );
 		checkAbortState();
-		emit appendInfoMessage( tr( "Restore done." ) );
+		emit infoSignal( tr( "Restore done." ) );
 	}
 	catch ( ProcessException e )
 	{
-		emit appendInfoMessage( tr( "Restore failed." ) );
-		emit appendErrorMessage( e.what() );
+		emit infoSignal( tr( "Restore failed." ) );
+		emit errorSignal( e.what() );
 	}
 	catch ( AbortException e )
 	{
-		emit appendInfoMessage( tr( "Backup aborted." ) );
-		emit appendErrorMessage( e.what() );
+		emit infoSignal( tr( "Backup aborted." ) );
+		emit errorSignal( e.what() );
 	}
 
 	emit finishProgressDialog();
@@ -107,16 +117,16 @@ void RestoreThread::applyMetadata( const QString& backupName, const QStringList&
 	{
 		auto_ptr< AbstractMetadata > metadata = ToolFactory::getMetadataImpl();
 		QObject::connect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
-							this, SIGNAL( appendInfoMessage( const QString& ) ) );
+						  this, SIGNAL( infoSignal( const QString& ) ) );
 		QObject::connect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
-							this, SIGNAL( appendErrorMessage( const QString& ) ) );
+						  this, SIGNAL( errorSignal( const QString& ) ) );
 		QFileInfo metadataFile = rsync->downloadMetadata( backupName, Settings::getInstance()->getApplicationDataDir() );
 		metadata->setMetadata( metadataFile, downloadedItems, downloadDestination );
 		FileSystemUtils::removeFile( metadataFile );
 		QObject::disconnect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
-							this, SIGNAL( appendInfoMessage( const QString& ) ) );
+							 this, SIGNAL( infoSignal( const QString& ) ) );
 		QObject::disconnect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
-							this, SIGNAL( appendErrorMessage( const QString& ) ) );
+							 this, SIGNAL( infoSignal( const QString& ) ) );
 	}
 }
 
@@ -128,21 +138,9 @@ void RestoreThread::checkAbortState() throw ( AbortException )
 	}
 }
 
-bool RestoreThread::abortRestoreProcess()
+void RestoreThread::abortRestoreProcess()
 {
 	qDebug() << "RestoreThread::abortRestoreProcess()";
-	/*int answer = QMessageBox::question ( this, tr ( "Cancel restore process?" ),
-																			 tr ( "The restore process has not been finished.\nThis will cancel the restore process.\nAre you sure you want to cancel?" ),
-																			 QMessageBox::Yes | QMessageBox::No ); */
-	int answer = QMessageBox::Yes; // TODO: make working QMessageBox::question - request
-	switch ( answer )
-	{
-		case QMessageBox::Yes:
-			isAborted = true;
-			emit abort();
-			return true;
-		case QMessageBox::No:
-			return false;
-	}
-	return false;
+	isAborted = true;
+	emit abort();
 }

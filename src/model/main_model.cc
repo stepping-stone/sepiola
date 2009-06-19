@@ -25,6 +25,7 @@
 #include "model/dir_tree_item.hh"
 #include "model/main_model.hh"
 #include "model/remote_dir_model.hh"
+#include "model/local_dir_model.hh"
 #include "model/restore_thread.hh"
 #include "tools/abstract_rsync.hh"
 #include "tools/abstract_metadata.hh"
@@ -85,12 +86,12 @@ bool MainModel::initConnection()
 		Settings* settings = Settings::getInstance();
 		auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
 		QObject::connect( ssh.get(), SIGNAL( infoSignal( const QString& ) ),
-							this, SIGNAL( appendInfoMessage( const QString& ) ) );
+						  this, SIGNAL( infoSignal( const QString& ) ) );
 		QObject::connect( ssh.get(), SIGNAL( errorSignal( const QString& ) ),
-							this, SIGNAL( appendErrorMessage( const QString& ) ) );
+						  this, SIGNAL( errorSignal( const QString& ) ) );
 
-		emit appendInfoMessage( tr( "Establishing connection ..." ) );
-		emit appendInfoMessage( tr( "Validating server's fingerprint ..." ) );
+		emit infoSignal( tr( "Establishing connection ..." ) );
+		emit infoSignal( tr( "Validating server's fingerprint ..." ) );
 		if ( !ssh->assertCorrectFingerprint() )
 		{
 			showInformationMessage( tr( "Server fingerprint validation failed" ) );
@@ -98,7 +99,7 @@ bool MainModel::initConnection()
 		}
 		else
 		{
-			emit appendInfoMessage( tr( "Server's fingerprint is correct." ) );
+			emit infoSignal( tr( "Server's fingerprint is correct." ) );
 		}
 		if ( !ssh->loginWithKey() )
 		{
@@ -119,31 +120,31 @@ bool MainModel::initConnection()
 					}
 				} catch ( LoginException e )
 				{
-					emit appendInfoMessage( tr( "Login failed." ) );
+					emit infoSignal( tr( "Login failed." ) );
 					emit showInformationMessageBox( e.what() );
 				}
 			}
 
-			emit appendInfoMessage( tr( "Trying to login" ) );
+			emit infoSignal( tr( "Trying to login" ) );
 			if ( !ssh->loginWithKey() )
 			{
 				showInformationMessage( tr( "Can not login to the server. Please review your settings." ) );
 			}
 			else
 			{
-				emit appendInfoMessage( tr( "Login succeeded." ) );
+				emit infoSignal( tr( "Login succeeded." ) );
 				qDebug() << "Second login with key was successful";
 				isInitialized = true;
 			}
 		}
 		else
 		{
-			emit appendInfoMessage( tr( "Login with key was successful" ) );
+			emit infoSignal( tr( "Login with key was successful" ) );
 			isInitialized = true;
 		}
-		emit appendInfoMessage( tr( "Connection established." ) );
+		emit infoSignal( tr( "Connection established." ) );
 		QObject::disconnect( ssh.get(), SIGNAL( infoSignal( const QString& ) ),
-								 this, SIGNAL( appendInfoMessage( const QString& ) ) );
+							 this, SIGNAL( infoSignal( const QString& ) ) );
 	}
 	catch ( ProcessException e )
 	{
@@ -163,13 +164,68 @@ void MainModel::backup( const QStringList& items, const QStringList& includePatt
 	BackupThread* backupThread = new BackupThread( items, includePatternList, excludePatternList, setDeleteFlag );
 
 	QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
-						this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
-	QObject::connect( backupThread, SIGNAL( appendInfoMessage( const QString& ) ),
-						this, SIGNAL( appendInfoMessage( const QString& ) ) );
-	QObject::connect( backupThread, SIGNAL( appendErrorMessage( const QString& ) ),
-						this, SIGNAL( appendErrorMessage( const QString& ) ) );
+					  this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
+	QObject::connect( backupThread, SIGNAL( infoSignal( const QString& ) ),
+					  this, SIGNAL( infoSignal( const QString& ) ) );
+	QObject::connect( backupThread, SIGNAL( errorSignal( const QString& ) ),
+					  this, SIGNAL( errorSignal( const QString& ) ) );
+	qRegisterMetaType<StringPairList>("StringPairList");
+	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
+	QObject::connect( backupThread, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
+					  this, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ) );
+	qDebug() << "QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );";
+	QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
+					  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
+	QObject::connect( backupThread, SIGNAL( finishProgressDialog() ),
+					  this, SIGNAL( finishProgressDialog() ) );
+	QObject::connect( backupThread, SIGNAL( updateOverviewFormLastBackupsInfo() ),
+					  this, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
+	QObject::connect( this, SIGNAL( abortProcess() ),
+					  backupThread, SLOT( abortBackupProcess() ) );
+	qDebug() << "MainModel::backup: startInCurrentThread=" << startInCurrentThread;
+	if ( startInCurrentThread )
+	{
+		// signals are not connected with QCoreApplication and multiple threads
+		// but in CLI mode we do not need an own thread
+		backupThread->startInCurrentThread();
+	}
+	else
+	{
+		backupThread->start();
+		//TODO: disconnect signal/slot connections
+	}
+}
+
+/**
+ * new version based on rules
+ */
+void MainModel::backup( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread )
+{
+	qDebug() << "MainModel::backup( " << includeRules << ", " << setDeleteFlag << ", " << startInCurrentThread << " )";
+	if ( !initConnection() )
+	{
+		closeProgressDialogSlot();
+		return;
+	}
+	BackupThread* backupThread = new BackupThread( includeRules, setDeleteFlag );
+
+	QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
+					  this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
+	QObject::connect( backupThread, SIGNAL( infoSignal( const QString& ) ),
+					  this, SIGNAL( infoSignal( const QString& ) ) );
+	QObject::connect( backupThread, SIGNAL( errorSignal( const QString& ) ),
+					  this, SIGNAL( errorSignal( const QString& ) ) );
+	qRegisterMetaType<StringPairList>("StringPairList");
+	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
+	QObject::connect( backupThread, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
+					  this, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ) );
+	qDebug() << "QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );";
+	QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
+					  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
 	QObject::connect( backupThread, SIGNAL( finishProgressDialog() ),
 						this, SIGNAL( finishProgressDialog() ) );
+	QObject::connect( backupThread, SIGNAL( updateOverviewFormLastBackupsInfo() ),
+					  this, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
 	QObject::connect( this, SIGNAL( abortProcess() ),
 						backupThread, SLOT( abortBackupProcess() ) );
 	qDebug() << "MainModel::backup: startInCurrentThread=" << startInCurrentThread;
@@ -178,15 +234,11 @@ void MainModel::backup( const QStringList& items, const QStringList& includePatt
 		// signals are not connected with QCoreApplication and multiple threads
 		// but in CLI mode we do not need an own thread
 		backupThread->startInCurrentThread();
-		Settings::getInstance()->addLastBackup(BackupTask(QDateTime::currentDateTime(), BackupTask::STATUS_UNDEFINED));
 	}
 	else
 	{
 		backupThread->start();
 		//TODO: disconnect signal/slot connections
-		BackupTask bkup(QDateTime::currentDateTime(), BackupTask::STATUS_UNDEFINED);
-		Settings::getInstance()->addLastBackup(bkup);
-		qDebug() << "MainModel::backup: bkup=" << bkup.toString();
 	}
 }
 
@@ -396,10 +448,10 @@ void MainModel::fullRestore( const QString& backupName, const QString& destinati
 
 	QObject::connect( restoreThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
 						this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
-	QObject::connect( restoreThread, SIGNAL( appendInfoMessage( const QString& ) ),
-						this, SIGNAL( appendInfoMessage( const QString& ) ) );
-	QObject::connect( restoreThread, SIGNAL( appendErrorMessage( const QString& ) ),
-						this, SIGNAL( appendErrorMessage( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( infoSignal( const QString& ) ),
+					  this, SIGNAL( infoSignal( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( errorSignal( const QString& ) ),
+					  this, SIGNAL( errorSignal( const QString& ) ) );
 	QObject::connect( restoreThread, SIGNAL( finishProgressDialog() ),
 						this, SIGNAL( finishProgressDialog() ) );
 	QObject::connect( this, SIGNAL( abortProcess() ),
@@ -424,14 +476,37 @@ void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const Q
 
 	QObject::connect( restoreThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
 						this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
-	QObject::connect( restoreThread, SIGNAL( appendInfoMessage( const QString& ) ),
-						this, SIGNAL( appendInfoMessage( const QString& ) ) );
-	QObject::connect( restoreThread, SIGNAL( appendErrorMessage( const QString& ) ),
-						this, SIGNAL( appendErrorMessage( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( infoSignal( const QString& ) ),
+					  this, SIGNAL( infoSignal( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( errorSignal( const QString& ) ),
+					  this, SIGNAL( errorSignal( const QString& ) ) );
 	QObject::connect( restoreThread, SIGNAL( finishProgressDialog() ),
 						this, SIGNAL( finishProgressDialog() ) );
 	QObject::connect( this, SIGNAL( abortProcess() ),
 						restoreThread, SLOT( abortRestoreProcess() ) );
+	restoreThread->start();
+	//TODO: disconnect signal/slot connections
+}
+
+void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const QHash<QString,bool>& selectionRules, const QString& backupName, const QString& destination )
+{
+	if( !initConnection() )
+	{
+		return;
+	}
+
+	RestoreThread* restoreThread = new RestoreThread( backupName, selectionRules, destination );
+
+	QObject::connect( restoreThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
+					  this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( infoSignal( const QString& ) ),
+					  this, SIGNAL( infoSignal( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( errorSignal( const QString& ) ),
+					  this, SIGNAL( errorSignal( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( finishProgressDialog() ),
+					  this, SIGNAL( finishProgressDialog() ) );
+	QObject::connect( this, SIGNAL( abortProcess() ),
+					  restoreThread, SLOT( abortRestoreProcess() ) );
 	restoreThread->start();
 	//TODO: disconnect signal/slot connections
 }
@@ -451,33 +526,41 @@ void MainModel::setStatusBarMessage( const QString& statusBarMessage )
 	emit updateStatusBarMessage( statusBarMessage );
 }
 
-QDirModel* MainModel::getLocalDirModel()
+LocalDirModel* MainModel::getLocalDirModel()
 {
 	if (!localDirModel)
 	{
-		localDirModel = new QDirModel( QStringList(),
+		localDirModel = new LocalDirModel( QStringList(),
 			QDir::Dirs | QDir::Files | QDir::Drives | QDir::Hidden | QDir::NoDotAndDotDot,
 			QDir::Name | QDir::IgnoreCase | QDir::DirsFirst
 		);
 	}
-
 	return localDirModel;
 }
 
 QStandardItemModel* MainModel::getRemoteDirModel( const QString& backupName )
 {
-	QStringList backupContent = getRestoreContent( backupName );
-	return new RemoteDirModel( backupContent );
+	return getRemoteDirModel_(backupName);
+}
+
+RemoteDirModel* MainModel::getRemoteDirModel_( const QString& backupName )
+{
+	if (!remoteDirModels[backupName]) {
+		QStringList backupContent = getRestoreContent( backupName );
+		RemoteDirModel* remoteDirModel = new RemoteDirModel( backupContent );
+		remoteDirModels.insert(backupName, remoteDirModel);
+	}
+	return remoteDirModels[backupName];
 }
 
 void MainModel::infoSlot( const QString& text )
 {
-	emit appendInfoMessage( text );
+	emit infoSignal( text );
 }
 
 void MainModel::errorSlot( const QString& text )
 {
-	emit appendErrorMessage( text );
+	emit errorSignal( text );
 }
 
 void MainModel::showProgressDialogSlot( const QString& dialogTitle )

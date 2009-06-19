@@ -16,70 +16,34 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QStack>
-#include <QDir>
+#include <Qt>
 #include <QDebug>
+#include <QSet>
+#include <QFileInfo>
 
-#include "model/remote_dir_model.hh"
-#include "model/dir_tree_item.hh"
-#include "settings/settings.hh"
-#include "utils/file_system_utils.hh"
+#include "model/local_dir_model.hh"
 
-#include <iostream>
-
-QString sortKey(QString file)
+LocalDirModel::LocalDirModel(const QStringList & nameFilters, QDir::Filters filters, QDir::SortFlags sort, QObject * parent) : QDirModel(nameFilters, filters, sort, parent)
 {
-	file = QDir::fromNativeSeparators(file);
-	file.replace('/', "/0");
-	if (!file.endsWith("/0"))
-	{
-		int index = file.lastIndexOf("/0");
-		if (index > 0 ) file[index + 1] = '1';
-	}
-
-	return file;
+	selectionRules.clear();
+	selectionRules.insert("/home/dsydler/Documents/", true);
+/*	selectionRules.insert("/home/dsydler/projects/xx/D/", true);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DA/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DA/DAF/DAFB/", true);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DB/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DC/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DD/DDD/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DD/DDD/DDDF/DDDFD/", true);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DE/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DF/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DG/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/D/DH/", false);
+	selectionRules.insert("/home/dsydler/projects/xx/bigfile", true);*/
 }
 
-RemoteDirModel::RemoteDirModel( QStringList backupContent )
+Qt::ItemFlags LocalDirModel::flags(const QModelIndex& index) const
 {
-	qDebug() << "RemoteDirModel::RemoteDirModel(QStringList)";
-
-	qSort(backupContent.begin(), backupContent.end(), fileLessThan);
-
-	if (!backupContent.isEmpty() && !FileSystemUtils::isRoot(backupContent.first()))
-	{
-		backupContent.push_front("/");
-	}
-
-	QFileIconProvider iconProvider;
-	setHorizontalHeaderLabels( QStringList( QObject::tr( "Name" ) ) );
-	QStack< QPair< QString, QStandardItem* > > dirStack;
-	dirStack.push( qMakePair( QString(), invisibleRootItem() ) );
-	foreach ( QString file, backupContent )
-	{
-		if ( file.isEmpty() ) continue;
-		while ( dirStack.size() > 1 && !file.startsWith( dirStack.top().first ) )
-		{
-			dirStack.pop();
-		}
-		if ( FileSystemUtils::isDir( file ) )
-		{
-			QStandardItem* dirTreeItem = new DirTreeItem( file, iconProvider );
-			dirStack.top().second->appendRow( dirTreeItem );
-			dirStack.push( qMakePair( file, dirTreeItem ) );
-		}
-		else
-		{
-			dirStack.top().second->appendRow( new DirTreeItem( file, iconProvider ) );
-		}
-	}
-
-	qDebug() << "RemoteDirModel::RemoteDirModel(QStringList) done";
-}
-
-Qt::ItemFlags RemoteDirModel::flags(const QModelIndex& index) const
-{
-	Qt::ItemFlags f = QStandardItemModel::flags(index);
+	Qt::ItemFlags f = QDirModel::flags(index);
 	if (index.column() == 0) // make the first column checkable
 		f |= Qt::ItemIsUserCheckable;
 	return f;
@@ -89,12 +53,12 @@ Qt::ItemFlags RemoteDirModel::flags(const QModelIndex& index) const
  * closest rule on parent directories -> subState
  * if any of the childs
  */
-QVariant RemoteDirModel::data(const QModelIndex& index, int role) const
+QVariant LocalDirModel::data(const QModelIndex& index, int role) const
 {
 	if (index.isValid() && index.column() == 0 && role == Qt::CheckStateRole)
 	{
-		QFileInfo f_info = QFileInfo( ((DirTreeItem*)this->itemFromIndex( index ))->getAbsoluteName() );
-		QString curPath = f_info.absoluteFilePath(); // + (f_info.isDir()?"/":"");
+		QFileInfo f_info = fileInfo(index);
+		QString curPath = f_info.absoluteFilePath() + (f_info.isDir()?"/":"");
 		bool existRulesOnChildren = false;
 		QPair<QString,bool> closestParentRule;
 		QHashIterator<QString,bool> i(selectionRules);
@@ -114,21 +78,21 @@ QVariant RemoteDirModel::data(const QModelIndex& index, int role) const
         // the item is checked only if we have stored its path
 		return (existRulesOnChildren ? 0 : 1)*((closestParentRule.second ? Qt::Checked : Qt::Unchecked)-1) + 1;
 	}
-	return QStandardItemModel::data(index, role);
+	return QDirModel::data(index, role);
 }
 /**
  * remove all rules on children
  * if rule exists on current node: negate it
  * else: add rule: (cur==checked)?excl:incl
  */
-bool RemoteDirModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (index.isValid() && index.column() == 0 && role == Qt::CheckStateRole)
 	{
 		Qt::CheckState curVal = (Qt::CheckState)(data(index,role).toInt());
-		QFileInfo f_info = QFileInfo( ((DirTreeItem*)this->itemFromIndex( index ))->getAbsoluteName() ); 
-		//bool isDir = f_info.isDir();
-		QString curPath = f_info.absoluteFilePath(); //+ (isDir?"/":"");
+		QFileInfo f_info = fileInfo(index); 
+		bool isDir = f_info.isDir();
+		QString curPath = f_info.absoluteFilePath() + (isDir?"/":"");
 		QPair<QString,bool> closestParentRule("",false);
 		QMutableHashIterator<QString,bool> i(selectionRules);
 		while (i.hasNext()) {
@@ -150,10 +114,10 @@ bool RemoteDirModel::setData(const QModelIndex& index, const QVariant& value, in
 		emit layoutChanged(); // in fact dataChanged() would be better, but it's too expensive to calculate all the changed items
 		return true;
 	}
-	return QStandardItemModel::setData(index, value, role);
+	return QDirModel::setData(index, value, role);
 }
 
-RemoteDirModel::~RemoteDirModel()
+LocalDirModel::~LocalDirModel()
 {
 }
 

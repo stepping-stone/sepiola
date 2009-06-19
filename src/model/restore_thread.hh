@@ -25,6 +25,8 @@
 
 #include "exception/abort_exception.hh"
 #include "tools/abstract_rsync.hh"
+#include "tools/abstract_informing_process.hh"
+#include "utils/string_utils.hh"
 
 using std::auto_ptr;
 
@@ -51,21 +53,26 @@ public:
 	 * @param destination a destination path for restoring
 	 */
 	RestoreThread( const QString& backupName, const QStringList& items, const QString& destination );
+	RestoreThread( const QString& backupName, const QHash<QString,bool>& selectionRules, const QString& destination );
 
 	/**
 	 * Destroyes the RestoreThread
 	 */
 	virtual ~RestoreThread();
+	
 
 signals:
 	void showCriticalMessageBox( const QString& message );
-	void appendInfoMessage( const QString& message );
-	void appendErrorMessage( const QString& message );
 	void finishProgressDialog();
 	void abort();
+	void infoSignal( const QString& text );
+	void errorSignal( const QString& text );
+
+	void progressSignal( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos = StringPairList());
+	void finalStatusSignal( ConstUtils::StatusEnum status );
 
 public slots:
-	bool abortRestoreProcess();
+	void abortRestoreProcess();
 
 protected:
 
@@ -84,6 +91,7 @@ private:
 	bool isCustomRestore;
 	QString backupName;
 	QStringList items;
+	QHash<QString,bool> selectionRules;
 	QString destination;
 };
 

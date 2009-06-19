@@ -27,15 +27,17 @@
 #include <QList>
 
 #include "model/remote_dir_model.hh"
+#include "model/local_dir_model.hh"
 #include "model/restore_name.hh"
 #include "settings/settings.hh"
 #include "tools/abstract_rsync.hh"
+#include "tools/abstract_informing_process.hh"
 
 /**
  * The MainModel class the main model according to the MVC pattern
  * @author Reto Aebersold, aebersold@puzzle.ch
  */
-class MainModel : public QObject
+class MainModel : public AbstractInformingProcess
 {
 	Q_OBJECT
 
@@ -87,13 +89,14 @@ public:
 	 * Gets a model representing the local file system
 	 * @return a local directory model
 	 */
-	QDirModel* getLocalDirModel();
+	LocalDirModel* getLocalDirModel();
 
 	/**
 	 * Gets a model representing the remote directory structure for a given backup name
 	 * @param backupName name of the backup
 	 * @return a remote directory model
 	 */
+	RemoteDirModel* getRemoteDirModel_( const QString& backupName );
 	QStandardItemModel* getRemoteDirModel( const QString& backupName );
 
 	/**
@@ -110,6 +113,7 @@ public:
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 * @param startInCurrentThread indicates whether the method runs in its own thread or not
 	 */
+	void backup( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread );
 	void backup( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag, const bool& startInCurrentThread );
 
 	/**
@@ -177,6 +181,7 @@ public:
 	 * @param destination a destination path for restoring
 	 */
 	void customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backupName, const QString& destination );
+	void customRestore( const QStandardItemModel* remoteDirModel, const QHash<QString,bool>& selectionRules, const QString& backupName, const QString& destination );
 
 	/**
 	 * Shows an information message box with the given text
@@ -212,10 +217,9 @@ signals:
 	void showInformationMessageBox( const QString& message );
 	void showCriticalMessageBox( const QString& message );
 	void updateStatusBarMessage ( const QString& message );
+	void updateOverviewFormLastBackupsInfo();
 
 	void showProgressDialog( const QString& dialogTitle );
-	void appendInfoMessage( const QString& message );
-	void appendErrorMessage( const QString& message );
 	void finishProgressDialog();
 	void closeProgressDialog();
 	bool abortProcess();
@@ -268,7 +272,8 @@ public slots:
 	 bool abortProcessSlot();
 
 private:
-	QDirModel* localDirModel;
+	LocalDirModel* localDirModel;
+	QHash<QString,RemoteDirModel*> remoteDirModels;
 	bool isLoginAborted;
 	QStringList getRestoreContent( const QString& backupName );
 };
@@ -280,6 +285,7 @@ inline void MainModel::abortLogin()
 
 inline bool MainModel::abortProcessSlot()
 {
+	qDebug() << "MainModel::abortProcessSlot()";
 	return(emit abortProcess());
 }
 
