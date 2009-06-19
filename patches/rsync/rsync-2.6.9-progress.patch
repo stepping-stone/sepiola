@@ -1,0 +1,27 @@
+diff -ur rsync-2.6.9/batch.c rsync-2.6.9-progress/batch.c
+--- rsync-2.6.9/batch.c	2006-04-26 01:51:12.000000000 +0200
++++ rsync-2.6.9-progress/batch.c	2009-05-14 17:01:39.000000000 +0200
+@@ -173,6 +173,8 @@
+ 	int fd, i, len;
+ 	char *p, filename[MAXPATHLEN];
+ 
++	if (strcmp(batch_name, "/dev/null") == 0) return;
++
+ 	stringjoin(filename, sizeof filename,
+ 		   batch_name, ".sh", NULL);
+ 	fd = do_open(filename, O_WRONLY | O_CREAT | O_TRUNC,
+diff -ur rsync-2.6.9/progress.c rsync-2.6.9-progress/progress.c
+--- rsync-2.6.9/progress.c	2006-10-14 01:17:33.000000000 +0200
++++ rsync-2.6.9-progress/progress.c	2009-05-14 17:01:35.000000000 +0200
+@@ -105,9 +105,9 @@
+ 			stats.num_files);
+ 	} else
+ 		strlcpy(eol, "\r", sizeof eol);
+-	rprintf(FCLIENT, "%12s %3d%% %7.2f%s %4d:%02d:%02d%s",
++	rprintf(FCLIENT, "%12s %3d%% %7.2f%s %4d:%02d:%02d %lli %lli%s",
+ 		human_num(ofs), pct, rate, units,
+-		remain_h, remain_m, remain_s, eol);
++		remain_h, remain_m, remain_s, stats.total_read, stats.total_written, eol);
+ }
+ 
+ void end_progress(OFF_T size)
