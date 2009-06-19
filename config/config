@@ -14,6 +14,8 @@ RsyncTimeout=43200
 [Server]
 ServerKey=e3:6d:87:79:1c:e3:0e:bc:ea:89:54:20:d9:2c:f5:cb
 Host=online-backup.stepping-stone.ch
+#ServerKey=6c:33:eb:2f:a8:73:25:34:fd:6f:36:15:58:db:d0:d8
+#Host=localhost
 BackupFolderName=backup
 MetaFolderName=.sepiola_backup
 BackupRootFolder=incoming/
@@ -21,7 +23,7 @@ RestoreRootFolder=.snapshots/
 MetadataFileName=metadata
 BackupContentFileName=backupContent
 BackupTimeFileName=backupTime
-BackupQuotaFileName=backupSize
+AbsoluteBackupQuotaFileName=/etc/backupSize
 AuthorizedKeyFolderName=.ssh/
 AuthorizedKeyFileName=authorized_keys
 
