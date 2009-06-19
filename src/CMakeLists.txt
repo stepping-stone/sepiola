@@ -144,11 +144,11 @@ QT4_WRAP_CPP(
 	gui/password_dialog.hh 
 	gui/pattern_dialog.hh
 	gui/output_dialog.hh 
-	gui/traffic_progress_dialog.hh 
+	gui/traffic_progress_dialog.hh
 	model/backup_thread.hh
 	model/main_model.hh
 	model/restore_thread.hh
-	tools/abstract_progress.hh
+	tools/abstract_informing_process.hh
 	tools/abstract_rsync.hh
 	tools/abstract_scheduler.hh
 	tools/rsync.hh
@@ -199,6 +199,7 @@ SET(SOURCE_FILES
 	model/restore_name.cc
 	model/restore_thread.cc
 	model/remote_dir_model.cc
+	model/local_dir_model.cc
 	model/scheduled_task.cc
 	model/backup_task.cc
 	settings/settings.cc
@@ -217,6 +218,7 @@ SET(SOURCE_FILES
 	utils/file_system_utils.cc
 	utils/log_file_utils.cc
 	utils/host_file_utils.cc
+	utils/progress_task.cc
 	${sepiola_UI} 
 	${sepiola_MOC} 
 	${sepiola_RC}
