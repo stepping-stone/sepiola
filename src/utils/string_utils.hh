@@ -20,15 +20,37 @@
 #define STRING_UTILS_HH_
 
 #include <QString>
+#include <QDebug>
+#include <math.h>
+
+typedef QList<QPair<QString,QString> > StringPairList;
+Q_DECLARE_METATYPE( StringPairList );
 
 class StringUtils
 {
 public:
 	static QString encaps(const QString& aStr, const QString& beforeTok = "", const QString& afterTok = "");
 	static QString concatSep(const QString& aStr, const QString& bStr = "", const QString& tok = ",");
+	static QString filenameShrink(const QString& filename, const int maxlen);
+	static bool isFilename(const QString& txt); // simple guess if txt can be displayed compact like a filename
+	static QString buf2QString(const char* buf);
+	static QString buf2QString(QString buf);
+	static float trafficStr2BytesPerSecond(QString trafficStr);
+	static QString bytesToReadableStr(double traffic, const QString& unitTxt);
+	static QString bytesToReadableStr(quint64 traffic, const QString& unitTxt);
+	static QString kBytesToReadableStr(double traffic, const QString& unitTxt);
+	
+	static QString equalStart(const QString& aStr, const QString& bStr);
+	static QString dirPart(const QString& filename);
+	static QString parentDir(const QString& filename);
+	static QString equalDirPart(const QString& filenameA, const QString& filenameB);
+
+	
+private:
+	static QString unit_prefixes() { return QString(" kMGTPEZY"); };
 };
 
-#endif /*STRING_UTILS_HH_*/
+
 
 inline QString StringUtils::encaps(const QString& aStr, const QString& beforeTok, const QString& afterTok)
 {
@@ -45,3 +67,106 @@ inline QString StringUtils::concatSep(const QString& aStr, const QString& bStr, 
 		return aStr;
 	return aStr + tok + bStr;
 }
+
+inline QString StringUtils::filenameShrink(const QString& filename, const int maxlen)
+{
+	int len = filename.length();
+	if (len <= maxlen)
+	{
+		return(filename);
+	}
+	else
+	{
+		QString ellipses = QString("...");
+		int fn_start = filename.lastIndexOf("/",-2);
+		QString fn_only = filename.mid(fn_start+1);
+		if (len-fn_start+ellipses.length() > maxlen) // filename only already too long
+		{
+			return((fn_only.length()>maxlen) ? (fn_only.left(maxlen-ellipses.length()) + ellipses) : fn_only);
+		} 
+		else 
+		{
+			return(filename.left(maxlen-len+fn_start-ellipses.length()) + ellipses + "/" + fn_only);
+		}
+	}
+}
+
+inline bool StringUtils::isFilename(const QString& txt) {
+	return(txt.count("/")>=2);
+}
+
+inline QString StringUtils::buf2QString(const char* buf) {
+	int i = 0;
+	QString retStr;
+	while (buf[i] != (char)0) {
+		if ((uchar)buf[i] >= 32 && (uchar)buf[i] <= 128) {
+			retStr.append(QChar(buf[i]));
+		} else {
+			QString num;
+			num.setNum((int)(uchar)buf[i],16);
+			retStr.append(QString("#%1;").arg(num));
+		}
+		i++;
+	}
+	return(retStr);
+}
+
+inline QString StringUtils::buf2QString(QString buf) {
+	return buf2QString(buf.toAscii().data());
+}
+
+inline float StringUtils::trafficStr2BytesPerSecond(QString trafficStr) {
+	int numLen = trafficStr.indexOf("B/s"), pos;
+	if (numLen!=-1) {
+		QChar expChar = trafficStr.toUpper().at(numLen-1);
+		if (QString("0123456789").contains(expChar)) { // only B/s _not_ KB/s, MB/s etc.
+			return trafficStr.left(numLen).toFloat();
+		} else {
+			if ((pos = StringUtils::unit_prefixes().toUpper().indexOf(expChar)) != -1) {
+				return pow(1024,pos)*trafficStr.left(numLen-1).toFloat();
+			} else {
+				return 0.0f;
+			}
+		}
+	} else {
+		return 0.0f;
+	}
+}
+
+inline QString StringUtils::bytesToReadableStr(double traffic, const QString& unitTxt) {
+	QString prefixes = StringUtils::unit_prefixes();
+	int i = 0;
+	while (traffic > 1000.0) {
+		traffic /= 1024.0;
+		i++;
+	}
+	QString retVal, prefix = prefixes.mid(i,1).trimmed();
+	return retVal.setNum(traffic, 'f', (prefix.length() > 0) ? 2 : 0) + " " + prefix + unitTxt;
+}
+
+inline QString StringUtils::bytesToReadableStr(quint64 traffic, const QString& unitTxt) {
+	return bytesToReadableStr((double)traffic, unitTxt);
+}
+
+inline QString StringUtils::kBytesToReadableStr(double traffic, const QString& unitTxt) {
+	return bytesToReadableStr(((double)traffic)*1024.0, unitTxt);
+}
+
+inline QString StringUtils::equalStart(const QString& aStr, const QString& bStr) {
+	int i = 0, imax = std::min(aStr.length(),bStr.length());
+	while (i < imax && aStr[i]==bStr[i]) i++;
+	return aStr.left(i);
+}
+
+inline QString StringUtils::dirPart(const QString& filename) { // for folders ending with "/" returns self
+	return filename.left(filename.lastIndexOf("/")+1);
+}
+inline QString StringUtils::parentDir(const QString& filename) { // same as parentDir, except for folders -> one back and not self
+	return filename.left(filename.lastIndexOf("/", filename.length()-2)+1);
+}
+
+inline QString StringUtils::equalDirPart(const QString& filenameA, const QString& filenameB) {
+	return dirPart(equalStart(filenameA,filenameB));
+}
+
+#endif /*STRING_UTILS_HH_*/
