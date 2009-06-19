@@ -81,7 +81,7 @@ const QString Settings::SETTINGS_RESTORE_ROOT_FOLDER = "RestoreRootFolder";
 const QString Settings::SETTINGS_METADATA_FILE_NAME = "MetadataFileName";
 const QString Settings::SETTINGS_BACKUP_CONTENT_FILE_NAME = "BackupContentFileName";
 const QString Settings::SETTINGS_BACKUP_TIME_FILE_NAME = "BackupTimeFileName";
-const QString Settings::SETTINGS_BACKUP_QUOTA_FILE_NAME = "BackupQuotaFileName";
+const QString Settings::SETTINGS_ABSOLUTE_BACKUP_QUOTA_FILE_NAME = "AbsoluteBackupQuotaFileName";
 const QString Settings::SETTINGS_AUTHORIZED_KEY_FOLDER_NAME = "AuthorizedKeyFolderName";
 const QString Settings::SETTINGS_AUTHORIZED_KEY_FILE_NAME = "AuthorizedKeyFileName";
 
@@ -140,13 +140,11 @@ Settings::Settings()
 	supportedLanguages << QObject::tr( "English" ); // default language has to be at the top (position zero)
 	supportedLanguages << QObject::tr( "German" );
 	qRegisterMetaType<ScheduledTask>("ScheduledTask");
+	qRegisterMetaType<StringPairList>("StringPairList");
+	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
 //	qRegisterMetaType<ScheduleRule::ScheduleType>("ScheduleRule::ScheduleType");
 //	qRegisterMetaType<ScheduleRule::Weekdays>("ScheduleRule::Weekdays");
 	qRegisterMetaTypeStreamOperators<ScheduledTask>("ScheduledTask");
-
-	qDebug() << "MetaTypeId for ScheduledTask is" << qMetaTypeId<ScheduledTask>(); 
-	qDebug() << "MetaTypeId for ScheduledTask::ScheduleTypeEnum is" << qMetaTypeId<ScheduleRule::ScheduleType>(); 
-	qDebug() << "MetaTypeId for ScheduledTask::WeekdaysEnum is" << qMetaTypeId<ScheduleRule::Weekdays>(); 
 }
 
 Settings::~Settings()
@@ -231,7 +229,7 @@ void Settings::reloadSettings()
 	metadataFileName = applicationSettings->value( SETTINGS_METADATA_FILE_NAME ).toString();
 	backupContentFileName = applicationSettings->value( SETTINGS_BACKUP_CONTENT_FILE_NAME ).toString();
 	backupTimeFileName = applicationSettings->value( SETTINGS_BACKUP_TIME_FILE_NAME ).toString();
-	backupQuotaFileName = applicationSettings->value( SETTINGS_BACKUP_QUOTA_FILE_NAME ).toString();
+	absoluteBackupQuotaFileName = applicationSettings->value( SETTINGS_ABSOLUTE_BACKUP_QUOTA_FILE_NAME ).toString();
 	authorizedKeyFolderName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FOLDER_NAME ).toString();
 	authorizedKeyFileName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FILE_NAME ).toString();
 	applicationSettings->endGroup();
@@ -288,7 +286,9 @@ void Settings::reloadSettings()
 	for ( int i = 0; i < size; ++i )
 	{
 		appData->setArrayIndex( i );
-		lastBackups.append( BackupTask( appData->value( SETTINGS_APPDATA_LASTBACKUP_DATE ).toDateTime(), ( BackupTask::StatusEnum )appData->value( SETTINGS_APPDATA_LASTBACKUP_STATUS ).toInt() ) );
+		ConstUtils::StatusEnum status = (ConstUtils::StatusEnum)(appData->value( SETTINGS_APPDATA_LASTBACKUP_STATUS ).toInt());
+		status = status==ConstUtils::STATUS_UNDEFINED ? ConstUtils::STATUS_ERROR : status;
+		lastBackups.append( BackupTask( appData->value( SETTINGS_APPDATA_LASTBACKUP_DATE ).toDateTime(), status ) );
 	}
 	appData->endArray();
 	scheduleRule = appData->value( SETTINGS_SCHEDULE_RULE ).value<ScheduledTask>();
@@ -596,6 +596,10 @@ void Settings::saveNOfLastBackups( int nOfLastBackups )
 	}
 }
 
+/**
+ * adds a new Task to the list of last Backup Tasks
+ * overwrites the lastBackupTask if its time is equal to the passed BackupTask's backupTime
+ */
 void Settings::addLastBackup( const BackupTask& lastBackup )
 {
 	if ( this->lastBackups.size() == 0 || !this->lastBackups.at( 0 ).equals( lastBackup ) )
@@ -634,11 +638,9 @@ void Settings::saveScheduleRule(const ScheduledTask& scheduleRule)
 	{
 		appData->beginGroup( SETTINGS_GROUP_APPDATA );
 		this->scheduleRule = scheduleRule;
-		qDebug() << "Settings::saveScheduleRule: MetaTypeId=" << qMetaTypeId<ScheduledTask>(); 
 
 		QVariant var;
 		var.setValue(scheduleRule);
-		qDebug() << "Settings::saveScheduleRule: QVariant var.type()" << var.type() << var.userType() << var.typeName();
 		appData->setValue( SETTINGS_SCHEDULE_RULE, var );
 		appData->endGroup();
 	}

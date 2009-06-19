@@ -205,7 +205,7 @@ class Settings : public QObject
 		QString getTempMetadataFileName();
 		QString getBackupContentFileName();
 		QString getBackupTimeFileName();
-		QString getBackupQuotaFileName();
+		QString getAbsoluteBackupQuotaFileName();
 		QString getAuthorizedKeyFolderName();
 		QString getAuthorizedKeyFileName();
 
@@ -297,7 +297,7 @@ class Settings : public QObject
 		static const QString SETTINGS_METADATA_FILE_NAME;
 		static const QString SETTINGS_BACKUP_CONTENT_FILE_NAME;
 		static const QString SETTINGS_BACKUP_TIME_FILE_NAME;
-		static const QString SETTINGS_BACKUP_QUOTA_FILE_NAME;
+		static const QString SETTINGS_ABSOLUTE_BACKUP_QUOTA_FILE_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FOLDER_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FILE_NAME;
 
@@ -379,7 +379,7 @@ class Settings : public QObject
 		QString metadataFileName;
 		QString backupContentFileName;
 		QString backupTimeFileName;
-		QString backupQuotaFileName;
+		QString absoluteBackupQuotaFileName;
 
 		QString authorizedKeyFolderName;
 		QString authorizedKeyFileName;
@@ -485,9 +485,9 @@ inline QString Settings::getBackupTimeFileName()
 	return backupTimeFileName;
 }
 
-inline QString Settings::getBackupQuotaFileName()
+inline QString Settings::getAbsoluteBackupQuotaFileName()
 {
-	return backupQuotaFileName;
+	return absoluteBackupQuotaFileName;
 }
 
 inline QString Settings::getLogFileName()
