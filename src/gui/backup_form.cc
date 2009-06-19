@@ -26,7 +26,7 @@
 
 #include "utils/log_file_utils.hh"
 
-BackupForm::BackupForm ( QWidget *parent, MainModel *model ) : QWidget ( parent )
+BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 {
 	setupUi ( this );
 
@@ -35,8 +35,11 @@ BackupForm::BackupForm ( QWidget *parent, MainModel *model ) : QWidget ( parent 
 	this->treeView->setModel( localDirModel );
 	this->treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
 	this->treeView->setColumnWidth( 0, 300 );
-	QModelIndex index = localDirModel->index( QDir::rootPath() );
-	this->treeView->expand( index );
+	QModelIndex index = localDirModel->index( "/home/dsydler/" );
+	do {
+		this->treeView->expand( index );
+		index = index.parent();
+	} while (index.isValid());
 
 	Settings* settings = Settings::getInstance();
 	this->includePatternList = settings->getIncludePatternList();
@@ -79,15 +82,13 @@ BackupForm::~BackupForm()
 
 void BackupForm::on_btnSchedule_pressed()
 {
-	QStringList backupItems = getSelectedFilesAndDirs();
-	if ( backupItems.size() == 0 && !this->radioButtonNoSchedule->isChecked() )
+	if ( this->localDirModel->getSelectionRules().size() == 0 && !this->radioButtonNoSchedule->isChecked() )
 	{
 		QMessageBox::information( this,
 									tr( "Empty backup list" ),
 									tr( "No items have been selected for scheduling" )
 								);
 		return;
-
 	}
 	/*ScheduleDialog scheduleDialog( this->model, backupItems, includePatternList, excludePatternList );
 	scheduleDialog.exec();*/
@@ -135,19 +136,16 @@ void BackupForm::schedule()
 
 void BackupForm::on_btnBackup_pressed()
 {
-	QStringList backupItems = getSelectedFilesAndDirs();
-	if ( backupItems.size() == 0 )
+	if ( this->localDirModel->getSelectionRules().size() == 0 )
 	{
-		QMessageBox::information( this,
-									tr( "Empty backup list" ),
-									tr( "No items have been selected for backup" )
-								);
+		QMessageBox::information( this, tr( "Empty backup list" ), tr( "No items have been selected for backup" ));
 		return;
-
 	}
 	bool deleteExtraneous = this->checkBoxDeleteExtraneous->checkState() == Qt::Checked;
 	this->model->showProgressDialogSlot( tr( "Backup" ) );
-	this->model->backup( backupItems, includePatternList, excludePatternList, deleteExtraneous, false );
+	qDebug() << "BackupForm::on_btnBackup_pressed()" << this->model->getLocalDirModel()->getSelectionRules();
+	this->model->backup( this->model->getLocalDirModel()->getSelectionRules(), deleteExtraneous, false );
+	//this->model->backup( backupItems, includePatternList, excludePatternList, deleteExtraneous, false );
 	emit updateOverviewFormLastBackupsInfo();
 }
 

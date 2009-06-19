@@ -209,26 +209,26 @@ void RestoreForm::on_btnRestore_pressed()
 		this->model->showInformationMessage( tr( "You can not start a restore because no backup is available." ) );
 		return;
 	}
-	if ( this->radioButtonCustom->isChecked() && this->treeViewFilesAndFolders->selectionModel()->selectedIndexes().size() == 0 )
-	{
-		this->model->showInformationMessage( tr( "No files and/or directories has been selected." ) );
-		return;
-	}
-
 	if ( this->comboBoxBackupNames->currentIndex() == -1 )
 	{
 		this->model->showInformationMessage( tr( "No backup has been selected." ) );
 		return;
 	}
+	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
+	qDebug() << "RestoreForm::on_btnRestore_pressed()" << "vor dem ominoesen Zugriff";
+	if ( this->radioButtonCustom->isChecked() && (this->model->getRemoteDirModel_(currentBackupName)->getSelectionRules().size() == 0) )
+	{
+		this->model->showInformationMessage( tr( "No files and/or directories has been selected." ) );
+		return;
+	}
+	qDebug() << "RestoreForm::on_btnRestore_pressed()" << "nach dem ominoesen Zugriff";
+
 
 	if ( this->radioButtonSpecific->isChecked() && !QFileInfo( this->lineEditPath->text() ).exists() )
 	{
 		this->model->showInformationMessage( tr( "Specific destination path is not valid" ) );
 		return;
 	}
-
-
-	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
 
 	QString destination;
 	if ( this->radioButtonOrigin->isChecked() )
@@ -250,7 +250,7 @@ void RestoreForm::on_btnRestore_pressed()
 	{
 		// custom restore
 		this->model->showProgressDialogSlot( tr( "Custom restore" ) );
-		QModelIndexList selectionList = this->treeViewFilesAndFolders->selectionModel()->selectedIndexes();
-		this->model->customRestore( remoteDirModel, selectionList, currentBackupName, destination );
+		QHash<QString,bool> selectionRules = this->model->getRemoteDirModel_(currentBackupName)->getSelectionRules();
+		this->model->customRestore( remoteDirModel, selectionRules, currentBackupName, destination );
 	}
 }

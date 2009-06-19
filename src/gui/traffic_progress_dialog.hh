@@ -23,6 +23,8 @@
 #include <QTime>
 
 #include "ui_traffic_progress_dialog.h"
+#include "utils/string_utils.hh"
+#include "model/backup_task.hh"
 
 /**
  * The OutputDialog class provides a dialog supporting text output
@@ -44,23 +46,13 @@ public:
 	 */
 	virtual ~TrafficProgressDialog();
 
-	/**
-	 * Appends the given info to the dialog
-	 * @param info text to append
-	 */
-	void appendInfo( const QString& info );
 	
 	/**
 	 * Displayes the given filename as info below the progressbar
 	 * @param filename filename to display
 	 */
-	void displayInfoFilename(const QString& filename);
+	void displayFilename(QLabel* lbl, const QString& filename);
 
-	/**
-	 * Appends the given error to the dialog
-	 * @param error text to append
-	 */
-	void appendError( const QString& error );
 
 	/**
 	 * Enables the finish button
@@ -68,16 +60,39 @@ public:
 	void finished();
 
 	void closeEvent( QCloseEvent * event );
+	
+	void setInfo(QLabel* lbl_label, QLabel* lpl_value, QPair<QString,QString> label_and_value);
+	void setInfoLine(QLabel* lbl_lbl, QLabel* val_lbl, QPair<QString,QString> label_and_value);
+	void setInfoLine1(QPair<QString,QString> label_and_value);
+	void setInfoLine2(QPair<QString,QString> label_and_value);
+	void setInfoLine3(QPair<QString,QString> label_and_value);
+	void setInfoLines(QList< QPair<QString,QString> > label_and_values);
 
 signals:
 	bool abort();
 
+public slots:
+	/**
+	 * Appends the given info to the dialog
+	 * @param info text to append
+	 */
+	void appendInfo( const QString& info );
+	/**
+	 * Appends the given error to the dialog
+	 * @param error text to append
+	 */
+	void appendError( const QString& error );
+	void updateProgress( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos );
+	void showFinalStatus(ConstUtils::StatusEnum status);
+	
 private slots:
 	void on_btnCancel_pressed();
+	void on_btnShowHideDetails_pressed();
 	void flushCache();
 
 private:
 	bool isErrorVisible;
+	bool isInfoVisible;
 	QTime lastUpdate;
 	QString outputCache;
 };

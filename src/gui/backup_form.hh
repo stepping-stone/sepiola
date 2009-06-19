@@ -22,6 +22,7 @@
 #include "ui_backup_form.h"
 
 #include "model/main_model.hh"
+#include "model/local_dir_model.hh"
 
 /**
  * The BackupForm class is the backup user interface.
@@ -77,7 +78,7 @@ signals:
 
 private:
 	MainModel* model;
-	QDirModel* localDirModel;
+	LocalDirModel* localDirModel;
 	QStringList includePatternList;
 	QStringList excludePatternList;
 	bool detailsVisible;

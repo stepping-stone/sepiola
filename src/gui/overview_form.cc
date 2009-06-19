@@ -69,13 +69,13 @@ void OverviewForm::refreshLastBackupsOverview()
 	QImage img;
 
 	// fill map with a pixmap for each status
-	QMap<BackupTask::StatusEnum, QPixmap> status_pixmap;
+	QMap<ConstUtils::StatusEnum, QPixmap> status_pixmap;
 	img.load( ":/main/sign_ok.svg" );
-	status_pixmap.insert( BackupTask::STATUS_OK, QPixmap::fromImage( img ) );
+	status_pixmap.insert( ConstUtils::STATUS_OK, QPixmap::fromImage( img ) );
 	img.load( ":/main/sign_error.svg" );
-	status_pixmap.insert( BackupTask::STATUS_ERROR, QPixmap::fromImage( img ) );
+	status_pixmap.insert( ConstUtils::STATUS_ERROR, QPixmap::fromImage( img ) );
 	img.load( ":/main/sign_warning.svg" );
-	status_pixmap.insert( BackupTask::STATUS_WARNING, QPixmap::fromImage( img ) );
+	status_pixmap.insert( ConstUtils::STATUS_WARNING, QPixmap::fromImage( img ) );
 	QList<BackupTask> lastBackups = settings->getLastBackups();
 	int n = std::min( settings->getNOfLastBackups(), lastBackups.size() );
 	// fill status-content of last backups into form
@@ -91,7 +91,7 @@ void OverviewForm::refreshLastBackupsOverview()
 		if ( !isHidden )
 		{
 			BackupTask lastBackup = lastBackups.at( i );
-			BackupTask::StatusEnum status = lastBackup.getStatus();
+			ConstUtils::StatusEnum status = lastBackup.getStatus();
 			lab_icon->setPixmap( status_pixmap.value( status ) );
 			lab_status->setText( lastBackup.getStatusText() );
 			lab_date->setText( lastBackup.getDateTime().toString() );

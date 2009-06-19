@@ -64,7 +64,9 @@ public:
 	void closeEvent( QCloseEvent * event );
 
 signals:
-	bool abort1();
+	bool abort();
+	void refreshLastBackupOverview();
+
 
 private slots:
 	void on_btnCancel_pressed();

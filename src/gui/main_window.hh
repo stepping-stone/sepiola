@@ -23,6 +23,7 @@
 #include <QDialog>
 #include <QStackedLayout>
 #include <QCloseEvent>
+#include <QMessageBox>
 #include <QProgressDialog>
 #include <QSplashScreen>
 
@@ -92,10 +93,7 @@ private slots:
 	void showClientPasswordDialog( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
 	
 	void showProgressDialog( const QString& dialogTitle );
-/*	void appendInfoMessage( const QString& info );
-	void updateFileProcessedInfo(const QString& filename );
-	void appendErrorMessage( const QString& error );
-*/	void finishProgressDialog();
+	void finishProgressDialog();
 	void closeProgressDialog();
 	
 	void on_actionOverview_triggered();

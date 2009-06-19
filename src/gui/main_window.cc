@@ -17,7 +17,6 @@
 */
 
 #include <QDebug>
-#include <QMessageBox>
 
 #include "gui/about_dialog.hh"
 #include "gui/logfile_form.hh"
@@ -132,13 +131,13 @@ void MainWindow::showClientPasswordDialog( const QString& username, bool isUsern
 void MainWindow::showInformationMessageBox( const QString& message )
 {
 	Settings* settings = Settings::getInstance();
-	QMessageBox::information( 0, settings->getApplicationName(), message );
+	QMessageBox::information( this, settings->getApplicationName(), message );
 }
 
 void MainWindow::showCriticalMessageBox( const QString& message )
 {
 	Settings* settings = Settings::getInstance();
-	QMessageBox::critical( 0, settings->getApplicationName(), message );
+	QMessageBox::critical( this, settings->getApplicationName(), message );
 }
 
 void MainWindow::setFormIndex( FORM_INDEX index )
@@ -270,42 +269,24 @@ void MainWindow::showProgressDialog( const QString& title )
 	qDebug() << "MainWindow::showProgressDialog(" << title << ")";
 	progressDialog = new TrafficProgressDialog( title );
 	QObject::connect( progressDialog, SIGNAL( abort() ), this->model, SLOT( abortProcessSlot() ) );
-	QObject::connect( this->model, SIGNAL( appendInfoMessage( const QString& ) ), progressDialog, SLOT( appendInfo( const QString& ) ) );
-	QObject::connect( this->model, SIGNAL( appendErrorMessage( const QString& ) ), progressDialog, SLOT( appendError( const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( infoSignal( const QString& ) ), progressDialog, SLOT( appendInfo( const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( errorSignal( const QString& ) ), progressDialog, SLOT( appendError( const QString& ) ) );
 	QObject::connect( this->model, SIGNAL( finishProgressDialog() ), this, SLOT( finishProgressDialog() ) );
 	QObject::connect( this->model, SIGNAL( closeProgressDialog() ), this, SLOT( closeProgressDialog() ) );
 
 	// log file signals/slots
-	QObject::connect( this->model, SIGNAL( outputInfoFileProcessed( const QString& ) ), progressDialog, SLOT( displayInfoFilename( const QString& ) ) );
-	QObject::connect( this->model, SIGNAL( appendInfoMessage( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
-	QObject::connect( this->model, SIGNAL( appendErrorMessage( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
+	qRegisterMetaType<StringPairList>("StringPairList");
+	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
+	QObject::connect( this->model, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
+					  progressDialog, SLOT( updateProgress( const QString&, float, const QDateTime&, StringPairList ) ) );
+	qDebug() << "	QObject::connect( this->model, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ), progressDialog, SLOT( showFinalStatus( ConstUtils::StatusEnum ) ) );";
+	QObject::connect( this->model, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
+					  progressDialog, SLOT( showFinalStatus( ConstUtils::StatusEnum ) ) );
+	QObject::connect( this->model, SIGNAL( infoSignal( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
+	QObject::connect( this->model, SIGNAL( errorSignal( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
 	progressDialog->show();
 	QApplication::processEvents();
 }
-
-/*void MainWindow::appendInfoMessage( const QString& info )
-{
-	qDebug() << "MainWindow::appendInfoMessage(" << info << ")";
-	if (progressDialog != 0) {
-		progressDialog->appendInfo( info );
-	}
-}*/
-
-/*void MainWindow::updateFileProcessedInfo( const QString& filename )
-{
-	qDebug() << "MainWindow::updateFileProcessedInfo(" << filename << ")";
-	if (progressDialog != 0) {
-		progressDialog->displayInfoFilename( filename );
-	}
-}*/
-
-/*void MainWindow::appendErrorMessage( const QString& error )
-{
-	qDebug() << "MainWindow::appendErrorMessage(" << error << ")";
-	if (progressDialog != 0) {
-		progressDialog->appendError( error );
-	}
-}*/
 
 void MainWindow::finishProgressDialog()
 {

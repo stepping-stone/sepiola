@@ -77,7 +77,8 @@ void OutputDialog::appendError( const QString& error )
 
 void OutputDialog::on_btnCancel_pressed()
 {
-	if (emit abort1()) {
+	if (emit abort()) {
+		qDebug() << "OutputDialog::on_btnCancel_pressed(): switching Button-visibility";
 		this->btnClose->setEnabled(true);
 		this->btnCancel->setEnabled(false);
 	}
@@ -88,6 +89,7 @@ void OutputDialog::finished()
 	flushCache();
 	this->btnClose->setEnabled( true );
 	this->btnCancel->setEnabled( false );
+	emit refreshLastBackupOverview();
 }
 
 void OutputDialog::closeEvent( QCloseEvent * event )
