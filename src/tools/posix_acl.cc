@@ -57,7 +57,7 @@ QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE
 		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> processedItem = processedItems.at(i);
 		if (processedItem.second != AbstractRsync::DELETED)
 		{
-			qDebug() << "Getting acl for item " << processedItem.first;
+			//qDebug() << "Getting acl for item " << processedItem.first;
 			//LogFileUtils::getInstance()->logToHex(processedItem.first);
 			//LogFileUtils::getInstance()->logToHex(processedItem.first.toLocal8Bit());
 			emit infoSignal(QObject::tr( "Getting metadata for %1" ).arg(processedItem.first) );

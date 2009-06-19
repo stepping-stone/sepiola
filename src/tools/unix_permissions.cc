@@ -57,7 +57,7 @@ QString UnixPermissions::getMetadata( const QList< QPair<QString, AbstractRsync:
 		if( processedItem.second != AbstractRsync::DELETED )
 		{
 			qDebug() << "Getting metadata for " << processedItem.first;
-			emit infoSignal( QObject::tr( "Getting metadata for %1" ).arg( processedItem.first ) );
+			//emit infoSignal( QObject::tr( "Getting metadata for %1" ).arg( processedItem.first ) );
 			ExtendedFile fileInfo( processedItem.first );
 			QString fileName = fileInfo.fileName();
 			QString owner = fileInfo.owner();

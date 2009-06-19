@@ -24,6 +24,7 @@
 #include <QTextStream>
 
 #include "exception/process_exception.hh"
+#include "tools/abstract_informing_process.hh"
 
 /**
  * The Process class provides the basic implementation for starting an external program
@@ -78,7 +79,7 @@ protected:
 	 * @param byteArray a byte array to store the characters into
 	 * @param msec milliseconds to block
 	 */
-	bool blockingReadLine(QByteArray* byteArray, int msec = 30000 );
+	bool blockingReadLine(QByteArray* byteArray, int msec = 30000, char lineEndChar=10 );
 
 	/**
 	 * Reads a line of data and stores the characters in string. This method blocks until a line
@@ -86,7 +87,7 @@ protected:
 	 * @param string a string to store the characters into
 	 * @param msec milliseconds to block
 	 */
-	bool blockingReadLine( QString* string, int msec = 30000 );
+	bool blockingReadLine( QString* string, int msec = 30000, char lineEndChar=10 );
 
 	/**
 	 * Blocks until the process has finished
@@ -129,6 +130,7 @@ private:
 	/**
 	 * A QProcess instance
 	 */
+	QString readBuffer;
 	QProcess* qProcess;
 
 	static const int MAX_LINE_SIZE;

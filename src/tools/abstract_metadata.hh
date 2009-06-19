@@ -22,14 +22,14 @@
 #include <QString>
 #include <QFileInfo>
 
-#include "tools/abstract_progress.hh"
 #include "tools/abstract_rsync.hh"
+#include "tools/abstract_informing_process.hh"
 
 /**
  * The AbstractMetadata class provides methods for getting and setting file and directory meta data
  * @author Bruno Santschi, santschi@puzzle.ch
  */
-class AbstractMetadata : public AbstractProgress
+class AbstractMetadata : public AbstractInformingProcess
 {
 public:
 

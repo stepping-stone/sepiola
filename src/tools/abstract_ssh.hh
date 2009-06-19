@@ -22,13 +22,13 @@
 #include <QFileInfo>
 
 #include "model/restore_name.hh"
-#include "tools/abstract_progress.hh"
+#include "tools/abstract_informing_process.hh"
 
 /**
  * The AbstractSsh class provides methods for using SSH
  * @author Bruno Santschi, santschi@puzzle.ch
  */
-class AbstractSsh : public AbstractProgress
+class AbstractSsh : public AbstractInformingProcess
 {
 public:
 

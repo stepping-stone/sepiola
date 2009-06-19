@@ -56,7 +56,7 @@ QString SetAcl::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_
 		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>  processedItem = processedItems.at( i );
 		if( processedItem.second != AbstractRsync::DELETED )
 		{
-			emit infoSignal( QObject::tr( "Getting metadata for %1" ).arg( processedItem.first ) );
+			//emit infoSignal( QObject::tr( "Getting metadata for %1" ).arg( processedItem.first ) );
 			outStream << processedItem.first << endl;
 			//setAclInStream << processedItem.first << endl;
 			waitForBytesWritten();

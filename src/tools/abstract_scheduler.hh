@@ -23,13 +23,13 @@
 #include <QString>
 #include <QTime>
 
-#include "tools/abstract_progress.hh"
+#include "tools/abstract_informing_process.hh"
 
 /**
  * The AbstractScheduler class provides methods for using a scheduler
  * @author Bruno Santschi, santschi@puzzle.ch
  */
-class AbstractScheduler : public AbstractProgress
+class AbstractScheduler : public AbstractInformingProcess
 {
 	Q_OBJECT
 	
