@@ -136,16 +136,16 @@ void CliManager::runSchedule()
 	QStringList backupList = settings->getBackupList();
 	MainModel mainModel;
 
-	QObject::connect( &mainModel, SIGNAL( appendInfoMessage( const QString& ) ),
+	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( appendErrorMessage( const QString& ) ),
+	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 
 	mainModel.backup( backupList, settings->getIncludePatternList(), settings->getExcludePatternList(), deleteExtraneousItems, true );
 
-	QObject::disconnect( &mainModel, SIGNAL( appendInfoMessage( const QString& ) ),
+	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( appendErrorMessage( const QString& ) ),
+	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 }
 
@@ -177,9 +177,9 @@ void CliManager::runCli( int argc, char* argv[] )
 		excludePatternList = FileSystemUtils::readLinesFromFile( excludeFileName, "UTF-8" );
 	}
 	MainModel mainModel;
-	QObject::connect( &mainModel, SIGNAL( appendInfoMessage( const QString& ) ),
+	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 						this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( appendErrorMessage( const QString& ) ),
+	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 						this, SLOT( printErrorMessage( const QString& ) ) );
 	QObject::connect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
 						this, SLOT( printInfoMessage( const QString& ) ) );
@@ -191,16 +191,16 @@ void CliManager::runCli( int argc, char* argv[] )
 						this, SLOT( askForPassword() ) );
 
 	// log file signals/slots
-	QObject::connect( &mainModel, SIGNAL( appendInfoMessage( const QString& ) ),
+	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( appendErrorMessage( const QString& ) ),
+	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 
 	mainModel.backup( backupList, includePatternList, excludePatternList, deleteExtraneousItems, true );
 
-	QObject::disconnect( &mainModel, SIGNAL( appendInfoMessage( const QString& ) ),
+	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 							 this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( appendErrorMessage( const QString& ) ),
+	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 							 this, SLOT( printErrorMessage( const QString& ) ) );
 	QObject::disconnect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
 							 this, SLOT( printInfoMessage( const QString& ) ) );
@@ -212,9 +212,9 @@ void CliManager::runCli( int argc, char* argv[] )
 							 this, SLOT( askForPassword() ) );
 
 	// log file signals/slots
-	QObject::disconnect( &mainModel, SIGNAL( appendInfoMessage( const QString& ) ),
+	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( appendErrorMessage( const QString& ) ),
+	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 }
 
