@@ -27,9 +27,11 @@
 #include <QDateTime>
 #include <QSize>
 #include <QPoint>
+#include <QHash>
 
 #include "model/backup_task.hh"
 #include "model/scheduled_task.hh"
+
 
 /**
  * The Settings class is used to store and read all settings for this application
@@ -265,6 +267,8 @@ class Settings : public QObject
 		void saveLastBackups( const QList<BackupTask>& lastBackups );
 		const ScheduledTask& getScheduleRule() const;
 		void saveScheduleRule( const ScheduledTask& scheduleRule );
+		const BackupSelectionHash& getLastBackupSelectionRules() const;
+		void saveBackupSelectionRules( const BackupSelectionHash& selectionRules );
 
 		static const QString VERSION;
 
@@ -338,6 +342,9 @@ class Settings : public QObject
 		static const QString SETTINGS_APPDATA_LASTBACKUP_DATE;
 		static const QString SETTINGS_APPDATA_LASTBACKUP_STATUS;
 		static const QString SETTINGS_SCHEDULE_RULE;
+		static const QString SETTINGS_LAST_BACKUP_RULES;
+		static const QString SETTINGS_LAST_BACKUP_RULES_ITEM;
+		static const QString SETTINGS_LAST_BACKUP_RULES_MODIFIER;
 
 
 		// Settings given at build-time or by platform
@@ -416,7 +423,7 @@ class Settings : public QObject
 		// [AppData]
 		QList<BackupTask> lastBackups;
 		ScheduledTask scheduleRule;
-
+		BackupSelectionHash lastBackupRules;
 
 		// non persistent
 		QString client_password;
@@ -434,6 +441,7 @@ class Settings : public QObject
 		bool createKeyFile( const QString& key, const QString& keyFilePath );
 
 };
+
 
 inline int Settings::getMaxLogLines()
 {
@@ -675,4 +683,10 @@ inline const ScheduledTask& Settings::getScheduleRule() const
 {
 	return scheduleRule;
 }
+
+inline const BackupSelectionHash& Settings::getLastBackupSelectionRules() const
+{
+	return lastBackupRules;
+}
+
 #endif

@@ -29,6 +29,7 @@
 #include "utils/file_system_utils.hh"
 #include "utils/string_utils.hh"
 #include "utils/log_file_utils.hh"
+#include "utils/datatypes.hh"
 #include "model/scheduled_task.hh"
 
 #ifdef Q_OS_UNIX
@@ -121,6 +122,9 @@ const QString Settings::SETTINGS_APPDATA_LASTBACKUPS = "LastBackups";
 const QString Settings::SETTINGS_APPDATA_LASTBACKUP_DATE = "LastBackupDate";
 const QString Settings::SETTINGS_APPDATA_LASTBACKUP_STATUS = "LastBackupStatus";
 const QString Settings::SETTINGS_SCHEDULE_RULE = "ScheduleRule";
+const QString Settings::SETTINGS_LAST_BACKUP_RULES = "LastBackupRules";
+const QString Settings::SETTINGS_LAST_BACKUP_RULES_ITEM = "Item";
+const QString Settings::SETTINGS_LAST_BACKUP_RULES_MODIFIER = "Modifier";
 
 
 // immutable
@@ -139,6 +143,7 @@ Settings::Settings()
 
 	supportedLanguages << QObject::tr( "English" ); // default language has to be at the top (position zero)
 	supportedLanguages << QObject::tr( "German" );
+	qRegisterMetaType<BackupSelectionHash>("BackupSelectionHash");
 	qRegisterMetaType<ScheduledTask>("ScheduledTask");
 	qRegisterMetaType<StringPairList>("StringPairList");
 	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
@@ -292,6 +297,18 @@ void Settings::reloadSettings()
 	}
 	appData->endArray();
 	scheduleRule = appData->value( SETTINGS_SCHEDULE_RULE ).value<ScheduledTask>();
+	
+	qRegisterMetaType< QPair<QString,bool> >("QPair<QString,bool>");
+	size = appData->beginReadArray( SETTINGS_LAST_BACKUP_RULES );
+	lastBackupRules.clear();
+	for ( int i = 0; i < size; ++i )
+	{
+		appData->setArrayIndex( i );
+		bool rule_modifier = appData->value( SETTINGS_LAST_BACKUP_RULES_MODIFIER ).toBool();
+		QString rule_item = appData->value( SETTINGS_LAST_BACKUP_RULES_ITEM ).toString();
+		lastBackupRules.insert( rule_item, rule_modifier );
+	}
+	appData->endArray();
 	appData->endGroup();
 
 	// [GUI]
@@ -644,4 +661,24 @@ void Settings::saveScheduleRule(const ScheduledTask& scheduleRule)
 		appData->setValue( SETTINGS_SCHEDULE_RULE, var );
 		appData->endGroup();
 	}
+}
+
+void Settings::saveBackupSelectionRules( const BackupSelectionHash& backupSelectionRules )
+{
+	qDebug() << "Settings::saveBackupSelectionRules(" << backupSelectionRules << ")";
+	this->lastBackupRules = backupSelectionRules;
+	appData->beginGroup( SETTINGS_GROUP_APPDATA );
+	appData->beginWriteArray( SETTINGS_LAST_BACKUP_RULES );
+	QList<QString> items = this->lastBackupRules.keys();
+	int i = 0;
+	foreach ( QString item, items )
+	{
+		appData->setArrayIndex( i );
+		qDebug() << "Settings::saveBackupSelectionRules(...)" << "writing:" << this->lastBackupRules[item] << item;
+		appData->setValue( SETTINGS_LAST_BACKUP_RULES_MODIFIER, this->lastBackupRules[item] );
+		appData->setValue( SETTINGS_LAST_BACKUP_RULES_ITEM, item );
+		i++;
+	}
+	appData->endArray();
+	appData->endGroup();
 }
