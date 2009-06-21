@@ -78,7 +78,7 @@ BackupThread::BackupThread( const QStringList& items, const QStringList& include
 	QObject::connect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
-BackupThread::BackupThread( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag )
+BackupThread::BackupThread( const BackupSelectionHash& includeRules, const bool& setDeleteFlag )
 {
 	isAborted = false;
 	this->includeRules = includeRules;
@@ -132,6 +132,8 @@ void BackupThread::run()
 	ProgressTask* subPt;
 	bool failed = false;
 	this->setLastBackupState(ConstUtils::STATUS_UNDEFINED);
+	Settings* settings = Settings::getInstance();
+	settings->saveBackupSelectionRules( this->includeRules );
 	try
 	{
 		checkAbortState();

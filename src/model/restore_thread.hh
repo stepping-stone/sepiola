@@ -53,7 +53,7 @@ public:
 	 * @param destination a destination path for restoring
 	 */
 	RestoreThread( const QString& backupName, const QStringList& items, const QString& destination );
-	RestoreThread( const QString& backupName, const QHash<QString,bool>& selectionRules, const QString& destination );
+	RestoreThread( const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
 
 	/**
 	 * Destroyes the RestoreThread
@@ -91,7 +91,7 @@ private:
 	bool isCustomRestore;
 	QString backupName;
 	QStringList items;
-	QHash<QString,bool> selectionRules;
+	BackupSelectionHash selectionRules;
 	QString destination;
 };
 

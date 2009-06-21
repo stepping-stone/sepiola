@@ -23,6 +23,8 @@
 #include <QStringList>
 #include <QFileInfo>
 
+#include "utils/datatypes.hh"
+
 /**
  * The RemoteDirModel class represents a remote file system
  * @author Bruno Santschi, santschi@puzzle.ch
@@ -45,10 +47,10 @@ public:
 	Qt::ItemFlags flags(const QModelIndex& index) const;
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-	const QHash<QString,bool>& getSelectionRules() { return selectionRules; };
+	const BackupSelectionHash& getSelectionRules() { return selectionRules; };
 	
 	private:
-		QHash<QString,bool> selectionRules;
+		BackupSelectionHash selectionRules;
 };
 
 QString sortKey(QString file);

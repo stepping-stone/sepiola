@@ -52,7 +52,7 @@ public:
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
 	BackupThread( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag );
-	BackupThread( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag );
+	BackupThread( const BackupSelectionHash& includeRules, const bool& setDeleteFlag );
 
 	/**
 	 * Destroys the BackupThread
@@ -102,7 +102,7 @@ private:
 	auto_ptr< AbstractRsync > rsync;
 	bool isAborted;
 	QStringList items;
-	QHash<QString,bool> includeRules;
+	BackupSelectionHash includeRules;
 	QStringList includePatternList;
 	QStringList excludePatternList;
 	bool setDeleteFlag;

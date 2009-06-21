@@ -104,6 +104,7 @@ bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int
 	return QDirModel::setData(index, value, role);
 }
 
+
 LocalDirModel::~LocalDirModel()
 {
 }

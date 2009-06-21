@@ -113,7 +113,7 @@ public:
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 * @param startInCurrentThread indicates whether the method runs in its own thread or not
 	 */
-	void backup( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread );
+	void backup( const BackupSelectionHash& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread );
 	void backup( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag, const bool& startInCurrentThread );
 
 	/**
@@ -181,7 +181,7 @@ public:
 	 * @param destination a destination path for restoring
 	 */
 	void customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backupName, const QString& destination );
-	void customRestore( const QStandardItemModel* remoteDirModel, const QHash<QString,bool>& selectionRules, const QString& backupName, const QString& destination );
+	void customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backupName, const QString& destination );
 
 	/**
 	 * Shows an information message box with the given text

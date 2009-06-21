@@ -199,7 +199,7 @@ void MainModel::backup( const QStringList& items, const QStringList& includePatt
 /**
  * new version based on rules
  */
-void MainModel::backup( const QHash<QString,bool>& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread )
+void MainModel::backup( const BackupSelectionHash& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread )
 {
 	qDebug() << "MainModel::backup( " << includeRules << ", " << setDeleteFlag << ", " << startInCurrentThread << " )";
 	if ( !initConnection() )
@@ -488,7 +488,7 @@ void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const Q
 	//TODO: disconnect signal/slot connections
 }
 
-void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const QHash<QString,bool>& selectionRules, const QString& backupName, const QString& destination )
+void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backupName, const QString& destination )
 {
 	if( !initConnection() )
 	{

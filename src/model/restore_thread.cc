@@ -44,7 +44,7 @@ RestoreThread::RestoreThread( const QString& backupName, const QStringList& item
 	init();
 }
 
-RestoreThread::RestoreThread( const QString& backupName, const QHash<QString,bool>& selectionRules, const QString& destination )
+RestoreThread::RestoreThread( const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )
 {
 	this->isCustomRestore = true;
 	this->backupName = backupName;
