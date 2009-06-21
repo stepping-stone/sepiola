@@ -20,6 +20,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <math.h>
+#include <algorithm>
 
 #include "utils/progress_task.hh"
 
@@ -113,7 +114,7 @@ ProgressTask* ProgressTask::getCurrentTask()
 		// find last terminated task
 		for (i = 0; i < this->subTasks.size() && this->subTasks[i]->isTerminated(); i++);
 		i_last_terminated = i-1;
-		i_contains_fp = std::min(this->subTasks.size()-1,i_last_terminated+1);
+		i_contains_fp = std::min<int>(this->subTasks.size()-1,i_last_terminated+1);
 		// find (beginning at task last_terminated) the last task, which contains already fixpoints.
 
 		for (i = i_last_terminated+1; i < this->subTasks.size(); i++) {
@@ -140,7 +141,7 @@ void ProgressTask::addFixpoint(QDateTime time, double stepN, bool force)
 		//qDebug() << "ProgressTask::addFixpoint: WARNING: provided step smaller than last one -> ignored"; 
 	} else {
 		if (force || this->fp_times.size()==0 || (DateTimeUtils::getSeconds(time) - DateTimeUtils::getSeconds(this->fp_times.last()) > 0.2) ) {
-			this->fp_steps.append(std::max(0.0,std::min(this->nSteps,stepN)));
+			this->fp_steps.append(std::max(0.0,std::min<double>(this->nSteps,stepN)));
 			this->fp_times.append(time);
 			this->setFixpointsChanged(true);
 		}
