@@ -77,6 +77,8 @@ signals:
 	void updateOverviewFormLastBackupsInfo();
 
 private:
+	void expandSelectedBranches();
+	
 	MainModel* model;
 	LocalDirModel* localDirModel;
 	QStringList includePatternList;

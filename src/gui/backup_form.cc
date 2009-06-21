@@ -29,19 +29,16 @@
 BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 {
 	setupUi ( this );
-
+	Settings* settings = Settings::getInstance();
 	this->model = model;
 	this->localDirModel = this->model->getLocalDirModel();
+	this->localDirModel->setSelectionRules(	settings->getLastBackupSelectionRules() );
+	
 	this->treeView->setModel( localDirModel );
 	this->treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
 	this->treeView->setColumnWidth( 0, 300 );
-	QModelIndex index = localDirModel->index( "/home/dsydler/" );
-	do {
-		this->treeView->expand( index );
-		index = index.parent();
-	} while (index.isValid());
+	this->expandSelectedBranches();
 
-	Settings* settings = Settings::getInstance();
 	this->includePatternList = settings->getIncludePatternList();
 	this->excludePatternList = settings->getExcludePatternList();
 	this->lineEditIncludePattern->setText( patternListToString( includePatternList ) );
@@ -79,6 +76,18 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 
 BackupForm::~BackupForm()
 {}
+
+void BackupForm::expandSelectedBranches()
+{
+	foreach ( QString location, this->localDirModel->getSelectionRules().keys() ) {
+		QString loc = StringUtils::parentDir(location);
+		QModelIndex index = localDirModel->index( loc );
+		while (index.isValid()) {
+			this->treeView->expand( index ); // if possible
+			index = index.parent();
+		}
+	}
+}
 
 void BackupForm::on_btnSchedule_pressed()
 {

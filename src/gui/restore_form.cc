@@ -250,7 +250,7 @@ void RestoreForm::on_btnRestore_pressed()
 	{
 		// custom restore
 		this->model->showProgressDialogSlot( tr( "Custom restore" ) );
-		QHash<QString,bool> selectionRules = this->model->getRemoteDirModel_(currentBackupName)->getSelectionRules();
+		BackupSelectionHash selectionRules = this->model->getRemoteDirModel_(currentBackupName)->getSelectionRules();
 		this->model->customRestore( remoteDirModel, selectionRules, currentBackupName, destination );
 	}
 }
