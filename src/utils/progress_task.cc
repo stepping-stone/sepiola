@@ -141,7 +141,7 @@ void ProgressTask::addFixpoint(QDateTime time, double stepN, bool force)
 		//qDebug() << "ProgressTask::addFixpoint: WARNING: provided step smaller than last one -> ignored"; 
 	} else {
 		if (force || this->fp_times.size()==0 || (DateTimeUtils::getSeconds(time) - DateTimeUtils::getSeconds(this->fp_times.last()) > 0.2) ) {
-			this->fp_steps.append(std::max(0.0,std::min<double>(this->nSteps,stepN)));
+			this->fp_steps.append(std::max<double>(0.0,std::min<double>(this->nSteps,stepN)));
 			this->fp_times.append(time);
 			this->setFixpointsChanged(true);
 		}
@@ -176,7 +176,7 @@ QDateTime ProgressTask::getRunningTime() {
 QDateTime ProgressTask::getTotalDurationBestGuess()
 {
 	if (fp_steps.size() >= 2) {
-		return DateTimeUtils::getDateTimeFromSecs( std::max(0.0,DateTimeUtils::getSeconds(this->getEstimatedTotalDuration())) );
+		return DateTimeUtils::getDateTimeFromSecs( std::max<double>(0.0,DateTimeUtils::getSeconds(this->getEstimatedTotalDuration())) );
 	} else {
 		return this->getProposedEstimatedDuration();
 	}
@@ -230,7 +230,7 @@ QDateTime ProgressTask::getEstimatedTimeLeft()
 	if (this->fp_steps.size() < 2) {
 		if (fp_times.size() > 0) {
 			// if starting time is provided, count backward based on estimated duration
-			return(DateTimeUtils::getDateTimeFromSecs( std::max(0.0,DateTimeUtils::getSeconds(this->getProposedEstimatedDuration()) + DateTimeUtils::getSeconds(fp_times.last()) - DateTimeUtils::getSeconds(QDateTime::currentDateTime())) ));
+			return(DateTimeUtils::getDateTimeFromSecs( std::max<double>(0.0,DateTimeUtils::getSeconds(this->getProposedEstimatedDuration()) + DateTimeUtils::getSeconds(fp_times.last()) - DateTimeUtils::getSeconds(QDateTime::currentDateTime())) ));
 		} else {
 			// if no starting time is provided, return estimated duration
 			return this->getProposedEstimatedDuration();
@@ -266,7 +266,7 @@ QDateTime ProgressTask::getEstimatedTimeLeft()
 		double retSecs = 0.0, curSecs = DateTimeUtils::getSeconds(QDateTime::currentDateTime());
 		int i = -1;
 		while (++i < this->lastDurationGuesses.size() && (curSecs-DateTimeUtils::getSeconds(this->lastDurationGuesses[i].first) < this->MEAN_OVER_LAST_N_SECONDS)) {
-			retSecs += std::max(0.0,DateTimeUtils::getSeconds(this->lastDurationGuesses[i].first) + DateTimeUtils::getSeconds(this->lastDurationGuesses[i].second) - curSecs);
+			retSecs += std::max<double>(0.0,DateTimeUtils::getSeconds(this->lastDurationGuesses[i].first) + DateTimeUtils::getSeconds(this->lastDurationGuesses[i].second) - curSecs);
 		} 
 		this->lastDurationGuesses = this->lastDurationGuesses.mid(0,i);
 		if (i > 0) {
