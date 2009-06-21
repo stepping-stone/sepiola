@@ -22,7 +22,7 @@
 #include <QString>
 #include <QDebug>
 #include <math.h>
-using namespace std;
+#include <algorithm>
 
 typedef QList<QPair<QString,QString> > StringPairList;
 Q_DECLARE_METATYPE( StringPairList );
@@ -154,7 +154,7 @@ inline QString StringUtils::kBytesToReadableStr(double traffic, const QString& u
 }
 
 inline QString StringUtils::equalStart(const QString& aStr, const QString& bStr) {
-	int i = 0, imax = ::min(aStr.length(),bStr.length());
+	int i = 0, imax = std::min<int>(aStr.length(),bStr.length());
 	while (i < imax && aStr[i]==bStr[i]) i++;
 	return aStr.left(i);
 }
