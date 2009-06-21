@@ -60,10 +60,10 @@ public:
 	 * @param errors a QString pointer for saving errors
 	 * @return a list of transfered items
 	 */
-	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QHash<QString,bool>& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
+	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
 	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
 
-	virtual long calculateUploadTransfer( const QHash<QString,bool> includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) = 0;
+	virtual long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) = 0;
 	
 	void upload( const QFileInfo& fileInfo, const QString& destination, bool bCompress, QString* errors = NULL );
 
@@ -82,7 +82,7 @@ public:
 	 * @param destination destination directory path
 	 * @return a list of downloaded items
 	 */
-	virtual QStringList downloadCustomBackup( const QString& backupName, const QHash<QString,bool>& includeRules, const QString& destination ) = 0;
+	virtual QStringList downloadCustomBackup( const QString& backupName, const BackupSelectionHash& includeRules, const QString& destination ) = 0;
 	virtual QStringList downloadCustomBackup( const QString& backupName, const QStringList& itemList, const QString& destination ) = 0;
 
 	/**
