@@ -61,7 +61,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
 	if (dry_run) { 	this->last_calculatedLiteralData = -1; arguments << "--stats" << "--only-write-batch=/dev/null"; }
 	
-	arguments << "--include-from=-"; //"--include-from=/home/dsydler/Documents/ssbackup/backupIncludes.txt";
+	arguments << "--include-from=-";
 	arguments << getRsyncSshArguments();
 	if ( setDeleteFlag )
 	{

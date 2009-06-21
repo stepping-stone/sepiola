@@ -26,19 +26,6 @@
 LocalDirModel::LocalDirModel(const QStringList & nameFilters, QDir::Filters filters, QDir::SortFlags sort, QObject * parent) : QDirModel(nameFilters, filters, sort, parent)
 {
 	selectionRules.clear();
-	selectionRules.insert("/home/dsydler/Documents/", true);
-/*	selectionRules.insert("/home/dsydler/projects/xx/D/", true);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DA/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DA/DAF/DAFB/", true);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DB/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DC/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DD/DDD/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DD/DDD/DDDF/DDDFD/", true);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DE/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DF/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DG/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/D/DH/", false);
-	selectionRules.insert("/home/dsydler/projects/xx/bigfile", true);*/
 }
 
 Qt::ItemFlags LocalDirModel::flags(const QModelIndex& index) const
