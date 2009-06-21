@@ -135,45 +135,29 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 			}
 			else
 			{
-				//qDebug() << "BLOCKING_READ_LINE: lese aus Buffer";
-				//qDebug() << "Puffer ist im Moment (in while) (" << readBuffer.length() << ")" << StringUtils::buf2QString(readBuffer.toAscii().data());
-				//qDebug() << "Kann noch" << BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1 << "Zeichen lesen.";
 				if (BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1 > 0) {
 					nCharsRead = qProcess->read(buf, BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1);
 					result = nCharsRead >= 0;
-					//qDebug() << "buf (orig)=" << StringUtils::buf2QString(buf);
-					//qDebug() << "buf (qstr)=" << StringUtils::buf2QString(QString("").append(buf).toAscii().data());
 					readBuffer.append(QByteArray(buf,nCharsRead));
 				}
-				//qDebug() << "Puffer ist im Moment (in while) (" << readBuffer.length() << ")" << StringUtils::buf2QString(readBuffer.toAscii().data());
 			}
 		}
 		if (qProcess->canReadLine()) {
-			//qDebug() << "BLOCKING_READ_LINE: lese LINE aus Buffer";
-			//qDebug() << "Puffer ist im Moment (nach while) (" << readBuffer.length() << ")" << StringUtils::buf2QString(readBuffer.toAscii().data());
 			if (BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1 > 0) {
 				nCharsRead = qProcess->readLine(buf, BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1);
 				result = nCharsRead >= 0;
-				//qDebug() << "buf (orig)=" << StringUtils::buf2QString(buf);
-				//qDebug() << "buf (qstr)=" << StringUtils::buf2QString(QString("").append(buf).toAscii().data());
 				readBuffer.append(QByteArray(buf,nCharsRead));
 			}
 		}
 		int pos = std::min((readBuffer.indexOf(QChar(lineEndChar))+(2*BLOCKREAD_MAX_LINE_SIZE)) % (2*BLOCKREAD_MAX_LINE_SIZE), (readBuffer.indexOf("\n")+(2*BLOCKREAD_MAX_LINE_SIZE)) % (2*BLOCKREAD_MAX_LINE_SIZE));
-		//qDebug() << "Puffer ist im Moment (" << readBuffer.length() << ")" << StringUtils::buf2QString(readBuffer.toAscii().data());
-		//qDebug() << "Return-Char gefunden bei:" << pos;
 		if (pos > BLOCKREAD_MAX_LINE_SIZE) {
 			*byteArray = QByteArray(""); 
-			//qDebug() << "BLOCKING_READ_LINE: konnte keine ganze Zeile lesen";
 			return false;
 		}
 		else
 		{
-			//qDebug() << "BLOCKING_READ_LINE: puffer:" << StringUtils::buf2QString(readBuffer);
-			// qDebug() << "BLOCKING_READ_LINE: return(" << readBuffer.left(pos) << ")";
 			*byteArray = readBuffer.left(pos).toAscii();
 			readBuffer = readBuffer.mid(pos+1);
-			//qDebug() << "BLOCKING_READ_LINE: puffer:" << StringUtils::buf2QString(readBuffer);
 			return result;
 		}
 	}
