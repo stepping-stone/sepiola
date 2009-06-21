@@ -24,8 +24,7 @@
 #include <math.h>
 #include <algorithm>
 
-typedef QList<QPair<QString,QString> > StringPairList;
-Q_DECLARE_METATYPE( StringPairList );
+#include "utils/datatypes.hh"
 
 class StringUtils
 {
@@ -33,17 +32,20 @@ public:
 	static QString encaps(const QString& aStr, const QString& beforeTok = "", const QString& afterTok = "");
 	static QString concatSep(const QString& aStr, const QString& bStr = "", const QString& tok = ",");
 	static QString filenameShrink(const QString& filename, const int maxlen);
-	static bool isFilename(const QString& txt); // simple guess if txt can be displayed compact like a filename
 	static QString buf2QString(const char* buf);
 	static QString buf2QString(QString buf);
+	
 	static float trafficStr2BytesPerSecond(QString trafficStr);
 	static QString bytesToReadableStr(double traffic, const QString& unitTxt);
 	static QString bytesToReadableStr(quint64 traffic, const QString& unitTxt);
 	static QString kBytesToReadableStr(double traffic, const QString& unitTxt);
 	
 	static QString equalStart(const QString& aStr, const QString& bStr);
-	static QString dirPart(const QString& filename);
-	static QString parentDir(const QString& filename);
+	
+	static bool isFilename(const QString& txt); // simple guess if txt can be displayed compact like a filename
+	static bool isDirectoryName(const QString& txt); // simple guess if txt might be a folder name
+	static QString dirPart(const QString& filename); // for folders ending with "/" returns self
+	static QString parentDir(const QString& filename); // same as dirPart, except for folders -> one back and not self
 	static QString equalDirPart(const QString& filenameA, const QString& filenameB);
 
 	
@@ -90,10 +92,6 @@ inline QString StringUtils::filenameShrink(const QString& filename, const int ma
 			return(filename.left(maxlen-len+fn_start-ellipses.length()) + ellipses + "/" + fn_only);
 		}
 	}
-}
-
-inline bool StringUtils::isFilename(const QString& txt) {
-	return(txt.count("/")>=2);
 }
 
 inline QString StringUtils::buf2QString(const char* buf) {
@@ -159,10 +157,18 @@ inline QString StringUtils::equalStart(const QString& aStr, const QString& bStr)
 	return aStr.left(i);
 }
 
+inline bool StringUtils::isFilename(const QString& txt) {
+	return(txt.count("/")>=2);
+}
+
+inline bool StringUtils::isDirectoryName(const QString& txt) {
+	return isFilename(txt) && txt.endsWith("/");
+}
+
 inline QString StringUtils::dirPart(const QString& filename) { // for folders ending with "/" returns self
 	return filename.left(filename.lastIndexOf("/")+1);
 }
-inline QString StringUtils::parentDir(const QString& filename) { // same as parentDir, except for folders -> one back and not self
+inline QString StringUtils::parentDir(const QString& filename) { // same as dirPart, except for folders -> one back and not self
 	return filename.left(filename.lastIndexOf("/", filename.length()-2)+1);
 }
 
