@@ -22,6 +22,7 @@
 #include <QString>
 #include <QDebug>
 #include <math.h>
+#include <ctype.h>
 
 typedef QList<QPair<QString,QString> > StringPairList;
 Q_DECLARE_METATYPE( StringPairList );
