@@ -198,7 +198,7 @@
          </size>
         </property>
         <property name="text" >
-         <string>currentFile</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -237,7 +237,7 @@
          </size>
         </property>
         <property name="text" >
-         <string>remainingTime</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -263,7 +263,7 @@
          </size>
         </property>
         <property name="text" >
-         <string>traffic</string>
+         <string/>
         </property>
        </widget>
       </item>
