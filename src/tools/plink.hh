@@ -62,6 +62,11 @@ public:
 	bool assertCorrectFingerprint();
 	
 	/**
+	 * @see AbstractSsh::getServerQuotaValues()
+	 */
+	QList<int> getServerQuotaValues();
+	
+	/**
 	 * Tests the generateKeys method
 	 * @see generateKeys()
 	 */

@@ -63,6 +63,12 @@ public:
 	 * Asserts that the server has the same fingerprint as set in the settings
 	 */
 	virtual bool assertCorrectFingerprint() = 0;
+	
+	/**
+	 * calls a script on the server which returns quota-values (quota, 
+	 * backupSize, snapshotSize) and returns the values in a QList<int>
+	 */
+	virtual QList<int> getServerQuotaValues() = 0;
 };
 
 inline AbstractSsh::~AbstractSsh()

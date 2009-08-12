@@ -310,6 +310,32 @@ QString Plink::extractKey( const QStringList& keyLines, const QString& startLine
 	return key;
 }
 
+QList<int> Plink::getServerQuotaValues()
+{
+	qDebug() << "Plink::getServerQuotaValues()";
+	Settings* settings = Settings::getInstance();
+		
+	QList<int> sizes;
+	
+	QStringList arguments;
+	arguments << "-i";
+	arguments << settings->createPrivatePuttyKeyFile();
+	arguments << settings->getServerUserName() + "@" + settings->getServerName();
+	arguments << settings->getServerQuotaScriptName();
+	
+	createProcess(settings->getPlinkName(), arguments);
+	start();
+	waitForFinished();
+	
+	QByteArray quotaText = readAllStandardOutput();
+	int quota, backup, snapshot;
+	QTextStream in(quotaText);
+	in >> quota >> backup >> snapshot;
+	sizes.clear();
+	sizes << quota << backup << snapshot;
+	return sizes;
+}
+
 void Plink::testGenerateKeys()
 {
 	QString username = "ssbackup";
