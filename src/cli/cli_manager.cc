@@ -121,8 +121,6 @@ void CliManager::runSchedule()
 	int delay = settings->getScheduleRule().getMinutesAfterStartup();
 	// TODO qDebug() << "CliManager::runSchedule: delay aus scheduledTask herauslesen, wei geht das unter Linux (delay=0?)";
 	
-	bool deleteExtraneousItems = settings->getDeleteExtraneousItems();
-
 	if ( delay > 0 )
 	{
 		qDebug() << "Starting schedule job in " << delay << " minute(s)";
@@ -133,7 +131,7 @@ void CliManager::runSchedule()
 		qDebug() << "Starting schedule job now";
 	}
 
-	QStringList backupList = settings->getBackupList();
+	BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
 	MainModel mainModel;
 
 	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
@@ -141,7 +139,7 @@ void CliManager::runSchedule()
 	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 
-	mainModel.backup( backupList, settings->getIncludePatternList(), settings->getExcludePatternList(), deleteExtraneousItems, true );
+	mainModel.backup( backupRules, true );
 
 	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
@@ -149,7 +147,7 @@ void CliManager::runSchedule()
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 }
 
-void CliManager::runCli( int argc, char* argv[] )
+/*void CliManager::runCli_withFileList( int argc, char* argv[] )
 {
 	if ( !assertArguments( argc, argv ) )
 	{
@@ -216,6 +214,59 @@ void CliManager::runCli( int argc, char* argv[] )
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+}*/
+
+void CliManager::runCli( int argc, char* argv[] )
+{
+	if ( !assertArguments( argc, argv ) )
+	{
+		printUsage( argc, argv );
+		return;
+	}
+
+	Settings* settings = Settings::getInstance();
+	BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
+	
+	MainModel mainModel;
+	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+					   this, SLOT( printInfoMessage( const QString& ) ) );
+	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+					   this, SLOT( printErrorMessage( const QString& ) ) );
+	QObject::connect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
+					   this, SLOT( printInfoMessage( const QString& ) ) );
+	QObject::connect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
+					   this, SLOT( printErrorMessage( const QString& ) ) );
+	QObject::connect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
+					   this, SLOT( askForPassword() ) );
+	QObject::connect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
+					   this, SLOT( askForPassword() ) );
+
+	// log file signals/slots
+	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+					   LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+					   LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+
+	mainModel.backup( backupRules, true );
+
+	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+						  this, SLOT( printInfoMessage( const QString& ) ) );
+	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+						  this, SLOT( printErrorMessage( const QString& ) ) );
+	QObject::disconnect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
+						  this, SLOT( printInfoMessage( const QString& ) ) );
+	QObject::disconnect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
+						  this, SLOT( printErrorMessage( const QString& ) ) );
+	QObject::disconnect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
+						  this, SLOT( askForPassword() ) );
+	QObject::disconnect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
+						  this, SLOT( askForPassword() ) );
+
+	// log file signals/slots
+	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+						  LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+						  LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 }
 
 void CliManager::printInfoMessage( const QString& message )
