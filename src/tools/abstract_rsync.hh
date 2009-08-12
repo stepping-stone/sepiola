@@ -60,10 +60,10 @@ public:
 	 * @param errors a QString pointer for saving errors
 	 * @return a list of transfered items
 	 */
-	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
+	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run=false ) = 0;
 	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
 
-	virtual long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) = 0;
+	virtual long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool compress, QString* errors ) = 0;
 	
 	void upload( const QFileInfo& fileInfo, const QString& destination, bool bCompress, QString* errors = NULL );
 
@@ -91,7 +91,7 @@ public:
 	 * @param destination destination directory path
 	 * @return the content file
 	 */
-	virtual QFileInfo downloadBackupContentFile( const QString& backupName, const QString& destination ) = 0;
+	virtual QFileInfo downloadBackupContentFile( const QString& computerName, const QString& backupName, const QString& destination ) = 0;
 
 	/**
 	 * Downloads the current backup content file
@@ -135,13 +135,7 @@ public:
 	 * @return all available prefixes on the server
 	 */
 	 virtual QStringList getPrefixes() = 0;
-	 
-	 /**
-	  * Reads int-values from the provided quota-file on the server
-	  * @return QList<int> of values from the quota-file
-	 */
-	 virtual QList<int> getServerQuotaValues() = 0;
-	 
+
 public slots:
 	virtual void abort() = 0;
 };
