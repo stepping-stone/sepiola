@@ -207,7 +207,7 @@ class Settings : public QObject
 		QString getTempMetadataFileName();
 		QString getBackupContentFileName();
 		QString getBackupTimeFileName();
-		QString getAbsoluteBackupQuotaFileName();
+		QString getServerQuotaScriptName();
 		QString getAuthorizedKeyFolderName();
 		QString getAuthorizedKeyFileName();
 
@@ -228,11 +228,6 @@ class Settings : public QObject
 		void saveServerName( const QString& serverName );
 		void saveInstallDate( const QDateTime& installDate, bool force_write = false );
 		QDateTime getInstallDate();
-		QStringList getBackupList();
-		QStringList getIncludePatternList();
-		void saveIncludePatternList( const QStringList& includePatternList );
-		QStringList getExcludePatternList();
-		void saveExcludePatternList( const QStringList& excludePatternList );
 		void saveBackupItemList( const QStringList& backupItems );
 		QString getClientPassword();
 		QString getServerUserName();
@@ -301,7 +296,7 @@ class Settings : public QObject
 		static const QString SETTINGS_METADATA_FILE_NAME;
 		static const QString SETTINGS_BACKUP_CONTENT_FILE_NAME;
 		static const QString SETTINGS_BACKUP_TIME_FILE_NAME;
-		static const QString SETTINGS_ABSOLUTE_BACKUP_QUOTA_FILE_NAME;
+		static const QString SETTINGS_SERVER_QUOTA_SCRIPT_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FOLDER_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FILE_NAME;
 
@@ -316,7 +311,7 @@ class Settings : public QObject
 
 		// writable settings
 		static const QString SETTINGS_INSTALL_DATE;
-		static const QString SETTINGS_BACKUP_LIST;
+		static const QString SETTINGS_BACKUP_RULES;
 		static const QString SETTINGS_SERVER_KEY;
 		static const QString SETTINGS_BACKUP_PREFIX;
 		static const QString SETTINGS_USERNAME;
@@ -324,7 +319,6 @@ class Settings : public QObject
 		static const QString SETTINGS_LANGUAGE;
 		static const QString SETTINGS_PRIVATE_PUTTY_KEY;
 		static const QString SETTINGS_PRIVATE_OPEN_SSH_KEY;
-		static const QString SETTINGS_DELETE_EXTRANEOUS_ITEMS;
 		static const QString SETTINGS_WINDOW_SIZE;
 		static const QString SETTINGS_WINDOW_POSITION;
 
@@ -386,7 +380,7 @@ class Settings : public QObject
 		QString metadataFileName;
 		QString backupContentFileName;
 		QString backupTimeFileName;
-		QString absoluteBackupQuotaFileName;
+		QString serverQuotaScriptName;
 
 		QString authorizedKeyFolderName;
 		QString authorizedKeyFileName;
@@ -407,7 +401,6 @@ class Settings : public QObject
 		QString serverKey;
 		QString privatePuttyKey;
 		QString privateOpenSshKey;
-		QStringList backupList;
 		bool deleteExtraneousItems;
 		QSize windowSize;
 		QPoint windowPosition;
@@ -493,9 +486,9 @@ inline QString Settings::getBackupTimeFileName()
 	return backupTimeFileName;
 }
 
-inline QString Settings::getAbsoluteBackupQuotaFileName()
+inline QString Settings::getServerQuotaScriptName()
 {
-	return absoluteBackupQuotaFileName;
+	return serverQuotaScriptName;
 }
 
 inline QString Settings::getLogFileName()
@@ -532,11 +525,6 @@ inline QString Settings::getThisApplicationFullPathExecutable()
 inline QString Settings::getThisApplicationExecutable()
 {
 	return thisApplication;
-}
-
-inline QStringList Settings::getBackupList()
-{
-	return backupList;
 }
 
 inline QString Settings::getServerPassword()

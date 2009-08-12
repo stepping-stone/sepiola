@@ -82,7 +82,7 @@ const QString Settings::SETTINGS_RESTORE_ROOT_FOLDER = "RestoreRootFolder";
 const QString Settings::SETTINGS_METADATA_FILE_NAME = "MetadataFileName";
 const QString Settings::SETTINGS_BACKUP_CONTENT_FILE_NAME = "BackupContentFileName";
 const QString Settings::SETTINGS_BACKUP_TIME_FILE_NAME = "BackupTimeFileName";
-const QString Settings::SETTINGS_ABSOLUTE_BACKUP_QUOTA_FILE_NAME = "AbsoluteBackupQuotaFileName";
+const QString Settings::SETTINGS_SERVER_QUOTA_SCRIPT_NAME = "QuotaScript";
 const QString Settings::SETTINGS_AUTHORIZED_KEY_FOLDER_NAME = "AuthorizedKeyFolderName";
 const QString Settings::SETTINGS_AUTHORIZED_KEY_FILE_NAME = "AuthorizedKeyFileName";
 
@@ -100,11 +100,10 @@ const QString Settings::SETTINGS_INSTALL_DATE = "InstallDate";
 const QString Settings::SETTINGS_USERNAME = "Username";
 const QString Settings::SETTINGS_LANGUAGE = "Language";
 const QString Settings::SETTINGS_BACKUP_PREFIX = "BackupPrefix";
-const QString Settings::SETTINGS_BACKUP_LIST = "BackupList";
+const QString Settings::SETTINGS_BACKUP_RULES = "BackupRules";
 const QString Settings::SETTINGS_SERVER_KEY = "ServerKey";
 const QString Settings::SETTINGS_PRIVATE_PUTTY_KEY = "PrivateKey";
 const QString Settings::SETTINGS_PRIVATE_OPEN_SSH_KEY = "PrivateOpenSshKey";
-const QString Settings::SETTINGS_DELETE_EXTRANEOUS_ITEMS = "DeleteExtraneousItems";
 const QString Settings::SETTINGS_WINDOW_POSITION = "WindowPosition";
 const QString Settings::SETTINGS_WINDOW_SIZE = "WindowSize";
 
@@ -179,7 +178,6 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	applicationDataDir = homeDir.absolutePath() + QDir::separator() + applicationDataDirName + QDir::separator();
 	applicationBinDir = configFile.absolutePath() + QDir::separator();
 	qRegisterMetaType<ScheduledTask>("ScheduledTask");
-	qDebug() << QMetaType::isRegistered(QMetaType::type("ScheduledTask"));
 	if (applicationSettings != 0) { delete applicationSettings; }
 	applicationSettings = new QSettings( configFile.absoluteFilePath(), QSettings::IniFormat );
 	if (resellerSettings != 0)    { delete resellerSettings; }
@@ -234,7 +232,7 @@ void Settings::reloadSettings()
 	metadataFileName = applicationSettings->value( SETTINGS_METADATA_FILE_NAME ).toString();
 	backupContentFileName = applicationSettings->value( SETTINGS_BACKUP_CONTENT_FILE_NAME ).toString();
 	backupTimeFileName = applicationSettings->value( SETTINGS_BACKUP_TIME_FILE_NAME ).toString();
-	absoluteBackupQuotaFileName = applicationSettings->value( SETTINGS_ABSOLUTE_BACKUP_QUOTA_FILE_NAME ).toString();
+	serverQuotaScriptName = applicationSettings->value( SETTINGS_SERVER_QUOTA_SCRIPT_NAME ).toString();
 	authorizedKeyFolderName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FOLDER_NAME ).toString();
 	authorizedKeyFileName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FILE_NAME ).toString();
 	applicationSettings->endGroup();
@@ -279,8 +277,7 @@ void Settings::reloadSettings()
 	}
 	privatePuttyKey = userSettings->value( SETTINGS_PRIVATE_PUTTY_KEY ).toString();
 	privateOpenSshKey = userSettings->value( SETTINGS_PRIVATE_OPEN_SSH_KEY ).toString();
-	backupList = userSettings->value( SETTINGS_BACKUP_LIST ).toStringList();
-	deleteExtraneousItems = userSettings->value( SETTINGS_DELETE_EXTRANEOUS_ITEMS ).toBool();
+	deleteExtraneousItems = true; // userSettings->value( SETTINGS_DELETE_EXTRANEOUS_ITEMS ).toBool();
 	windowSize = userSettings->value( SETTINGS_WINDOW_SIZE ).toSize();
 	windowPosition = userSettings->value( SETTINGS_WINDOW_POSITION, QPoint( 200, 200 ) ).toPoint();
 
@@ -318,17 +315,6 @@ void Settings::reloadSettings()
 
 	this->settingsChanged = false;
 }
-
-void Settings::saveDeleteExtraneousItems( const bool& deleteExtraneousItems )
-{
-	if ( deleteExtraneousItems != this->deleteExtraneousItems )
-	{
-		userSettings->setValue(
-			SETTINGS_DELETE_EXTRANEOUS_ITEMS, deleteExtraneousItems );
-		this->deleteExtraneousItems = deleteExtraneousItems;
-	}
-}
-
 
 QDateTime Settings::getInstallDate()
 {
@@ -430,15 +416,6 @@ void Settings::deletePrivateKeyFiles()
 {
 	FileSystemUtils::removeFile( this->getApplicationDataDir() + this->privatePuttyKeyFileName );
 	FileSystemUtils::removeFile( this->getApplicationDataDir() + this->privateOpenSshKeyFileName );
-}
-
-void Settings::saveBackupItemList( const QStringList& backupList )
-{
-	if ( this->backupList != backupList )
-	{
-		this->backupList = backupList;
-		userSettings->setValue( SETTINGS_BACKUP_LIST, backupList );
-	}
 }
 
 void Settings::setServerPassword( const QString& password )
@@ -563,26 +540,6 @@ const char* Settings::getEOLCharacter()
 		return "\r\n";
 	}
 	return "\n";
-}
-
-QStringList Settings::getIncludePatternList()
-{
-	return FileSystemUtils::readLinesFromFile( applicationDataDir + includePatternFileName, "UTF-8" );
-}
-
-QStringList Settings::getExcludePatternList()
-{
-	return FileSystemUtils::readLinesFromFile( applicationDataDir + excludePatternFileName, "UTF-8" );
-}
-
-void Settings::saveIncludePatternList( const QStringList& includePatternList )
-{
-	FileSystemUtils::writeLinesToFile( applicationDataDir + includePatternFileName, includePatternList, "UTF-8" );
-}
-
-void Settings::saveExcludePatternList( const QStringList& excludePatternList )
-{
-	FileSystemUtils::writeLinesToFile( applicationDataDir + excludePatternFileName, excludePatternList, "UTF-8" );
 }
 
 void Settings::saveWindowSize( QSize size )
