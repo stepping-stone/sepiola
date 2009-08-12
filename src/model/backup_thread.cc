@@ -36,10 +36,10 @@
 #include "utils/progress_task.hh"
 
 const QString BackupThread::TASKNAME_PREPARE_DIRECTORIES = "preparing server directories";
-const QString BackupThread::TASKNAME_ESTIMATE_BACKUP_SIZE = "estimate backup size";
+const QString BackupThread::TASKNAME_ESTIMATE_BACKUP_SIZE = "estimating backup size";
 const QString BackupThread::TASKNAME_FILE_UPLOAD = "file upload";
-const QString BackupThread::TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT = "download current backup content file";
-const QString BackupThread::TASKNAME_UPLOAD_METADATA = "upload metadata";
+const QString BackupThread::TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT = "downloading current backup content file";
+const QString BackupThread::TASKNAME_UPLOAD_METADATA = "uploading metadata";
 const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
 
 
@@ -140,7 +140,6 @@ void BackupThread::run()
 		Settings* settings = Settings::getInstance();
 		emit infoSignal( tr( "Creating/validating server directories" ) );
 		
-		this->pt.debugIsCorrectCurrentTask(TASKNAME_PREPARE_DIRECTORIES);
 		prepareServerDirectories();
 		checkAbortState();
 
@@ -148,7 +147,7 @@ void BackupThread::run()
 		QString source = "/";
 		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_ESTIMATE_BACKUP_SIZE);
-		emit infoSignal( tr( "Estimating backup size" ) );
+		emit infoSignal( QObject::tr( QString(TASKNAME_ESTIMATE_BACKUP_SIZE).toLocal8Bit() ) );
 		quint64 backupSize = this->estimateBackupSize( source, destination );
 		qDebug() << "calculated literal data:" << backupSize;
 		if ((subPt = this->pt.getSubtask(TASKNAME_ESTIMATE_BACKUP_SIZE)) != 0) subPt->setTerminated(true);
@@ -156,7 +155,7 @@ void BackupThread::run()
 		
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_FILE_UPLOAD);
 		emit infoSignal( tr( "Uploading files and directories" ) );
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, false, &errors );
+		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, false, &errors );
 		if ( errors != "" )
 		{
 			failed = true;
@@ -296,7 +295,8 @@ ConstUtils::StatusEnum BackupThread::getLastBackupState()
 void BackupThread::rsyncUploadProgressHandler(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten) {
 	ProgressTask* mySubPt = this->pt.getCurrentTask();
 	StringPairList vars = StringPairList();
-	if (mySubPt->getName()==TASKNAME_FILE_UPLOAD || mySubPt->getName()==TASKNAME_UPLOAD_METADATA)
+	QString currentTaskName = mySubPt->getName();
+	if (currentTaskName==TASKNAME_FILE_UPLOAD || currentTaskName==TASKNAME_UPLOAD_METADATA || currentTaskName==TASKNAME_ESTIMATE_BACKUP_SIZE)
 	{
 		mySubPt->addFixpointNow(bytesWritten);
 		vars.append( QPair<QString,QString>(tr("current file"), filename) );
@@ -366,7 +366,7 @@ quint64 BackupThread::estimateBackupSize( const QString& src, const QString& des
 	StringPairList vars;
 	vars.append(QPair<QString,QString>(tr("current task"), mySubPt->getName()));
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
-	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, setDeleteFlag, false, &errors );
+	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, &errors );
 	ProgressTask* uploadPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD);
 	if (uploadPt != 0) uploadPt->setNumberOfSteps(uploadSize);
 	return uploadSize;
@@ -374,6 +374,7 @@ quint64 BackupThread::estimateBackupSize( const QString& src, const QString& des
 
 void BackupThread::updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList )
 {
+	qDebug() << "BackupThread::updateBackupContentFile(" << backupContentFileName.absoluteFilePath() << "," << backupList << ")";
 	QSet<QString> existingItems;
 	QFile backupContentFile( backupContentFileName.absoluteFilePath() );
 	if ( backupContentFile.open( QIODevice::ReadOnly ) )
@@ -415,6 +416,7 @@ void BackupThread::updateBackupContentFile( const QFileInfo& backupContentFileNa
 	foreach( QString item, existingItems )
 	{
 		outputStream << item << endl;
+		// qDebug() << item;
 		checkAbortState();
 	}
 	backupContentFile.close();
