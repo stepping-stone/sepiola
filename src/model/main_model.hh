@@ -96,9 +96,11 @@ public:
 	 * @param backupName name of the backup
 	 * @return a remote directory model
 	 */
-	RemoteDirModel* getRemoteDirModel_( const QString& backupName );
-	QStandardItemModel* getRemoteDirModel( const QString& backupName );
-
+	QStandardItemModel* getCurrentRemoteDirModel_general();
+	RemoteDirModel* getCurrentRemoteDirModel();
+	RemoteDirModel* loadRemoteDirModel( const QString& computerName, const QString& backupName );
+	void clearRemoteDirModel();
+	
 	/**
 	 * Initializes the connection to the server
 	 * @return true if the connection is established
@@ -113,8 +115,7 @@ public:
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 * @param startInCurrentThread indicates whether the method runs in its own thread or not
 	 */
-	void backup( const BackupSelectionHash& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread );
-	void backup( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag, const bool& startInCurrentThread );
+	void backup( const BackupSelectionHash& includeRules, const bool& startInCurrentThread );
 
 	/**
 	 * Checks if a lock exists
@@ -146,7 +147,7 @@ public:
 	 * @param scheduleRule ScheduledTask-object indicating type and information for scheduling
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
-	void schedule( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const ScheduledTask& scheduleRule, const bool& setDeleteFlag );
+	void schedule( const BackupSelectionHash& includeRules, const ScheduledTask& scheduleRule );
 
 	/**
 	 * Gets all available restore names
@@ -273,7 +274,7 @@ public slots:
 
 private:
 	LocalDirModel* localDirModel;
-	QHash<QString,RemoteDirModel*> remoteDirModels;
+	RemoteDirModel* remoteDirModel;
 	bool isLoginAborted;
 	QStringList getRestoreContent( const QString& backupName );
 };

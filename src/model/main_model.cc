@@ -39,13 +39,14 @@
 const QString MainModel::BACKUP_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 const QString MainModel::BACKUP_TIME_TODAY = "TODAY";
 
-MainModel::MainModel() : localDirModel(0)
+MainModel::MainModel() : localDirModel(0), remoteDirModel(0)
 {
 }
 
 MainModel::~MainModel()
 {
 	delete localDirModel;
+	delete remoteDirModel;
 }
 
 void MainModel::keepSettings()
@@ -153,60 +154,15 @@ bool MainModel::initConnection()
 	return isInitialized;
 }
 
-void MainModel::backup( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag, const bool& startInCurrentThread )
+void MainModel::backup( const BackupSelectionHash& includeRules, const bool& startInCurrentThread )
 {
-	qDebug() << "MainModel::backup( " << items << ", " << includePatternList << ", " << excludePatternList << " )";
+	qDebug() << "MainModel::backup( " << includeRules << ", " << startInCurrentThread << " )";
 	if ( !initConnection() )
 	{
 		closeProgressDialogSlot();
 		return;
 	}
-	BackupThread* backupThread = new BackupThread( items, includePatternList, excludePatternList, setDeleteFlag );
-
-	QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
-					  this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
-	QObject::connect( backupThread, SIGNAL( infoSignal( const QString& ) ),
-					  this, SIGNAL( infoSignal( const QString& ) ) );
-	QObject::connect( backupThread, SIGNAL( errorSignal( const QString& ) ),
-					  this, SIGNAL( errorSignal( const QString& ) ) );
-	qRegisterMetaType<StringPairList>("StringPairList");
-	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
-	QObject::connect( backupThread, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
-					  this, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ) );
-	qDebug() << "QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );";
-	QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
-					  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
-	QObject::connect( backupThread, SIGNAL( finishProgressDialog() ),
-					  this, SIGNAL( finishProgressDialog() ) );
-	QObject::connect( backupThread, SIGNAL( updateOverviewFormLastBackupsInfo() ),
-					  this, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
-	QObject::connect( this, SIGNAL( abortProcess() ),
-					  backupThread, SLOT( abortBackupProcess() ) );
-	qDebug() << "MainModel::backup: startInCurrentThread=" << startInCurrentThread;
-	if ( startInCurrentThread )
-	{
-		// signals are not connected with QCoreApplication and multiple threads
-		// but in CLI mode we do not need an own thread
-		backupThread->startInCurrentThread();
-	}
-	else
-	{
-		backupThread->start();
-		//TODO: disconnect signal/slot connections
-	}
-}
-
-/**
- * new version based on rules
- */
-void MainModel::backup( const BackupSelectionHash& includeRules, const bool& setDeleteFlag, const bool& startInCurrentThread )
-{
-	qDebug() << "MainModel::backup( " << includeRules << ", " << setDeleteFlag << ", " << startInCurrentThread << " )";
-	if ( !initConnection() )
-	{
-		closeProgressDialogSlot();
-		return;
-	}
+	bool setDeleteFlag = true;
 	BackupThread* backupThread = new BackupThread( includeRules, setDeleteFlag );
 
 	QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
@@ -219,7 +175,6 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& set
 	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
 	QObject::connect( backupThread, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
 					  this, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ) );
-	qDebug() << "QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );";
 	QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
 					  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
 	QObject::connect( backupThread, SIGNAL( finishProgressDialog() ),
@@ -248,7 +203,7 @@ bool MainModel::isSchedulingOnStartSupported()
 	return scheduler->isSchedulingOnStartSupported();
 }
 
-void MainModel::schedule(  const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const ScheduledTask& scheduleRule, const bool& setDeleteFlag )
+void MainModel::schedule( const BackupSelectionHash& includeRules, const ScheduledTask& scheduleRule )
 {
 	showProgressDialogSlot( tr( "Verify connection" ) );
 	if ( initConnection() )
@@ -262,8 +217,7 @@ void MainModel::schedule(  const QStringList& items, const QStringList& includeP
 		return;
 	}
 	Settings* settings = Settings::getInstance();
-	settings->saveBackupItemList( items );
-	settings->saveDeleteExtraneousItems( setDeleteFlag );
+	settings->saveBackupSelectionRules( includeRules );
 
 	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
 
@@ -330,15 +284,15 @@ QList<int> MainModel::getServerQuota()
 	{
 		return quota;
 	}
-	try
-	{
-		auto_ptr<AbstractRsync> rsync = ToolFactory::getRsyncImpl();
-		quota = rsync->getServerQuotaValues();
-	}
-	catch ( ProcessException e )
-	{
-		emit showCriticalMessageBox( e.what() );
-	}
+	//try
+	//{
+		auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
+		quota = ssh->getServerQuotaValues();
+	//}
+	//catch ( ProcessException e )
+	//{
+	//	emit showCriticalMessageBox( e.what() );
+	//}
 	return quota;
 }
 
@@ -414,7 +368,7 @@ QStringList MainModel::getRestoreContent( const QString& backupName )
 	{
 		Settings* settings = Settings::getInstance();
 		auto_ptr< AbstractRsync > rsync = ToolFactory::getRsyncImpl();
-		QFileInfo backupContentFileName = rsync->downloadBackupContentFile( backupName, settings->getApplicationDataDir() );
+		QFileInfo backupContentFileName = rsync->downloadBackupContentFile( settings->getBackupPrefix(), backupName, settings->getApplicationDataDir() );
 
 		QFile backupContentFile( backupContentFileName.absoluteFilePath() );
 		if ( !backupContentFile.open( QIODevice::ReadOnly ) )
@@ -538,19 +492,31 @@ LocalDirModel* MainModel::getLocalDirModel()
 	return localDirModel;
 }
 
-QStandardItemModel* MainModel::getRemoteDirModel( const QString& backupName )
+QStandardItemModel* MainModel::getCurrentRemoteDirModel_general()
 {
-	return getRemoteDirModel_(backupName);
+	return getCurrentRemoteDirModel();
 }
 
-RemoteDirModel* MainModel::getRemoteDirModel_( const QString& backupName )
+RemoteDirModel* MainModel::getCurrentRemoteDirModel()
 {
-	if (!remoteDirModels[backupName]) {
-		QStringList backupContent = getRestoreContent( backupName );
-		RemoteDirModel* remoteDirModel = new RemoteDirModel( backupContent );
-		remoteDirModels.insert(backupName, remoteDirModel);
-	}
-	return remoteDirModels[backupName];
+	return remoteDirModel;
+}
+
+RemoteDirModel* MainModel::loadRemoteDirModel( const QString& computerName, const QString& backupName )
+{
+	// @TODO there is at the moment no possibility to firce reload
+	this->clearRemoteDirModel();
+	qDebug() << "MainModel::loadRemoteDirModel   remoteDirModel" << remoteDirModel;
+	QStringList backupContent = getRestoreContent( backupName );
+	this->remoteDirModel = new RemoteDirModel( backupContent );
+	qDebug() << "MainModel::loadRemoteDirModel   remoteDirModel" << remoteDirModel;
+	return this->remoteDirModel;
+}
+
+void MainModel::clearRemoteDirModel()
+{
+	delete this->remoteDirModel;
+	this->remoteDirModel = 0;
 }
 
 void MainModel::infoSlot( const QString& text )
