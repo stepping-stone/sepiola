@@ -42,15 +42,14 @@ Rsync::Rsync() {}
 
 Rsync::~Rsync() {}
 
-/**
- * deprecated
- */
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
+
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
 {
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files";
-	qDebug() << "Rsync::upload(" << includeRules << ", " << src << ", " << destination << ", " << setDeleteFlag << ", " << compress << ", " << errors << ", " << dry_run << ")";
+	qDebug() << "Rsync::upload(" << includeRules << ", " << src << ", " << destination << ", " << compress << ", " << errors << ", " << dry_run << ")";
 	Settings* settings = Settings::getInstance();
+	bool setDeleteFlag = settings->getDeleteExtraneousItems();
 
 	QString source(src);
 	FileSystemUtils::convertToServerPath( &source );
@@ -61,11 +60,10 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
 	if (dry_run) { 	this->last_calculatedLiteralData = -1; arguments << "--stats" << "--only-write-batch=/dev/null"; }
 	
-	arguments << "--include-from=-";
 	arguments << getRsyncSshArguments();
 	if ( setDeleteFlag )
 	{
-		arguments << "--del";
+		arguments << "--del";  // << "--delete-excluded"; // TODO: perhaps --delete-excluded is necessary (temporary inserted [ds] on 2009-08-12, resulted in program-abortion), --del solely doesn't delete files excluded from backup-selection
 	}
 	if ( compress )
 	{
@@ -73,6 +71,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	}
 	arguments << source;
 	arguments << getValidDestinationPath( destination );
+	arguments << "--include-from=-";
 
 	createProcess( settings->getRsyncName() , arguments );
 	start();
@@ -101,7 +100,8 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 			this->last_calculatedLiteralData = lineData.mid(STATISTICS_FIRST_USED_LABEL.length()).trimmed().split(" ")[0].toLong();
 		}
 		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> item = getItemAndStoreTransferredBytes( lineData );
-		if (!endReached && item.first != "") {
+
+		if (!endReached && item.first != "" && item.first != "./") {
 			item.first.prepend( "/" );
 			this->progress_lastFilename = item.first;
 			removeSymlinkString( &item.first );
@@ -111,20 +111,20 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 			switch( item.second )
 			{
 				case UPLOADED:
-					outputText = tr( "Uploading %1" ).arg( item.first );
+					outputText = tr( "Uploading %1" ).arg( item.first.trimmed() );
 					emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
 					break;
 				case SKIPPED:
-					outputText = tr( "Skipping %1" ).arg( item.first );
+					outputText = tr( "Skipping %1" ).arg( item.first.trimmed() );
 					break;
 				case DELETED:
-					outputText = tr( "Deleting %1" ).arg( item.first );
+					outputText = tr( "Deleting %1" ).arg( item.first.trimmed() );
 					break;
 				default:
 					break;
 			}
-			//qDebug() << outputText;
-			//$$$ emit infoSignal( outputText );
+			// qDebug() << outputText;
+			emit infoSignal( outputText );
 		} else {
 			emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
 		}
@@ -148,6 +148,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	return uploadedItems;
 }
 
+/**
+ * deprecated
+ */
 QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
 {
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
@@ -161,7 +164,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
 	arguments << getRsyncUploadArguments();
-	if (dry_run) { 	this->last_calculatedLiteralData = -1; arguments << "--stats" << "--only-write-batch=/dev/null"; }
+	if (dry_run) { 	this->last_calculatedLiteralData = 1; arguments << "--stats" << "--only-write-batch=/dev/null"; }
 	arguments << "--files-from=-";
 	arguments << getRsyncSshArguments();
 	if ( setDeleteFlag )
@@ -227,7 +230,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	bool endReached = false;
 	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
 	{
-		qDebug() << lineData;
+		//qDebug() << lineData;
 		lineData.replace( settings->getEOLCharacter(), "");
 		endReached = endReached || lineData.contains(STATISTICS_FIRST_LABEL);
 		if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
@@ -257,7 +260,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 				default:
 					break;
 			}
-			qDebug() << outputText;
+			// qDebug() << outputText;
 			emit infoSignal( outputText );
 		} else {
 			emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
@@ -283,9 +286,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 }
 
 
-long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) throw ( ProcessException )
+long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool compress, QString* errors ) throw ( ProcessException )
 {
-	this->upload( includeRules, src, destination, setDeleteFlag, compress, errors, true );
+	this->upload( includeRules, src, destination, compress, errors, true );
 	return this->last_calculatedLiteralData;
 }
 
@@ -314,11 +317,11 @@ QStringList Rsync::downloadCustomBackup( const QString& backupName, const Backup
 	return this->download( source, destination, selectionRules, false, true );
 }
 
-QFileInfo Rsync::downloadBackupContentFile( const QString& backupName, const QString& destination )
+QFileInfo Rsync::downloadBackupContentFile( const QString& computerName, const QString& backupName, const QString& destination )
 {
-	qDebug() << "Rsync::downloadBackupContentFile(" << backupName << ", " << destination << ")";
+	qDebug() << "Rsync::downloadBackupContentFile(" << computerName << "," << backupName << "," << destination << ")";
 	Settings* settings = Settings::getInstance();
-	QString source = backupName + "/" + settings->getBackupPrefix() + "/" + settings->getMetaFolderName() + "/";
+	QString source = backupName + "/" + computerName + "/" + settings->getMetaFolderName() + "/";
 
 	downloadSingleFile( source, destination, settings->getBackupContentFileName(), true, true );
 	return destination + settings->getBackupContentFileName();
@@ -466,7 +469,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 
 QStringList Rsync::download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal ) throw ( ProcessException )
 {
-	qDebug() << "Rsync::download(" << source << ", " << destination << ", ... )";
+	qDebug() << "Rsync::download(" << source << ", " << destination << "," << includeRules << ", ... )";
 
 	Settings* settings = Settings::getInstance();
 	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + source;
@@ -486,11 +489,12 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		createProcess( settings->getRsyncName() , arguments );
 		start();
 		
-		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules);
+		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, true);
 		foreach ( QByteArray rule, convertedRules )
 		{
 			write( rule );
 			write( settings->getEOLCharacter() );
+			qDebug() << "rule:" << rule;
 			waitForBytesWritten();
 		}
 		closeWriteChannel();
@@ -506,6 +510,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
+		// qDebug() << lineData;
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
 		if (item != "") {
 			removeSymlinkString( &item );
@@ -517,7 +522,8 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 			emit trafficInfoSignal(this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten);
 		}
 	}
-//	qDebug() << "Downloaded Items: " << downloadedItems;
+	qDebug() << "Downloaded Items: " << downloadedItems;
+	qDebug() << tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() );
 	emit infoSignal( tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() ) );
 	waitForFinished();
 	
@@ -587,6 +593,7 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination )
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
+		qDebug() << "Rsync::downloadAllRestoreInfoFiles(...): lineData" << lineData << "item" << item;
 		if ( !item.contains( "=>" ) && item.contains( settings->getMetaFolderName() + "/" + settings->getBackupTimeFileName() ) )
 		{
 			downloadedRestoreInfoFiles << destination + item;
@@ -659,35 +666,9 @@ QStringList Rsync::getPrefixes()
 		}
 	}
 	waitForFinished();
+	qDebug() << "Rsync::getPrefixes(): prefixes:" << prefixes;
 	return prefixes;
 }
-
-QList<int> Rsync::getServerQuotaValues()
-{
-	qDebug() << "Rsync::getServerQuotaValues()";
-	Settings* settings = Settings::getInstance();
-	QString src = QFileInfo(settings->getAbsoluteBackupQuotaFileName()).absolutePath() + "/";
-	QString dst = settings->getApplicationDataDir();
-	QFileInfo quotaFileInfo = dst + this->downloadSingleFile( src, dst, QFileInfo(settings->getAbsoluteBackupQuotaFileName()).fileName(), true, true ).fileName();
-	QList<int> sizes;
-	if (quotaFileInfo.isFile()) {
- 		QFile quotaFile(quotaFileInfo.absoluteFilePath());
-		if (quotaFile.open(QIODevice::ReadOnly))
-		{
-			int quota, backup, snapshot;
-			QTextStream in(&quotaFile);
-			in >> quota >> backup >> snapshot;
-			sizes.clear();
-			sizes << quota << backup << snapshot;
-		} else {
-			sizes.clear();
-		}
-	} else {
-		sizes.clear();
-	}
-	return sizes;
-}
-
 
 QStringList Rsync::getRsyncGeneralArguments()
 {
@@ -784,7 +765,7 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsync
 	return qMakePair( itemName, type );
 }
 
-QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules )
+QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, bool forceRelativePaths )
 {
 	QList<QByteArray> filters;
 	QStack<QPair<QString,bool> > unclosedDirs;
@@ -797,18 +778,16 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 		bool ruleMod = includeRules[rule];
 		QString ruleParentDir = StringUtils::parentDir(rule);
 		QString ruleDir = StringUtils::dirPart(rule);
-		bool isSubDir = (ruleDir!=curDir && ruleDir.startsWith(curDir));
-		bool isParentDir = (ruleDir!=curDir && curDir.startsWith(ruleDir));
-		qDebug() << "rule" << (ruleMod?"+":"-") << rule << "( ruleDir" << ruleDir << "curDir" << curDir << ")" << "isSubDir" << isSubDir << "isParentDir" << isParentDir;
+		// qDebug() << "rule" << (ruleMod?"+":"-") << rule << "( ruleDir" << ruleDir << "curDir" << curDir << ")" << "isSubDir" << isSubDir << "isParentDir" << isParentDir;
 		
 		curDir = StringUtils::equalDirPart(curDir,ruleParentDir);
 		while (unclosedDirs.size()>0 && !ruleDir.startsWith(unclosedDirs.top().first)) {
 			QPair<QString,bool> dirToClose = unclosedDirs.pop();
 			if (dirToClose.second || dirToClose.first !=  lastRule) { // don't exclude dir/** bejond dir/
-				filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
-				qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
+				filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second, forceRelativePaths );
+				// qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 			} else {
-				qDebug() << "dropped" << dirToClose.first;
+				// qDebug() << "dropped" << dirToClose.first;
 			}
 		}
 		while (curDir!=ruleParentDir) {
@@ -816,38 +795,41 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 			if (curDir==StringUtils::dirPart(lastRule) && !includeRules[lastRule]) { // remove exclude before identical include
 				filters.removeLast();
 			}
-			filters << convertRuleToByteArray( curDir,true );
-			qDebug() << convertRuleToByteArray( curDir,true );
+			filters << convertRuleToByteArray( curDir,true, forceRelativePaths );
+			// qDebug() << convertRuleToByteArray( curDir,true );
 		}
 		if (rule.endsWith("/")) { // rule is a dir
-			filters << convertRuleToByteArray( ruleDir,ruleMod  );
+			filters << convertRuleToByteArray( ruleDir,ruleMod, forceRelativePaths  );
 			unclosedDirs.push( QPair<QString,bool>(ruleDir,ruleMod) );
 			if (ruleMod) {
 				curDir = ruleDir;
 			}
 		} else {
-			filters << convertRuleToByteArray( rule,ruleMod );
-			qDebug() << convertRuleToByteArray( rule,ruleMod );
+			filters << convertRuleToByteArray( rule,ruleMod, forceRelativePaths );
+			// qDebug() << convertRuleToByteArray( rule,ruleMod );
 		}		
 		lastRule = rule;
 	}
 	while (unclosedDirs.size() > 0) {
 		QPair<QString,bool> dirToClose = unclosedDirs.pop();
 		if (dirToClose.second || dirToClose.first !=  lastRule) { // don't exclude dir/** bejond dir/
-			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
-			qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
+			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second, forceRelativePaths );
+			// qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 		}		
 	}
-	filters << convertRuleToByteArray( "**",false );
+	if (!forceRelativePaths) { filters << convertRuleToByteArray( "**",false, forceRelativePaths ); }
 	qDebug() << "final filter list";
 	foreach (QByteArray filter, filters)
 		qDebug() << filter;
 	return filters;
 }
 
-QByteArray Rsync::convertRuleToByteArray(QString rule, bool modifier)
+QByteArray Rsync::convertRuleToByteArray(QString rule, bool modifier, bool forceRelativePaths)
 {
 	FileSystemUtils::convertToServerPath( &rule );
+	if (forceRelativePaths && rule.startsWith("/")) {
+		rule = rule.mid(1);
+	}
 	QString rule_modifier = modifier ? "+ " : "- ";
 	if ( Settings::IS_MAC )
 		return (rule_modifier + rule.normalized( QString::NormalizationForm_D )).toUtf8();
@@ -882,6 +864,7 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItemAndStoreTransfe
 	if (rsyncOutputLine.startsWith(" ") && rsyncOutputLine.contains("%") && rsyncOutputLine.contains("B/s")) {
 		QString trafficStr;
 		QStringList parts = rsyncOutputLine.simplified().split(" ");
+		if (parts[parts.size()-1].trimmed().startsWith("(")) { parts.pop_back(); }
 		this->progress_trafficB_s = StringUtils::trafficStr2BytesPerSecond(parts[parts.size()-4]);
 		this->progress_bytesRead = parts[parts.size()-2].toLongLong();
 		this->progress_bytesWritten = parts[parts.size()-1].toLongLong();
@@ -957,7 +940,7 @@ void Rsync::testDeleteAllRestoreInfoFiles()
 void Rsync::testDownloadBackupContentFile()
 {
 	Rsync rsync;
-	rsync.downloadBackupContentFile( Settings::getInstance()->getBackupRootFolder(), Settings::getInstance()->getApplicationDataDir() );
+	rsync.downloadBackupContentFile( Settings::getInstance()->getBackupPrefix(), Settings::getInstance()->getBackupRootFolder(), Settings::getInstance()->getApplicationDataDir() );
 }
 
 void Rsync::testGetPrefixes()

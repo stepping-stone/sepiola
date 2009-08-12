@@ -54,13 +54,13 @@ public:
 	/**
 	 * @see AbstractRsync::upload( const QStringList& items, const QString& source, const QString& destination, const QString& includePattern, const QString& excludePattern, QString* errors )
 	 */
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) throw ( ProcessException );
+	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run=false ) throw ( ProcessException );
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* errors, bool dry_run=false ) throw ( ProcessException );
 	
 	/**
 	 * 
 	 */
-	long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) throw ( ProcessException );
+	long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool compress, QString* errors ) throw ( ProcessException );
 	
 	/**
 	 * @see AbstractRsync::downloadFullBackup( const QString& backupName, const QString& destination )
@@ -76,7 +76,7 @@ public:
 	/**
 	 * @see AbstractRsync::downloadBackupContentFile( const QString& backupName, const QString& destination )
 	 */
-	QFileInfo downloadBackupContentFile( const QString& backupName, const QString& destination );
+	QFileInfo downloadBackupContentFile( const QString& computerName, const QString& backupName, const QString& destination );
 
 	/**
 	 * @see AbstractRsync::downloadCurrentBackupContentFile( const QString& destination )
@@ -108,11 +108,6 @@ public:
 		*/
 	 QStringList getPrefixes();
 
-	 /**
-	  * @see AbstractRsync::getServerQuotaValues()
-	  */
-	 QList<int> getServerQuotaValues();
-	
 	 /**
 	 * Tests the getPrefixes method
 	 * @see getPrefixes()
@@ -163,7 +158,7 @@ private:
 	static QString getValidDestinationPath( const QString& destination );
 	static QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItem( QString rsyncOutputLine );
 	QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItemAndStoreTransferredBytes( QString rsyncOutputLine );
-	static QList<QByteArray> calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules );
+	static QList<QByteArray> calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, bool forceRelativePaths=false );
 	static void removeSymlinkString( QString* path );
 
 	quint64 progress_bytesRead;
@@ -178,7 +173,7 @@ private:
 	QStringList download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal ) throw ( ProcessException );
 
 	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
-	static QByteArray convertRuleToByteArray(QString rule, bool modifier);
+	static QByteArray convertRuleToByteArray(QString rule, bool modifier, bool forceRelativePaths=false );
 };
 
 #endif
