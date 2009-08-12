@@ -279,7 +279,6 @@ void MainWindow::showProgressDialog( const QString& title )
 	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
 	QObject::connect( this->model, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
 					  progressDialog, SLOT( updateProgress( const QString&, float, const QDateTime&, StringPairList ) ) );
-	qDebug() << "	QObject::connect( this->model, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ), progressDialog, SLOT( showFinalStatus( ConstUtils::StatusEnum ) ) );";
 	QObject::connect( this->model, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
 					  progressDialog, SLOT( showFinalStatus( ConstUtils::StatusEnum ) ) );
 	QObject::connect( this->model, SIGNAL( infoSignal( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
