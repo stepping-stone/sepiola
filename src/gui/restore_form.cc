@@ -20,9 +20,13 @@
 #include <QDebug>
 
 #include "gui/restore_form.hh"
+#include "model/dir_tree_item.hh"
 
 RestoreForm::~RestoreForm()
-{}
+{
+	QObject::disconnect( this->comboBoxPrefixes, SIGNAL( currentIndexChanged( int ) ),
+					 this, SLOT( initRestoreNames() ) );
+}
 
 RestoreForm::RestoreForm ( QWidget *parent, MainModel *model ) : QWidget ( parent )
 {
@@ -41,6 +45,8 @@ RestoreForm::RestoreForm ( QWidget *parent, MainModel *model ) : QWidget ( paren
 	this->model = model;
 	this->labelPrefixes->setText( "" );
 	this->labelBackupNames->setText( "" );
+	QObject::connect( this->comboBoxPrefixes, SIGNAL( currentIndexChanged( int ) ),
+					  this, SLOT( initRestoreNames() ) );
 }
 
 bool RestoreForm::isInitialized()
@@ -54,7 +60,7 @@ void RestoreForm::initPrefixes()
 						this, SLOT( initRestoreNames() ) );
 
 	this->model->showProgressDialogSlot( tr( "Downloading prefixes" ) );
-
+	this->model->clearRemoteDirModel();
 
 	Settings* settings = Settings::getInstance();
 
@@ -70,7 +76,7 @@ void RestoreForm::initPrefixes()
 		{
 			QString prefix = prefixes.at( i );
 			this->comboBoxPrefixes->addItem( prefix );
-			if( prefix ==  	settings->getBackupPrefix() )
+			if( prefix == settings->getBackupPrefix() )
 			{
 				// pre-select the default prefix
 				this->comboBoxPrefixes->setCurrentIndex( i );
@@ -79,7 +85,7 @@ void RestoreForm::initPrefixes()
 		this->model->closeProgressDialogSlot();
 		initRestoreNames();
 		QObject::connect( this->comboBoxPrefixes, SIGNAL( currentIndexChanged( int ) ),
-							this, SLOT( initRestoreNames() ) );
+						  this, SLOT( initRestoreNames() ) );
 	}
 	else
 	{
@@ -92,10 +98,11 @@ void RestoreForm::initPrefixes()
 
 void RestoreForm::initRestoreNames()
 {
+	qDebug() << "RestoreForm::initRestoreNames()" << "prefix:" << this->comboBoxPrefixes->currentText();
 	this->model->showProgressDialogSlot( tr( "Downloading restore meta data" ) );
 	Settings* settings = Settings::getInstance();
 	QObject::disconnect( this->comboBoxBackupNames, SIGNAL( currentIndexChanged( int ) ),
-							 this, SLOT( populateFilesAndFoldersTree() ) );
+						 this, SLOT( initRestoreNames() ) );
 
 	settings->saveBackupPrefix( this->comboBoxPrefixes->currentText() );
 	this->comboBoxBackupNames->clear();
@@ -117,13 +124,14 @@ void RestoreForm::initRestoreNames()
 		}
 		populateFilesAndFoldersTree();
 		QObject::connect( this->comboBoxBackupNames, SIGNAL( currentIndexChanged( int ) ),
-							this, SLOT( populateFilesAndFoldersTree() ) );
+						  this, SLOT( initRestoreNames() ) );
 	}
 	else
 	{
 		setBackupSelectionDisabled( true );
 	}
 	this->model->closeProgressDialogSlot();
+	this->expandTreePart();
 }
 
 void RestoreForm::setPrefixSelectionDisabled( const bool& disable )
@@ -165,20 +173,35 @@ void RestoreForm::populateFilesAndFoldersTree()
 {
 	qDebug() << "RestoreForm::populateFilesAndFoldersTree()";
 	QApplication::setOverrideCursor( QCursor(Qt::WaitCursor ) );
-	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
-	this->treeViewFilesAndFolders->setSelectionMode( QAbstractItemView::ExtendedSelection );
-	remoteDirModel = this->model->getRemoteDirModel( currentBackupName );
-	this->treeViewFilesAndFolders->setModel( remoteDirModel );
+	this->refreshRemoteDirModel();
+	this->treeViewFilesAndFolders->setSelectionMode( QAbstractItemView::NoSelection );
 
-	//expand the first visible root item
-	QStandardItem* invisibleRootItem = remoteDirModel->invisibleRootItem();
-	if ( invisibleRootItem->hasChildren() )
-	{
-		QStandardItem* rootItem = invisibleRootItem->child( 0 );
-		QModelIndex rootModelIndex = remoteDirModel->indexFromItem( rootItem );
-		this->treeViewFilesAndFolders->setExpanded( rootModelIndex, true );
-	}
+	this->expandTreePart();
 	QApplication::restoreOverrideCursor();
+}
+
+void RestoreForm::expandTreePart()
+{
+	//expand the first visible root item
+	int nLevels = 2;
+	int iLevel = 0;
+	QStandardItemModel* remoteDirModel = this->model->getCurrentRemoteDirModel();
+	QStandardItem* dirItem = remoteDirModel->invisibleRootItem();
+	while ( iLevel < nLevels && dirItem->hasChildren())
+	{
+		this->treeViewFilesAndFolders->setExpanded( remoteDirModel->indexFromItem( dirItem ), true );
+		dirItem = dirItem->child(0);
+		iLevel++;
+	}
+}
+
+void RestoreForm::refreshRemoteDirModel()
+{
+	this->model->clearRemoteDirModel();
+	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
+	QString currentPrefix = this->comboBoxPrefixes->currentText();
+	this->treeViewFilesAndFolders->setModel( this->model->loadRemoteDirModel( currentPrefix, currentBackupName ) );
+	this->treeViewFilesAndFolders->repaint();
 }
 
 void RestoreForm::on_btnRefresh_pressed()
@@ -215,13 +238,12 @@ void RestoreForm::on_btnRestore_pressed()
 		return;
 	}
 	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
-	qDebug() << "RestoreForm::on_btnRestore_pressed()" << "vor dem ominoesen Zugriff";
-	if ( this->radioButtonCustom->isChecked() && (this->model->getRemoteDirModel_(currentBackupName)->getSelectionRules().size() == 0) )
+	QString currentPrefix = this->comboBoxPrefixes->currentText();
+	if ( this->radioButtonCustom->isChecked() && (this->model->getCurrentRemoteDirModel()->getSelectionRules().size() == 0) )
 	{
 		this->model->showInformationMessage( tr( "No files and/or directories has been selected." ) );
 		return;
 	}
-	qDebug() << "RestoreForm::on_btnRestore_pressed()" << "nach dem ominoesen Zugriff";
 
 
 	if ( this->radioButtonSpecific->isChecked() && !QFileInfo( this->lineEditPath->text() ).exists() )
@@ -250,7 +272,7 @@ void RestoreForm::on_btnRestore_pressed()
 	{
 		// custom restore
 		this->model->showProgressDialogSlot( tr( "Custom restore" ) );
-		BackupSelectionHash selectionRules = this->model->getRemoteDirModel_(currentBackupName)->getSelectionRules();
-		this->model->customRestore( remoteDirModel, selectionRules, currentBackupName, destination );
+		BackupSelectionHash selectionRules = this->model->getCurrentRemoteDirModel()->getSelectionRules();
+		this->model->customRestore( this->model->getCurrentRemoteDirModel(), selectionRules, currentBackupName, destination );
 	}
 }

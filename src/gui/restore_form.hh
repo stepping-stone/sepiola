@@ -53,7 +53,10 @@ public:
 	 * Initializes the prefix list
 	 */
 	void initPrefixes();
+	void expandTreePart();
 
+	void refreshRemoteDirModel();
+	RemoteDirModel* getCurrentRemoteDirModel();
 	
 private slots:
 	void initRestoreNames();
@@ -64,7 +67,6 @@ private slots:
 
 private:
 	MainModel* model;
-	QStandardItemModel* remoteDirModel;
 	bool initialized;
 	
 	void setPrefixSelectionDisabled( const bool& disable );

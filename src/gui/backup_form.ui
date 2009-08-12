@@ -126,34 +126,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4" >
-         <widget class="QCheckBox" name="checkBoxTuesday" >
-          <property name="text" >
-           <string>Tuesday</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="4" >
-         <widget class="QCheckBox" name="checkBoxWednesday" >
-          <property name="text" >
-           <string>Wednesday</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="4" >
-         <widget class="QCheckBox" name="checkBoxThursday" >
-          <property name="text" >
-           <string>Thursday</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5" >
-         <widget class="QCheckBox" name="checkBoxFriday" >
-          <property name="text" >
-           <string>Friday</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="5" >
          <widget class="QCheckBox" name="checkBoxSaturday" >
           <property name="text" >
@@ -161,14 +133,42 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="5" >
+        <item row="0" column="5" >
+         <widget class="QCheckBox" name="checkBoxTuesday" >
+          <property name="text" >
+           <string>Tuesday</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="6" >
+         <widget class="QCheckBox" name="checkBoxWednesday" >
+          <property name="text" >
+           <string>Wednesday</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7" >
+         <widget class="QCheckBox" name="checkBoxThursday" >
+          <property name="text" >
+           <string>Thursday</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4" >
+         <widget class="QCheckBox" name="checkBoxFriday" >
+          <property name="text" >
+           <string>Friday</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="6" >
          <widget class="QCheckBox" name="checkBoxSunday" >
           <property name="text" >
            <string>Sunday</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="6" >
+        <item row="1" column="7" >
          <spacer name="horizontalSpacer" >
           <property name="orientation" >
            <enum>Qt::Horizontal</enum>
@@ -225,18 +225,24 @@
        </widget>
       </item>
      </layout>
+     <zorder>radioButtonNoSchedule</zorder>
+     <zorder></zorder>
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" >
-     <item row="0" column="0" colspan="2" >
+    <layout class="QVBoxLayout" >
+
+   <item>
+    <layout class="QHBoxLayout" >
+
+     <item>
       <widget class="QPushButton" name="btnRefresh" >
        <property name="text" >
         <string>&amp;Refresh</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="2" colspan="3" >
+     <item>
       <spacer>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
@@ -249,178 +255,17 @@
        </property>
       </spacer>
      </item>
-     <item row="1" column="0" colspan="5" >
+
+    </layout>
+   </item>
+
+     <item>
       <widget class="QTreeView" name="treeView" />
      </item>
-     <item row="2" column="0" colspan="5" >
-      <widget class="QGroupBox" name="groupBoxPatterns" >
-       <property name="title" >
-        <string>Include/exclude patterns</string>
-       </property>
-       <layout class="QGridLayout" >
-        <item row="0" column="0" >
-         <widget class="QLabel" name="labelIncludePattern" >
-          <property name="text" >
-           <string>Include pattern:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2" >
-         <spacer>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0" >
-           <size>
-            <width>231</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item rowspan="5" row="0" column="3" >
-         <widget class="Line" name="line" >
-          <property name="orientation" >
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item rowspan="5" row="0" column="4" >
-         <widget class="QLabel" name="label" >
-          <property name="text" >
-           <string>As the list of files/directories to transfer is built,&#xd;
-rsync checks each name to be transferred against the&#xd;
-list of include/exclude patterns in turn, and the first&#xd;
-matching pattern is acted on: if it is an exclude pat-&#xd;
-tern, then that file is skipped; if it is an include&#xd;
-pattern then that filename is not skipped; if no match-&#xd;
-ing pattern is found, then the filename is not skipped.</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2" >
-         <widget class="QLineEdit" name="lineEditIncludePattern" >
-          <property name="enabled" >
-           <bool>true</bool>
-          </property>
-          <property name="text" >
-           <string/>
-          </property>
-          <property name="readOnly" >
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2" >
-         <widget class="QPushButton" name="btnEditInclude" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text" >
-           <string>E&amp;dit</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="3" >
-         <widget class="Line" name="line_3" >
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" >
-         <widget class="QLabel" name="labelExcludePattern" >
-          <property name="text" >
-           <string>Exclude pattern:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="2" >
-         <spacer>
-          <property name="orientation" >
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0" >
-           <size>
-            <width>231</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="4" column="0" colspan="2" >
-         <widget class="QLineEdit" name="lineEditExcludePattern" >
-          <property name="enabled" >
-           <bool>true</bool>
-          </property>
-          <property name="readOnly" >
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2" >
-         <widget class="QPushButton" name="btnEditExclude" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text" >
-           <string>Ed&amp;it</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="3" column="0" colspan="5" >
-      <widget class="QGroupBox" name="groupBoxDeletion" >
-       <property name="title" >
-        <string>Deletion</string>
-       </property>
-       <layout class="QGridLayout" >
-        <item row="0" column="0" >
-         <widget class="QCheckBox" name="checkBoxDeleteExtraneous" >
-          <property name="text" >
-           <string>Delete extraneous files and directories</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" >
-         <widget class="Line" name="line_2" >
-          <property name="orientation" >
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2" >
-         <widget class="QLabel" name="label_2" >
-          <property name="text" >
-           <string>This tells rsync to delete extraneous files from the&#xd;
-receiving side (ones that are not on the sending&#xd;
-side), but only for the directories that are being&#xd;
-synchronized.</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="2" >
-      <widget class="QPushButton" name="btnDetails" >
-       <property name="text" >
-        <string>More</string>
-       </property>
-       <property name="checked" >
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2" >
+   <item>
+    <layout class="QHBoxLayout" >
+
+     <item row="2" column="0" >
       <spacer>
        <property name="orientation" >
         <enum>Qt::Horizontal</enum>
@@ -433,29 +278,30 @@ synchronized.</string>
        </property>
       </spacer>
      </item>
-     <item row="4" column="3" >
+     <item row="2" column="1" >
       <widget class="QPushButton" name="btnSchedule" >
        <property name="text" >
         <string>S&amp;chedule</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="4" >
+     <item row="2" column="2" >
       <widget class="QPushButton" name="btnBackup" >
        <property name="text" >
         <string>B&amp;ackup</string>
        </property>
       </widget>
      </item>
+
+    </layout>
+   </item>
+
     </layout>
    </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>treeView</tabstop>
-  <tabstop>lineEditIncludePattern</tabstop>
-  <tabstop>lineEditExcludePattern</tabstop>
-  <tabstop>btnSchedule</tabstop>
  </tabstops>
  <resources/>
  <connections/>

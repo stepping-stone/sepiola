@@ -39,12 +39,6 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 	this->treeView->setColumnWidth( 0, 300 );
 	this->expandSelectedBranches();
 
-	this->includePatternList = settings->getIncludePatternList();
-	this->excludePatternList = settings->getExcludePatternList();
-	this->lineEditIncludePattern->setText( patternListToString( includePatternList ) );
-	this->lineEditExcludePattern->setText( patternListToString( excludePatternList ) );
-	setDetailsVisible( false );
-
 		// disable option "minutes after booting" if the scheduler does not support it
 	if ( !this->model->isSchedulingOnStartSupported() )
 	{
@@ -106,6 +100,7 @@ void BackupForm::on_btnSchedule_pressed()
 
 void BackupForm::schedule()
 {
+	ScheduledTask scheduleTask;
 	if ( this->radioButtonDaily->isChecked() )
 	{
 		QTime time = this->timeEditTime->time();
@@ -125,19 +120,18 @@ void BackupForm::schedule()
 			this->model->infoDialog( tr( "Check at least one day" ) );
 			return;
 		}
-		bool setDeleteFlag = this->checkBoxDeleteExtraneous->checkState() == Qt::Checked;
-		this->model->schedule( getSelectedFilesAndDirs(), this->includePatternList, this->excludePatternList, ScheduledTask(wd, time), setDeleteFlag );
+		scheduleTask = ScheduledTask(wd, time);
 	}
 	else if ( this->radioButtonMinutesAfterBooting->isChecked() )
 	{
 		int delay = this->spinBoxMinutesAfterBooting->value();
-		bool setDeleteFlag = this->checkBoxDeleteExtraneous->checkState() == Qt::Checked;
-		this->model->schedule( getSelectedFilesAndDirs(), this->includePatternList, this->excludePatternList, ScheduledTask(delay), setDeleteFlag );
+		scheduleTask = ScheduledTask(delay);
 	}
 	else if ( this->radioButtonNoSchedule->isChecked() )
 	{
-		this->model->schedule( getSelectedFilesAndDirs(), this->includePatternList, this->excludePatternList, ScheduledTask(), FALSE );
+		scheduleTask = ScheduledTask();
 	}
+	this->model->schedule( this->model->getLocalDirModel()->getSelectionRules(), scheduleTask );
 	qDebug() << "BackupForm::schedule(): emit updateOverviewFormScheduleInfo()";
 	emit updateOverviewFormScheduleInfo();
 }
@@ -150,48 +144,11 @@ void BackupForm::on_btnBackup_pressed()
 		QMessageBox::information( this, tr( "Empty backup list" ), tr( "No items have been selected for backup" ));
 		return;
 	}
-	bool deleteExtraneous = this->checkBoxDeleteExtraneous->checkState() == Qt::Checked;
 	this->model->showProgressDialogSlot( tr( "Backup" ) );
 	qDebug() << "BackupForm::on_btnBackup_pressed()" << this->model->getLocalDirModel()->getSelectionRules();
-	this->model->backup( this->model->getLocalDirModel()->getSelectionRules(), deleteExtraneous, false );
+	this->model->backup( this->model->getLocalDirModel()->getSelectionRules(), false );
 	//this->model->backup( backupItems, includePatternList, excludePatternList, deleteExtraneous, false );
 	emit updateOverviewFormLastBackupsInfo();
-}
-
-void BackupForm::on_btnEditInclude_pressed()
-{
-	PatternDialog patternDialog( tr( "Include Pattern" ), tr( "Edit include patterns" ), this->includePatternList );
-	QObject::connect( &patternDialog, SIGNAL( getPatternList( QStringList ) ),
-						this, SLOT ( setIncludePatternList( QStringList ) ) );
-	patternDialog.exec();
-	QObject::disconnect( &patternDialog, SIGNAL( getPatternList( QStringList ) ),
-						this, SLOT ( setIncludePatternList( QStringList ) ) );
-	this->lineEditIncludePattern->setText( patternListToString( this->includePatternList ) );
-	Settings::getInstance()->saveIncludePatternList( includePatternList );
-}
-
-void BackupForm::on_btnEditExclude_pressed()
-{
-	PatternDialog patternDialog( tr( "Exclude Pattern" ), tr( "Edit exclude patterns" ), this->excludePatternList );
-	QObject::connect( &patternDialog, SIGNAL( getPatternList( QStringList ) ),
-						this, SLOT ( setExcludePatternList( QStringList ) ) );
-	patternDialog.exec();
-	QObject::disconnect( &patternDialog, SIGNAL( getPatternList( QStringList ) ),
-						this, SLOT ( setExcludePatternList( QStringList ) ) );
-	this->lineEditExcludePattern->setText( patternListToString( this->excludePatternList ) );
-	Settings::getInstance()->saveExcludePatternList( excludePatternList );
-}
-
-void BackupForm::setIncludePatternList( const QStringList& includePatternList )
-{
-	this->includePatternList = includePatternList;
-	this->lineEditIncludePattern->setText( patternListToString( this->includePatternList ) );
-}
-
-void BackupForm::setExcludePatternList( const QStringList& excludePatternList )
-{
-	this->excludePatternList = excludePatternList;
-	this->lineEditExcludePattern->setText( patternListToString( this->excludePatternList ) );
 }
 
 QString BackupForm::patternListToString( QStringList patternList )
@@ -224,27 +181,6 @@ QStringList BackupForm::getSelectedFilesAndDirs()
 	}
 	localDirModel->setResolveSymlinks(bkup_ResolveSymbolicLinks);
 	return items;
-}
-
-void BackupForm::setDetailsVisible( bool visible )
-{
-	this->groupBoxPatterns->setVisible( visible );
-	this->groupBoxDeletion->setVisible( visible );
-
-	if ( visible )
-	{
-		this->btnDetails->setText( tr( "L&ess..." ) );
-	}
-	else
-	{
-		this->btnDetails->setText( tr( "&More..." ) );
-	}
-	detailsVisible = visible;
-}
-
-void BackupForm::on_btnDetails_pressed()
-{
-	setDetailsVisible( !detailsVisible );
 }
 
 void BackupForm::refreshLocalDirModel()

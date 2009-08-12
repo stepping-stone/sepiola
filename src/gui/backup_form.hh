@@ -47,28 +47,10 @@ private:
 	QStringList getSelectedFilesAndDirs();
 	QString patternListToString( QStringList patternList );
 
-public slots:
-
-	/**
-	 * Slot for setting the include pattern list
-	 * @param includePatternList list of patterns to set
-	 */
-	void setIncludePatternList( const QStringList& includePatternList );
-
-	/**
-	 * Slot for setting the exclude pattern list
-	 * @param excludePatternList list of patterns to set
-	 */
-	void setExcludePatternList( const QStringList& excludePatternList );
-	
 private slots:
 	void on_btnRefresh_pressed();
 	void on_btnSchedule_pressed();
 	void on_btnBackup_pressed();
-	void on_btnEditInclude_pressed();
-	void on_btnEditExclude_pressed();
-	void on_btnDetails_pressed();
-	void setDetailsVisible( bool visible );
 	void refreshLocalDirModel();
 	void schedule();
 	
@@ -81,8 +63,6 @@ private:
 	
 	MainModel* model;
 	LocalDirModel* localDirModel;
-	QStringList includePatternList;
-	QStringList excludePatternList;
 	bool detailsVisible;
 };
 
