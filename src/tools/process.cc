@@ -143,7 +143,7 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 			}
 		}
 		if (qProcess->canReadLine()) {
-			if (BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1 > 0) {
+			if (BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1 > 1) {
 				nCharsRead = qProcess->readLine(buf, BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()-1);
 				result = nCharsRead >= 0;
 				readBuffer.append(QByteArray(buf,nCharsRead));
