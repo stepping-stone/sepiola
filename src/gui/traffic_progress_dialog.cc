@@ -33,6 +33,7 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	setWindowTitle( title );
 	setAttribute( Qt::WA_DeleteOnClose );
 
+	this->labelTitle->setText( title );
 	this->labelError->setVisible( false );
 	this->textEditError->setVisible( false );
 	this->isErrorVisible = false;
