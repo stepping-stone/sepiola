@@ -284,7 +284,7 @@ void BackupThread::setLastBackupState(ConstUtils::StatusEnum newStatus)
 		// backupState cannot become "better", e.g. go from WARNINGS to OK during one backup
 		this->backupCurrentStatus = (ConstUtils::StatusEnum)std::max( (int)newStatus, (int)(this->backupCurrentStatus) );
 	}
-	settings->addLastBackup( BackupTask(this->backupStartDateTime, this->backupCurrentStatus) ); // overwrites the lastTask if its time is equal to the passed BackupTask's backupTime
+	settings->addLastBackup( BackupTask(QDateTime::currentDateTime() /* this->backupStartDateTime */, this->backupCurrentStatus) ); // overwrites the lastTask if its time is equal to the passed BackupTask's backupTime
 }
 
 ConstUtils::StatusEnum BackupThread::getLastBackupState()
