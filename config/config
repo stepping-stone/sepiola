@@ -23,7 +23,7 @@ RestoreRootFolder=.snapshots/
 MetadataFileName=metadata
 BackupContentFileName=backupContent
 BackupTimeFileName=backupTime
-AbsoluteBackupQuotaFileName=/etc/backupSize
+QuotaScript=/bin/getQuota
 AuthorizedKeyFolderName=.ssh/
 AuthorizedKeyFileName=authorized_keys
 
