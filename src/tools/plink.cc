@@ -333,6 +333,7 @@ QList<int> Plink::getServerQuotaValues()
 	in >> quota >> backup >> snapshot;
 	sizes.clear();
 	sizes << quota << backup << snapshot;
+	qDebug() << "Quota values on server:" << sizes;
 	return sizes;
 }
 
