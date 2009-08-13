@@ -83,8 +83,8 @@ public:
 	static void testProgressTaskClass();
 
 private:
-	static const double DURATION_CALCULATION_TIME_RANGE = 120.0; // only the activities of the last TIME_RANGE seconds are taken into Account
-	static const double MEAN_OVER_LAST_N_SECONDS = 30.0;
+	static const double DURATION_CALCULATION_TIME_RANGE = 40.0; // only the activities of the last TIME_RANGE seconds are taken into Account
+	static const double MEAN_OVER_LAST_N_SECONDS = 20.0;
 	bool isFinished;
 	bool fp_changed;
 	QList<ProgressTask*> subTasks;
