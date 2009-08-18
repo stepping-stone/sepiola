@@ -22,6 +22,7 @@
 #include <QLocale>
 #include <QDebug>
 #include <QFileInfo>
+#include <QtPlugin>
 
 #include <unistd.h>
 #include <signal.h>
@@ -42,6 +43,7 @@
 #include "test/test_manager.hh"
 #include "utils/log_file_utils.hh"
 
+Q_IMPORT_PLUGIN(qsvg)
 
 namespace
 {
