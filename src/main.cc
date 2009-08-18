@@ -22,7 +22,6 @@
 #include <QLocale>
 #include <QDebug>
 #include <QFileInfo>
-#include <QtPlugin>
 
 #include <unistd.h>
 #include <signal.h>
@@ -36,14 +35,17 @@
 #include <windows.h>
 #endif
 
+#ifdef CMAKE_BUILD_TYPE_DEPLOY
+	#include <QtPlugin>
+	Q_IMPORT_PLUGIN(qsvg)
+#endif
+
 #include "cli/cli_manager.hh"
 #include "gui/main_window.hh"
 #include "model/main_model.hh"
 #include "settings/settings.hh"
 #include "test/test_manager.hh"
 #include "utils/log_file_utils.hh"
-
-Q_IMPORT_PLUGIN(qsvg)
 
 namespace
 {
