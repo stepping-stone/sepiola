@@ -86,8 +86,8 @@
         </property>
         <property name="text" >
          <string>stepping stone GmbH&#xd;
-Pappelweg 41&#xd;
-CH-3013 Bern</string>
+Neufeldstrasse 9&#xd;
+CH-3012 Bern</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
