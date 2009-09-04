@@ -24,6 +24,10 @@
 
 #include "utils/progress_task.hh"
 
+const double ProgressTask::DURATION_CALCULATION_TIME_RANGE = 40.0; // only the activities of the last TIME_RANGE seconds are taken into Account
+const double ProgressTask::MEAN_OVER_LAST_N_SECONDS = 20.0;
+
+
 ProgressTask::ProgressTask() : isFinished(false), parent(0)
 {
 }
