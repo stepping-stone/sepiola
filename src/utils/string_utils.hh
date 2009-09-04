@@ -23,8 +23,13 @@
 #include <QDebug>
 #include <math.h>
 #include <algorithm>
+#include <iostream>
+#include <string>
 
 #include "utils/datatypes.hh"
+#include "test/test_manager.hh"
+
+using namespace std;
 
 class StringUtils
 {
@@ -48,11 +53,26 @@ public:
 	static QString parentDir(const QString& filename); // same as dirPart, except for folders -> one back and not self
 	static QString equalDirPart(const QString& filenameA, const QString& filenameB);
 
+	static void testChar2StdString();
 	
 private:
 	static QString unit_prefixes() { return QString(" kMGTPEZY"); };
 };
 
+namespace
+{
+	// run test by calling sepiola with parameter: -test testProgressTaskClass
+	int StringUtils_dummy = TestManager::registerTest( "testChar2StdString", StringUtils::testChar2StdString );
+}
+
+inline void StringUtils::testChar2StdString() {
+	char* myText = "abcd";
+	std::string myString1(myText);
+	cout << myString1;
+	std::string myString2 = myText;
+	cout << myString2;	
+	cout << std::string(myText) << endl;
+}
 
 
 inline QString StringUtils::encaps(const QString& aStr, const QString& beforeTok, const QString& afterTok)
