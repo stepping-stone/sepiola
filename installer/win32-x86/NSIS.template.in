@@ -515,9 +515,9 @@ Section "Installer Section" InstSection
   
   !insertmacro MUI_STARTMENU_WRITE_END
 
-  DetailPrint 'Starting "$INSTDIR\bin\sepiola.exe -update" to update settings to current version.'
-  ExecWait '"$INSTDIR\bin\sepiola.exe" -update' $0
-  ; MessageBox MB_OK "sepiola.exe returned $0" 
+  DetailPrint 'Starting "$INSTDIR\bin\@CPACK_PACKAGE_NAME@.exe -update" to update settings to current version.'
+  ExecWait '"$INSTDIR\bin\@CPACK_PACKAGE_NAME@.exe" -update' $0
+  ; MessageBox MB_OK "@CPACK_PACKAGE_NAME@.exe returned $0" 
 SectionEnd
 
 ;--------------------------------
