@@ -289,6 +289,18 @@ void MainWindow::showProgressDialog( const QString& title )
 
 void MainWindow::finishProgressDialog()
 {
+	QObject::disconnect( progressDialog, SIGNAL( abort() ), this->model, SLOT( abortProcessSlot() ) );
+	QObject::disconnect( this->model, SIGNAL( infoSignal( const QString& ) ), progressDialog, SLOT( appendInfo( const QString& ) ) );
+	QObject::disconnect( this->model, SIGNAL( errorSignal( const QString& ) ), progressDialog, SLOT( appendError( const QString& ) ) );
+	QObject::disconnect( this->model, SIGNAL( finishProgressDialog() ), this, SLOT( finishProgressDialog() ) );
+	QObject::disconnect( this->model, SIGNAL( closeProgressDialog() ), this, SLOT( closeProgressDialog() ) );
+	QObject::disconnect( this->model, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
+					  progressDialog, SLOT( updateProgress( const QString&, float, const QDateTime&, StringPairList ) ) );
+	QObject::disconnect( this->model, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
+					  progressDialog, SLOT( showFinalStatus( ConstUtils::StatusEnum ) ) );
+	QObject::disconnect( this->model, SIGNAL( infoSignal( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
+	QObject::disconnect( this->model, SIGNAL( errorSignal( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
+	
 	progressDialog->finished();
 	QApplication::processEvents();
 }
