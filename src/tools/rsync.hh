@@ -158,7 +158,7 @@ private:
 	static QString getValidDestinationPath( const QString& destination );
 	static QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItem( QString rsyncOutputLine );
 	QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItemAndStoreTransferredBytes( QString rsyncOutputLine );
-	static QList<QByteArray> calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, bool forceRelativePaths=false );
+	static QList<QByteArray> calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules );
 	static void removeSymlinkString( QString* path );
 
 	quint64 progress_bytesRead;
@@ -173,7 +173,7 @@ private:
 	QStringList download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal ) throw ( ProcessException );
 
 	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
-	static QByteArray convertRuleToByteArray(QString rule, bool modifier, bool forceRelativePaths=false );
+	static QByteArray convertRuleToByteArray(QString rule, bool modifier );
 };
 
 #endif

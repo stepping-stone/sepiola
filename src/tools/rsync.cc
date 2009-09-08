@@ -479,8 +479,8 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	arguments << getRsyncDownloadArguments();
 	arguments << getRsyncSshArguments();
 	if (compress) arguments << "-z";
-	arguments << QDir::cleanPath( src );
-	arguments << getValidDestinationPath( destination );
+	arguments << getValidDestinationPath( src ) + "/";
+	arguments << QDir::cleanPath( destination ) + "/";
 
 	if ( includeRules.size() > 0 )
 	{
@@ -489,7 +489,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		createProcess( settings->getRsyncName() , arguments );
 		start();
 		
-		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, true);
+		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules);
 		foreach ( QByteArray rule, convertedRules )
 		{
 			write( rule );
@@ -765,7 +765,7 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsync
 	return qMakePair( itemName, type );
 }
 
-QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, bool forceRelativePaths )
+QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules )
 {
 	qDebug() << "Rsync::calculateRsyncRulesFromIncludeRules(...)";
 	LogFileUtils* log = LogFileUtils::getInstance();
@@ -795,7 +795,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 		while (unclosedDirs.size()>0 && !ruleDir.startsWith(unclosedDirs.top().first)) {
 			QPair<QString,bool> dirToClose = unclosedDirs.pop();
 			if (dirToClose.second || dirToClose.first !=  lastRule) { // don't exclude dir/** bejond dir/
-				filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second, forceRelativePaths );
+				filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 				// qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 			} else {
 				// qDebug() << "dropped" << dirToClose.first;
@@ -806,17 +806,17 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 			if (curDir==StringUtils::dirPart(lastRule) && !includeRules[lastRule]) { // remove exclude before identical include
 				filters.removeLast();
 			}
-			filters << convertRuleToByteArray( curDir,true, forceRelativePaths );
+			filters << convertRuleToByteArray( curDir,true );
 			// qDebug() << convertRuleToByteArray( curDir,true );
 		}
 		if (rule.endsWith("/")) { // rule is a dir
-			filters << convertRuleToByteArray( ruleDir,ruleMod, forceRelativePaths  );
+			filters << convertRuleToByteArray( ruleDir,ruleMod  );
 			unclosedDirs.push( QPair<QString,bool>(ruleDir,ruleMod) );
 			if (ruleMod) {
 				curDir = ruleDir;
 			}
 		} else {
-			filters << convertRuleToByteArray( rule,ruleMod, forceRelativePaths );
+			filters << convertRuleToByteArray( rule,ruleMod );
 			// qDebug() << convertRuleToByteArray( rule,ruleMod );
 		}		
 		lastRule = rule;
@@ -824,11 +824,11 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 	while (unclosedDirs.size() > 0) {
 		QPair<QString,bool> dirToClose = unclosedDirs.pop();
 		if (dirToClose.second || dirToClose.first !=  lastRule) { // don't exclude dir/** bejond dir/
-			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second, forceRelativePaths );
+			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 			// qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 		}		
 	}
-	if (!forceRelativePaths) { filters << convertRuleToByteArray( "**",false, forceRelativePaths ); }
+	filters << convertRuleToByteArray( "**",false );
 	
 	qDebug() << "include rules for rsync:";
 	log->writeLog("include rules for rsync:");
@@ -839,12 +839,9 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 	return filters;
 }
 
-QByteArray Rsync::convertRuleToByteArray(QString rule, bool modifier, bool forceRelativePaths)
+QByteArray Rsync::convertRuleToByteArray(QString rule, bool modifier)
 {
 	FileSystemUtils::convertToServerPath( &rule );
-	if (forceRelativePaths && rule.startsWith("/")) {
-		rule = rule.mid(1);
-	}
 	QString rule_modifier = modifier ? "+ " : "- ";
 	if ( Settings::IS_MAC )
 		return (rule_modifier + rule.normalized( QString::NormalizationForm_D )).toUtf8();
