@@ -494,7 +494,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		{
 			write( rule );
 			write( settings->getEOLCharacter() );
-			qDebug() << "rule:" << rule;
+			// qDebug() << "rule:" << rule;
 			waitForBytesWritten();
 		}
 		closeWriteChannel();
@@ -767,11 +767,22 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsync
 
 QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, bool forceRelativePaths )
 {
+	qDebug() << "Rsync::calculateRsyncRulesFromIncludeRules(...)";
+	LogFileUtils* log = LogFileUtils::getInstance();
+	
 	QList<QByteArray> filters;
 	QStack<QPair<QString,bool> > unclosedDirs;
 	QString curDir = "/";
 	QList<QString> includeRulesList = includeRules.keys();
 	qSort(includeRulesList);
+	
+	qDebug() << "provided selection rules:";
+	log->writeLog("provided selection rules:");
+	foreach (QString rule, includeRulesList) {
+		qDebug() << (includeRules[rule] ? "+" : "-") + QString(" ") + rule;
+		log->writeLog( (includeRules[rule] ? "+" : "-") + QString(" ") + rule );
+	}	
+	
 	QString lastRule = "";
 	foreach (QString rule, includeRulesList)
 	{
@@ -818,9 +829,13 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 		}		
 	}
 	if (!forceRelativePaths) { filters << convertRuleToByteArray( "**",false, forceRelativePaths ); }
-	qDebug() << "final filter list";
-	foreach (QByteArray filter, filters)
+	
+	qDebug() << "include rules for rsync:";
+	log->writeLog("include rules for rsync:");
+	foreach (QByteArray filter, filters) {
 		qDebug() << filter;
+		log->writeLog(filter);
+	}
 	return filters;
 }
 
