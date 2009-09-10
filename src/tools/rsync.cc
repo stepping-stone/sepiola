@@ -81,6 +81,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
 	if (StringUtils::writeStringListToFile(include_dirs_list, include_dirs_filename, settings->getEOLCharacter())) {
 		arguments << "--files-from=" + include_dirs_filename << "--no-relative";
+		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
+	} else {
+		qDebug() << "unable to write directory-names to file" << include_dirs_filename << ".";
 	}
 	foreach ( QByteArray rule, convertedRules )
 	{
