@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QDebug>
+#include <QFile>
 #include <math.h>
 #include <algorithm>
 #include <iostream>
@@ -52,7 +53,8 @@ public:
 	static QString dirPart(const QString& filename); // for folders ending with "/" returns self
 	static QString parentDir(const QString& filename); // same as dirPart, except for folders -> one back and not self
 	static QString equalDirPart(const QString& filenameA, const QString& filenameB);
-
+	static bool writeStringListToFile(const QList<QString>& include_dirs_list, const QString& include_dirs_filename, QString eolChar = "\n" );
+	
 	static void testChar2StdString();
 	
 private:
@@ -194,6 +196,21 @@ inline QString StringUtils::parentDir(const QString& filename) { // same as dirP
 
 inline QString StringUtils::equalDirPart(const QString& filenameA, const QString& filenameB) {
 	return dirPart(equalStart(filenameA,filenameB));
+}
+
+inline bool StringUtils::writeStringListToFile(const QList<QString>& item_list, const QString& filename, QString eolChar ) {
+	QFile out(filename);
+	if ( out.open( QIODevice::WriteOnly ) ) {
+		QTextStream outStream( &out );
+		foreach ( QString item, item_list )
+		{
+			outStream << item + eolChar;
+		}
+		out.close();
+		return true;
+	} else {
+		return false;
+	}
 }
 
 #endif /*STRING_UTILS_HH_*/
