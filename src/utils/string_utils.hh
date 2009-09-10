@@ -68,7 +68,8 @@ namespace
 }
 
 inline void StringUtils::testChar2StdString() {
-	char* myText = "abcd";
+	QString testStr = QString("abcd");
+	char* myText = testStr.toAscii().data();
 	std::string myString1(myText);
 	cout << myString1;
 	std::string myString2 = myText;
