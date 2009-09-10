@@ -50,6 +50,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	qDebug() << "Rsync::upload(" << includeRules << ", " << src << ", " << destination << ", " << compress << ", " << errors << ", " << dry_run << ")";
 	Settings* settings = Settings::getInstance();
 	bool setDeleteFlag = settings->getDeleteExtraneousItems();
+	QString include_dirs_filename = settings->getApplicationDataDir() + "includes";
 
 	QString source(src);
 	FileSystemUtils::convertToServerPath( &source );
@@ -76,7 +77,11 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	createProcess( settings->getRsyncName() , arguments );
 	start();
 	
-	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules);
+	QStringList include_dirs_list;
+	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
+	if (StringUtils::writeStringListToFile(include_dirs_list, include_dirs_filename, settings->getEOLCharacter())) {
+		arguments << "--files-from=" + include_dirs_filename << "--no-relative";
+	}
 	foreach ( QByteArray rule, convertedRules )
 	{
 		write( rule );
@@ -765,7 +770,7 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsync
 	return qMakePair( itemName, type );
 }
 
-QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules )
+QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, QStringList* files_from_list )
 {
 	qDebug() << "Rsync::calculateRsyncRulesFromIncludeRules(...)";
 	LogFileUtils* log = LogFileUtils::getInstance();
@@ -807,6 +812,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 				filters.removeLast();
 			}
 			filters << convertRuleToByteArray( curDir,true );
+			if (files_from_list != 0) { files_from_list->append(curDir); }
 			// qDebug() << convertRuleToByteArray( curDir,true );
 		}
 		if (rule.endsWith("/")) { // rule is a dir
@@ -814,6 +820,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 			unclosedDirs.push( QPair<QString,bool>(ruleDir,ruleMod) );
 			if (ruleMod) {
 				curDir = ruleDir;
+				if (files_from_list != 0) { files_from_list->append(curDir); }
 			}
 		} else {
 			filters << convertRuleToByteArray( rule,ruleMod );
@@ -830,6 +837,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 	}
 	filters << convertRuleToByteArray( "**",false );
 	
+	if (files_from_list != 0) { qSort((*files_from_list)); }
 	qDebug() << "include rules for rsync:";
 	log->writeLog("include rules for rsync:");
 	foreach (QByteArray filter, filters) {
