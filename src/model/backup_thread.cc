@@ -374,7 +374,7 @@ quint64 BackupThread::estimateBackupSize( const QString& src, const QString& des
 
 void BackupThread::updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList )
 {
-	qDebug() << "BackupThread::updateBackupContentFile(" << backupContentFileName.absoluteFilePath() << "," << backupList << ")";
+	qDebug() << "BackupThread::updateBackupContentFile(" << backupContentFileName.absoluteFilePath() << ", [backupList] )";
 	QSet<QString> existingItems;
 	QFile backupContentFile( backupContentFileName.absoluteFilePath() );
 	if ( backupContentFile.open( QIODevice::ReadOnly ) )
