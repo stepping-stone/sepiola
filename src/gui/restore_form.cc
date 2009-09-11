@@ -102,7 +102,7 @@ void RestoreForm::initRestoreNames()
 	this->model->showProgressDialogSlot( tr( "Downloading restore meta data" ) );
 	Settings* settings = Settings::getInstance();
 	QObject::disconnect( this->comboBoxBackupNames, SIGNAL( currentIndexChanged( int ) ),
-						 this, SLOT( initRestoreNames() ) );
+						 this, SLOT( populateFilesAndFoldersTree() ) );
 
 	settings->saveBackupPrefix( this->comboBoxPrefixes->currentText() );
 	this->comboBoxBackupNames->clear();
@@ -124,7 +124,7 @@ void RestoreForm::initRestoreNames()
 		}
 		populateFilesAndFoldersTree();
 		QObject::connect( this->comboBoxBackupNames, SIGNAL( currentIndexChanged( int ) ),
-						  this, SLOT( initRestoreNames() ) );
+						  this, SLOT( populateFilesAndFoldersTree() ) );
 	}
 	else
 	{
