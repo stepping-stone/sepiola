@@ -74,17 +74,17 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	arguments << getValidDestinationPath( destination );
 	arguments << "--include-from=-";
 
-	createProcess( settings->getRsyncName() , arguments );
-	start();
-	
 	QStringList include_dirs_list;
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
 	if (StringUtils::writeStringListToFile(include_dirs_list, include_dirs_filename, settings->getEOLCharacter())) {
-		arguments << "--files-from=" + include_dirs_filename << "--no-relative";
+		arguments << "--files-from=" + include_dirs_filename;
 		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
 	} else {
 		qDebug() << "unable to write directory-names to file" << include_dirs_filename << ".";
 	}
+	
+	createProcess( settings->getRsyncName() , arguments );
+	start();
 	foreach ( QByteArray rule, convertedRules )
 	{
 		write( rule );
@@ -792,6 +792,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 	}	
 	
 	QString lastRule = "";
+	if (files_from_list != 0) { files_from_list->clear(); files_from_list->append("/"); } // clear list and add "/"
 	foreach (QString rule, includeRulesList)
 	{
 		bool ruleMod = includeRules[rule];
