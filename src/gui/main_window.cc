@@ -41,17 +41,14 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 
 	if ( settings->isReinstalled() )
 	{
-		int answer = QMessageBox::question( this, tr( "Keep settings?" ), tr( "The application has been reinstalled.\n", "Do you want to keep the settings?" ), QMessageBox::Yes | QMessageBox::No );
+		int answer = QMessageBox::question( this, tr( "Keep settings?" ), tr( "The application has been reinstalled.\nDo you want to keep the settings?" ), QMessageBox::Yes | QMessageBox::No );
 		switch ( answer )
 		{
-			case QMessageBox::Yes:
-				model->keepSettings();
-				break;
 			case QMessageBox::No:
 				model->deleteSettings();
 				break;
 			default:
-				// should never be reached
+				model->keepSettings();
 				break;
 		}
 	}
