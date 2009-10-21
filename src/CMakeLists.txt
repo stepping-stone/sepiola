@@ -267,6 +267,9 @@ IF(Q_WS_WIN)
 	)
 
 	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
+	IF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
+		INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config_reseller DESTINATION ${APP_DIR})
+	ENDIF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
 	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
 	
 	INSTALL(PROGRAMS 
