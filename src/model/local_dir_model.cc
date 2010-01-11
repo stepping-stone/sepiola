@@ -35,7 +35,7 @@ Qt::ItemFlags LocalDirModel::flags(const QModelIndex& index) const
 		f |= Qt::ItemIsUserCheckable;
 	return f;
 }
- 
+
 /**
  * closest rule on parent directories -> subState
  * if any of the childs
@@ -45,16 +45,17 @@ QVariant LocalDirModel::data(const QModelIndex& index, int role) const
 	if (index.isValid() && index.column() == 0 && role == Qt::CheckStateRole)
 	{
 		QFileInfo f_info = fileInfo(index);
-		QString curPath = f_info.absoluteFilePath() + (f_info.isDir()?"/":"");
+		bool curPathIsDir = f_info.isDir();
+		QString curPath = f_info.absoluteFilePath() + ((curPathIsDir &&  !f_info.absoluteFilePath().endsWith("/"))?"/":"");
 		bool existRulesOnChildren = false;
 		QPair<QString,bool> closestParentRule;
 		QHashIterator<QString,bool> i(selectionRules);
 		while (i.hasNext()) {
 			i.next();
-			if (i.key() != curPath && i.key().startsWith(curPath)) {
+			if (i.key() != curPath && curPathIsDir && i.key().startsWith(curPath)) {
 				// rules on children
 				existRulesOnChildren = true;
-			} else if (curPath.startsWith(i.key())) {
+			} else if (i.key() == curPath || (i.key().endsWith("/") && curPath.startsWith(i.key()))) {
 				// rules on parents or self
 				if (i.key().length() > closestParentRule.first.length()) {
 					// rule is "closer" -> take it
@@ -77,17 +78,17 @@ bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int
 	if (index.isValid() && index.column() == 0 && role == Qt::CheckStateRole)
 	{
 		Qt::CheckState curVal = (Qt::CheckState)(data(index,role).toInt());
-		QFileInfo f_info = fileInfo(index); 
-		bool isDir = f_info.isDir();
-		QString curPath = f_info.absoluteFilePath() + (isDir?"/":"");
+		QFileInfo f_info = fileInfo(index);
+		bool curPathIsDir = f_info.isDir();
+		QString curPath = f_info.absoluteFilePath() + ((curPathIsDir &&  !f_info.absoluteFilePath().endsWith("/"))?"/":"");
 		QPair<QString,bool> closestParentRule("",false);
 		QMutableHashIterator<QString,bool> i(selectionRules);
 		while (i.hasNext()) {
 			i.next();
-			if (i.key().startsWith(curPath)) {
+			if (i.key() == curPath || (curPathIsDir && i.key().startsWith(curPath))) {
 				// rules on children and self
 				i.remove();
-			} else if (curPath.startsWith(i.key())) {
+			} else if (curPathIsDir && curPath.startsWith(i.key())) {
 				// rules on parents
 				if (i.key().length() > closestParentRule.first.length()) {
 					// rule is "closer" -> take it
