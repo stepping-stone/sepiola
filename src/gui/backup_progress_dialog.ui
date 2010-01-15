@@ -34,7 +34,7 @@
         </font>
        </property>
        <property name="text" >
-        <string>Backup</string>
+        <string>Backup in progress...</string>
        </property>
        <property name="textFormat" >
         <enum>Qt::AutoText</enum>
@@ -47,95 +47,6 @@
         </color>
        </property>
       </widget>
-     </item>
-     <item>
-      <widget class="QGraphicsView" name="graphics_statusIcon" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize" >
-        <size>
-         <width>16</width>
-         <height>16</height>
-        </size>
-       </property>
-       <property name="maximumSize" >
-        <size>
-         <width>24</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="baseSize" >
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="frameShape" >
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow" >
-        <enum>QFrame::Plain</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" >
-       <item>
-        <widget class="QLabel" name="label_status_success" >
-         <property name="font" >
-          <font>
-           <pointsize>16</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="styleSheet" >
-          <string notr="true" />
-         </property>
-         <property name="text" >
-          <string>&lt;font color="#00CC00">successfully finished&lt;/font></string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_status_warning" >
-         <property name="font" >
-          <font>
-           <pointsize>16</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="frameShape" >
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="text" >
-          <string>&lt;font color="#FFBB00">finished with warnings&lt;/font></string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_status_error" >
-         <property name="font" >
-          <font>
-           <pointsize>16</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text" >
-          <string>&lt;font color="#FF0000">stopped due to errors&lt;/font></string>
-         </property>
-         <property name="textFormat" >
-          <enum>Qt::AutoText</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
      <item>
       <spacer>
@@ -175,7 +86,7 @@
        <number>6</number>
       </property>
       <item row="0" column="0" >
-       <widget class="QLabel" name="labelText_BackingUp" >
+       <widget class="QLabel" name="labelText_BackupStep" >
         <property name="minimumSize" >
          <size>
           <width>100</width>
@@ -247,7 +158,7 @@
        </spacer>
       </item>
       <item row="1" column="1" >
-       <widget class="QLabel" name="label_trafic" >
+       <widget class="QLabel" name="label_traffic" >
         <property name="text" >
          <string>traffic</string>
         </property>
@@ -285,12 +196,22 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="btnPause" >
+       <property name="enabled" >
+        <bool>true</bool>
+       </property>
+       <property name="text" >
+        <string>&amp;Pause</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnCancel" >
        <property name="enabled" >
         <bool>true</bool>
        </property>
        <property name="text" >
-        <string>&amp;Cancel</string>
+        <string>&amp;Abort</string>
        </property>
       </widget>
      </item>
@@ -309,22 +230,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>btnClose</sender>
-   <signal>clicked()</signal>
-   <receiver>OutputDialog</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
