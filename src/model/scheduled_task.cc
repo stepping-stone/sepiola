@@ -40,7 +40,7 @@ ScheduledTask::ScheduledTask()
 	this->setType(ScheduleRule::NEVER);
 	this->clearWeekdays();
 	this->setTimeToRun(QTime());
-	this->setMinutesAfterStartup(-1);
+	this->setMinutesAfterStartup(0);
 }
 
 /**
@@ -52,6 +52,7 @@ ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> weekdays, QTime timeTo
 	this->setType(ScheduleRule::AT_WEEKDAYS_AND_TIME);
 	this->setWeekdays(weekdays);
 	this->setTimeToRun(timeToRun);
+	this->setMinutesAfterStartup(0);
 }
 
 /**
