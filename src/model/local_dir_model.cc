@@ -49,17 +49,18 @@ QVariant LocalDirModel::data(const QModelIndex& index, int role) const
 		QString curPath = f_info.absoluteFilePath() + ((curPathIsDir &&  !f_info.absoluteFilePath().endsWith("/"))?"/":"");
 		bool existRulesOnChildren = false;
 		QPair<QString,bool> closestParentRule;
-		QHashIterator<QString,bool> i(selectionRules);
-		while (i.hasNext()) {
-			i.next();
-			if (i.key() != curPath && curPathIsDir && i.key().startsWith(curPath)) {
+		QHashIterator<QString,bool> itr(selectionRules);
+		while (itr.hasNext()) {
+			itr.next();
+			QString rulePath = itr.key();
+			if (rulePath != curPath && curPathIsDir && rulePath.startsWith(curPath)) {
 				// rules on children
 				existRulesOnChildren = true;
-			} else if (i.key() == curPath || (i.key().endsWith("/") && curPath.startsWith(i.key()))) {
+			} else if (rulePath == curPath || (rulePath.endsWith("/") && curPath.startsWith(rulePath))) {
 				// rules on parents or self
-				if (i.key().length() > closestParentRule.first.length()) {
+				if (rulePath.length() > closestParentRule.first.length()) {
 					// rule is "closer" -> take it
-					closestParentRule = QPair<QString,bool>(i.key(),i.value());
+					closestParentRule = QPair<QString,bool>(rulePath, itr.value());
 				}
 			}
 		}
@@ -82,17 +83,19 @@ bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int
 		bool curPathIsDir = f_info.isDir();
 		QString curPath = f_info.absoluteFilePath() + ((curPathIsDir &&  !f_info.absoluteFilePath().endsWith("/"))?"/":"");
 		QPair<QString,bool> closestParentRule("",false);
-		QMutableHashIterator<QString,bool> i(selectionRules);
-		while (i.hasNext()) {
-			i.next();
-			if (i.key() == curPath || (curPathIsDir && i.key().startsWith(curPath))) {
+		QMutableHashIterator<QString,bool> itr(selectionRules);
+		while (itr.hasNext()) {
+			itr.next();
+			QString rulePath = itr.key();
+			bool rulePathIsDir = rulePath.endsWith("/");
+			if (rulePath == curPath || (curPathIsDir && rulePath.startsWith(curPath))) {
 				// rules on children and self
-				i.remove();
-			} else if (curPathIsDir && curPath.startsWith(i.key())) {
+				itr.remove();
+			} else if (rulePathIsDir && curPath.startsWith(rulePath)) {
 				// rules on parents
-				if (i.key().length() > closestParentRule.first.length()) {
+				if (rulePath.length() > closestParentRule.first.length()) {
 					// rule is "closer" -> take it
-					closestParentRule = QPair<QString,bool>(i.key(),i.value());
+					closestParentRule = QPair<QString,bool>(rulePath, itr.value());
 				}
 			}
 		}
@@ -100,6 +103,7 @@ bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int
 			selectionRules.insert(curPath, !closestParentRule.second);
 		}
 		emit layoutChanged(); // in fact dataChanged() would be better, but it's too expensive to calculate all the changed items
+		// qDebug() << "Current selection rules" << selectionRules.keys();
 		return true;
 	}
 	return QDirModel::setData(index, value, role);

@@ -186,12 +186,14 @@ void RestoreForm::expandTreePart()
 	int nLevels = 2;
 	int iLevel = 0;
 	QStandardItemModel* remoteDirModel = this->model->getCurrentRemoteDirModel();
-	QStandardItem* dirItem = remoteDirModel->invisibleRootItem();
-	while ( iLevel < nLevels && dirItem->hasChildren())
-	{
-		this->treeViewFilesAndFolders->setExpanded( remoteDirModel->indexFromItem( dirItem ), true );
-		dirItem = dirItem->child(0);
-		iLevel++;
+	if (remoteDirModel != 0) {
+		QStandardItem* dirItem = remoteDirModel->invisibleRootItem();
+		while ( iLevel < nLevels && dirItem->hasChildren())
+		{
+			this->treeViewFilesAndFolders->setExpanded( remoteDirModel->indexFromItem( dirItem ), true );
+			dirItem = dirItem->child(0);
+			iLevel++;
+		}
 	}
 }
 
