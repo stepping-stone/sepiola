@@ -18,15 +18,6 @@
         <translation>Urheberrecht bei</translation>
     </message>
     <message>
-        <location filename="../gui/about_dialog.ui" line="88"/>
-        <source>stepping stone GmbH
-Pappelweg 41
-CH-3013 Bern</source>
-        <translation>stepping stone GmbH
-Pappelweg 41
-CH-3013 Bern</translation>
-    </message>
-    <message>
         <location filename="../gui/about_dialog.ui" line="113"/>
         <source>Developed by</source>
         <translation>Entwickelt durch</translation>
