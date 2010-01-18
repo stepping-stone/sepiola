@@ -44,6 +44,18 @@ OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( paren
 
 	this->model = model;
 
+	// adjust content of change-quota-label
+	Settings* settings = Settings::getInstance();
+	this->labelInfoChangeQuota->setOpenExternalLinks(true);
+	QString uid_param = settings->getQuotaModificationUrlUidParam();
+	uid_param = (uid_param == "") ? "$UID$" : uid_param;
+	if (settings->getQuotaModificationUrl() != "") {
+		this->labelInfoChangeQuota->setText(QObject::tr("<a href=\"%1\">Change quota</a>").arg(settings->getQuotaModificationUrl().replace(uid_param, settings->getServerUserName())));
+	} else {
+		this->labelInfoChangeQuota->setText("");
+		this->labelInfoChangeQuota->setVisible(false);
+	}
+
 	// refresh form
 	this->refreshSpaceStatistic();
 	this->refreshLastBackupsOverview();
@@ -128,7 +140,7 @@ void OverviewForm::refreshSpaceStatistic()
 	QString format_percent = QString( "%1\%" ), format_MB = QString( "%1 MB" ), format_GB = QString( "%1 GB" ), format_TB = QString( "%1 TB" );
 	QStringList sizeNames; sizeNames << "Backup" << "Snapshot" << "Free" << "Quota";
 	int precision_MB = 0, precision_GB = 1, precision_TB = 2;
-	
+
 	int quota, backup, snapshot;
 	qDebug() << "OverviewForm::refreshSpaceStatistic(): quotaValues.size()" << quotaValues.size();
 	if (quotaValues.size() == 3) {
@@ -136,14 +148,14 @@ void OverviewForm::refreshSpaceStatistic()
 		backup = quotaValues.at(1);
 		snapshot = quotaValues.at(2);
 		this->labelSpaceAvailable->setPixmap( this->getSpaceVisualization( quota, backup, snapshot ) );
-		
+
 		// The following 3 lines could also be in the constructor
 		this->labelLegendBackup->setPixmap( this->getSpaceVisualization( 100, 100, 0, 16, 1 ) );
 		this->labelLegendSnapshot->setPixmap( this->getSpaceVisualization( 100, 0, 100, 16, 1 ) );
 		this->labelLegendFree->setPixmap( this->getSpaceVisualization( 100, 0, 0, 16, 1 ) );
 
 		QList<float> sizes; sizes << backup << snapshot << ( quota - backup - snapshot ) << quota;
-	
+
 		// set field-text of all space-fields
 		for ( int i = 0; i < sizeNames.size(); i++ )
 		{
@@ -184,7 +196,7 @@ void OverviewForm::refreshSpaceStatistic()
 				el_percent->setText( QObject::tr("N/A") );
 			}
 		}
-	}		
+	}
 }
 
 /**

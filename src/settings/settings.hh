@@ -210,6 +210,8 @@ class Settings : public QObject
 		QString getServerQuotaScriptName();
 		QString getAuthorizedKeyFolderName();
 		QString getAuthorizedKeyFileName();
+		QString getQuotaModificationUrl();
+		QString getQuotaModificationUrlUidParam();
 
 		QString getThisApplicationFullPathExecutable();
 		QString getThisApplicationExecutable();
@@ -299,6 +301,8 @@ class Settings : public QObject
 		static const QString SETTINGS_SERVER_QUOTA_SCRIPT_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FOLDER_NAME;
 		static const QString SETTINGS_AUTHORIZED_KEY_FILE_NAME;
+		static const QString SETTINGS_QUOTA_MODIFICATION_URL;
+		static const QString SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM;
 
 		// [Executables]
 		static const QString SETTINGS_GROUP_EXECUTABLES;
@@ -384,6 +388,8 @@ class Settings : public QObject
 
 		QString authorizedKeyFolderName;
 		QString authorizedKeyFileName;
+		QString quotaModificationUrl;
+		QString quotaModificationUrlUidParam;
 
 		// [Executables]
 		QString thisApplication;
@@ -585,6 +591,16 @@ inline QString Settings::getAuthorizedKeyFolderName()
 inline QString Settings::getAuthorizedKeyFileName()
 {
 	return authorizedKeyFileName;
+}
+
+inline QString Settings::getQuotaModificationUrl()
+{
+	return quotaModificationUrl;
+}
+
+inline QString Settings::getQuotaModificationUrlUidParam()
+{
+	return quotaModificationUrlUidParam;
 }
 
 inline QString Settings::getRsyncName()

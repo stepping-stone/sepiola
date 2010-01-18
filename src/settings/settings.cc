@@ -85,6 +85,8 @@ const QString Settings::SETTINGS_BACKUP_TIME_FILE_NAME = "BackupTimeFileName";
 const QString Settings::SETTINGS_SERVER_QUOTA_SCRIPT_NAME = "QuotaScript";
 const QString Settings::SETTINGS_AUTHORIZED_KEY_FOLDER_NAME = "AuthorizedKeyFolderName";
 const QString Settings::SETTINGS_AUTHORIZED_KEY_FILE_NAME = "AuthorizedKeyFileName";
+const QString Settings::SETTINGS_QUOTA_MODIFICATION_URL = "QuotaModificationUrl";
+const QString Settings::SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM = "QuotaModificationUrlUidParam";
 
 // [Executables]
 const QString Settings::SETTINGS_GROUP_EXECUTABLES = "Executables";
@@ -235,6 +237,8 @@ void Settings::reloadSettings()
 	serverQuotaScriptName = applicationSettings->value( SETTINGS_SERVER_QUOTA_SCRIPT_NAME ).toString();
 	authorizedKeyFolderName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FOLDER_NAME ).toString();
 	authorizedKeyFileName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FILE_NAME ).toString();
+	quotaModificationUrl = applicationSettings->value( SETTINGS_QUOTA_MODIFICATION_URL ).toString();
+	quotaModificationUrlUidParam = applicationSettings->value( SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM ).toString();
 	applicationSettings->endGroup();
 
 	// [Executables]
@@ -257,6 +261,8 @@ void Settings::reloadSettings()
 	serverKey = resellerSettings->value( SETTINGS_SERVER_KEY, serverKey ).toString();
 	backupRootFolder = resellerSettings->value( SETTINGS_BACKUP_ROOT_FOLDER, backupRootFolder ).toString();
 	restoreRootFolder = resellerSettings->value( SETTINGS_RESTORE_ROOT_FOLDER, restoreRootFolder ).toString();
+	quotaModificationUrl = resellerSettings->value( SETTINGS_QUOTA_MODIFICATION_URL, quotaModificationUrl ).toString();
+	quotaModificationUrlUidParam = resellerSettings->value( SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM, quotaModificationUrlUidParam ).toString();
 	resellerSettings->endGroup();
 
 	applicationName = resellerSettings->value( SETTINGS_GROUP_APPLICATION + "/" + SETTINGS_APPLICATION_FULL_NAME, applicationName ).toString();
@@ -294,7 +300,7 @@ void Settings::reloadSettings()
 	}
 	appData->endArray();
 	scheduleRule = appData->value( SETTINGS_SCHEDULE_RULE ).value<ScheduledTask>();
-	
+
 	qRegisterMetaType< QPair<QString,bool> >("QPair<QString,bool>");
 	size = appData->beginReadArray( SETTINGS_LAST_BACKUP_RULES );
 	lastBackupRules.clear();
