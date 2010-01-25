@@ -116,11 +116,11 @@ bool CliManager::isUpdateOnlyApplication( int argc, char* argv[] )
 void CliManager::runSchedule()
 {
 	Settings* settings = Settings::getInstance();
-	
+
 	// int delay = settings->getSchedulerDelay();
 	int delay = settings->getScheduleRule().getMinutesAfterStartup();
 	// TODO qDebug() << "CliManager::runSchedule: delay aus scheduledTask herauslesen, wei geht das unter Linux (delay=0?)";
-	
+
 	if ( delay > 0 )
 	{
 		qDebug() << "Starting schedule job in " << delay << " minute(s)";
@@ -132,6 +132,7 @@ void CliManager::runSchedule()
 	}
 
 	BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
+	qDebug() << "backupRules:" << backupRules;
 	MainModel mainModel;
 
 	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
@@ -226,7 +227,7 @@ void CliManager::runCli( int argc, char* argv[] )
 
 	Settings* settings = Settings::getInstance();
 	BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
-	
+
 	MainModel mainModel;
 	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 					   this, SLOT( printInfoMessage( const QString& ) ) );
@@ -319,7 +320,7 @@ QString CliManager::readPassword()
 	#ifdef Q_OS_WIN
 		HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
 		DWORD fdwOldMode;
-		if (hStdin == INVALID_HANDLE_VALUE || !GetConsoleMode(hStdin, &fdwOldMode) || !SetConsoleMode(hStdin, fdwOldMode & ~ENABLE_ECHO_INPUT)) { 
+		if (hStdin == INVALID_HANDLE_VALUE || !GetConsoleMode(hStdin, &fdwOldMode) || !SetConsoleMode(hStdin, fdwOldMode & ~ENABLE_ECHO_INPUT)) {
 			qWarning() << QObject::tr("Caution: Cannot turn off the password echoing! Password will be shown when typed.");
 		}
 	#endif
@@ -330,9 +331,9 @@ QString CliManager::readPassword()
 	cin >> password;
 
 	#ifdef Q_OS_WIN
-		SetConsoleMode(hStdin, fdwOldMode); 
+		SetConsoleMode(hStdin, fdwOldMode);
 	#endif
-	
+
 	#ifdef Q_OS_UNIX
 		// Restore terminal.
 		(void) tcsetattr( 0, TCSAFLUSH, &oldTermios );
