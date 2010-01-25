@@ -40,23 +40,23 @@ public:
 	static QString filenameShrink(const QString& filename, const int maxlen);
 	static QString buf2QString(const char* buf);
 	static QString buf2QString(QString buf);
-	
+
 	static float trafficStr2BytesPerSecond(QString trafficStr);
 	static QString bytesToReadableStr(double traffic, const QString& unitTxt);
 	static QString bytesToReadableStr(quint64 traffic, const QString& unitTxt);
 	static QString kBytesToReadableStr(double traffic, const QString& unitTxt);
-	
+
 	static QString equalStart(const QString& aStr, const QString& bStr);
-	
+
 	static bool isFilename(const QString& txt); // simple guess if txt can be displayed compact like a filename
 	static bool isDirectoryName(const QString& txt); // simple guess if txt might be a folder name
 	static QString dirPart(const QString& filename); // for folders ending with "/" returns self
 	static QString parentDir(const QString& filename); // same as dirPart, except for folders -> one back and not self
 	static QString equalDirPart(const QString& filenameA, const QString& filenameB);
 	static bool writeStringListToFile(const QList<QString>& include_dirs_list, const QString& include_dirs_filename, QString eolChar = "\n" );
-	
+
 	static void testChar2StdString();
-	
+
 private:
 	static QString unit_prefixes() { return QString(" kMGTPEZY"); };
 };
@@ -64,7 +64,7 @@ private:
 namespace
 {
 	// run test by calling sepiola with parameter: -test testProgressTaskClass
-	int StringUtils_dummy = TestManager::registerTest( "testChar2StdString", StringUtils::testChar2StdString );
+	int stringUtils_dummy = TestManager::registerTest( "testChar2StdString", StringUtils::testChar2StdString );
 }
 
 inline void StringUtils::testChar2StdString() {
@@ -73,7 +73,7 @@ inline void StringUtils::testChar2StdString() {
 	std::string myString1(myText);
 	cout << myString1;
 	std::string myString2 = myText;
-	cout << myString2;	
+	cout << myString2;
 	cout << std::string(myText) << endl;
 }
 
@@ -109,8 +109,8 @@ inline QString StringUtils::filenameShrink(const QString& filename, const int ma
 		if (len-fn_start+ellipses.length() > maxlen) // filename only already too long
 		{
 			return((fn_only.length()>maxlen) ? (fn_only.left(maxlen-ellipses.length()) + ellipses) : fn_only);
-		} 
-		else 
+		}
+		else
 		{
 			return(filename.left(maxlen-len+fn_start-ellipses.length()) + ellipses + "/" + fn_only);
 		}
@@ -210,6 +210,7 @@ inline bool StringUtils::writeStringListToFile(const QList<QString>& item_list, 
 		out.close();
 		return true;
 	} else {
+		qDebug() << "StringUtils::writeStringListToFile(...)" << "problems opening file:" << filename;
 		return false;
 	}
 }
