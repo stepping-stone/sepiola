@@ -191,11 +191,11 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 
 	if ( QFile( resellerSettingsFileName ).exists() )
 	{
-		qDebug() << "Loading reseller-settings from file <" + resellerSettings->fileName() + ">";
+		// qDebug() << "Loading reseller-settings from file <" + resellerSettings->fileName() + ">";
 	}
 	else
 	{
-		qDebug() << "Information: No reseller-specific settings provided <" + resellerSettingsFileName + "> -> settings are taken from standard config file <" + applicationSettings->fileName() + ">.";
+		// qDebug() << "Information: No reseller-specific settings provided <" + resellerSettingsFileName + "> -> settings are taken from standard config file <" + applicationSettings->fileName() + ">.";
 	}
 
 	reloadSettings();
