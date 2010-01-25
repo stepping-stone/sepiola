@@ -88,11 +88,11 @@ BackupThread::BackupThread( const BackupSelectionHash& includeRules, const bool&
 
 	// TODO adjust the given values for subtask steps and durations
 	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
-	pt.appendTask(TASKNAME_PREPARE_DIRECTORIES, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
-	pt.appendTask(TASKNAME_ESTIMATE_BACKUP_SIZE, DateTimeUtils::getDateTimeFromSecs(3 /* time for dry run */), 30 /* steps??? */);
+	pt.appendTask(TASKNAME_PREPARE_DIRECTORIES, DateTimeUtils::getDateTimeFromSecs(2 /* time for directory-preparation */), 3.0);
+	pt.appendTask(TASKNAME_ESTIMATE_BACKUP_SIZE, DateTimeUtils::getDateTimeFromSecs(30 /* time for dry run */), 1.0 /* steps??? */);
 	pt.appendTask(TASKNAME_FILE_UPLOAD, DateTimeUtils::getDateTimeFromSecs(100), 250/* enter bytes to upload */);
-	pt.appendTask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
-	pt.appendTask(TASKNAME_UPLOAD_METADATA, DateTimeUtils::getDateTimeFromSecs(2), 1 /* steps??? */);
+	pt.appendTask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT, DateTimeUtils::getDateTimeFromSecs(2 /* backup content download */), 3);
+	pt.appendTask(TASKNAME_UPLOAD_METADATA, DateTimeUtils::getDateTimeFromSecs(2), 1.0 /* steps??? */);
 	pt.appendTask(TASKNAME_METAINFO, DateTimeUtils::getDateTimeFromSecs(2), 1);
 	currentTaskNr = 0;
 
@@ -277,18 +277,43 @@ void BackupThread::setLastBackupState(ConstUtils::StatusEnum newStatus)
 	Settings* settings = Settings::getInstance();
 	if (this->backupStartDateTime.isNull()) // new Backup
 	{
+		qDebug() << "overwriting last backup state";
 		this->backupStartDateTime = QDateTime::currentDateTime();
 		this->backupCurrentStatus = newStatus;
 	} else {
+		qDebug() << "creating new last backup state object";
 		// backupState cannot become "better", e.g. go from WARNINGS to OK during one backup
 		this->backupCurrentStatus = (ConstUtils::StatusEnum)std::max( (int)newStatus, (int)(this->backupCurrentStatus) );
 	}
-	settings->addLastBackup( BackupTask(this->backupStartDateTime, this->backupCurrentStatus) ); // overwrites the lastTask if its time is equal to the passed BackupTask's backupTime
+	QList<BackupTask> savedBkupInfos = settings->getLastBackups();
+	if (!savedBkupInfos.empty() && savedBkupInfos.first().getDateTime() == this->backupStartDateTime) {
+		this->backupStartDateTime = QDateTime::currentDateTime();
+		settings->replaceLastBackup( BackupTask(this->backupStartDateTime, newStatus) );
+	} else {
+		this->backupStartDateTime = QDateTime::currentDateTime();
+		settings->addLastBackup( BackupTask(this->backupStartDateTime, newStatus) );
+	}
 }
 
 ConstUtils::StatusEnum BackupThread::getLastBackupState()
 {
 	return this->backupCurrentStatus;
+}
+
+void BackupThread::rsyncDryrunProgressHandler(const QString& filename, long files_total, long files_done) {
+	ProgressTask* mySubPt = this->pt.getSubtask(TASKNAME_ESTIMATE_BACKUP_SIZE); // this->pt.getCurrentTask();
+	StringPairList vars = StringPairList();
+	QString currentTaskName = mySubPt!=0 ? mySubPt->getName() : "";
+	if (currentTaskName==TASKNAME_ESTIMATE_BACKUP_SIZE)
+	{
+		double ratio_done = (double)files_done / (files_total!=0 ? files_total: 1);
+		mySubPt->addFixpointNow(ratio_done);
+		vars.append( QPair<QString,QString>(tr("current task"), mySubPt->getName()));
+		vars.append( QPair<QString,QString>(tr("current file"), StringUtils::filenameShrink(filename,72)) );
+		vars.append( QPair<QString,QString>(tr("files processed"), QString("%1 / %2").arg(QString::number(files_done),QString::number(files_total))) );
+		vars.append( QPair<QString,QString>(tr("estimated remaining time")+":", mySubPt->getRootTask()->getEstimatedTimeLeftString()) );
+	}
+	updateInformationToDisplay(vars);
 }
 
 void BackupThread::rsyncUploadProgressHandler(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten) {
@@ -298,6 +323,7 @@ void BackupThread::rsyncUploadProgressHandler(const QString& filename, float tra
 	if (currentTaskName==TASKNAME_FILE_UPLOAD || currentTaskName==TASKNAME_UPLOAD_METADATA || currentTaskName==TASKNAME_ESTIMATE_BACKUP_SIZE)
 	{
 		mySubPt->addFixpointNow(bytesWritten);
+		vars.append( QPair<QString,QString>(tr("current task"), mySubPt->getName()));
 		vars.append( QPair<QString,QString>(tr("current file"), filename) );
 		vars.append( QPair<QString,QString>(tr("traffic / transferred")+":", StringUtils::bytesToReadableStr((double)traffic,"B/s") + " / " + StringUtils::bytesToReadableStr((double)bytesWritten+bytesRead, "B")) );
 		vars.append( QPair<QString,QString>(tr("estimated remaining time")+":", mySubPt->getRootTask()->getEstimatedTimeLeftString()) );
@@ -365,7 +391,11 @@ quint64 BackupThread::estimateBackupSize( const QString& src, const QString& des
 	StringPairList vars;
 	vars.append(QPair<QString,QString>(tr("current task"), mySubPt->getName()));
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
+	QObject::connect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
+					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
 	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, &errors );
+	QObject::disconnect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
+					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
 	ProgressTask* uploadPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD);
 	if (uploadPt != 0) uploadPt->setNumberOfSteps(uploadSize);
 	return uploadSize;
