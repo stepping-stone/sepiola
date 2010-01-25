@@ -305,8 +305,8 @@ int main(int argc, char *argv[])
 	}
 
 	// run with gui
-	qInstallMsgHandler(messageHandler);
 	QApplication app(argc, argv);
+	qInstallMsgHandler(messageHandler);
 	if ( !initSettings( &app) || !assertGuiDependencies() )
 	{
 		QMessageBox::critical( 0, "Dependency missing", DEPENDENCY_MISSING);
