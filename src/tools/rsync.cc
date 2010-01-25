@@ -21,6 +21,7 @@
 #include <QStringList>
 #include <QByteArray>
 #include <QString>
+#include <QTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QIODevice>
@@ -38,13 +39,18 @@
 #include "utils/log_file_utils.hh"
 #include "utils/string_utils.hh"
 
-Rsync::Rsync() {}
+Rsync::Rsync() {
+	this->files_total = -1;
+	this->cur_n_files_done = 0;
+	this->lastUpdateTime = QDateTime::currentDateTime();
+}
 
 Rsync::~Rsync() {}
 
 
 QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
 {
+	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files";
 	qDebug() << "Rsync::upload(" << includeRules << ", " << src << ", " << destination << ", " << compress << ", " << errors << ", " << dry_run << ")";
@@ -59,8 +65,8 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	arguments << getRsyncGeneralArguments();
 	arguments << getRsyncUploadArguments();
 
-	if (dry_run) { 	this->last_calculatedLiteralData = -1; arguments << "--stats" << "--only-write-batch=/dev/null"; }
-	
+	if (dry_run) { 	this->last_calculatedLiteralData = -1; arguments << "-v" << "--stats" << "--only-write-batch=/dev/null"; }
+
 	arguments << getRsyncSshArguments();
 	if ( setDeleteFlag )
 	{
@@ -82,7 +88,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	} else {
 		qDebug() << "unable to write directory-names to file" << include_dirs_filename << ".";
 	}
-	
+
 	createProcess( settings->getRsyncName() , arguments );
 	start();
 	foreach ( QByteArray rule, convertedRules )
@@ -97,44 +103,75 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
 	QString lineData;
 	bool endReached = false;
+	DryrunStates dryrun_state = DRY_RUN_START;
+	long nOfFiles = -1;
+	QString lastFileName;
 	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
 	{
-		//qDebug() << lineData;
+		qDebug() << lineData;
 		lineData.replace( settings->getEOLCharacter(), "");
 		endReached = (endReached || (lineData.contains(STATISTICS_FIRST_LABEL)));
-		// /*$$$DEBUG*/if (endReached) { qDebug() << "Rsync::upload(...)" << lineData; }
 		if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
 			endReached = true; // hopefully not necessary
+			dryrun_state = DRY_RUN_COUNT_FILES;
 			this->last_calculatedLiteralData = lineData.mid(STATISTICS_FIRST_USED_LABEL.length()).trimmed().split(" ")[0].toLong();
 		}
 		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> item = getItemAndStoreTransferredBytes( lineData );
 
-		if (!endReached && item.first != "" && item.first != "./") {
-			item.first.prepend( "/" );
-			this->progress_lastFilename = item.first;
-			removeSymlinkString( &item.first );
-			FileSystemUtils::convertToLocalPath( &item.first );
-			uploadedItems << item;
-			QString outputText;
-			switch( item.second )
-			{
-				case UPLOADED:
-					outputText = tr( "Uploading %1" ).arg( item.first.trimmed() );
-					emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
-					break;
-				case SKIPPED:
-					outputText = tr( "Skipping %1" ).arg( item.first.trimmed() );
-					break;
-				case DELETED:
-					outputText = tr( "Deleting %1" ).arg( item.first.trimmed() );
-					break;
-				default:
-					break;
+		if (dry_run && dryrun_state == DRY_RUN_START && lineData.contains("building file list ...")) {
+			dryrun_state = DRY_RUN_COUNT_FILES;
+		}
+		if (dry_run && dryrun_state == DRY_RUN_COUNT_FILES && lineData.contains("files to consider")) {
+			dryrun_state = DRY_RUN_CALCULATE_SIZE;
+			nOfFiles = lineData.trimmed().split(" ")[0].toLong();
+		}
+		if (dry_run && dryrun_state == DRY_RUN_COUNT_FILES && lineData.contains(" files...")) {
+			int curFileNr = lineData.trimmed().split(" ")[0].toLong();
+			this->files_total = curFileNr;
+			bufferedInfoOutput(); // prevents direct flush
+		}
+		if (dry_run && dryrun_state == DRY_RUN_CALCULATE_SIZE) {
+			if (!lineData.startsWith("<f") && !lineData.startsWith("cd") ) {
+				if (lineData.contains("to-check=")) {
+					QStringList files_cur_total = lineData.trimmed().split("to-check=").last().split("/");
+					this->files_total = nOfFiles; // files_cur_total.last().replace(")","").toLong();
+					this->cur_n_files_done = files_total - files_cur_total.first().toLong();
+					this->progress_lastFilename = lastFileName;
+				}
+			} else {
+				lastFileName = lineData.mid(10).trimmed();
 			}
-			// qDebug() << outputText;
-			emit infoSignal( outputText );
-		} else {
-			emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
+			bufferedInfoOutput(); // prevents direct flush
+		}
+
+		if (!dry_run) {
+			if (!endReached && item.first != "" && item.first != "./") {
+				item.first.prepend( "/" );
+				this->progress_lastFilename = item.first;
+				removeSymlinkString( &item.first );
+				FileSystemUtils::convertToLocalPath( &item.first );
+				uploadedItems << item;
+				QString outputText;
+				switch( item.second )
+				{
+					case UPLOADED:
+						outputText = tr( "Uploading %1" ).arg( item.first.trimmed() );
+						emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
+						break;
+					case SKIPPED:
+						outputText = tr( "Skipping %1" ).arg( item.first.trimmed() );
+						break;
+					case DELETED:
+						outputText = tr( "Deleting %1" ).arg( item.first.trimmed() );
+						break;
+					default:
+						break;
+				}
+				// qDebug() << outputText;
+				emit infoSignal( outputText );
+			} else {
+				emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
+			}
 		}
 	}
 	qDebug() <<  QString::number( uploadedItems.size() ) << "files and/or directories processed";
@@ -154,6 +191,26 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		}
 	}
 	return uploadedItems;
+}
+
+
+void Rsync::updateInfoOutput() {
+	// qDebug() << "Rsync::updateVolumeOutput()";
+	emit volumeCalculationInfoSignal( this->progress_lastFilename, this->files_total, this->cur_n_files_done );
+}
+void Rsync::bufferedInfoOutput() // prevents direct flush
+{
+	const int msecs_to_wait_for_flush = 250;
+
+	QDateTime currentTime = QDateTime::currentDateTime();
+	if ( this->lastUpdateTime.addMSecs(msecs_to_wait_for_flush) <= currentTime )
+	{
+		qDebug() << "soft Update success" << msecs_to_wait_for_flush << this->lastUpdateTime;
+		// update, but only after half a second, such that following info arriving in the next second are also flushed
+		this->lastUpdateTime = currentTime;
+		// QTimer::singleShot(msecs_to_wait_for_flush, this, SLOT(updateInfoOutput())); // funktioniert unerklaerlicherweise nicht
+		updateInfoOutput();
+	}
 }
 
 /**
@@ -445,7 +502,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		if (item != "") {
 			removeSymlinkString( &item );
 			FileSystemUtils::convertToLocalPath( &item );
-			downloadedItems << item; 
+			downloadedItems << item;
 			QString output = tr( "Downloading %1" ).arg( item );
 			emit infoSignal( output );
 		} else {
@@ -455,7 +512,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 //	qDebug() << "Downloaded Items: " << downloadedItems;
 	emit infoSignal( tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() ) );
 	waitForFinished();
-	
+
 	QString errors = readAllStandardError();
 	if ( errors != "" )
 	{
@@ -496,7 +553,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		arguments << "--include-from=-";
 		createProcess( settings->getRsyncName() , arguments );
 		start();
-		
+
 		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules);
 		foreach ( QByteArray rule, convertedRules )
 		{
@@ -523,7 +580,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		if (item != "") {
 			removeSymlinkString( &item );
 			FileSystemUtils::convertToLocalPath( &item );
-			downloadedItems << item; 
+			downloadedItems << item;
 			QString output = tr( "Downloading %1" ).arg( item );
 			emit infoSignal( output );
 		} else {
@@ -534,7 +591,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	qDebug() << tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() );
 	emit infoSignal( tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() ) );
 	waitForFinished();
-	
+
 	QString errors = readAllStandardError();
 	if ( errors != "" )
 	{
@@ -691,7 +748,7 @@ QStringList Rsync::getRsyncGeneralArguments()
 		result << "-iilrtxHS8";
 		result << "--specials";
 		result << "--progress";
-	}	
+	}
 	return result;
 }
 
@@ -777,20 +834,20 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 {
 	qDebug() << "Rsync::calculateRsyncRulesFromIncludeRules(...)";
 	LogFileUtils* log = LogFileUtils::getInstance();
-	
+
 	QList<QByteArray> filters;
 	QStack<QPair<QString,bool> > unclosedDirs;
 	QString curDir = "/";
 	QList<QString> includeRulesList = includeRules.keys();
 	qSort(includeRulesList);
-	
+
 	qDebug() << "provided selection rules:";
 	log->writeLog("provided selection rules:");
 	foreach (QString rule, includeRulesList) {
 		qDebug() << (includeRules[rule] ? "+" : "-") + QString(" ") + rule;
 		log->writeLog( (includeRules[rule] ? "+" : "-") + QString(" ") + rule );
-	}	
-	
+	}
+
 	QString lastRule = "";
 	if (files_from_list != 0) { files_from_list->clear(); files_from_list->append("/"); } // clear list and add "/"
 	foreach (QString rule, includeRulesList)
@@ -799,7 +856,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 		QString ruleParentDir = StringUtils::parentDir(rule);
 		QString ruleDir = StringUtils::dirPart(rule);
 		// qDebug() << "rule" << (ruleMod?"+":"-") << rule << "( ruleDir" << ruleDir << "curDir" << curDir << ")" << "isSubDir" << isSubDir << "isParentDir" << isParentDir;
-		
+
 		curDir = StringUtils::equalDirPart(curDir,ruleParentDir);
 		while (unclosedDirs.size()>0 && !ruleDir.startsWith(unclosedDirs.top().first)) {
 			QPair<QString,bool> dirToClose = unclosedDirs.pop();
@@ -829,7 +886,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 		} else {
 			filters << convertRuleToByteArray( rule,ruleMod );
 			// qDebug() << convertRuleToByteArray( rule,ruleMod );
-		}		
+		}
 		lastRule = rule;
 	}
 	while (unclosedDirs.size() > 0) {
@@ -837,10 +894,10 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 		if (dirToClose.second || dirToClose.first !=  lastRule) { // don't exclude dir/** bejond dir/
 			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 			// qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
-		}		
+		}
 	}
 	filters << convertRuleToByteArray( "**",false );
-	
+
 	if (files_from_list != 0) { qSort((*files_from_list)); }
 	qDebug() << "include rules for rsync:";
 	log->writeLog("include rules for rsync:");
@@ -866,7 +923,7 @@ QByteArray Rsync::convertRuleToByteArray(QString rule, bool modifier)
 void Rsync::testRsyncRulesConversion()
 {
 	qDebug() << "Rsync rules conversion test";
-	
+
 	BackupSelectionHash includeRules;
 	includeRules.insert("/home/dsydler/projects/xx/D/", true);
 	includeRules.insert("/home/dsydler/projects/xx/D/DA/", false);

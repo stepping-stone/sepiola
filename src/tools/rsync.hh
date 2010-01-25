@@ -35,8 +35,12 @@ class Rsync : public AbstractRsync, public Process
 
 public slots:
 	void abort();
-	
+	void bufferedInfoOutput();
+private slots:
+	void updateInfoOutput();
+
 signals:
+	void volumeCalculationInfoSignal(const QString& filename, long files_total, long files_done);
 	void trafficInfoSignal(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten);
 
 public:
@@ -56,12 +60,12 @@ public:
 	 */
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run=false ) throw ( ProcessException );
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* errors, bool dry_run=false ) throw ( ProcessException );
-	
+
 	/**
-	 * 
+	 *
 	 */
 	long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool compress, QString* errors ) throw ( ProcessException );
-	
+
 	/**
 	 * @see AbstractRsync::downloadFullBackup( const QString& backupName, const QString& destination )
 	 */
@@ -166,7 +170,11 @@ private:
 	float progress_trafficB_s;
 	QString progress_lastFilename;
 	quint64 last_calculatedLiteralData;
-	
+
+	long files_total;
+	long cur_n_files_done;
+	QDateTime lastUpdateTime;
+
 	QFileInfo downloadSingleFile( const QString& source, const QString& destination, const QFileInfo& fileName, bool compress, bool emitErrorSignal );
 	QStringList download( const QString& source, const QString& destination, bool compress) throw ( ProcessException );
 	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException );
