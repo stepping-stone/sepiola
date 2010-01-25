@@ -147,7 +147,7 @@ bool FileSystemUtils::isDir(const QString& path)
 
 void FileSystemUtils::writeLinesToFile(const QString& fileName, const QStringList& lines, const QString& encoding)
 {
-	qDebug() << "FileSystemUtils::writeLinesToFile( " << fileName << ", " << lines << " )";
+	qDebug() << "FileSystemUtils::writeLinesToFile( " << fileName << ", ... )";
 	QStringList result;
 	QFile file(fileName);
 	if ( !file.open(QIODevice::WriteOnly) )
