@@ -19,6 +19,7 @@
 #ifndef SETTINGS_HH
 #define SETTINGS_HH
 
+#include <stdlib.h>
 #include <QObject>
 #include <QFileInfo>
 #include <QSettings>
@@ -231,6 +232,7 @@ class Settings : public QObject
 		void saveInstallDate( const QDateTime& installDate, bool force_write = false );
 		QDateTime getInstallDate();
 		void saveBackupItemList( const QStringList& backupItems );
+		QString getClientUserName();
 		QString getClientPassword();
 		QString getServerUserName();
 		QString getServerPassword();
@@ -261,6 +263,7 @@ class Settings : public QObject
 		void saveNOfLastBackups( int nOfLastBackups );
 		const QList<BackupTask>& getLastBackups() const;
 		void addLastBackup( const BackupTask& lastBackup );
+		void replaceLastBackup( const BackupTask& newBackupInfo );
 		void saveLastBackups( const QList<BackupTask>& lastBackups );
 		const ScheduledTask& getScheduleRule() const;
 		void saveScheduleRule( const ScheduledTask& scheduleRule );
@@ -533,9 +536,19 @@ inline QString Settings::getThisApplicationExecutable()
 	return thisApplication;
 }
 
+inline QString Settings::getServerUserName()
+{
+	return serverUserName;
+}
+
 inline QString Settings::getServerPassword()
 {
 	return server_password;
+}
+
+inline QString Settings::getClientUserName()
+{
+	return QString(getenv("USER"));
 }
 
 inline QString Settings::getClientPassword()
@@ -621,11 +634,6 @@ inline QString Settings::getSshName()
 inline int Settings::getLanguageIndex()
 {
 	return languageIndex;
-}
-
-inline QString Settings::getServerUserName()
-{
-	return serverUserName;
 }
 
 inline QString Settings::getBackupContentFileName()

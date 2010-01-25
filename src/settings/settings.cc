@@ -195,7 +195,7 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	}
 	else
 	{
-		qDebug() << "reseller-config-file not found <" + resellerSettingsFileName + ">";
+		qDebug() << "Information: No reseller-specific settings provided <" + resellerSettingsFileName + "> -> settings are taken from standard config file <" + applicationSettings->fileName() + ">.";
 	}
 
 	reloadSettings();
@@ -578,28 +578,29 @@ void Settings::saveNOfLastBackups( int nOfLastBackups )
 
 /**
  * adds a new Task to the list of last Backup Tasks
- * overwrites the lastBackupTask if its time is equal to the passed BackupTask's backupTime
+ * overwrites the lastBackupTask if its time is equal to the passed BackupTask's backupTime or if passed if it is equal to the passed QDateTime originalStartDateTime (f.ex. to be able to reset time to end of backup)
  */
 void Settings::addLastBackup( const BackupTask& lastBackup )
 {
-	if ( this->lastBackups.size() == 0 || !this->lastBackups.at( 0 ).equals( lastBackup ) )
-	{
-		if ( this->lastBackups.size()>0 && this->lastBackups.at( 0 ).equalDateTime( lastBackup ) )
-		{
-			BackupTask bt = this->lastBackups.takeFirst();
-			bt.setStatus( lastBackup.getStatus() );
-			this->lastBackups.prepend( bt );
-		}
-		else
-		{
-			this->lastBackups.prepend( lastBackup );
-		}
-		this->saveLastBackups(this->lastBackups);
+	if ( this->lastBackups.size() == 0 || !this->lastBackups.at( 0 ).equals( lastBackup ) ) {
+		// identical values are not repeated
+		this->lastBackups.prepend( lastBackup );
 	}
+	this->saveLastBackups(this->lastBackups);
+}
+
+void Settings::replaceLastBackup( const BackupTask& newBackupInfo ) {
+	if ( this->lastBackups.size() != 0 ) {
+		this->lastBackups.takeFirst();
+		this->lastBackups.prepend( newBackupInfo );
+	}
+	this->saveLastBackups(this->lastBackups);
 }
 
 void Settings::saveLastBackups( const QList<BackupTask>& lastBackups )
 {
+	qDebug() << "Settings::saveLastBackups(...)";
+	qDebug() << "saving lastBackup-settings into file:" << this->appData->fileName();
 	appData->beginGroup( SETTINGS_GROUP_APPDATA );
 	appData->beginWriteArray( SETTINGS_APPDATA_LASTBACKUPS );
 	for ( int i = 0; i < std::min( this->lastBackups.size(), Settings::MAX_SAVED_LAST_BACKUPS ); ++i )
@@ -610,6 +611,7 @@ void Settings::saveLastBackups( const QList<BackupTask>& lastBackups )
 	}
 	appData->endArray();
 	appData->endGroup();
+	appData->sync(); // simple fix for the issue, that lastBackups were never persisted in -schedule-runs
 }
 
 void Settings::saveScheduleRule(const ScheduledTask& scheduleRule)
