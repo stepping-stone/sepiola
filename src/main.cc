@@ -305,6 +305,7 @@ int main(int argc, char *argv[])
 	}
 
 	// run with gui
+	qInstallMsgHandler(messageHandler);
 	QApplication app(argc, argv);
 	if ( !initSettings( &app) || !assertGuiDependencies() )
 	{
@@ -318,7 +319,6 @@ int main(int argc, char *argv[])
 	}
 	//createConsole();
 	LogFileUtils::getInstance()->open();
-	qInstallMsgHandler(messageHandler);
 	MainModel model;
 
 	QTranslator translator;
@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
 	{
 		LogFileUtils::getInstance()->writeLog(QObject::tr("Update started") );
 		// set update date
-		Settings* settings = Settings::getInstance(); 
+		Settings* settings = Settings::getInstance();
 		settings->saveInstallDate( settings->getInstallDate(), true );
 	}
 	else
