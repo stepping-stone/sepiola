@@ -54,7 +54,7 @@ ProgressTask::~ProgressTask() {
 
 bool ProgressTask::existsSubtask(QString name)
 {
-	for (int i = 0; i < this->subTasks.size(); i++) 
+	for (int i = 0; i < this->subTasks.size(); i++)
 		if (this->subTasks[i]->getName() == name)
 			return true;
 	return false;
@@ -84,7 +84,7 @@ int ProgressTask::getNumberOfSubtasks()
 {
 	return this->subTasks.size();
 }
-	
+
 ProgressTask* ProgressTask::appendTask(ProgressTask* pt)
 {
 	this->subTasks.append(pt);
@@ -128,7 +128,7 @@ ProgressTask* ProgressTask::getCurrentTask()
 		}
 		return this->subTasks[i_contains_fp]->getCurrentTask();
 	}
-	else 
+	else
 	{
 		return this;
 	}
@@ -141,8 +141,8 @@ void ProgressTask::addFixpointNow(double stepN)
 
 void ProgressTask::addFixpoint(QDateTime time, double stepN, bool force)
 {
-	if (this->fp_steps.size() > 0 && stepN < this->fp_steps.last()) { 
-		//qDebug() << "ProgressTask::addFixpoint: WARNING: provided step smaller than last one -> ignored"; 
+	if (this->fp_steps.size() > 0 && stepN < this->fp_steps.last()) {
+		//qDebug() << "ProgressTask::addFixpoint: WARNING: provided step smaller than last one -> ignored";
 	} else {
 		if (force || this->fp_times.size()==0 || (DateTimeUtils::getSeconds(time) - DateTimeUtils::getSeconds(this->fp_times.last()) > 0.2) ) {
 			this->fp_steps.append(std::max<double>(0.0,std::min<double>(this->nSteps,stepN)));
@@ -212,7 +212,7 @@ void ProgressTask::collectFixpointsFromSubtasks()
 			for (int i = 0; i < subTasks.size(); i++) {
 				ProgressTask* pt = subTasks[i];
 				pt->collectFixpointsFromSubtasks();
-				double q = DateTimeUtils::getSeconds(pt->getProposedEstimatedDuration()) / pt->getNumberOfSteps(); 
+				double q = DateTimeUtils::getSeconds(pt->getProposedEstimatedDuration()) / pt->getNumberOfSteps();
 				for (int j = 0; j < pt->fp_times.size(); j++) {
 					this->fp_steps.append(pt->fp_steps[j] * q + totDuration );
 					this->fp_times.append(pt->fp_times[j]);
@@ -240,7 +240,9 @@ QDateTime ProgressTask::getEstimatedTimeLeft()
 			return this->getProposedEstimatedDuration();
 		}
 	} else {
-		double t_mean, n_mean, t_last_secs = DateTimeUtils::getSeconds(fp_times.last());
+		double t_mean = 0.0;
+		double n_mean = 0.0;
+		double t_last_secs = DateTimeUtils::getSeconds(fp_times.last());
 		int i_from = fp_steps.size()-2; // earliest fixpoint to take into account
 		while (i_from > 0 && t_last_secs - DateTimeUtils::getSeconds(fp_times[i_from])<=DURATION_CALCULATION_TIME_RANGE) i_from--;
 		int n = fp_steps.size()-i_from;
@@ -261,7 +263,7 @@ QDateTime ProgressTask::getEstimatedTimeLeft()
 		}
 		double remaining_secs_from_last_fp = (this->getNumberOfSteps() - fp_steps.last()) * sum_dxdy / sum_dx2;
 		QDateTime guess = DateTimeUtils::getDateTimeFromSecs( remaining_secs_from_last_fp + DateTimeUtils::getSeconds(fp_times.last()) - DateTimeUtils::getSeconds(QDateTime::currentDateTime()) );
-		
+
 		// if guess is unrealistically large (>1 month), guess is not accepted as reliable value
 		if (DateTimeUtils::getSeconds(guess)<2592000.0) {
 			// the estimation is fed into a list, then a mean of these guesses (with respect to the time passed) is returned
@@ -271,7 +273,7 @@ QDateTime ProgressTask::getEstimatedTimeLeft()
 		int i = -1;
 		while (++i < this->lastDurationGuesses.size() && (curSecs-DateTimeUtils::getSeconds(this->lastDurationGuesses[i].first) < this->MEAN_OVER_LAST_N_SECONDS)) {
 			retSecs += std::max<double>(0.0,DateTimeUtils::getSeconds(this->lastDurationGuesses[i].first) + DateTimeUtils::getSeconds(this->lastDurationGuesses[i].second) - curSecs);
-		} 
+		}
 		this->lastDurationGuesses = this->lastDurationGuesses.mid(0,i);
 		if (i > 0) {
 			return( DateTimeUtils::getDateTimeFromSecs(retSecs/i) );
@@ -301,21 +303,21 @@ float ProgressTask::getFinishedRatio()
 void ProgressTask::testProgressTaskClass()
 {
 	qDebug() << "ProgressTask Test";
-	
+
 	qDebug() << "DateTime-Test";
 	qDebug() << DateTimeUtils::getSeconds(DateTimeUtils::getDateTimeFromSecs(100));
-	
+
 	ProgressTask pt("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
 	pt.appendTask("dry-run", DateTimeUtils::getDateTimeFromSecs(40), 30);
 	pt.appendTask("file-upload", DateTimeUtils::getDateTimeFromSecs(100), 250);
 	pt.appendTask("send meta-information", DateTimeUtils::getDateTimeFromSecs(20), 2);
-	
+
 	for (int task_nr = 0; task_nr < pt.getNumberOfSubtasks(); task_nr++) {
 		ProgressTask* subPt = pt.getSubtask(task_nr);
 		qDebug() << "TASK" << subPt->getFullName();
 		for (int i = 0; i <= subPt->getNumberOfSteps(); i++) {
 			if (i!=0) {
-				QWaitCondition waitCondition; QMutex mutex; mutex.lock(); 
+				QWaitCondition waitCondition; QMutex mutex; mutex.lock();
 				waitCondition.wait( &mutex, (long)(10 + DateTimeUtils::getSeconds(subPt->getProposedEstimatedDuration())/subPt->getNumberOfSteps()*(task_nr==1?2:1)*(rand()%1000)) );
 			}
 			subPt->addFixpointNow(i);
