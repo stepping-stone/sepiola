@@ -75,7 +75,7 @@ ScheduledTask::ScheduledTask(const ScheduledTask& task)
 	this->timeToRun = task.getTimeToRun();
 	this->minutesAfterStartup = task.getMinutesAfterStartup();
 }
-	
+
 ScheduledTask::~ScheduledTask() {}
 
 ScheduleRule::ScheduleType ScheduledTask::getType() const
@@ -153,17 +153,34 @@ QString ScheduledTask::toString() const
 		case ScheduleRule::NEVER: { return QString(QObject::tr("never")); break; }
 		case ScheduleRule::AT_WEEKDAYS_AND_TIME:
 		{
-			QString tok = ", ";
-			QList<ScheduleRule::Weekdays> wdList = weekdays.toList();
-			qStableSort(wdList.begin(), wdList.end());
-			QString wdStr = "";
-			for (int i = 0; i < wdList.size(); i++)
-			{
-				wdStr = wdStr + this->weekdayNames.value(wdList.at(i)).left(3) + tok;
+			if (weekdays.size() > 0) {
+				//QString tok = ", ";
+				QList<ScheduleRule::Weekdays> wdList = weekdays.toList();
+				QList<QDateTime> nextBackupDatesList;
+				const QDateTime now = QDateTime::currentDateTime();
+				const int wd_now = now.date().dayOfWeek();
+				//qStableSort(wdList.begin(), wdList.end());
+				//QString wdStr = "";
+				for (int i = 0; i < wdList.size(); i++)
+				{
+					//wdStr = wdStr + this->weekdayNames.value(wdList.at(i)).left(3) + tok;
+					QDateTime nextBkup = QDateTime::currentDateTime();
+					nextBkup.setTime(this->timeToRun);
+					int daysDiff = (wdList.at(i)+1-wd_now+7) % 7; // ScheduleRule::Weekdays starts at Monday=0 -> +1
+					if (daysDiff == 0 && (nextBkup.time() < now.time())) { daysDiff = daysDiff + 7; }
+					nextBkup = nextBkup.addDays( daysDiff );
+					nextBackupDatesList.append(nextBkup);
+				}
+				//wdStr.chop(tok.length());
+				qStableSort(nextBackupDatesList.begin(), nextBackupDatesList.end());
+
+				// full info (not desired by stst
+				// return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"), nextBackupDatesList.at(0).toString());
+				return QObject::tr("%1").arg(nextBackupDatesList.at(0).toString());
+				break;
+			} else {
+				return QObject::tr("no weekdays selected");
 			}
-			wdStr.chop(tok.length());
-			return QObject::tr("on %1 at %2").arg(wdStr, this->timeToRun.toString("hh:mm"));
-			break;
 		}
 		case ScheduleRule::AFTER_BOOT:
 		{
