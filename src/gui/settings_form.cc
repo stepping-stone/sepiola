@@ -40,6 +40,17 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 				qWarning() << "Not expected button found";
 		}
 	}
+	Settings* settings = Settings::getInstance();
+	QString uid_param = settings->getQuotaModificationUrlUidParam();
+	uid_param = (uid_param == "") ? "$UID$" : uid_param;
+	if (settings->getQuotaModificationUrl() != "") {
+		this->labelInfoChangeQuota->setText(QObject::tr("<a href=\"%1\">Change quota</a>").arg(settings->getQuotaModificationUrl().replace(uid_param, settings->getServerUserName())));
+		this->labelInfoChangeQuota->setOpenExternalLinks(true);
+	} else {
+		this->labelInfoChangeQuota->setText("");
+		this->labelInfoChangeQuota->setVisible(false);
+		this->labelInfoChangeQuota_label->setVisible(false);
+	}
 	QObject::connect( this->buttonBox, SIGNAL( accepted() ), this, SLOT( save() ) );
 	QObject::connect( this->buttonBox, SIGNAL( rejected() ), this, SLOT( reset() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), parent, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
@@ -56,7 +67,7 @@ void SettingsForm::reload()
 	this->lineEditUsername->setText( settings->getServerUserName() );
 	this->lineEditBackupPrefix->setText( settings->getBackupPrefix() );
 	this->spinBoxNOfShownLastBackups->setValue( settings->getNOfLastBackups() );
-	
+
 	this->comboBoxLanguage->clear();
 	foreach( QString language, settings->getSupportedLanguages() )
 	{

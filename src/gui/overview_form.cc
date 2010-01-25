@@ -46,11 +46,11 @@ OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( paren
 
 	// adjust content of change-quota-label
 	Settings* settings = Settings::getInstance();
-	this->labelInfoChangeQuota->setOpenExternalLinks(true);
 	QString uid_param = settings->getQuotaModificationUrlUidParam();
 	uid_param = (uid_param == "") ? "$UID$" : uid_param;
 	if (settings->getQuotaModificationUrl() != "") {
 		this->labelInfoChangeQuota->setText(QObject::tr("<a href=\"%1\">Change quota</a>").arg(settings->getQuotaModificationUrl().replace(uid_param, settings->getServerUserName())));
+		this->labelInfoChangeQuota->setOpenExternalLinks(true);
 	} else {
 		this->labelInfoChangeQuota->setText("");
 		this->labelInfoChangeQuota->setVisible(false);

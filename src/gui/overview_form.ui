@@ -267,7 +267,7 @@
         <item row="4" column="4">
          <widget class="QLabel" name="labelInfoChangeQuota">
           <property name="text">
-           <string>&lt;a href=&quot;http://www.google.ch&quot; target=&quot;_blank&quot;&gt;Google&lt;/a&gt;</string>
+           <string>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</string>
           </property>
          </widget>
         </item>
