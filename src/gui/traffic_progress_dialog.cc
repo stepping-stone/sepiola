@@ -37,7 +37,7 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	this->labelError->setVisible( false );
 	this->textEditError->setVisible( false );
 	this->isErrorVisible = false;
-	
+
 	this->labelInfo->setVisible( false );
 	this->textEditInfo->setVisible( false );
 	this->isInfoVisible = false;
@@ -45,9 +45,10 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	this->btnClose->setEnabled( false );
 	this->btnClose->setVisible( false );
 	this->btnPause->setVisible( false );
-	
+
 	this->groupBoxFinalStatus->setVisible( false );
-	this->lastUpdate = QTime::currentTime();
+	this->lastUpdateTextLog = QDateTime::currentDateTime();
+	this->lastUpdateTextInfo = QDateTime::currentDateTime();
 }
 
 TrafficProgressDialog::~TrafficProgressDialog()
@@ -57,12 +58,12 @@ TrafficProgressDialog::~TrafficProgressDialog()
 void TrafficProgressDialog::appendInfo( const QString& info )
 {
 	const int msecs_to_wait_for_flush = 500;
-	QTime currentTime = QTime::currentTime();
+	QDateTime currentTime = QDateTime::currentDateTime();
 	this->outputCache.append( info );
-	if ( this->lastUpdate.addMSecs(msecs_to_wait_for_flush) <= currentTime )
+	if ( this->lastUpdateTextLog.addMSecs(msecs_to_wait_for_flush) <= currentTime )
 	{
 		// update, but only after a second, such that following messages ariving in the next second are also flushed
-		this->lastUpdate = QTime::currentTime();
+		this->lastUpdateTextLog = currentTime;
 		QTimer::singleShot(msecs_to_wait_for_flush, this, SLOT(flushCache()));
 	}
 	else
@@ -137,17 +138,17 @@ void TrafficProgressDialog::showFinalStatus(ConstUtils::StatusEnum status)
 	QString statusText;
 	switch (status)
 	{
-		case ConstUtils::STATUS_OK: 
+		case ConstUtils::STATUS_OK:
 			img.load( ":/main/sign_ok.svg" );
 			statusText = tr("successfully finished");
 			text_color = QColor(0,191,0);
 			break;
-		case ConstUtils::STATUS_WARNING: 
+		case ConstUtils::STATUS_WARNING:
 			img.load( ":/main/sign_warning.svg" );
 			statusText = tr("finished with warnings");
 			text_color = QColor(255,191,0);
 			break;
-		case ConstUtils::STATUS_ERROR: default: 
+		case ConstUtils::STATUS_ERROR: default:
 			img.load( ":/main/sign_error.svg" );
 			statusText = tr("failed");
 			text_color = QColor(223,0,0);
@@ -205,23 +206,54 @@ void TrafficProgressDialog::setInfoLine3(QPair<QString,QString> label_and_value)
 {
 	setInfoLine(this->labelKey_info3, this->label_info3, label_and_value);
 }
+void TrafficProgressDialog::setInfoLine4(QPair<QString,QString> label_and_value)
+{
+	setInfoLine(this->labelKey_info4, this->label_info4, label_and_value);
+}
 void TrafficProgressDialog::setInfoLines(StringPairList label_and_values)
 {
+	QPair<QString,QString> empty_info;
 	if (label_and_values.size() > 0) {
 		setInfoLine1(label_and_values[0]);
+	} else {
+		setInfoLine1(empty_info);
 	}
 	if (label_and_values.size() > 1) {
 		setInfoLine2(label_and_values[1]);
+	} else {
+		setInfoLine1(empty_info);
 	}
 	if (label_and_values.size() > 2) {
 		setInfoLine3(label_and_values[2]);
+	} else {
+		setInfoLine1(empty_info);
+	}
+	if (label_and_values.size() > 3) {
+		setInfoLine4(label_and_values[3]);
+	} else {
+		setInfoLine1(empty_info);
 	}
 }
 
 void TrafficProgressDialog::updateProgress( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos )
 {
-	//qDebug() << "TrafficProgressDialog::updateProgress(" << "," << taskText << "," << percentFinished << "," << timeRemaining << "," << infos << ")";
+	// qDebug() << "TrafficProgressDialog::updateProgress(" << "," << taskText << "," << percentFinished << "," << timeRemaining << "," << infos << ")";
 	// TODO: use the other parameters to fill GUI-elements
-	this->setInfoLines(infos);
 	this->progressBar->setValue((int)(percentFinished*100.0f));
+
+	const int msecs_to_wait_for_flush = 500;
+	QDateTime currentTime = QDateTime::currentDateTime();
+	this->lastInfos = infos;
+	if ( this->lastUpdateTextInfo.addMSecs(msecs_to_wait_for_flush) <= currentTime )
+	{
+		// update, but only after a second, such that following info arriving in the next second are also flushed
+		this->lastUpdateTextInfo = currentTime;
+		QTimer::singleShot(msecs_to_wait_for_flush, this, SLOT(flushInfoLines()));
+	}
+}
+
+void TrafficProgressDialog::flushInfoLines()
+{
+	qDebug() << "TrafficProgressDialog::flushInfoLines() -> lastInfos " << lastInfos;
+	this->setInfoLines(lastInfos);
 }

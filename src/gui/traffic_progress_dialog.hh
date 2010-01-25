@@ -46,7 +46,7 @@ public:
 	 */
 	virtual ~TrafficProgressDialog();
 
-	
+
 	/**
 	 * Displayes the given filename as info below the progressbar
 	 * @param filename filename to display
@@ -60,12 +60,13 @@ public:
 	void finished();
 
 	void closeEvent( QCloseEvent * event );
-	
+
 	void setInfo(QLabel* lbl_label, QLabel* lpl_value, QPair<QString,QString> label_and_value);
 	void setInfoLine(QLabel* lbl_lbl, QLabel* val_lbl, QPair<QString,QString> label_and_value);
 	void setInfoLine1(QPair<QString,QString> label_and_value);
 	void setInfoLine2(QPair<QString,QString> label_and_value);
 	void setInfoLine3(QPair<QString,QString> label_and_value);
+	void setInfoLine4(QPair<QString,QString> label_and_value);
 	void setInfoLines(QList< QPair<QString,QString> > label_and_values);
 
 signals:
@@ -84,17 +85,20 @@ public slots:
 	void appendError( const QString& error );
 	void updateProgress( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos );
 	void showFinalStatus(ConstUtils::StatusEnum status);
-	
+
 private slots:
 	void on_btnCancel_pressed();
 	void on_btnShowHideDetails_pressed();
 	void flushCache();
+	void flushInfoLines();
 
 private:
 	bool isErrorVisible;
 	bool isInfoVisible;
-	QTime lastUpdate;
+	QDateTime lastUpdateTextLog;
+	QDateTime lastUpdateTextInfo;
 	QString outputCache;
+	StringPairList lastInfos;
 };
 
 #endif // TRAFFIC_PROGRESS_DIALOG_HH
