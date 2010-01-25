@@ -188,8 +188,22 @@ void PosixAcl::setMetadata(const QFileInfo& metadataFileName, const QStringList&
 	QString errors = readAllStandardError();
 	if (errors != "")
 	{
-		qWarning() << "Error occurred while setting ACL's: " << errors;
-		throw ProcessException( QObject::tr( "Error occurred while setting ACL's:\n" ) + errors );
+		qDebug() << "in SetAcl::setMetadata" << "filtering errors:" << errors;
+		QStringList errList = errors.split("\n");
+		for (int i = 0; i < errList.size();) {
+			QString errStr = errList.at(i);
+			qDebug() << "  investigating error:" << errStr << "user=" << settings->getClientUserName() << "contains(setfacl)" << errStr.contains("setfacl:") << "contains(cannot...)" << errStr.contains("Cannot change owner/group: Operation not permitted");
+			if ( (settings->getClientUserName() != "root" && errStr.contains("setfacl:")  && errStr.contains("Cannot change owner/group: Operation not permitted")) || errStr == "" ) {
+				errList.removeAt(i);
+			} else {
+				i++;
+			}
+		}
+		if (errList.size() > 0) {
+			errors = errList.join("\n");
+			qWarning() << "Error occurred while setting ACL's: " << errors;
+			throw ProcessException( QObject::tr( "Error occurred while setting ACL's:\n" ) + errors );
+		}
 	}
 }
 
