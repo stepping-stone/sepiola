@@ -62,7 +62,7 @@ public:
 	void startInCurrentThread();
 	void setLastBackupState(ConstUtils::StatusEnum status);
 	ConstUtils::StatusEnum getLastBackupState();
-	
+
 signals:
 	void showCriticalMessageBox( const QString& message );
 	void finishProgressDialog();
@@ -75,6 +75,7 @@ signals:
 	void finalStatusSignal( ConstUtils::StatusEnum status );
 
 public slots:
+	void rsyncDryrunProgressHandler(const QString&, long int, long int)
 	void rsyncUploadProgressHandler(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten);
 	void updateInformationToDisplay(StringPairList vars = StringPairList());
 	void abortBackupProcess();
