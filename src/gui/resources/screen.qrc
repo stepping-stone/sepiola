@@ -13,5 +13,6 @@
         <file>sign_ok.svg</file>
         <file>sign_warning.svg</file>
         <file>splash.png</file>
+        <file>sepiola_logo_anim.gif</file>
     </qresource>
 </RCC>
