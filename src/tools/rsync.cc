@@ -83,7 +83,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QStringList include_dirs_list;
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
 	if (StringUtils::writeStringListToFile(include_dirs_list, include_dirs_filename, settings->getEOLCharacter())) {
-		arguments << "--files-from=" + StringUtils::quoteText(include_dirs_filename, " ").trimmed();
+		arguments << "--files-from=" + convertFilenameForRsyncArgument(include_dirs_filename);
 		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
 	} else {
 		qDebug() << "unable to write directory-names to file" << include_dirs_filename << ".";
@@ -93,7 +93,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	start();
 	foreach ( QByteArray rule, convertedRules )
 	{
-		write( rule );
+		write( convertFilenameForRsyncArgument(rule) );
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
@@ -557,7 +557,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules);
 		foreach ( QByteArray rule, convertedRules )
 		{
-			write( rule );
+			write( convertFilenameForRsyncArgument(rule) );
 			write( settings->getEOLCharacter() );
 			// qDebug() << "rule:" << rule;
 			waitForBytesWritten();
@@ -828,6 +828,23 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsync
 		type = SKIPPED;
 	}
 	return qMakePair( itemName, type );
+}
+
+QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
+	FileSystemUtils::convertToServerPath( &filename );
+	if ( Settings::IS_WINDOWS )
+	{
+		return( filename.toUtf8() );
+	}
+	else if ( Settings::IS_MAC )
+	{
+		QString outputString = filename.normalized( QString::NormalizationForm_D );
+		return(outputString.toUtf8());
+	}
+	else
+	{
+		return( filename.toLocal8Bit() );
+	}
 }
 
 QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, QStringList* files_from_list )

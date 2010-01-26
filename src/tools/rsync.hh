@@ -179,6 +179,7 @@ private:
 	QStringList download( const QString& source, const QString& destination, bool compress) throw ( ProcessException );
 	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException );
 	QStringList download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal ) throw ( ProcessException );
+	QByteArray convertFilenameForRsyncArgument(QString filename);
 
 	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
 	static QByteArray convertRuleToByteArray(QString rule, bool modifier );
