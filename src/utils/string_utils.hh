@@ -22,6 +22,7 @@
 #include <QString>
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <math.h>
 #include <algorithm>
 #include <iostream>
@@ -37,7 +38,8 @@ class StringUtils
 public:
 	static QString encaps(const QString& aStr, const QString& beforeTok = "", const QString& afterTok = "");
 	static QString concatSep(const QString& aStr, const QString& bStr = "", const QString& tok = ",");
-	static QString filenameShrink(const QString& filename, const int maxlen);
+//	static QString filenameShrink(const QString& filename, const int maxlen);
+	static QString filenameShrink(const QString& filename, const int maxlen, const QChar dirSeparator = QDir::separator());
 	static QString quoteText(QString text, QString tok);
 	static QString buf2QString(const char* buf);
 	static QString buf2QString(QString buf);
@@ -95,7 +97,7 @@ inline QString StringUtils::concatSep(const QString& aStr, const QString& bStr, 
 	return aStr + tok + bStr;
 }
 
-inline QString StringUtils::filenameShrink(const QString& filename, const int maxlen)
+inline QString StringUtils::filenameShrink(const QString& filename, const int maxlen, const QChar dirSeparator)
 {
 	int len = filename.length();
 	if (len <= maxlen)
@@ -105,7 +107,7 @@ inline QString StringUtils::filenameShrink(const QString& filename, const int ma
 	else
 	{
 		QString ellipses = QString("...");
-		int fn_start = filename.lastIndexOf("/",-2);
+		int fn_start = filename.lastIndexOf(dirSeparator,-2);
 		QString fn_only = filename.mid(fn_start+1);
 		if (len-fn_start+ellipses.length() > maxlen) // filename only already too long
 		{
@@ -113,7 +115,7 @@ inline QString StringUtils::filenameShrink(const QString& filename, const int ma
 		}
 		else
 		{
-			return(filename.left(maxlen-len+fn_start-ellipses.length()) + ellipses + "/" + fn_only);
+			return(filename.left(maxlen-len+fn_start-ellipses.length()) + ellipses + dirSeparator + fn_only);
 		}
 	}
 }
