@@ -58,12 +58,13 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 	this->settingsForm = new SettingsForm( this, this->model );
 	this->logfileForm = new LogfileForm( this, this->model );
 
-	
+
 	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ), overviewForm, SLOT ( refreshScheduleOverview() ) );
 	QObject::connect( model, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
+	QObject::connect( this->overviewForm, SIGNAL( startBackupNow() ), this->backupForm, SLOT( on_btnBackup_clicked() ) );
 
-	
+
 	stackedLayout = new QStackedLayout( frameMain );
 	stackedLayout->addWidget( overviewForm );
 	stackedLayout->addWidget( backupForm );
@@ -79,7 +80,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::show() {
-	QWidget::show();	
+	QWidget::show();
 	Settings* settings = Settings::getInstance();
 	if ( settings->isInevitableSettingsMissing() )
 	{
@@ -297,7 +298,7 @@ void MainWindow::finishProgressDialog()
 					  progressDialog, SLOT( showFinalStatus( ConstUtils::StatusEnum ) ) );
 	QObject::disconnect( this->model, SIGNAL( infoSignal( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
 	QObject::disconnect( this->model, SIGNAL( errorSignal( const QString& ) ), this, SIGNAL( writeLog( const QString& ) ) );
-	
+
 	progressDialog->finished();
 	QApplication::processEvents();
 }

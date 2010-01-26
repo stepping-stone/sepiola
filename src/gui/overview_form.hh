@@ -52,29 +52,32 @@ public:
 	 * Returns whether the restore list has been initialized
 	 */
 	bool isInitialized();
-	
+
 public slots:
 	/**
  	 * Refreshes the graphical quota-statistics
 	 */
 	void refreshSpaceStatistic();
-	
+
 	/**
 	 * Refreshes the overview of the last n backups
 	 */
 	void refreshLastBackupsOverview();
-	
+
 	/**
 	 * Refreshes the overview of the scheduled backup
 	 */
 	void refreshScheduleOverview();
 
 private:
-	QPixmap getSpaceVisualization(int quota, int used, int snapshot, int imgH=16, int imgW=1000);
+	QPixmap getSpaceVisualization(int quota, int used, int snapshot, int imgW=1000, int imgH=16);
 	QRgb linIP(QRgb v0, QRgb vMid, QRgb v1, float mid, float x);
-	
+
 private slots:
 	void on_btnBackupNow_clicked();
+
+signals:
+	void startBackupNow();
 
 private:
 	MainModel* model;
@@ -85,6 +88,7 @@ private:
 	QRgb COLOR_BACKUP;
 	QRgb COLOR_SNAPSHOT;
 	QRgb COLOR_FREE;
+	QRgb COLOR_UNKNOWN;
 };
 
 #endif

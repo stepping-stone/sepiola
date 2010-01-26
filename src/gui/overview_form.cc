@@ -38,6 +38,7 @@ OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	COLOR_BACKUP = qRgba( 255, 0, 0, 255 );
 	COLOR_SNAPSHOT = qRgba( 255, 175, 0, 255 );
 	COLOR_FREE = qRgba( 0, 191, 0, 255 );
+	COLOR_UNKNOWN = qRgba( 127, 127, 127, 255 );
 
 	setupUi( this );
 	initialized = false;
@@ -56,11 +57,15 @@ OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( paren
 		this->labelInfoChangeQuota->setVisible(false);
 	}
 
+	// The following 3 lines could also be in the constructor
+	this->labelLegendBackup->setPixmap( this->getSpaceVisualization( 100, 100, 0, 1, 16 ) );
+	this->labelLegendSnapshot->setPixmap( this->getSpaceVisualization( 100, 0, 100, 1, 16 ) );
+	this->labelLegendFree->setPixmap( this->getSpaceVisualization( 100, 0, 0, 1, 16 ) );
+
 	// refresh form
 	this->refreshSpaceStatistic();
 	this->refreshLastBackupsOverview();
 	this->refreshScheduleOverview();
-
 }
 
 OverviewForm::~OverviewForm()
@@ -69,7 +74,7 @@ OverviewForm::~OverviewForm()
 
 void OverviewForm::on_btnBackupNow_clicked()
 {
-	QMessageBox::information( this, tr( "Backup" ), tr( "Not implemented yet, unclear which items to backup" ));
+	emit startBackupNow();
 }
 
 void OverviewForm::refreshLastBackupsOverview()
@@ -143,16 +148,12 @@ void OverviewForm::refreshSpaceStatistic()
 
 	int quota, backup, snapshot;
 	qDebug() << "OverviewForm::refreshSpaceStatistic(): quotaValues.size()" << quotaValues.size();
+
 	if (quotaValues.size() == 3) {
 		quota = quotaValues.at(0);
 		backup = quotaValues.at(1);
 		snapshot = quotaValues.at(2);
 		this->labelSpaceAvailable->setPixmap( this->getSpaceVisualization( quota, backup, snapshot ) );
-
-		// The following 3 lines could also be in the constructor
-		this->labelLegendBackup->setPixmap( this->getSpaceVisualization( 100, 100, 0, 16, 1 ) );
-		this->labelLegendSnapshot->setPixmap( this->getSpaceVisualization( 100, 0, 100, 16, 1 ) );
-		this->labelLegendFree->setPixmap( this->getSpaceVisualization( 100, 0, 0, 16, 1 ) );
 
 		QList<float> sizes; sizes << backup << snapshot << ( quota - backup - snapshot ) << quota;
 
@@ -176,11 +177,7 @@ void OverviewForm::refreshSpaceStatistic()
 			}
 		}
 	} else {
-		QPixmap emptyPixmap;
-		this->labelSpaceAvailable->setPixmap( emptyPixmap );
-		this->labelLegendBackup->setPixmap( emptyPixmap );
-		this->labelLegendSnapshot->setPixmap( emptyPixmap );
-		this->labelLegendFree->setPixmap( emptyPixmap );
+		this->labelSpaceAvailable->setPixmap( this->getSpaceVisualization( -1, 0, 0, 10 ) );
 
 		// set field-text of all space-fields
 		for ( int i = 0; i < sizeNames.size(); i++ )
@@ -189,11 +186,13 @@ void OverviewForm::refreshSpaceStatistic()
 			QLabel * el_percent = this->findChild<QLabel *>( QString( "labelSpacePercent" ) + sizeNames[i] );
 			if ( el_abs != 0 )
 			{
-				el_abs->setText( QObject::tr("N/A") );
+				el_abs->setTextFormat(Qt::RichText);
+				el_abs->setText( QObject::tr("&mdash; GB") );
 			}
 			if ( el_percent != 0 )
 			{
-				el_percent->setText( QObject::tr("N/A") );
+				el_percent->setTextFormat(Qt::RichText);
+				el_percent->setText( QObject::tr("&mdash; %") );
 			}
 		}
 	}
@@ -202,25 +201,30 @@ void OverviewForm::refreshSpaceStatistic()
 /**
 * returns a QPixmap-bar, showing used, snapshot and free space in different colors
 */
-QPixmap OverviewForm::getSpaceVisualization( int quota, int used, int snapshot, int imgH, int imgW )
+QPixmap OverviewForm::getSpaceVisualization( int quota, int used, int snapshot, int imgW, int imgH )
 {
 	QImage spaceImg = QImage( imgW, imgH, QImage::Format_RGB32 );
 	spaceImg.fill( COLOR_WHITE );
 	float thresholdX = 0.5f; // brightness at which original color is left untouched, below darkend, above brightend
 	int i = 0;
-	for ( int j = 0; j < imgH; j++ )
-	{
+	for ( int j = 0; j < imgH; j++ ) {
 		QRgb* rgbData = ( QRgb* )( spaceImg.scanLine( j ) );
 		float b = ( float )pow( sin(( 75 + ( j / ( imgH - 1.0 ) ) * 110.0 ) / 180.0 * 3.141592 ), 2.0 ) * 0.7f + 0.2;
-		QRgb c = linIP( COLOR_BLACK, COLOR_BACKUP, COLOR_WHITE, thresholdX, b );
-		for ( i = 0; i < floor(( float )imgW*used / quota ); i++ )
-			rgbData[i] = c;
-		c = linIP( COLOR_BLACK, COLOR_SNAPSHOT, COLOR_WHITE, thresholdX, b );
-		for ( ;i < floor(( float )imgW*( used + snapshot ) / quota );i++ )
-			rgbData[i] = c;
-		c = linIP( COLOR_BLACK, COLOR_FREE, COLOR_WHITE, thresholdX, b );
-		for ( ;i < imgW;i++ )
-			rgbData[i] = c;
+		if (quota > 0) {
+			QRgb c = linIP( COLOR_BLACK, COLOR_BACKUP, COLOR_WHITE, thresholdX, b );
+			for ( i = 0; i < floor(( float )imgW*used / quota ); i++ )
+				rgbData[i] = c;
+			c = linIP( COLOR_BLACK, COLOR_SNAPSHOT, COLOR_WHITE, thresholdX, b );
+			for ( ;i < floor(( float )imgW*( used + snapshot ) / quota );i++ )
+				rgbData[i] = c;
+			c = linIP( COLOR_BLACK, COLOR_FREE, COLOR_WHITE, thresholdX, b );
+			for ( ;i < imgW;i++ )
+				rgbData[i] = c;
+		} else {
+			QRgb c = linIP( COLOR_BLACK, COLOR_UNKNOWN, COLOR_WHITE, thresholdX, b );
+			for ( i = 0; i < imgW; i++ )
+				rgbData[i] = c;
+		}
 	}
 	return QPixmap::fromImage( spaceImg );
 }
