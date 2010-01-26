@@ -177,8 +177,8 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	{
 		homeDir.mkdir( applicationDataDirName );
 	}
-	applicationDataDir = homeDir.absolutePath() + QDir::separator() + applicationDataDirName + QDir::separator();
-	applicationBinDir = configFile.absolutePath() + QDir::separator();
+	applicationDataDir = homeDir.absolutePath() + "/" + applicationDataDirName + "/";
+	applicationBinDir = configFile.absolutePath() + "/";
 	qRegisterMetaType<ScheduledTask>("ScheduledTask");
 	if (applicationSettings != 0) { delete applicationSettings; }
 	applicationSettings = new QSettings( configFile.absoluteFilePath(), QSettings::IniFormat );
