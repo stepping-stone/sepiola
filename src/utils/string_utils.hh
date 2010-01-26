@@ -38,6 +38,7 @@ public:
 	static QString encaps(const QString& aStr, const QString& beforeTok = "", const QString& afterTok = "");
 	static QString concatSep(const QString& aStr, const QString& bStr = "", const QString& tok = ",");
 	static QString filenameShrink(const QString& filename, const int maxlen);
+	static QString quoteText(QString text, QString tok);
 	static QString buf2QString(const char* buf);
 	static QString buf2QString(QString buf);
 
@@ -115,6 +116,11 @@ inline QString StringUtils::filenameShrink(const QString& filename, const int ma
 			return(filename.left(maxlen-len+fn_start-ellipses.length()) + ellipses + "/" + fn_only);
 		}
 	}
+}
+
+inline QString StringUtils::quoteText(QString text, QString tok) {
+	tok = tok.at(0);
+	return(tok + text.replace("\\","\\\\").replace(tok,"\\"+tok) + tok);
 }
 
 inline QString StringUtils::buf2QString(const char* buf) {
