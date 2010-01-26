@@ -48,9 +48,9 @@ signals:
 private slots:
 	void accept();
 	void reject();
-	void on_btnAdd_pressed();
-	void on_btnEdit_pressed();
-	void on_btnRemove_pressed();
+	void on_btnAdd_clicked();
+	void on_btnEdit_clicked();
+	void on_btnRemove_clicked();
 	void addPattern( const QString& pattern );
 	void editPattern( const int& position, const QString& text );
 

@@ -67,7 +67,7 @@ OverviewForm::~OverviewForm()
 {
 }
 
-void OverviewForm::on_btnBackupNow_pressed()
+void OverviewForm::on_btnBackupNow_clicked()
 {
 	QMessageBox::information( this, tr( "Backup" ), tr( "Not implemented yet, unclear which items to backup" ));
 }

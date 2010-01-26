@@ -32,16 +32,8 @@ RestoreForm::RestoreForm ( QWidget *parent, MainModel *model ) : QWidget ( paren
 {
 	setupUi ( this );
 	initialized = false;
-	QButtonGroup* restoreTypGroup = new QButtonGroup( this );
-	restoreTypGroup->addButton( this->radioButtonFull );
-	restoreTypGroup->addButton( this->radioButtonCustom );
-	this->radioButtonCustom->setChecked( true );
 
-	QButtonGroup* restoreToGroup = new QButtonGroup( this )	;
-	restoreToGroup->addButton( this->radioButtonOrigin );
-	restoreToGroup->addButton( this->radioButtonSpecific );
-	this->radioButtonSpecific->setChecked( true );
-
+	this->lastRestoreDestination = "";
 	this->model = model;
 	this->labelPrefixes->setText( "" );
 	this->labelBackupNames->setText( "" );
@@ -149,24 +141,21 @@ void RestoreForm::setPrefixSelectionDisabled( const bool& disable )
 
 void RestoreForm::setBackupSelectionDisabled( const bool& disable )
 {
-	this->comboBoxBackupNames->setDisabled( disable );
+	// this->comboBoxBackupNames->setDisabled( disable );
+	this->comboBoxBackupNames->setVisible( !disable );
+	this->labelBackupNames->setText( disable ? tr( "Nothing found to restore" ) : "" );
 	this->radioButtonFull->setDisabled( disable );
 	this->radioButtonCustom->setDisabled( disable );
-	this->groupBoxCustom->setDisabled( disable );
-	this->radioButtonOrigin->setDisabled( disable );
-	this->radioButtonSpecific->setDisabled( disable );
-	this->lineEditPath->setDisabled( disable );
-	this->btnBrowse->setDisabled( disable );
+	this->btnBrowseAndRestore->setDisabled( disable );
 	this->btnRestore->setDisabled( disable );
+	this->setRestoreTreeDisabled( disable );
+	if (disable) this->treeViewFilesAndFolders->setModel( 0 );
+}
 
-	if( disable )
-	{
-		this->labelBackupNames->setText( tr( "Nothing found to restore" ) );
-	}
-	else
-	{
-		this->labelBackupNames->setText( "" );
-	}
+void RestoreForm::setRestoreTreeDisabled( const bool& disable )
+{
+	this->treeViewFilesAndFolders->setDisabled( disable );
+	// this->treeViewFilesAndFolders->setModel( disable ? 0 : this->model->getCurrentRemoteDirModel() );
 }
 
 void RestoreForm::populateFilesAndFoldersTree()
@@ -206,29 +195,59 @@ void RestoreForm::refreshRemoteDirModel()
 	this->treeViewFilesAndFolders->repaint();
 }
 
-void RestoreForm::on_btnRefresh_pressed()
+void RestoreForm::on_radioButtonFull_clicked()
+{
+	this->setRestoreTreeDisabled( true );
+}
+
+void RestoreForm::on_radioButtonCustom_clicked()
+{
+	this->setRestoreTreeDisabled( false );
+}
+
+void RestoreForm::on_btnRefresh_clicked()
 {
 	initPrefixes();
 }
 
-void RestoreForm::on_btnBrowse_pressed()
+bool RestoreForm::browseForDestinationFolder(QString& destination)
 {
 	QFileDialog fileDialog( this );
 	fileDialog.setFileMode( QFileDialog::DirectoryOnly );
-	if ( fileDialog.exec() )
+	fileDialog.setWindowTitle( QObject::tr("Restore destination folder") );
+	if (lastRestoreDestination != "" && QFileInfo(lastRestoreDestination).exists()) {
+		fileDialog.setDirectory( lastRestoreDestination );
+	}
+	bool retVal = (fileDialog.exec() == QDialog::Accepted);
+	qDebug() << "retVal=" << (retVal ? "true" : "false");
+	if ( retVal )
 	{
 		QStringList selectedDir = fileDialog.selectedFiles();
 		if ( selectedDir.size() != 1 )
 		{
-			return;
+			destination = "";
+			return retVal;
 		}
-		this->lineEditPath->setText( selectedDir.first() );
+		destination = selectedDir.first();
+		return retVal;
 	}
+	return retVal;
 }
 
-void RestoreForm::on_btnRestore_pressed()
+void RestoreForm::on_btnBrowseAndRestore_clicked()
+{
+	startRestore(this->radioButtonFull->isChecked(), "");
+}
+
+void RestoreForm::on_btnRestore_clicked()
+{
+	startRestore(this->radioButtonFull->isChecked(), "/");
+}
+
+void RestoreForm::startRestore(bool isFullRestore, QString destination)
 {
 	// validate user's selection
+	this->lastRestoreDestination = destination;
 	if ( !this->treeViewFilesAndFolders->selectionModel() )
 	{
 		this->model->showInformationMessage( tr( "You can not start a restore because no backup is available." ) );
@@ -241,37 +260,30 @@ void RestoreForm::on_btnRestore_pressed()
 	}
 	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
 	QString currentPrefix = this->comboBoxPrefixes->currentText();
-	if ( this->radioButtonCustom->isChecked() && (this->model->getCurrentRemoteDirModel()->getSelectionRules().size() == 0) )
+	if ( !isFullRestore && (this->model->getCurrentRemoteDirModel()->getSelectionRules().size() == 0) )
 	{
 		this->model->showInformationMessage( tr( "No files and/or directories has been selected." ) );
 		return;
 	}
-
-
-	if ( this->radioButtonSpecific->isChecked() && !QFileInfo( this->lineEditPath->text() ).exists() )
+	bool selectionAborted = false;
+	while ( (destination == "" || !QFileInfo( destination ).exists()) && !(selectionAborted = !browseForDestinationFolder(destination)) && destination == "" )	{
+		this->model->showInformationMessage( "No valid destination folder has been selected.\nPlease select a valid restore destination." );
+	}
+	if (selectionAborted) {
+		return;
+	}
+	if ( destination != "/" && !QFileInfo( destination ).exists() )
 	{
 		this->model->showInformationMessage( tr( "Specific destination path is not valid" ) );
 		return;
 	}
 
-	QString destination;
-	if ( this->radioButtonOrigin->isChecked() )
-	{
-		destination = "/";
-	}
-	else
-	{
-		destination = this->lineEditPath->text();
-	}
 	destination = QDir::fromNativeSeparators( destination );
-	if ( this->radioButtonFull->isChecked() )
-	{
+	if ( isFullRestore ) {
 		// full restore
 		this->model->showProgressDialogSlot( tr( "Full restore" ) );
 		this->model->fullRestore( currentBackupName, destination );
-	}
-	else
-	{
+	} else {
 		// custom restore
 		this->model->showProgressDialogSlot( tr( "Custom restore" ) );
 		BackupSelectionHash selectionRules = this->model->getCurrentRemoteDirModel()->getSelectionRules();

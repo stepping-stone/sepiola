@@ -83,7 +83,7 @@ void BackupForm::expandSelectedBranches()
 	}
 }
 
-void BackupForm::on_btnSchedule_pressed()
+void BackupForm::on_btnSchedule_clicked()
 {
 	if ( this->localDirModel->getSelectionRules().size() == 0 && !this->radioButtonNoSchedule->isChecked() )
 	{
@@ -137,7 +137,7 @@ void BackupForm::schedule()
 }
 
 
-void BackupForm::on_btnBackup_pressed()
+void BackupForm::on_btnBackup_clicked()
 {
 	if ( this->localDirModel->getSelectionRules().size() == 0 )
 	{
@@ -145,7 +145,7 @@ void BackupForm::on_btnBackup_pressed()
 		return;
 	}
 	this->model->showProgressDialogSlot( tr( "Backup" ) );
-	qDebug() << "BackupForm::on_btnBackup_pressed()" << this->model->getLocalDirModel()->getSelectionRules();
+	qDebug() << "BackupForm::on_btnBackup_clicked()" << this->model->getLocalDirModel()->getSelectionRules();
 	this->model->backup( this->model->getLocalDirModel()->getSelectionRules(), false );
 	//this->model->backup( backupItems, includePatternList, excludePatternList, deleteExtraneous, false );
 	emit updateOverviewFormLastBackupsInfo();
@@ -188,7 +188,7 @@ void BackupForm::refreshLocalDirModel()
 	this->localDirModel->refresh();
 }
 
-void BackupForm::on_btnRefresh_pressed()
+void BackupForm::on_btnRefresh_clicked()
 {
 	refreshLocalDirModel();
 }

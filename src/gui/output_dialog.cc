@@ -75,10 +75,10 @@ void OutputDialog::appendError( const QString& error )
 	this->textEditError->append( error  );
 }
 
-void OutputDialog::on_btnCancel_pressed()
+void OutputDialog::on_btnCancel_clicked()
 {
 	if (emit abort()) {
-		qDebug() << "OutputDialog::on_btnCancel_pressed(): switching Button-visibility";
+		qDebug() << "OutputDialog::on_btnCancel_clicked(): switching Button-visibility";
 		this->btnClose->setEnabled(true);
 		this->btnCancel->setEnabled(false);
 	}

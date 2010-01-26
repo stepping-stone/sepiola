@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>BackupForm</class>
- <widget class="QWidget" name="BackupForm" >
-  <property name="geometry" >
+ <widget class="QWidget" name="BackupForm">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,32 +10,32 @@
     <height>703</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QLabel" name="labelTitle" >
-       <property name="font" >
+      <widget class="QLabel" name="labelTitle">
+       <property name="font">
         <font>
-         <pointsize>11</pointsize>
+         <pointsize>20</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
-       <property name="text" >
-        <string>Backup</string>
+       <property name="text">
+        <string>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Backup&lt;/span&gt;</string>
        </property>
       </widget>
      </item>
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>0</width>
          <height>0</height>
@@ -45,50 +46,50 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBoxSchedule" >
-     <property name="enabled" >
+    <widget class="QGroupBox" name="groupBoxSchedule">
+     <property name="enabled">
       <bool>true</bool>
      </property>
-     <property name="title" >
+     <property name="title">
       <string>Schedule options</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout">
       <item>
-       <layout class="QGridLayout" >
-        <property name="verticalSpacing" >
+       <layout class="QGridLayout">
+        <property name="verticalSpacing">
          <number>0</number>
         </property>
-        <item row="0" column="0" >
-         <widget class="QRadioButton" name="radioButtonDaily" >
-          <property name="text" >
+        <item row="0" column="0">
+         <widget class="QRadioButton" name="radioButtonDaily">
+          <property name="text">
            <string>Daily</string>
           </property>
-          <property name="checked" >
+          <property name="checked">
            <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="0" column="1" >
-         <widget class="QLabel" name="labelTime" >
-          <property name="text" >
+        <item row="0" column="1">
+         <widget class="QLabel" name="labelTime">
+          <property name="text">
            <string>     Time:</string>
           </property>
          </widget>
         </item>
-        <item rowspan="2" row="0" column="2" >
-         <layout class="QVBoxLayout" >
+        <item row="0" column="2" rowspan="2">
+         <layout class="QVBoxLayout">
           <item>
-           <widget class="QTimeEdit" name="timeEditTime" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+           <widget class="QTimeEdit" name="timeEditTime">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="displayFormat" >
+            <property name="displayFormat">
              <string>hh:mm</string>
             </property>
-            <property name="time" >
+            <property name="time">
              <time>
               <hour>0</hour>
               <minute>0</minute>
@@ -98,11 +99,11 @@
            </widget>
           </item>
           <item>
-           <spacer name="verticalSpacer" >
-            <property name="orientation" >
+           <spacer name="verticalSpacer">
+            <property name="orientation">
              <enum>Qt::Vertical</enum>
             </property>
-            <property name="sizeHint" stdset="0" >
+            <property name="sizeHint" stdset="0">
              <size>
               <width>40</width>
               <height>20</height>
@@ -112,68 +113,68 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="3" >
-         <widget class="QLabel" name="labelDate" >
-          <property name="text" >
+        <item row="0" column="3">
+         <widget class="QLabel" name="labelDate">
+          <property name="text">
            <string>       Day:</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="4" >
-         <widget class="QCheckBox" name="checkBoxMonday" >
-          <property name="text" >
+        <item row="0" column="4">
+         <widget class="QCheckBox" name="checkBoxMonday">
+          <property name="text">
            <string>Monday</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="5" >
-         <widget class="QCheckBox" name="checkBoxSaturday" >
-          <property name="text" >
+        <item row="1" column="5">
+         <widget class="QCheckBox" name="checkBoxSaturday">
+          <property name="text">
            <string>Saturday</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="5" >
-         <widget class="QCheckBox" name="checkBoxTuesday" >
-          <property name="text" >
+        <item row="0" column="5">
+         <widget class="QCheckBox" name="checkBoxTuesday">
+          <property name="text">
            <string>Tuesday</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="6" >
-         <widget class="QCheckBox" name="checkBoxWednesday" >
-          <property name="text" >
+        <item row="0" column="6">
+         <widget class="QCheckBox" name="checkBoxWednesday">
+          <property name="text">
            <string>Wednesday</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="7" >
-         <widget class="QCheckBox" name="checkBoxThursday" >
-          <property name="text" >
+        <item row="0" column="7">
+         <widget class="QCheckBox" name="checkBoxThursday">
+          <property name="text">
            <string>Thursday</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="4" >
-         <widget class="QCheckBox" name="checkBoxFriday" >
-          <property name="text" >
+        <item row="1" column="4">
+         <widget class="QCheckBox" name="checkBoxFriday">
+          <property name="text">
            <string>Friday</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="6" >
-         <widget class="QCheckBox" name="checkBoxSunday" >
-          <property name="text" >
+        <item row="1" column="6">
+         <widget class="QCheckBox" name="checkBoxSunday">
+          <property name="text">
            <string>Sunday</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="7" >
-         <spacer name="horizontalSpacer" >
-          <property name="orientation" >
+        <item row="1" column="7">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
             <height>20</height>
@@ -184,30 +185,37 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" >
+       <layout class="QHBoxLayout">
         <item>
-         <widget class="QRadioButton" name="radioButtonMinutesAfterBooting" >
-          <property name="enabled" >
+         <widget class="QRadioButton" name="radioButtonMinutesAfterBooting">
+          <property name="enabled">
            <bool>true</bool>
           </property>
-          <property name="text" >
-           <string>Minutes after booting:</string>
+          <property name="text">
+           <string>Run backup</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBoxMinutesAfterBooting" >
-          <property name="value" >
+         <widget class="QSpinBox" name="spinBoxMinutesAfterBooting">
+          <property name="value">
            <number>10</number>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_2" >
-          <property name="orientation" >
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>minutes after starting the computer.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <property name="sizeHint" stdset="0" >
+          <property name="sizeHint" stdset="0">
            <size>
             <width>40</width>
             <height>20</height>
@@ -218,8 +226,8 @@
        </layout>
       </item>
       <item>
-       <widget class="QRadioButton" name="radioButtonNoSchedule" >
-        <property name="text" >
+       <widget class="QRadioButton" name="radioButtonNoSchedule">
+        <property name="text">
          <string>Never (manual backup)</string>
         </property>
        </widget>
@@ -230,72 +238,65 @@
     </widget>
    </item>
    <item>
-    <layout class="QVBoxLayout" >
-
-   <item>
-    <layout class="QHBoxLayout" >
-
+    <layout class="QVBoxLayout">
      <item>
-      <widget class="QPushButton" name="btnRefresh" >
-       <property name="text" >
-        <string>&amp;Refresh</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout">
+       <item>
+        <widget class="QPushButton" name="btnRefresh">
+         <property name="text">
+          <string>&amp;Refresh</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>611</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
      <item>
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>611</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
+      <widget class="QTreeView" name="treeView"/>
      </item>
-
-    </layout>
-   </item>
-
      <item>
-      <widget class="QTreeView" name="treeView" />
+      <layout class="QHBoxLayout">
+       <item>
+        <spacer>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>421</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnSchedule">
+         <property name="text">
+          <string>S&amp;chedule</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnBackup">
+         <property name="text">
+          <string>B&amp;ackup</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-   <item>
-    <layout class="QHBoxLayout" >
-
-     <item row="2" column="0" >
-      <spacer>
-       <property name="orientation" >
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0" >
-        <size>
-         <width>421</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="2" column="1" >
-      <widget class="QPushButton" name="btnSchedule" >
-       <property name="text" >
-        <string>S&amp;chedule</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="2" >
-      <widget class="QPushButton" name="btnBackup" >
-       <property name="text" >
-        <string>B&amp;ackup</string>
-       </property>
-      </widget>
-     </item>
-
-    </layout>
-   </item>
-
     </layout>
    </item>
   </layout>

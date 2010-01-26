@@ -20,6 +20,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QFileInfo>
+#include <QMovie>
 #include <QMessageBox>
 
 #include "gui/traffic_progress_dialog.hh"
@@ -49,6 +50,12 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	this->groupBoxFinalStatus->setVisible( false );
 	this->lastUpdateTextLog = QDateTime::currentDateTime();
 	this->lastUpdateTextInfo = QDateTime::currentDateTime();
+
+	this->label_animatedSepiolaLogo->setVisible(false);
+	/*QMovie* movie = new QMovie(":/main/sepiola_logo_anim.gif");
+	this->label_animatedSepiolaLogo->setMovie(movie);
+	this->repaint();
+	movie->start();*/
 }
 
 TrafficProgressDialog::~TrafficProgressDialog()
@@ -90,9 +97,9 @@ void TrafficProgressDialog::appendError( const QString& error )
 	this->textEditError->append( error  );
 }
 
-void TrafficProgressDialog::on_btnCancel_pressed()
+void TrafficProgressDialog::on_btnCancel_clicked()
 {
-	qDebug() << "BackupProgress::on_btnCancel_pressed(): switching Button-visibility";
+	qDebug() << "BackupProgress::on_btnCancel_clicked(): switching Button-visibility";
 	int answer = QMessageBox::question(this, tr("Cancel"), tr("Do you really want to cancel"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 	if (answer == QMessageBox::Yes) {
 		emit abort();
@@ -104,9 +111,9 @@ void TrafficProgressDialog::on_btnCancel_pressed()
 	}
 }
 
-void TrafficProgressDialog::on_btnShowHideDetails_pressed()
+void TrafficProgressDialog::on_btnShowHideDetails_clicked()
 {
-	qDebug() << "TrafficProgressDialog::on_btnShowHideDetails_pressed(): info- and error-textfield visibility";
+	qDebug() << "TrafficProgressDialog::on_btnShowHideDetails_clicked(): info- and error-textfield visibility";
 	bool newVis = !(this->isErrorVisible || this->isInfoVisible);
 	this->btnShowHideDetails->setText ( newVis ? tr("Hide details") : tr("Show details") );
 	this->labelInfo->setVisible( newVis );

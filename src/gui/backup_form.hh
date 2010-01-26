@@ -48,9 +48,9 @@ private:
 	QString patternListToString( QStringList patternList );
 
 private slots:
-	void on_btnRefresh_pressed();
-	void on_btnSchedule_pressed();
-	void on_btnBackup_pressed();
+	void on_btnRefresh_clicked();
+	void on_btnSchedule_clicked();
+	void on_btnBackup_clicked();
 	void refreshLocalDirModel();
 	void schedule();
 	

@@ -43,13 +43,13 @@ void PasswordDialog::setDialogMessage(const QString& msg)
 	this->labelMessage->setText(msg);
 }
 
-void PasswordDialog::on_btnOk_pressed()
+void PasswordDialog::on_btnOk_clicked()
 {
 	emit processPasswordReturnValues(this->lineEditUsername->text(), this->lineEditPassword->text(), isUsernameEditable);
 	this->done(Accepted);
 }
 
-void PasswordDialog::on_btnCancel_pressed()
+void PasswordDialog::on_btnCancel_clicked()
 {
 	this->done(Rejected);
 	emit abort();

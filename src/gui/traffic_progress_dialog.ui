@@ -1,10 +1,11 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>TrafficProgressDialog</class>
- <widget class="QDialog" name="TrafficProgressDialog" >
-  <property name="windowModality" >
+ <widget class="QDialog" name="TrafficProgressDialog">
+  <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
-  <property name="geometry" >
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -12,34 +13,34 @@
     <height>435</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QLabel" name="labelTitle" >
-       <property name="sizePolicy" >
-        <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
+      <widget class="QLabel" name="labelTitle">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="font" >
+       <property name="font">
         <font>
          <pointsize>16</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>Backup</string>
        </property>
-       <property name="textFormat" >
+       <property name="textFormat">
         <enum>Qt::AutoText</enum>
        </property>
-       <property name="Color" stdset="0" >
+       <property name="Color" stdset="0">
         <color>
          <red>192</red>
          <green>0</green>
@@ -50,10 +51,10 @@
      </item>
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -61,77 +62,111 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QLabel" name="label_animatedSepiolaLogo">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>32</horstretch>
+         <verstretch>32</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="resources/screen.qrc">:/main/sepiola_logo_anim.gif</pixmap>
+       </property>
+       <property name="scaledContents">
+        <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBoxFinalStatus" >
-     <property name="flat" >
+    <widget class="QGroupBox" name="groupBoxFinalStatus">
+     <property name="flat">
       <bool>true</bool>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="spacing" >
+     <layout class="QHBoxLayout">
+      <property name="spacing">
        <number>6</number>
       </property>
-      <property name="margin" >
+      <property name="margin">
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_iconFinalStatus" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+       <widget class="QLabel" name="label_iconFinalStatus">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>32</horstretch>
           <verstretch>32</verstretch>
          </sizepolicy>
         </property>
-        <property name="maximumSize" >
+        <property name="maximumSize">
          <size>
           <width>32</width>
           <height>32</height>
          </size>
         </property>
-        <property name="font" >
+        <property name="font">
          <font>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
-        <property name="pixmap" >
-         <pixmap resource="resources/screen.qrc" >:/main/sign_error.svg</pixmap>
+        <property name="pixmap">
+         <pixmap resource="resources/screen.qrc">:/main/sign_error.svg</pixmap>
         </property>
-        <property name="scaledContents" >
+        <property name="scaledContents">
          <bool>true</bool>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_finalStatus" >
-        <property name="font" >
+       <widget class="QLabel" name="label_finalStatus">
+        <property name="font">
          <font>
           <pointsize>16</pointsize>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
-        <property name="styleSheet" >
-         <string notr="true" >color: rgb(224, 0, 0);</string>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(224, 0, 0);</string>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Backup failed</string>
         </property>
        </widget>
       </item>
       <item>
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -143,136 +178,136 @@
     </widget>
    </item>
    <item>
-    <widget class="QProgressBar" name="progressBar" >
-     <property name="value" >
+    <widget class="QProgressBar" name="progressBar">
+     <property name="value">
       <number>0</number>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Minimum" hsizetype="Expanding" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title" >
+     <property name="title">
       <string/>
      </property>
-     <layout class="QGridLayout" >
-      <property name="verticalSpacing" >
+     <layout class="QGridLayout">
+      <property name="verticalSpacing">
        <number>6</number>
       </property>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="labelKey_info1" >
-        <property name="minimumSize" >
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelKey_info1">
+        <property name="minimumSize">
          <size>
           <width>100</width>
           <height>0</height>
          </size>
         </property>
-        <property name="font" >
+        <property name="font">
          <font>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Backing up</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="label_info1" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_info1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="maximumSize" >
+        <property name="maximumSize">
          <size>
           <width>400</width>
           <height>16777215</height>
          </size>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="labelKey_info2" >
-        <property name="font" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelKey_info2">
+        <property name="font">
          <font>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Uploading</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="labelKey_info3" >
-        <property name="font" >
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelKey_info3">
+        <property name="font">
          <font>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Time remaining</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="label_info3" >
-        <property name="maximumSize" >
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_info3">
+        <property name="maximumSize">
          <size>
           <width>400</width>
           <height>16777215</height>
          </size>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="labelKey_info4" >
-        <property name="font" >
+      <item row="3" column="0">
+       <widget class="QLabel" name="labelKey_info4">
+        <property name="font">
          <font>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Time remaining</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
-       <widget class="QLabel" name="label_info4" >
-        <property name="maximumSize" >
+      <item row="3" column="1">
+       <widget class="QLabel" name="label_info4">
+        <property name="maximumSize">
          <size>
           <width>400</width>
           <height>16777215</height>
          </size>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
        </widget>
       </item>
-      <item rowspan="3" row="3" column="2" >
+      <item row="3" column="2" rowspan="3">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -280,12 +315,12 @@
         </property>
        </spacer>
       </item>
-      <item rowspan="3" row="0" column="2" >
+      <item row="0" column="2" rowspan="3">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -293,15 +328,15 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="label_info2" >
-        <property name="maximumSize" >
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_info2">
+        <property name="maximumSize">
          <size>
           <width>400</width>
           <height>16777215</height>
          </size>
         </property>
-        <property name="text" >
+        <property name="text">
          <string/>
         </property>
        </widget>
@@ -310,50 +345,50 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <layout class="QVBoxLayout" >
-       <property name="spacing" >
+      <layout class="QVBoxLayout">
+       <property name="spacing">
         <number>0</number>
        </property>
        <item>
-        <widget class="QLabel" name="labelInfo" >
-         <property name="font" >
+        <widget class="QLabel" name="labelInfo">
+         <property name="font">
           <font>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Info</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="textEditInfo" />
+        <widget class="QTextEdit" name="textEditInfo"/>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" >
-       <property name="spacing" >
+      <layout class="QVBoxLayout">
+       <property name="spacing">
         <number>0</number>
        </property>
        <item>
-        <widget class="QLabel" name="labelError" >
-         <property name="font" >
+        <widget class="QLabel" name="labelError">
+         <property name="font">
           <font>
            <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>Error</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="textEditError" />
+        <widget class="QTextEdit" name="textEditError"/>
        </item>
       </layout>
      </item>
@@ -361,10 +396,10 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
@@ -373,20 +408,20 @@
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QPushButton" name="btnShowHideDetails" >
-       <property name="text" >
+      <widget class="QPushButton" name="btnShowHideDetails">
+       <property name="text">
         <string>Show Details</string>
        </property>
       </widget>
      </item>
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
          <height>40</height>
@@ -395,31 +430,31 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnPause" >
-       <property name="enabled" >
+      <widget class="QPushButton" name="btnPause">
+       <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>&amp;Pause</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnCancel" >
-       <property name="enabled" >
+      <widget class="QPushButton" name="btnCancel">
+       <property name="enabled">
         <bool>true</bool>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>&amp;Cancel</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnClose" >
-       <property name="enabled" >
+      <widget class="QPushButton" name="btnClose">
+       <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="text" >
+       <property name="text">
         <string>C&amp;lose</string>
        </property>
       </widget>
@@ -429,7 +464,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="resources/screen.qrc" />
+  <include location="resources/screen.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -438,11 +473,11 @@
    <receiver>TrafficProgressDialog</receiver>
    <slot>close()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>548</x>
      <y>340</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>299</x>
      <y>185</y>
     </hint>

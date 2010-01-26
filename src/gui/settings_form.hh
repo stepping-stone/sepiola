@@ -61,7 +61,7 @@ signals:
 private slots:
 	void save();
 	void reset();
-	void on_btnDefaultPrefix_pressed();
+	void on_btnDefaultPrefix_clicked();
 	void on_lineEditUsername_textEdited ( QString username );
 	void on_lineEditBackupPrefix_textEdited( QString backupPrefix );
 	void on_comboBoxLanguage_currentIndexChanged ( int languageIndex );

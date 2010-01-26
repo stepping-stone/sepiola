@@ -69,7 +69,7 @@ signals:
 
 
 private slots:
-	void on_btnCancel_pressed();
+	void on_btnCancel_clicked();
 	void flushCache();
 
 private:

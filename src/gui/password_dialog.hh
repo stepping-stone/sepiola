@@ -50,8 +50,8 @@ signals:
 	void processPasswordReturnValues(const QString& username, const QString& password, const bool isUsernameEditable);
 	
 private slots:
-	void on_btnOk_pressed();
-	void on_btnCancel_pressed();
+	void on_btnOk_clicked();
+	void on_btnCancel_clicked();
 	void reject();
 
 private:

@@ -26,13 +26,13 @@
       <widget class="QLabel" name="labelTitle">
        <property name="font">
         <font>
-         <pointsize>11</pointsize>
+         <pointsize>20</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
        <property name="text">
-        <string>Settings</string>
+        <string>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Settings&lt;/span&gt;</string>
        </property>
       </widget>
      </item>

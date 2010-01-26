@@ -157,7 +157,7 @@ void SettingsForm::on_spinBoxNOfShownLastBackups_valueChanged( int i )
 	formChanged = (i != Settings::getInstance()->getNOfLastBackups());
 }
 
-void SettingsForm::on_btnDefaultPrefix_pressed()
+void SettingsForm::on_btnDefaultPrefix_clicked()
 {
 	this->lineEditBackupPrefix->setText( Settings::getInstance()->getLocalHostName() );
 	formChanged = true;

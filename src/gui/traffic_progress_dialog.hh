@@ -87,8 +87,8 @@ public slots:
 	void showFinalStatus(ConstUtils::StatusEnum status);
 
 private slots:
-	void on_btnCancel_pressed();
-	void on_btnShowHideDetails_pressed();
+	void on_btnCancel_clicked();
+	void on_btnShowHideDetails_clicked();
 	void flushCache();
 	void flushInfoLines();
 

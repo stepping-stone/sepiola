@@ -74,7 +74,7 @@ private:
 	QRgb linIP(QRgb v0, QRgb vMid, QRgb v1, float mid, float x);
 	
 private slots:
-	void on_btnBackupNow_pressed();
+	void on_btnBackupNow_clicked();
 
 private:
 	MainModel* model;

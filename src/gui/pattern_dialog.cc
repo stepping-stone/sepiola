@@ -65,7 +65,7 @@ void PatternDialog::editPattern( const int& position, const QString& text )
 	item->setText( text );
 }
 
-void PatternDialog::on_btnAdd_pressed()
+void PatternDialog::on_btnAdd_clicked()
 {
 	TextInputDialog inputDialog( tr( "Add" ), tr( "Add a pattern" ) );
 	QObject::connect( &inputDialog, SIGNAL( textEntered( QString ) ),
@@ -75,7 +75,7 @@ void PatternDialog::on_btnAdd_pressed()
 						this, SLOT( addPattern( QString ) ) );
 }
 
-void PatternDialog::on_btnEdit_pressed()
+void PatternDialog::on_btnEdit_clicked()
 {
 	foreach( QListWidgetItem* selectedItem,  this->listWidgetPattern->selectedItems())
 	{
@@ -90,7 +90,7 @@ void PatternDialog::on_btnEdit_pressed()
 	}
 }
 
-void PatternDialog::on_btnRemove_pressed()
+void PatternDialog::on_btnRemove_clicked()
 {
 	foreach( QListWidgetItem* selectedItem,  this->listWidgetPattern->selectedItems())
 	{
