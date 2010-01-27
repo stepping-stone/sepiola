@@ -236,6 +236,7 @@ class Settings : public QObject
 		QString getClientPassword();
 		QString getServerUserName();
 		QString getServerPassword();
+		int getEffectiveUserId();
 		int getLanguageIndex();
 		void saveServerUserName( const QString& userName );
 		void setServerPassword( const QString& password );
@@ -431,6 +432,8 @@ class Settings : public QObject
 		QString client_password;
 		QString server_password;
 
+		int effectiveUserId;
+
 	private slots:
 		void setServerUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable );
 		void setClientUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable );
@@ -554,6 +557,11 @@ inline QString Settings::getClientUserName()
 inline QString Settings::getClientPassword()
 {
 	return client_password;
+}
+
+inline int Settings::getEffectiveUserId()
+{
+	return this->effectiveUserId;
 }
 
 inline QString Settings::getApplicationName()

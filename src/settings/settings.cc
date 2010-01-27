@@ -141,6 +141,11 @@ Settings::Settings()
 	this->resellerSettings = 0;
 	this->userSettings = 0;
 	this->appData = 0;
+#ifdef Q_OS_UNIX
+	this->effectiveUserId = getuid();
+#else
+	this->effectiveUserId = 0;
+#endif
 
 	supportedLanguages << QObject::tr( "English" ); // default language has to be at the top (position zero)
 	supportedLanguages << QObject::tr( "German" );

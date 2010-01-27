@@ -192,7 +192,7 @@ void PosixAcl::setMetadata(const QFileInfo& metadataFileName, const QStringList&
 		QStringList errList = errors.split("\n");
 		for (int i = 0; i < errList.size();) {
 			QString errStr = errList.at(i);
-			if ( (settings->getClientUserName() != "root" && errStr.contains("setfacl:")  && errStr.contains("Cannot change owner/group: Operation not permitted")) || errStr == "" ) {
+			if ( (settings->getEffectiveUserId() != 0 && errStr.contains("setfacl:")  && errStr.contains("Cannot change owner/group: Operation not permitted")) || errStr == "" ) {
 				errList.removeAt(i);
 			} else {
 				i++;
