@@ -43,6 +43,10 @@ Rsync::Rsync() {
 	this->files_total = -1;
 	this->cur_n_files_done = 0;
 	this->lastUpdateTime = QDateTime::currentDateTime();
+
+	this->progress_trafficB_s = 0;
+	this->progress_bytesRead = 0;
+	this->progress_bytesWritten = 0;
 }
 
 Rsync::~Rsync() {}
@@ -64,8 +68,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
 	arguments << getRsyncUploadArguments();
+	arguments << getRsyncProgressArguments();
 
-	if (dry_run) { 	this->last_calculatedLiteralData = -1; arguments << "-v" << "--stats" << "--only-write-batch=/dev/null"; }
+	if (dry_run) { 	this->last_calculatedLiteralData = 0; arguments << "-v" << "--stats" << "--only-write-batch=/dev/null"; }
 
 	arguments << getRsyncSshArguments();
 	if ( setDeleteFlag )
@@ -111,67 +116,69 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	{
 		qDebug() << lineData;
 		lineData.replace( settings->getEOLCharacter(), "");
-		endReached = (endReached || (lineData.contains(STATISTICS_FIRST_LABEL)));
-		if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
-			endReached = true; // hopefully not necessary
-			dryrun_state = DRY_RUN_COUNT_FILES;
-			this->last_calculatedLiteralData = lineData.mid(STATISTICS_FIRST_USED_LABEL.length()).trimmed().split(" ")[0].toLong();
-		}
-		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> item = getItemAndStoreTransferredBytes( lineData );
-
-		if (dry_run && dryrun_state == DRY_RUN_START && lineData.contains("building file list ...")) {
-			dryrun_state = DRY_RUN_COUNT_FILES;
-		}
-		if (dry_run && dryrun_state == DRY_RUN_COUNT_FILES && lineData.contains("files to consider")) {
-			dryrun_state = DRY_RUN_CALCULATE_SIZE;
-			nOfFiles = lineData.trimmed().split(" ")[0].toLong();
-		}
-		if (dry_run && dryrun_state == DRY_RUN_COUNT_FILES && lineData.contains(" files...")) {
-			int curFileNr = lineData.trimmed().split(" ")[0].toLong();
-			this->files_total = curFileNr;
-			bufferedInfoOutput(); // prevents direct flush
-		}
-		if (dry_run && dryrun_state == DRY_RUN_CALCULATE_SIZE) {
-			if (!lineData.startsWith("<f") && !lineData.startsWith("cd") ) {
-				if (lineData.contains("to-check=")) {
-					QStringList files_cur_total = lineData.trimmed().split("to-check=").last().split("/");
-					this->files_total = nOfFiles; // files_cur_total.last().replace(")","").toLong();
-					this->cur_n_files_done = files_total - files_cur_total.first().toLong();
-					this->progress_lastFilename = lastFileName;
-				}
-			} else {
-				lastFileName = lineData.mid(10).trimmed();
+		if (lineData.size() > 0) {
+			endReached = (endReached || (lineData.contains(STATISTICS_FIRST_LABEL)));
+			if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
+				endReached = true; // hopefully not necessary
+				dryrun_state = DRY_RUN_COUNT_FILES;
+				this->last_calculatedLiteralData = lineData.mid(STATISTICS_FIRST_USED_LABEL.length()).trimmed().split(" ")[0].toLong();
 			}
-			bufferedInfoOutput(); // prevents direct flush
-		}
+			QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> item = getItemAndStoreTransferredBytes( lineData );
 
-		if (!dry_run) {
-			if (!endReached && item.first != "" && item.first != "./") {
-				item.first.prepend( "/" );
-				this->progress_lastFilename = item.first;
-				removeSymlinkString( &item.first );
-				FileSystemUtils::convertToLocalPath( &item.first );
-				uploadedItems << item;
-				QString outputText;
-				switch( item.second )
-				{
-					case UPLOADED:
-						outputText = tr( "Uploading %1" ).arg( item.first.trimmed() );
-						emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
-						break;
-					case SKIPPED:
-						outputText = tr( "Skipping %1" ).arg( item.first.trimmed() );
-						break;
-					case DELETED:
-						outputText = tr( "Deleting %1" ).arg( item.first.trimmed() );
-						break;
-					default:
-						break;
+			if (dry_run && dryrun_state == DRY_RUN_START && lineData.contains("building file list ...")) {
+				dryrun_state = DRY_RUN_COUNT_FILES;
+			}
+			if (dry_run && dryrun_state == DRY_RUN_COUNT_FILES && lineData.contains("files to consider")) {
+				dryrun_state = DRY_RUN_CALCULATE_SIZE;
+				nOfFiles = lineData.trimmed().split(" ")[0].toLong();
+			}
+			if (dry_run && dryrun_state == DRY_RUN_COUNT_FILES && lineData.contains(" files...")) {
+				int curFileNr = lineData.trimmed().split(" ")[0].toLong();
+				this->files_total = curFileNr;
+				bufferedInfoOutput(); // prevents direct flush
+			}
+			if (dry_run && dryrun_state == DRY_RUN_CALCULATE_SIZE) {
+				if (!lineData.startsWith("<f") && !lineData.startsWith("cd") ) {
+					if (lineData.contains("to-check=")) {
+						QStringList files_cur_total = lineData.trimmed().split("to-check=").last().split("/");
+						this->files_total = nOfFiles; // files_cur_total.last().replace(")","").toLong();
+						this->cur_n_files_done = files_total - files_cur_total.first().toLong();
+						this->progress_lastFilename = lastFileName;
+					}
+				} else {
+					lastFileName = lineData.mid(10).trimmed();
 				}
-				// qDebug() << outputText;
-				emit infoSignal( outputText );
-			} else {
-				emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
+				bufferedInfoOutput(); // prevents direct flush
+			}
+
+			if (!dry_run) {
+				if (!endReached && item.first != "" && item.first != "./") {
+					item.first.prepend( "/" );
+					this->progress_lastFilename = item.first;
+					removeSymlinkString( &item.first );
+					FileSystemUtils::convertToLocalPath( &item.first );
+					uploadedItems << item;
+					QString outputText;
+					switch( item.second )
+					{
+						case UPLOADED:
+							outputText = tr( "Uploading %1" ).arg( item.first.trimmed() );
+							emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
+							break;
+						case SKIPPED:
+							outputText = tr( "Skipping %1" ).arg( item.first.trimmed() );
+							break;
+						case DELETED:
+							outputText = tr( "Deleting %1" ).arg( item.first.trimmed() );
+							break;
+						default:
+							break;
+					}
+					// qDebug() << outputText;
+					emit infoSignal( outputText );
+				} else {
+					emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
+				}
 			}
 		}
 	}
@@ -306,9 +313,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> item = getItemAndStoreTransferredBytes( lineData );
 		if (!endReached && item.first != "") {
 			item.first.prepend( "/" );
-			this->progress_lastFilename = item.first;
 			removeSymlinkString( &item.first );
 			FileSystemUtils::convertToLocalPath( &item.first );
+			this->progress_lastFilename = item.first;
 			uploadedItems << item;
 			QString outputText;
 			switch( item.second )
@@ -496,7 +503,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	QStringList downloadedItems;
 
 	QString lineData;
-	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
+	while( blockingReadLine( &lineData, 2147483647 ) ) // -1 does not work on windows
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
@@ -543,10 +550,11 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
 	arguments << getRsyncDownloadArguments();
+	arguments << getRsyncProgressArguments();
 	arguments << getRsyncSshArguments();
 	if (compress) arguments << "-z";
-	arguments << getValidDestinationPath( src ) + "/";
-	arguments << QDir::cleanPath( destination ) + "/";
+	arguments << QDir::cleanPath( src ) + "/";
+	arguments << getValidDestinationPath( destination ) + "/";
 
 	if ( includeRules.size() > 0 )
 	{
@@ -592,8 +600,9 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	qDebug() << tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() );
 	emit infoSignal( tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() ) );
 	waitForFinished();
-
+	qDebug() << "Rsync::download(...)" << "vor readAllStandardError";
 	QString errors = readAllStandardError();
+	qDebug() << "Rsync::download(...)" << "nach readAllStandardError";
 	if ( errors != "" )
 	{
 		qWarning() << "Error occurred while downloading: " << errors;
@@ -602,6 +611,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 			throw ProcessException( tr ( "Error occurred while downloading: " ) + errors );
 		}
 	}
+	qDebug() << "Rsync::download(...)" << "nach if (this->exitCode() != 0)";
 	if (this->exitCode() != 0)
 	{
 		if ( emitErrorSignal )
@@ -609,6 +619,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 			throw ProcessException( QObject::tr( "rsync exited with with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(errors).arg(readAllStandardOutput().data()) );
 		}
 	}
+	qDebug() << "Rsync::download(...)" << "nach if (this->exitCode() != 0)";
 	return downloadedItems;
 }
 
@@ -655,7 +666,7 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination )
 
 	QStringList downloadedRestoreInfoFiles;
 	QString lineData;
-	while( blockingReadLine( &lineData, 2147483647, 13 ) )
+	while( blockingReadLine( &lineData, 2147483647 ) )
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
@@ -715,7 +726,7 @@ QStringList Rsync::getPrefixes()
 
 	QStringList prefixes;
 	QString lineData;
-	while( blockingReadLine( &lineData, 2147483647, 13 ) )
+	while( blockingReadLine( &lineData, 2147483647 ) )
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
 
@@ -748,7 +759,6 @@ QStringList Rsync::getRsyncGeneralArguments()
 	{
 		result << "-iilrtxHS8";
 		result << "--specials";
-		result << "--progress";
 	}
 	return result;
 }
@@ -761,6 +771,14 @@ QStringList Rsync::getRsyncUploadArguments()
 	result << "--chmod=ugo=rwX";
 	return result;
 }
+
+QStringList Rsync::getRsyncProgressArguments()
+{
+	QStringList result;
+	result << "--progress";
+	return result;
+}
+
 
 QStringList Rsync::getRsyncDownloadArguments()
 {
@@ -792,15 +810,33 @@ QStringList Rsync::getRsyncSshArguments()
 	return arguments;
 }
 
+QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
+	FileSystemUtils::convertToServerPath( &filename );
+	if ( Settings::IS_WINDOWS )
+	{
+		return( filename.toUtf8() );
+	}
+	else if ( Settings::IS_MAC )
+	{
+		QString outputString = filename.normalized( QString::NormalizationForm_D );
+		return(outputString.toUtf8());
+	}
+	else
+	{
+		return( filename.toLocal8Bit() );
+	}
+}
+
 QString Rsync::getValidDestinationPath( const QString& destination )
 {
 	QString validDestination = destination;
-	FileSystemUtils::convertToServerPath( &validDestination );
 	if ( validDestination.size() > 1 && validDestination.endsWith( "/" ) )
 	{
-		return validDestination.left( validDestination.size() -1 );
+		validDestination = validDestination.left( validDestination.size() -1 );
 	}
+	FileSystemUtils::convertToServerPath( &validDestination );
 	return validDestination;
+	// return convertFilenameForRsyncArgument(validDestination);
 }
 
 QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsyncOutputLine )
@@ -829,23 +865,6 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsync
 		type = SKIPPED;
 	}
 	return qMakePair( itemName, type );
-}
-
-QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
-	FileSystemUtils::convertToServerPath( &filename );
-	if ( Settings::IS_WINDOWS )
-	{
-		return( filename.toUtf8() );
-	}
-	else if ( Settings::IS_MAC )
-	{
-		QString outputString = filename.normalized( QString::NormalizationForm_D );
-		return(outputString.toUtf8());
-	}
-	else
-	{
-		return( filename.toLocal8Bit() );
-	}
 }
 
 QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, QStringList* files_from_list )
