@@ -309,7 +309,7 @@ void BackupThread::rsyncDryrunProgressHandler(const QString& filename, long file
 		double ratio_done = (double)files_done / (files_total!=0 ? files_total: 1);
 		mySubPt->addFixpointNow(ratio_done);
 		vars.append( QPair<QString,QString>(tr("current task"), mySubPt->getName()));
-		vars.append( QPair<QString,QString>(tr("current file"), StringUtils::filenameShrink(filename,72)) );
+		vars.append( QPair<QString,QString>(tr("current file"), StringUtils::filenameShrink(QDir::toNativeSeparators(filename),72)) );
 		vars.append( QPair<QString,QString>(tr("files processed"), QString("%1 / %2").arg(QString::number(files_done),QString::number(files_total))) );
 		vars.append( QPair<QString,QString>(tr("estimated remaining time")+":", mySubPt->getRootTask()->getEstimatedTimeLeftString()) );
 	}
