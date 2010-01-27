@@ -92,11 +92,10 @@ void RestoreForm::initRestoreNames()
 {
 	qDebug() << "RestoreForm::initRestoreNames()" << "prefix:" << this->comboBoxPrefixes->currentText();
 	this->model->showProgressDialogSlot( tr( "Downloading restore meta data" ) );
-	Settings* settings = Settings::getInstance();
 	QObject::disconnect( this->comboBoxBackupNames, SIGNAL( currentIndexChanged( int ) ),
 						 this, SLOT( populateFilesAndFoldersTree() ) );
 
-	settings->saveBackupPrefix( this->comboBoxPrefixes->currentText() );
+	// settings->saveBackupPrefix( this->comboBoxPrefixes->currentText() );
 	this->comboBoxBackupNames->clear();
 	QList<RestoreName> restoreNames = this->model->getRestoreNames();
 
