@@ -566,9 +566,9 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules);
 		foreach ( QByteArray rule, convertedRules )
 		{
-			write( convertFilenameForRsyncArgument(rule) );
+			write( rule ); // TODO: Muss diese rule convertiert werden? (z.B. mit getValidDestinationPath oder convertFilenameForRsyncArgument)
 			write( settings->getEOLCharacter() );
-			// qDebug() << "rule:" << rule;
+			qDebug() << "rule:" <<  rule;
 			waitForBytesWritten();
 		}
 		closeWriteChannel();
@@ -599,27 +599,28 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	qDebug() << "Downloaded Items: " << downloadedItems;
 	qDebug() << tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() );
 	emit infoSignal( tr( "%1 files and/or directories downloaded" ).arg( downloadedItems.size() ) );
+
 	waitForFinished();
-	qDebug() << "Rsync::download(...)" << "vor readAllStandardError";
-	QString errors = readAllStandardError();
-	qDebug() << "Rsync::download(...)" << "nach readAllStandardError";
-	if ( errors != "" )
-	{
-		qWarning() << "Error occurred while downloading: " << errors;
-		if ( emitErrorSignal )
+	if (this->isAlive()) {
+		QString standardErrors = readAllStandardError();
+		if ( standardErrors != "" )
 		{
-			throw ProcessException( tr ( "Error occurred while downloading: " ) + errors );
+			qWarning() << "Error occurred while uploading: " << standardErrors;
+			// if (errors) *errors = standardErrors; // needed to return error-messages
+			if ( emitErrorSignal )
+			{
+				throw ProcessException( tr ( "Error occurred while downloading: " ) + standardErrors );
+			}
+		}
+	} else {
+		if ( this->exitCode() != 0)
+		{
+			if ( emitErrorSignal )
+			{
+				throw ProcessException( QObject::tr( "rsync exited with with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
+			}
 		}
 	}
-	qDebug() << "Rsync::download(...)" << "nach if (this->exitCode() != 0)";
-	if (this->exitCode() != 0)
-	{
-		if ( emitErrorSignal )
-		{
-			throw ProcessException( QObject::tr( "rsync exited with with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(errors).arg(readAllStandardOutput().data()) );
-		}
-	}
-	qDebug() << "Rsync::download(...)" << "nach if (this->exitCode() != 0)";
 	return downloadedItems;
 }
 
@@ -799,7 +800,7 @@ QStringList Rsync::getRsyncSshArguments()
 	if ( settings->useOpenSshInsteadOfPlinkForRsync() )
 	{
 		QString argument;
-		argument.append( settings->getSshName() );
+		argument.append( "'" + settings->getSshName() + "'" );
 		argument.append(" -i '" + settings->createPrivateOpenSshKeyFile() + "'");
 		arguments << argument;
 	}
