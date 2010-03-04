@@ -32,15 +32,15 @@ diff -ur rsync-2.6.9/io.c rsync-2.6.9-progress/io.c
  		}
 diff -ur rsync-2.6.9/main.c rsync-2.6.9-progress/main.c
 --- rsync-2.6.9/main.c	2006-10-14 01:46:32.000000000 +0200
-+++ rsync-2.6.9-progress/main.c	2010-03-04 15:58:33.000000000 +0100
-@@ -75,6 +75,7 @@
++++ rsync-2.6.9-progress/main.c	2010-03-04 16:35:00.000000000 +0100
+@@ -71,6 +71,7 @@
+ extern char curr_dir[MAXPATHLEN];
+ extern struct filter_list_struct server_filter_list;
+ 
++int batch_dev_null = 0;
+ int local_server = 0;
  int new_root_dir = 0;
  mode_t orig_umask = 0;
- struct file_list *the_file_list;
-+int batch_dev_null = 0;
- 
- /* There's probably never more than at most 2 outstanding child processes,
-  * but set it higher, just in case. */
 @@ -1347,6 +1348,7 @@
  		if (read_batch && strcmp(batch_name, "-") == 0)
  			batch_fd = STDIN_FILENO;
