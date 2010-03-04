@@ -130,7 +130,7 @@ bool RemoteDirModel::setData(const QModelIndex& index, const QVariant& value, in
 		QFileInfo f_info = QFileInfo( ((DirTreeItem*)this->itemFromIndex( index ))->getAbsoluteName() );
 		bool curPathIsDir = f_info.absoluteFilePath().endsWith("/"); // no other possibility found at the moment
 		QString curPath = f_info.absoluteFilePath() + ((curPathIsDir &&  !f_info.absoluteFilePath().endsWith("/"))?"/":"");
-		qDebug() << "RemoteDirModel::setData(" << curPath << ")";
+		// qDebug() << "RemoteDirModel::setData(" << curPath << ")";
 		QPair<QString,bool> closestParentRule("",false);
 		QMutableHashIterator<QString,bool> itr(selectionRules);
 		while (itr.hasNext()) {
