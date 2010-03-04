@@ -983,10 +983,13 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItemAndStoreTransfe
 	if (rsyncOutputLine.startsWith(" ") && rsyncOutputLine.contains("%") && rsyncOutputLine.contains("B/s")) {
 		QString trafficStr;
 		QStringList parts = rsyncOutputLine.simplified().split(" ");
-		if (parts[parts.size()-1].trimmed().startsWith("(")) { parts.pop_back(); }
-		this->progress_trafficB_s = StringUtils::trafficStr2BytesPerSecond(parts[parts.size()-4]);
-		this->progress_bytesRead = parts[parts.size()-2].toLongLong();
-		this->progress_bytesWritten = parts[parts.size()-1].toLongLong();
+		if (parts.size() >= 1 && parts[parts.size()-1].trimmed().startsWith("(")) { parts.pop_back(); }
+		int nParts = parts.size();
+		if ( nParts >= 4 ) {
+			this->progress_trafficB_s = StringUtils::trafficStr2BytesPerSecond(parts[nParts-4]);
+			this->progress_bytesRead = parts[nParts-2].toLongLong();
+			this->progress_bytesWritten = parts[nParts-1].toLongLong();
+		}
 		return qMakePair( QString(""), SKIPPED );
 	} else {
 		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> myPair = getItem( rsyncOutputLine );
