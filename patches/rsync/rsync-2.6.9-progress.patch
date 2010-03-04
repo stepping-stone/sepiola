@@ -1,6 +1,6 @@
 diff -ur rsync-2.6.9/batch.c rsync-2.6.9-progress/batch.c
 --- rsync-2.6.9/batch.c	2006-04-26 01:51:12.000000000 +0200
-+++ rsync-2.6.9-progress/batch.c	2009-05-14 17:01:39.000000000 +0200
++++ rsync-2.6.9-progress/batch.c	2010-03-04 15:57:39.000000000 +0100
 @@ -173,6 +173,8 @@
  	int fd, i, len;
  	char *p, filename[MAXPATHLEN];
@@ -10,9 +10,48 @@ diff -ur rsync-2.6.9/batch.c rsync-2.6.9-progress/batch.c
  	stringjoin(filename, sizeof filename,
  		   batch_name, ".sh", NULL);
  	fd = do_open(filename, O_WRONLY | O_CREAT | O_TRUNC,
+diff -ur rsync-2.6.9/io.c rsync-2.6.9-progress/io.c
+--- rsync-2.6.9/io.c	2006-10-01 00:11:20.000000000 +0200
++++ rsync-2.6.9-progress/io.c	2010-03-04 15:59:54.000000000 +0100
+@@ -51,6 +51,7 @@
+ extern char *filesfrom_host;
+ extern struct stats stats;
+ extern struct file_list *the_file_list;
++extern int batch_dev_null;
+ 
+ const char phase_unknown[] = "unknown";
+ int ignore_timeout = 0;
+@@ -1079,7 +1080,7 @@
+ 			continue;
+ 		}
+ 
+-		if (FD_ISSET(fd, &e_fds)) {
++		if (FD_ISSET(fd, &e_fds) && !(fd == batch_fd && batch_dev_null)) {
+ 			rsyserr(FINFO, errno,
+ 				"select exception on fd %d", fd);
+ 		}
+diff -ur rsync-2.6.9/main.c rsync-2.6.9-progress/main.c
+--- rsync-2.6.9/main.c	2006-10-14 01:46:32.000000000 +0200
++++ rsync-2.6.9-progress/main.c	2010-03-04 15:58:33.000000000 +0100
+@@ -75,6 +75,7 @@
+ int new_root_dir = 0;
+ mode_t orig_umask = 0;
+ struct file_list *the_file_list;
++int batch_dev_null = 0;
+ 
+ /* There's probably never more than at most 2 outstanding child processes,
+  * but set it higher, just in case. */
+@@ -1347,6 +1348,7 @@
+ 		if (read_batch && strcmp(batch_name, "-") == 0)
+ 			batch_fd = STDIN_FILENO;
+ 		else {
++			if (strcmp(batch_name, "/dev/null") == 0) batch_dev_null = 1;
+ 			batch_fd = do_open(batch_name,
+ 				   write_batch ? O_WRONLY | O_CREAT | O_TRUNC
+ 				   : O_RDONLY, S_IRUSR | S_IWUSR);
 diff -ur rsync-2.6.9/progress.c rsync-2.6.9-progress/progress.c
 --- rsync-2.6.9/progress.c	2006-10-14 01:17:33.000000000 +0200
-+++ rsync-2.6.9-progress/progress.c	2009-05-14 17:01:35.000000000 +0200
++++ rsync-2.6.9-progress/progress.c	2010-03-04 15:57:39.000000000 +0100
 @@ -105,9 +105,9 @@
  			stats.num_files);
  	} else
