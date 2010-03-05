@@ -40,7 +40,7 @@ public:
 	static QString concatSep(const QString& aStr, const QString& bStr = "", const QString& tok = ",");
 //	static QString filenameShrink(const QString& filename, const int maxlen);
 	static QString filenameShrink(const QString& filename, const int maxlen, const QChar dirSeparator = QDir::separator());
-	static QString quoteText(QString text, QString tok);
+	static QString quoteText(QString text, QString tok, QString escapeCharacter = "\\");
 	static QString buf2QString(const char* buf);
 	static QString buf2QString(QString buf);
 
@@ -120,9 +120,14 @@ inline QString StringUtils::filenameShrink(const QString& filename, const int ma
 	}
 }
 
-inline QString StringUtils::quoteText(QString text, QString tok) {
+inline QString StringUtils::quoteText(QString text, QString tok, QString escapeCharacter) {
 	tok = tok.at(0);
-	return(tok + text.replace("\\","\\\\").replace(tok,"\\"+tok) + tok);
+	escapeCharacter = escapeCharacter.at(0);
+	if (tok != escapeCharacter) {
+		return(tok + text.replace(escapeCharacter,escapeCharacter+escapeCharacter).replace(tok,escapeCharacter+tok) + tok);
+	} else {
+		return text;
+	}
 }
 
 inline QString StringUtils::buf2QString(const char* buf) {
