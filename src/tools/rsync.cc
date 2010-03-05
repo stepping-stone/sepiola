@@ -606,7 +606,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		QString standardErrors = readAllStandardError();
 		if ( standardErrors != "" )
 		{
-			qWarning() << "Error occurred while uploading: " << standardErrors;
+			qWarning() << "Error occurred while downloading: " << standardErrors;
 			// if (errors) *errors = standardErrors; // needed to return error-messages
 			if ( emitErrorSignal )
 			{
