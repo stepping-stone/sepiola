@@ -296,8 +296,9 @@ QList<int> MainModel::getServerQuota()
 	return quota;
 }
 
-QList<RestoreName> MainModel::getRestoreNames()
+QList<RestoreName> MainModel::getRestoreNames( const QString & backup_prefix )
 {
+	qDebug() << "MainModel::getRestoreNames(" << backup_prefix << ")";
 	QMap<QDate, RestoreName> backupNamesMap;
 	QList<RestoreName> backupNames;
 	bool wasError = false;
@@ -305,7 +306,7 @@ QList<RestoreName> MainModel::getRestoreNames()
 	{
 		Settings* settings = Settings::getInstance();
 		auto_ptr< AbstractRsync > rsync = ToolFactory::getRsyncImpl();
-		QStringList restoreInfoFiles = rsync->downloadAllRestoreInfoFiles( settings->getApplicationDataDir() );
+		QStringList restoreInfoFiles = rsync->downloadAllRestoreInfoFiles( settings->getApplicationDataDir(), backup_prefix );
 		foreach( QString restoreInfoFile, restoreInfoFiles )
 		{
 			qDebug() << "restoreInfoFile: (" + restoreInfoFile + ")";
@@ -326,12 +327,12 @@ QList<RestoreName> MainModel::getRestoreNames()
 
 				// extract path to backup (e.g. /.snapthots/daily.0 or /incoming )
 				QString backupName = restoreInfoFile;
-				backupName = backupName.mid( settings->getApplicationDataDir().length(), backupName.lastIndexOf( settings->getBackupPrefix() ) - settings->getApplicationDataDir().length() );
+				backupName = backupName.mid( settings->getApplicationDataDir().length(), backupName.lastIndexOf( backup_prefix ) - 1 - settings->getApplicationDataDir().length() );
 
 				//backupNamesSet << RestoreName(  backupName, date );
 				backupNamesMap.insert(date, RestoreName(  backupName, date ));
-			} 
-			else 
+			}
+			else
 			{
 				wasError = true;
 			}
@@ -360,7 +361,7 @@ QList<RestoreName> MainModel::getRestoreNames()
 	return backupNames;
 }
 
-QStringList MainModel::getRestoreContent( const QString& backupName )
+QStringList MainModel::getRestoreContent( const QString& backupName, const QString & backup_prefix )
 {
 	qDebug() << "MainModel::getRestoreContent( " << backupName << " )";
 	QStringList backupContent;
@@ -368,7 +369,7 @@ QStringList MainModel::getRestoreContent( const QString& backupName )
 	{
 		Settings* settings = Settings::getInstance();
 		auto_ptr< AbstractRsync > rsync = ToolFactory::getRsyncImpl();
-		QFileInfo backupContentFileName = rsync->downloadBackupContentFile( settings->getBackupPrefix(), backupName, settings->getApplicationDataDir() );
+		QFileInfo backupContentFileName = rsync->downloadBackupContentFile( backup_prefix, backupName, settings->getApplicationDataDir() );
 
 		QFile backupContentFile( backupContentFileName.absoluteFilePath() );
 		if ( !backupContentFile.open( QIODevice::ReadOnly ) )
@@ -507,7 +508,7 @@ RemoteDirModel* MainModel::loadRemoteDirModel( const QString& computerName, cons
 	// @TODO there is at the moment no possibility to firce reload
 	this->clearRemoteDirModel();
 	qDebug() << "MainModel::loadRemoteDirModel   remoteDirModel" << remoteDirModel;
-	QStringList backupContent = getRestoreContent( backupName );
+	QStringList backupContent = getRestoreContent( backupName, computerName );
 	this->remoteDirModel = new RemoteDirModel( backupContent );
 	qDebug() << "MainModel::loadRemoteDirModel   remoteDirModel" << remoteDirModel;
 	return this->remoteDirModel;

@@ -97,7 +97,7 @@ void RestoreForm::initRestoreNames()
 
 	// settings->saveBackupPrefix( this->comboBoxPrefixes->currentText() );
 	this->comboBoxBackupNames->clear();
-	QList<RestoreName> restoreNames = this->model->getRestoreNames();
+	QList<RestoreName> restoreNames = this->model->getRestoreNames(this->comboBoxPrefixes->currentText());
 
 	if ( restoreNames.size() > 0 )
 	{
@@ -189,6 +189,7 @@ void RestoreForm::refreshRemoteDirModel()
 {
 	this->model->clearRemoteDirModel();
 	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
+	qDebug() << "RestoreForm::refreshRemoteDirModel: currentBackupName=" << currentBackupName;
 	QString currentPrefix = this->comboBoxPrefixes->currentText();
 	this->treeViewFilesAndFolders->setModel( this->model->loadRemoteDirModel( currentPrefix, currentBackupName ) );
 	this->treeViewFilesAndFolders->repaint();

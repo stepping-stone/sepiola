@@ -100,7 +100,7 @@ public:
 	RemoteDirModel* getCurrentRemoteDirModel();
 	RemoteDirModel* loadRemoteDirModel( const QString& computerName, const QString& backupName );
 	void clearRemoteDirModel();
-	
+
 	/**
 	 * Initializes the connection to the server
 	 * @return true if the connection is established
@@ -153,14 +153,14 @@ public:
 	 * Gets all available restore names
 	 * @return a list of RestoreName items
 	 */
-	QList<RestoreName> getRestoreNames();
+	QList<RestoreName> getRestoreNames( const QString & backup_prefix );
 
 	/**
 	 * Gets all available prefixes from the server
 	 * @return a list of prefix names
 	 */
 	QStringList getPrefixes();
-	
+
 	 /**
 	 * Reads int-values from the provided quota-file on the server
 	 * @return QList<int> of values from the quota-file
@@ -276,7 +276,7 @@ private:
 	LocalDirModel* localDirModel;
 	RemoteDirModel* remoteDirModel;
 	bool isLoginAborted;
-	QStringList getRestoreContent( const QString& backupName );
+	QStringList getRestoreContent( const QString& backupName, const QString & backup_prefix );
 };
 
 inline void MainModel::abortLogin()
