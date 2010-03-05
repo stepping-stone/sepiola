@@ -95,12 +95,12 @@ public:
 	/**
 	 * @see AbstractRsync::downloadCurrentMetadata( const QString& destination )
 	 */
-	QFileInfo downloadCurrentMetadata( const QString& destination, bool emitErrorSignal );
+	QFileInfo downloadCurrentMetadata( const QString& destination, bool emitErrorSignal = true );
 
 	/**
 	 * @see AbstractRsync::downloadAllRestoreInfoFiles( const QString& destination )
 	 */
-	QStringList downloadAllRestoreInfoFiles( const QString& destination);
+	QStringList downloadAllRestoreInfoFiles( const QString& destination, const QString& backup_prefix );
 
 	/**
 	 * @see AbstractRsync:deleteAllRestoreInfoFiles( const QString& destination )

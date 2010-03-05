@@ -54,6 +54,7 @@ Rsync::~Rsync() {}
 
 QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
 {
+	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << compress << ", ...)";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files";
@@ -457,7 +458,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	qDebug() << "Rsync::download(" << source << ", " << destination << ", ... )";
 
 	Settings* settings = Settings::getInstance();
-	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + source;
+	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(source, "'");
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -545,7 +546,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	qDebug() << "Rsync::download(" << source << ", " << destination << "," << includeRules << ", ... )";
 
 	Settings* settings = Settings::getInstance();
-	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + source;
+	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(source, "'");
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -624,9 +625,9 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	return downloadedItems;
 }
 
-QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination )
+QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination, const QString& backup_prefix )
 {
-	qDebug() << "Rsync::downloadAllRestoreInfoFiles()";
+	qDebug() << "Rsync::downloadAllRestoreInfoFiles(" << destination << ")";
 	Settings* settings = Settings::getInstance();
 
 	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":";
@@ -639,7 +640,7 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination )
 	// include backup info file from backup folder
 	QString includePath = settings->getBackupRootFolder();
 	arguments << "--include=" + includePath;
-	includePath += settings->getBackupPrefix() + "/";
+	includePath += backup_prefix + "/";
 	arguments << "--include=" + includePath;
 	includePath += settings->getMetaFolderName() + "/";
 	arguments << "--include=" + includePath;
@@ -651,7 +652,7 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination )
 	arguments << "--include=" + includePath;
 	includePath += "*/";
 	arguments << "--include=" + includePath;
-	includePath += settings->getBackupPrefix() + "/";
+	includePath += backup_prefix + "/";
 	arguments << "--include=" + includePath;
 	includePath += settings->getMetaFolderName() + "/";
 	arguments << "--include=" + includePath;
@@ -671,7 +672,6 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination )
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
-		qDebug() << "Rsync::downloadAllRestoreInfoFiles(...): lineData" << lineData << "item" << item;
 		if ( !item.contains( "=>" ) && item.contains( settings->getMetaFolderName() + "/" + settings->getBackupTimeFileName() ) )
 		{
 			downloadedRestoreInfoFiles << destination + item;
@@ -717,7 +717,7 @@ QStringList Rsync::getPrefixes()
 	arguments << getRsyncSshArguments();
 
 	// include backupRootFolder/*/
-	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder();
+	QString src = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder(), "'");
 	arguments << "--include=/*/";
 	arguments << "--exclude=*";
 	arguments << src;
@@ -730,6 +730,7 @@ QStringList Rsync::getPrefixes()
 	while( blockingReadLine( &lineData, 2147483647 ) )
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
+		qDebug() << "Rsync::getPrefixes():" << lineData;
 
 		QString column;
 		QTextStream line( &lineData );
@@ -737,7 +738,7 @@ QStringList Rsync::getPrefixes()
 		line >> column; // skip size
 		line >> column; // skip modification date
 		line >> column; // skip modification time
-		line >> column; // take prefix
+		column = line.readLine().trimmed(); // take prefix
 		if ( column != "." )
 		{
 			prefixes << column;
@@ -800,13 +801,13 @@ QStringList Rsync::getRsyncSshArguments()
 	if ( settings->useOpenSshInsteadOfPlinkForRsync() )
 	{
 		QString argument;
-		argument.append( "'" + settings->getSshName() + "'" );
-		argument.append(" -i '" + settings->createPrivateOpenSshKeyFile() + "'");
+		argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
+		argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
 		arguments << argument;
 	}
 	else
 	{
-		arguments << "'" + settings->getPlinkName() + "' -i " + "'" + settings->createPrivatePuttyKeyFile() + "'";
+		arguments << StringUtils::quoteText(settings->getPlinkName(), "'") + " -i " + StringUtils::quoteText(settings->createPrivatePuttyKeyFile(), "'");
 	}
 	return arguments;
 }
@@ -1034,7 +1035,7 @@ void Rsync::testUpload()
 	QStringList files;
 	files << "/tmp2/";
 	QString source = "/";
-	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
+	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/", "'");
 	Rsync rsync;
 	QString errors;
 	rsync.upload( files, source, destination, QStringList(), QStringList(), false, false, &errors );
@@ -1050,7 +1051,7 @@ void Rsync::testDownloadCurrentMetadata()
 void Rsync::testDownloadAllRestoreInfoFiles()
 {
 	Rsync rsync;
-	rsync.downloadAllRestoreInfoFiles( Settings::getInstance()->getApplicationDataDir() );
+	rsync.downloadAllRestoreInfoFiles( Settings::getInstance()->getApplicationDataDir(), Settings::getInstance()->getBackupPrefix() );
 }
 
 void Rsync::testDeleteAllRestoreInfoFiles()

@@ -67,7 +67,7 @@ bool Plink::loginWithKey()
 	QStringList arguments;
 	arguments << "-i" << privatePuttyKeyFileName;
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
-	arguments << "sh -c 'echo " + LOGIN_ECHO_MESSAGE + "'";
+	arguments << "sh -c " + StringUtils::quoteText("echo " + LOGIN_ECHO_MESSAGE, "'");
 	createProcess( settings->getPlinkName(), arguments );
 	setProcessChannelMode( QProcess::MergedChannels );
 	start();
@@ -196,7 +196,7 @@ bool Plink::generateKeys( const QString& password )
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	QString shellArguments;
 	arguments << "sh" << "-c";
-	shellArguments.append( "'echo " + LOGIN_ECHO_MESSAGE + ";" );
+	shellArguments.append( "echo " + LOGIN_ECHO_MESSAGE + ";" );
 	shellArguments.append( "puttygen -q -t dsa -b 1024 -o " + privatePuttyKeyFileName + ";" );
 	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + publicKeyFileName + " -O public-openssh;" );
 	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + privateOpenSshKeyFileName + " -O private-openssh;" );
@@ -209,7 +209,8 @@ bool Plink::generateKeys( const QString& password )
 	shellArguments.append( "echo " + END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE +";" );
 	shellArguments.append( "rm " + privatePuttyKeyFileName + ";" );
 	shellArguments.append( "rm " + privateOpenSshKeyFileName + ";" );
-	shellArguments.append( "rm " + publicKeyFileName + "'");
+	shellArguments.append( "rm " + publicKeyFileName);
+	shellArguments = StringUtils::quoteText(shellArguments, "'");
 	arguments << shellArguments;
 
 	emit infoSignal( QObject::tr( "Log in ..." ) );
@@ -314,19 +315,19 @@ QList<int> Plink::getServerQuotaValues()
 {
 	qDebug() << "Plink::getServerQuotaValues()";
 	Settings* settings = Settings::getInstance();
-		
+
 	QList<int> sizes;
-	
+
 	QStringList arguments;
 	arguments << "-i";
 	arguments << settings->createPrivatePuttyKeyFile();
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	arguments << settings->getServerQuotaScriptName();
-	
+
 	createProcess(settings->getPlinkName(), arguments);
 	start();
 	waitForFinished();
-	
+
 	QByteArray quotaText = readAllStandardOutput();
 	int quota, backup, snapshot;
 	QTextStream in(quotaText);

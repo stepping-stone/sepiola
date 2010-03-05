@@ -64,7 +64,7 @@ public:
 	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
 
 	virtual long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool compress, QString* errors ) = 0;
-	
+
 	void upload( const QFileInfo& fileInfo, const QString& destination, bool bCompress, QString* errors = NULL );
 
 	/**
@@ -122,13 +122,13 @@ public:
 	 * @param destination destination directory path
 	 * @return a list of available restore info files
 	 */
-	virtual QStringList downloadAllRestoreInfoFiles( const QString& destination ) = 0;
+	virtual QStringList downloadAllRestoreInfoFiles( const QString& destination, const QString& backup_prefix ) = 0;
 
 	/**
 	 * Deletes all restore info files
 	 * @param path restore info files path
 	 */
-	virtual void deleteAllRestoreInfoFiles( const QString& path) = 0;
+	virtual void deleteAllRestoreInfoFiles( const QString& path ) = 0;
 
 	/**
 	 * Gets all available prefixes from the server

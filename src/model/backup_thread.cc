@@ -145,7 +145,7 @@ void BackupThread::run()
 
 		QString errors;
 		QString source = "/";
-		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
+		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/", "'");
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_ESTIMATE_BACKUP_SIZE);
 		emit infoSignal( QObject::tr( QString(TASKNAME_ESTIMATE_BACKUP_SIZE).toLocal8Bit() ) );
 		quint64 backupSize = this->estimateBackupSize( source, destination );
@@ -166,8 +166,7 @@ void BackupThread::run()
 
 		if ( processedItems.size() > 0 )
 		{
-			QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" +
-				settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName();
+			QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName(), "'");
 			//auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
 
 			// backup content file list
@@ -348,7 +347,7 @@ void BackupThread::prepareServerDirectories()
 	// create local directories and upload them
 	Settings* settings = Settings::getInstance();
 	QString source = settings->getApplicationDataDir();
-	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + settings->getBackupRootFolder();
+	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder(), "'"); // $$$ quotes necessary?
 	QDir workingDir( settings->getApplicationDataDir() );
 	QString backupPrefixFolder = settings->getBackupPrefix();
 	workingDir.mkdir( backupPrefixFolder );
