@@ -73,7 +73,7 @@ public:
 	 * @param destination destination directory path
 	 * @return a list of downloaded items
 	 */
-	virtual QStringList downloadFullBackup( const QString& backupName, const QString& destination ) = 0;
+	virtual QStringList downloadFullBackup( const QString& backup_prefix, const QString& backupName, const QString& destination ) = 0;
 
 	/**
 	 * Downloads a custom list of files and dirs to a given destination
@@ -82,8 +82,8 @@ public:
 	 * @param destination destination directory path
 	 * @return a list of downloaded items
 	 */
-	virtual QStringList downloadCustomBackup( const QString& backupName, const BackupSelectionHash& includeRules, const QString& destination ) = 0;
-	virtual QStringList downloadCustomBackup( const QString& backupName, const QStringList& itemList, const QString& destination ) = 0;
+	virtual QStringList downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& includeRules, const QString& destination ) = 0;
+	virtual QStringList downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const QStringList& itemList, const QString& destination ) = 0;
 
 	/**
 	 * Downloads the backup content file
@@ -91,7 +91,7 @@ public:
 	 * @param destination destination directory path
 	 * @return the content file
 	 */
-	virtual QFileInfo downloadBackupContentFile( const QString& computerName, const QString& backupName, const QString& destination ) = 0;
+	virtual QFileInfo downloadBackupContentFile( const QString& backup_prefix, const QString& backupName, const QString& destination ) = 0;
 
 	/**
 	 * Downloads the current backup content file
@@ -107,7 +107,7 @@ public:
 	 * @param destination destination directory path
 	 * @return the metadata file
 	 */
-	virtual QFileInfo downloadMetadata( const QString& backupName, const QString& destination ) = 0;
+	virtual QFileInfo downloadMetadata( const QString& backup_prefix, const QString& backupName, const QString& destination ) = 0;
 
 	/**
 	 * Downloads the current metadata file

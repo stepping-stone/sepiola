@@ -67,20 +67,20 @@ public:
 	long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool compress, QString* errors ) throw ( ProcessException );
 
 	/**
-	 * @see AbstractRsync::downloadFullBackup( const QString& backupName, const QString& destination )
+	 * @see AbstractRsync::downloadFullBackup( const QString& backup_prefix, const QString& backupName, const QString& destination )
 	 */
-	QStringList downloadFullBackup( const QString& backupName, const QString& destination );
+	QStringList downloadFullBackup( const QString& backup_prefix, const QString& backupName, const QString& destination );
 
 	/**
 	 * @see AbstractRsync::downloadCustomBackup( const QString& backupName, const QStringList& itemList, const QString& destination )
 	 */
-	QStringList downloadCustomBackup( const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
-	QStringList downloadCustomBackup( const QString& backupName, const QStringList& itemList, const QString& destination );
+	QStringList downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
+	QStringList downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const QStringList& itemList, const QString& destination );
 
 	/**
 	 * @see AbstractRsync::downloadBackupContentFile( const QString& backupName, const QString& destination )
 	 */
-	QFileInfo downloadBackupContentFile( const QString& computerName, const QString& backupName, const QString& destination );
+	QFileInfo downloadBackupContentFile( const QString& backup_prefix, const QString& backupName, const QString& destination );
 
 	/**
 	 * @see AbstractRsync::downloadCurrentBackupContentFile( const QString& destination )
@@ -88,9 +88,9 @@ public:
 	QFileInfo downloadCurrentBackupContentFile( const QString& destination, bool emitErrorSignal );
 
 	/**
-	 * @see AbstractRsync::downloadMetadata( const QString& backupName, const QString& destination )
+	 * @see AbstractRsync::downloadMetadata( const QString& backup_prefix, const QString& backupName, const QString& destination )
 	 */
-	QFileInfo downloadMetadata( const QString& backupName, const QString& destination );
+	QFileInfo downloadMetadata( const QString& backup_prefix, const QString& backupName, const QString& destination );
 
 	/**
 	 * @see AbstractRsync::downloadCurrentMetadata( const QString& destination )

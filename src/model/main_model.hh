@@ -98,7 +98,7 @@ public:
 	 */
 	QStandardItemModel* getCurrentRemoteDirModel_general();
 	RemoteDirModel* getCurrentRemoteDirModel();
-	RemoteDirModel* loadRemoteDirModel( const QString& computerName, const QString& backupName );
+	RemoteDirModel* loadRemoteDirModel( const QString& backup_prefix, const QString& backupName );
 	void clearRemoteDirModel();
 
 	/**
@@ -172,7 +172,7 @@ public:
 	 * @param backupName name of the backup for fetching the restore items
 	 * @param destination a destination path for restoring
 	 */
-	void fullRestore( const QString& backupName, const QString& destination );
+	void fullRestore( const QString& backup_prefix, const QString& backupName, const QString& destination );
 
 	/**
 	 * Restores a custom list of items
@@ -181,8 +181,8 @@ public:
 	 * @param backupName name of the backup for fetching the restore items
 	 * @param destination a destination path for restoring
 	 */
-	void customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backupName, const QString& destination );
-	void customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backupName, const QString& destination );
+	// void customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backup_prefix, const QString& backupName, const QString& destination );
+	void customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backup_prefix, const QString& backupName, const QString& destination );
 
 	/**
 	 * Shows an information message box with the given text
@@ -276,7 +276,7 @@ private:
 	LocalDirModel* localDirModel;
 	RemoteDirModel* remoteDirModel;
 	bool isLoginAborted;
-	QStringList getRestoreContent( const QString& backupName, const QString & backup_prefix );
+	QStringList getRestoreContent( const QString& backup_prefix, const QString& backupName );
 };
 
 inline void MainModel::abortLogin()

@@ -44,7 +44,7 @@ public:
 	 * @param backupName name of the backup for fetching the restore items
 	 * @param destination a destination path for restoring
 	 */
-	RestoreThread( const QString& backupName, const QString& destination );
+//	RestoreThread( const QString& backup_prefix, const QString& backupName, const QString& destination );
 
 	/**
 	 * Creates a RestoreThread
@@ -52,14 +52,14 @@ public:
 	 * @param items selected items
 	 * @param destination a destination path for restoring
 	 */
-	RestoreThread( const QString& backupName, const QStringList& items, const QString& destination );
-	RestoreThread( const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
+//	RestoreThread( const QString& backup_prefix, const QString& backupName, const QStringList& items, const QString& destination );
+	RestoreThread( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
 
 	/**
 	 * Destroyes the RestoreThread
 	 */
 	virtual ~RestoreThread();
-	
+
 
 signals:
 	void showCriticalMessageBox( const QString& message );
@@ -84,11 +84,12 @@ protected:
 private:
 	void init();
 	void checkAbortState() throw ( AbortException );
-	void applyMetadata( const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination );
+	void applyMetadata( const QString& backup_prefix, const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination );
 
 	auto_ptr< AbstractRsync > rsync;
 	bool isAborted;
 	bool isCustomRestore;
+	QString backup_prefix;
 	QString backupName;
 	QStringList items;
 	BackupSelectionHash selectionRules;

@@ -367,35 +367,35 @@ long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, con
 }
 
 
-QStringList Rsync::downloadFullBackup( const QString& backupName, const QString& destination )
+QStringList Rsync::downloadFullBackup( const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
-	qDebug() << "Rsync::downloadFullBackup(" << backupName << ")";
+	qDebug() << "Rsync::downloadFullBackup(" << backup_prefix << "," << backupName << ")";
 	Settings* settings = Settings::getInstance();
-	QString source = backupName + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/*";
+	QString source = backupName + "/" + backup_prefix + "/" + settings->getBackupFolderName() + "/*";
 	return download( source, destination, false );
 }
 
-QStringList Rsync::downloadCustomBackup( const QString& backupName, const QStringList& itemList, const QString& destination )
+QStringList Rsync::downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const QStringList& itemList, const QString& destination )
 {
 	qDebug() << "Rsync::downloadCustomBackup(" << backupName << ", ..., " << destination << ")";
 	Settings* settings = Settings::getInstance();
-	QString source = backupName + "/" + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
+	QString source = backupName + "/" + backup_prefix + "/" + settings->getBackupFolderName() + "/";
 	return download( source, destination, itemList, false, true );
 }
 
-QStringList Rsync::downloadCustomBackup( const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )
+QStringList Rsync::downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )
 {
 	qDebug() << "Rsync::downloadCustomBackup(" << backupName << ", ..., " << destination << ")";
 	Settings* settings = Settings::getInstance();
-	QString source = backupName + "/" + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/";
+	QString source = backupName + "/" + backup_prefix + "/" + settings->getBackupFolderName() + "/";
 	return this->download( source, destination, selectionRules, false, true );
 }
 
-QFileInfo Rsync::downloadBackupContentFile( const QString& computerName, const QString& backupName, const QString& destination )
+QFileInfo Rsync::downloadBackupContentFile( const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
-	qDebug() << "Rsync::downloadBackupContentFile(" << computerName << "," << backupName << "," << destination << ")";
+	qDebug() << "Rsync::downloadBackupContentFile(" << backup_prefix << "," << backupName << "," << destination << ")";
 	Settings* settings = Settings::getInstance();
-	QString source = backupName + "/" + computerName + "/" + settings->getMetaFolderName() + "/";
+	QString source = backupName + "/" + backup_prefix + "/" + settings->getMetaFolderName() + "/";
 
 	downloadSingleFile( source, destination, settings->getBackupContentFileName(), true, true );
 	return destination + settings->getBackupContentFileName();
@@ -412,11 +412,11 @@ QFileInfo Rsync::downloadCurrentBackupContentFile( const QString& destination, b
 	return destination + settings->getBackupContentFileName();
 }
 
-QFileInfo Rsync::downloadMetadata( const QString& backupName, const QString& destination )
+QFileInfo Rsync::downloadMetadata( const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
-	qDebug() << "Rsync::downloadMetadata(" << backupName << ", " << destination << ")";
+	qDebug() << "Rsync::downloadMetadata(" << backup_prefix << "," << backupName << "," << destination << ")";
 	Settings* settings = Settings::getInstance();
-	QString source = backupName + "/" + settings->getBackupPrefix() + "/" + settings->getMetaFolderName() + "/";
+	QString source = backupName + "/" + backup_prefix + "/" + settings->getMetaFolderName() + "/";
 
 	downloadSingleFile( source, destination, settings->getMetadataFileName(), true, true );
 	return destination + settings->getMetadataFileName();
@@ -1032,10 +1032,11 @@ void Rsync::testGetItem()
 void Rsync::testUpload()
 {
 	Settings* settings = Settings::getInstance();
+	QString backup_prefix = settings->getBackupPrefix();
 	QStringList files;
 	files << "/tmp2/";
 	QString source = "/";
-	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/", "'");
+	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + backup_prefix + "/" + settings->getBackupFolderName() + "/", "'");
 	Rsync rsync;
 	QString errors;
 	rsync.upload( files, source, destination, QStringList(), QStringList(), false, false, &errors );
@@ -1051,7 +1052,8 @@ void Rsync::testDownloadCurrentMetadata()
 void Rsync::testDownloadAllRestoreInfoFiles()
 {
 	Rsync rsync;
-	rsync.downloadAllRestoreInfoFiles( Settings::getInstance()->getApplicationDataDir(), Settings::getInstance()->getBackupPrefix() );
+	QString backup_prefix = Settings::getInstance()->getBackupPrefix();
+	rsync.downloadAllRestoreInfoFiles( Settings::getInstance()->getApplicationDataDir(), backup_prefix );
 }
 
 void Rsync::testDeleteAllRestoreInfoFiles()
@@ -1063,7 +1065,8 @@ void Rsync::testDeleteAllRestoreInfoFiles()
 void Rsync::testDownloadBackupContentFile()
 {
 	Rsync rsync;
-	rsync.downloadBackupContentFile( Settings::getInstance()->getBackupPrefix(), Settings::getInstance()->getBackupRootFolder(), Settings::getInstance()->getApplicationDataDir() );
+	QString backup_prefix = Settings::getInstance()->getBackupPrefix();
+	rsync.downloadBackupContentFile( backup_prefix, Settings::getInstance()->getBackupRootFolder(), Settings::getInstance()->getApplicationDataDir() );
 }
 
 void Rsync::testGetPrefixes()

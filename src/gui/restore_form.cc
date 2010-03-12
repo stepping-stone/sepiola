@@ -258,8 +258,8 @@ void RestoreForm::startRestore(bool isFullRestore, QString destination)
 		this->model->showInformationMessage( tr( "No backup has been selected." ) );
 		return;
 	}
-	QString currentBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
-	QString currentPrefix = this->comboBoxPrefixes->currentText();
+	QString selectedBackupName = this->comboBoxBackupNames->itemData( this->comboBoxBackupNames->currentIndex() ).toString();
+	QString selectedBackupPrefix = this->comboBoxPrefixes->currentText();
 	if ( !isFullRestore && (this->model->getCurrentRemoteDirModel()->getSelectionRules().size() == 0) )
 	{
 		this->model->showInformationMessage( tr( "No files and/or directories has been selected." ) );
@@ -282,11 +282,11 @@ void RestoreForm::startRestore(bool isFullRestore, QString destination)
 	if ( isFullRestore ) {
 		// full restore
 		this->model->showProgressDialogSlot( tr( "Full restore" ) );
-		this->model->fullRestore( currentBackupName, destination );
+		this->model->fullRestore( selectedBackupPrefix, selectedBackupName, destination );
 	} else {
 		// custom restore
 		this->model->showProgressDialogSlot( tr( "Custom restore" ) );
 		BackupSelectionHash selectionRules = this->model->getCurrentRemoteDirModel()->getSelectionRules();
-		this->model->customRestore( this->model->getCurrentRemoteDirModel(), selectionRules, currentBackupName, destination );
+		this->model->customRestore( this->model->getCurrentRemoteDirModel(), selectionRules, selectedBackupPrefix, selectedBackupName, destination );
 	}
 }

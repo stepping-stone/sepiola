@@ -24,29 +24,35 @@
 #include "utils/file_system_utils.hh"
 
 
-RestoreThread::RestoreThread( const QString& backupName, const QString& destination )
+/**
+ * deprecated, fullRestore is done by passing selectionRule("/",true)
+ */
+/* RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
 	this->isCustomRestore = false;
+	this->backup_prefix = backup_prefix;
 	this->backupName = backupName;
 	this->destination = destination;
 	init();
-}
+} */
 
 /**
  * deprecated
  */
-RestoreThread::RestoreThread( const QString& backupName, const QStringList& items, const QString& destination )
+/* RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const QStringList& items, const QString& destination )
 {
 	this->isCustomRestore = true;
+	this->backup_prefix = backup_prefix;
 	this->backupName = backupName;
 	this->items = items;
 	this->destination = destination;
 	init();
-}
+} */
 
-RestoreThread::RestoreThread( const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )
+RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )
 {
 	this->isCustomRestore = true;
+	this->backup_prefix = backup_prefix;
 	this->backupName = backupName;
 	this->selectionRules = selectionRules;
 	this->destination = destination;
@@ -90,15 +96,15 @@ void RestoreThread::run()
 		QStringList downloadedItems;
 		if ( isCustomRestore )
 		{
-			downloadedItems = rsync->downloadCustomBackup( backupName, selectionRules, destination );
+			downloadedItems = rsync->downloadCustomBackup( backup_prefix, backupName, selectionRules, destination );
 		}
 		else
 		{
-			downloadedItems = rsync->downloadFullBackup( backupName, destination );
+			downloadedItems = rsync->downloadFullBackup( backup_prefix, backupName, destination );
 		}
 		checkAbortState();
 		emit infoSignal( tr( "Applying Metadata" ) );
-		applyMetadata( backupName, downloadedItems, destination );
+		applyMetadata( backup_prefix, backupName, downloadedItems, destination );
 		checkAbortState();
 		emit infoSignal( tr( "Restore done." ) );
 	}
@@ -116,7 +122,7 @@ void RestoreThread::run()
 	emit finishProgressDialog();
 }
 
-void RestoreThread::applyMetadata( const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination )
+void RestoreThread::applyMetadata( const QString& backup_prefix, const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination )
 {
 	if ( downloadedItems.size() > 0 )
 	{
@@ -125,7 +131,7 @@ void RestoreThread::applyMetadata( const QString& backupName, const QStringList&
 						  this, SIGNAL( infoSignal( const QString& ) ) );
 		QObject::connect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
 						  this, SIGNAL( errorSignal( const QString& ) ) );
-		QFileInfo metadataFile = rsync->downloadMetadata( backupName, Settings::getInstance()->getApplicationDataDir() );
+		QFileInfo metadataFile = rsync->downloadMetadata( backup_prefix, backupName, Settings::getInstance()->getApplicationDataDir() );
 		metadata->setMetadata( metadataFile, downloadedItems, downloadDestination );
 		FileSystemUtils::removeFile( metadataFile );
 		QObject::disconnect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),

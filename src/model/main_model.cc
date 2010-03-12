@@ -361,9 +361,9 @@ QList<RestoreName> MainModel::getRestoreNames( const QString & backup_prefix )
 	return backupNames;
 }
 
-QStringList MainModel::getRestoreContent( const QString& backupName, const QString & backup_prefix )
+QStringList MainModel::getRestoreContent( const QString & backup_prefix, const QString& backupName )
 {
-	qDebug() << "MainModel::getRestoreContent( " << backupName << " )";
+	qDebug() << "MainModel::getRestoreContent( " << backup_prefix << "," << backupName << " )";
 	QStringList backupContent;
 	try
 	{
@@ -393,13 +393,15 @@ QStringList MainModel::getRestoreContent( const QString& backupName, const QStri
 	return backupContent;
 }
 
-void MainModel::fullRestore( const QString& backupName, const QString& destination )
+void MainModel::fullRestore( const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
 	if( !initConnection() )
 	{
 		return;
 	}
-	RestoreThread* restoreThread = new RestoreThread( backupName, destination );
+	BackupSelectionHash selectionRules;
+	selectionRules.insert("/", true);
+	RestoreThread* restoreThread = new RestoreThread( backup_prefix, backupName, selectionRules, destination );
 
 	QObject::connect( restoreThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
 						this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
@@ -415,7 +417,7 @@ void MainModel::fullRestore( const QString& backupName, const QString& destinati
 	//TODO: disconnect signal/slot connections
 }
 
-void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backupName, const QString& destination )
+/* void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
 	if( !initConnection() )
 	{
@@ -427,7 +429,7 @@ void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const Q
 		DirTreeItem* item = (DirTreeItem*)remoteDirModel->itemFromIndex( selectedItem );
 		itemList << item->getAbsoluteName();
 	}
-	RestoreThread* restoreThread = new RestoreThread( backupName, itemList, destination );
+	RestoreThread* restoreThread = new RestoreThread( backup_prefix, backupName, itemList, destination );
 
 	QObject::connect( restoreThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
 						this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
@@ -441,16 +443,16 @@ void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const Q
 						restoreThread, SLOT( abortRestoreProcess() ) );
 	restoreThread->start();
 	//TODO: disconnect signal/slot connections
-}
+} */
 
-void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backupName, const QString& destination )
+void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
 	if( !initConnection() )
 	{
 		return;
 	}
 
-	RestoreThread* restoreThread = new RestoreThread( backupName, selectionRules, destination );
+	RestoreThread* restoreThread = new RestoreThread( backup_prefix, backupName, selectionRules, destination );
 
 	QObject::connect( restoreThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
 					  this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
@@ -503,14 +505,13 @@ RemoteDirModel* MainModel::getCurrentRemoteDirModel()
 	return remoteDirModel;
 }
 
-RemoteDirModel* MainModel::loadRemoteDirModel( const QString& computerName, const QString& backupName )
+RemoteDirModel* MainModel::loadRemoteDirModel( const QString& backup_prefix, const QString& backupName )
 {
 	// @TODO there is at the moment no possibility to firce reload
 	this->clearRemoteDirModel();
 	qDebug() << "MainModel::loadRemoteDirModel   remoteDirModel" << remoteDirModel;
-	QStringList backupContent = getRestoreContent( backupName, computerName );
+	QStringList backupContent = getRestoreContent( backup_prefix, backupName );
 	this->remoteDirModel = new RemoteDirModel( backupContent );
-	qDebug() << "MainModel::loadRemoteDirModel   remoteDirModel" << remoteDirModel;
 	return this->remoteDirModel;
 }
 
