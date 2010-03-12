@@ -66,6 +66,7 @@ bool Plink::loginWithKey()
 
 	QStringList arguments;
 	arguments << "-i" << privatePuttyKeyFileName;
+	/* $$$ TODO [dt] check if this is correct */ // arguments << "-o" << "IdentitiesOnly=yes"; // doesn't work lonely so
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	arguments << "sh -c " + StringUtils::quoteText("echo " + LOGIN_ECHO_MESSAGE, "'");
 	createProcess( settings->getPlinkName(), arguments );

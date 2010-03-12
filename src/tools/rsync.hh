@@ -185,6 +185,7 @@ private:
 
 	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
 	static QByteArray convertRuleToByteArray(QString rule, bool modifier );
+	static QByteArray convertQStringToQByteArray(QString aStr);
 };
 
 #endif

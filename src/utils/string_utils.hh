@@ -57,6 +57,7 @@ public:
 	static QString parentDir(const QString& filename); // same as dirPart, except for folders -> one back and not self
 	static QString equalDirPart(const QString& filenameA, const QString& filenameB);
 	static bool writeStringListToFile(const QList<QString>& include_dirs_list, const QString& include_dirs_filename, QString eolChar = "\n" );
+	static bool writeQByteArrayListToFile(const QList<QByteArray>& include_dirs_list, const QString& include_dirs_filename, QByteArray eolChar = "\n" );
 
 	static void testChar2StdString();
 	static void testQuoteText();
@@ -262,5 +263,21 @@ inline bool StringUtils::writeStringListToFile(const QList<QString>& item_list, 
 		return false;
 	}
 }
+
+inline bool StringUtils::writeQByteArrayListToFile(const QList<QByteArray>& item_list, const QString& filename, QByteArray eolChar ) {
+	QFile out(filename);
+	if ( out.open( QIODevice::WriteOnly ) ) {
+		foreach ( QByteArray item, item_list )
+		{
+			out.write(item + eolChar);
+		}
+		out.close();
+		return true;
+	} else {
+		qDebug() << "StringUtils::writeStringListToFile(...)" << "problems opening file:" << filename;
+		return false;
+	}
+}
+
 
 #endif /*STRING_UTILS_HH_*/

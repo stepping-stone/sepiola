@@ -54,11 +54,10 @@ Rsync::~Rsync() {}
 
 QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
 {
-	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << compress << ", ...)";
+	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << compress << "," << errors << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files";
-	qDebug() << "Rsync::upload(" << includeRules << ", " << src << ", " << destination << ", " << compress << ", " << errors << ", " << dry_run << ")";
 	Settings* settings = Settings::getInstance();
 	bool setDeleteFlag = settings->getDeleteExtraneousItems();
 	QString include_dirs_filename = settings->getApplicationDataDir() + "includes";
@@ -88,8 +87,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
 	QStringList include_dirs_list;
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
-	for (int i = 0; i < include_dirs_list.size(); i++ ) { include_dirs_list[i] = convertFilenameForRsyncArgument(include_dirs_list[i]); }
-	if (StringUtils::writeStringListToFile(include_dirs_list, include_dirs_filename, settings->getEOLCharacter())) {
+	QList<QByteArray> convertedIncludeDirs;
+	foreach ( QString include_dir, include_dirs_list ) { qDebug() << "$$$" << include_dir; convertedIncludeDirs.append(convertFilenameForRsyncArgument(include_dir)); }
+	if (StringUtils::writeQByteArrayListToFile(convertedIncludeDirs, include_dirs_filename, settings->getEOLCharacter())) {
 		arguments << "--files-from=" + convertFilenameForRsyncArgument(include_dirs_filename);
 		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
 	} else {
@@ -100,7 +100,8 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	start();
 	foreach ( QByteArray rule, convertedRules )
 	{
-		write( convertFilenameForRsyncArgument(rule) );
+		write(rule); // write( convertFilenameForRsyncArgument(rule) );
+		qDebug() << rule; // $$$ delete again
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
@@ -115,6 +116,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QString lastFileName;
 	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
 	{
+		// qDebug() << "first in while" << readAllStandardError(); // $$$ delete again
 		qDebug() << lineData;
 		lineData.replace( settings->getEOLCharacter(), "");
 		if (lineData.size() > 0) {
@@ -175,7 +177,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 						default:
 							break;
 					}
-					// qDebug() << outputText;
+					qDebug() << outputText; // $$$ comment out again
 					emit infoSignal( outputText );
 				} else {
 					emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
@@ -196,7 +198,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	} else {
 		if ( this->exitCode() != 0)
 		{
-			throw ProcessException( QObject::tr( "rsync exited with with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
+			throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
 		}
 	}
 	return uploadedItems;
@@ -347,7 +349,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		QString standardErrors = readAllStandardError();
 		if ( standardErrors != "" )
 		{
-			qWarning() << "Error occurred while uploading: " + standardErrors;
+			qWarning() << "Rsync::upload with itemlist -> Error occurred while uploading: " + standardErrors;
 			if (errors) *errors = standardErrors;
 		}
 	} else {
@@ -559,20 +561,12 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 
 	if ( includeRules.size() > 0 )
 	{
-		// read download list from input
-		arguments << "--include-from=-";
+		QString includesFilename = settings->getApplicationDataDir() + "restore_includes";
+		if (StringUtils::writeQByteArrayListToFile( calculateRsyncRulesFromIncludeRules(includeRules), includesFilename, QByteArray(settings->getEOLCharacter()) )) {
+			arguments << "--include-from=" + convertFilenameForRsyncArgument(includesFilename);
+		}
 		createProcess( settings->getRsyncName() , arguments );
 		start();
-
-		QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules);
-		foreach ( QByteArray rule, convertedRules )
-		{
-			write( rule ); // TODO: Muss diese rule convertiert werden? (z.B. mit getValidDestinationPath oder convertFilenameForRsyncArgument)
-			write( settings->getEOLCharacter() );
-			qDebug() << "rule:" <<  rule;
-			waitForBytesWritten();
-		}
-		closeWriteChannel();
 	}
 	else
 	{
@@ -812,23 +806,6 @@ QStringList Rsync::getRsyncSshArguments()
 	return arguments;
 }
 
-QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
-	FileSystemUtils::convertToServerPath( &filename );
-	if ( Settings::IS_WINDOWS )
-	{
-		return( filename.toUtf8() );
-	}
-	else if ( Settings::IS_MAC )
-	{
-		QString outputString = filename.normalized( QString::NormalizationForm_D );
-		return(outputString.toUtf8());
-	}
-	else
-	{
-		return( filename.toLocal8Bit() );
-	}
-}
-
 QString Rsync::getValidDestinationPath( const QString& destination )
 {
 	QString validDestination = destination;
@@ -916,7 +893,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 			// qDebug() << convertRuleToByteArray( curDir,true );
 		}
 		if (rule.endsWith("/")) { // rule is a dir
-			filters << convertRuleToByteArray( ruleDir,ruleMod  );
+			filters << convertRuleToByteArray( ruleDir, ruleMod  );
 			unclosedDirs.push( QPair<QString,bool>(ruleDir,ruleMod) );
 			if (ruleMod) {
 				curDir = ruleDir;
@@ -932,7 +909,6 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 		QPair<QString,bool> dirToClose = unclosedDirs.pop();
 		if (dirToClose.second || dirToClose.first !=  lastRule) { // don't exclude dir/** bejond dir/
 			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
-			// qDebug() << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 		}
 	}
 	filters << convertRuleToByteArray( "**",false );
@@ -947,17 +923,41 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 	return filters;
 }
 
+QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
+	FileSystemUtils::convertToServerPath( &filename );
+	if ( Settings::IS_WINDOWS ) {
+		return( filename.toUtf8() );
+	} else if ( Settings::IS_MAC ) {
+		return(filename.normalized( QString::NormalizationForm_D ).toUtf8());
+	} else {
+		return( filename.toLocal8Bit() );
+	}
+}
+
 QByteArray Rsync::convertRuleToByteArray(QString rule, bool modifier)
 {
 	FileSystemUtils::convertToServerPath( &rule );
 	QString rule_modifier = modifier ? "+ " : "- ";
-	if ( Settings::IS_MAC )
+	if ( Settings::IS_MAC ) {
 		return (rule_modifier + rule.normalized( QString::NormalizationForm_D )).toUtf8();
-	else if ( Settings::IS_WINDOWS )
+	} else if ( Settings::IS_WINDOWS ) {
 		return (rule_modifier + rule).toUtf8();
-	else
-		return (rule_modifier + rule).toLocal8Bit();
+	} else {
+		return (rule_modifier + rule).toUtf8();
+	}
 }
+
+QByteArray Rsync::convertQStringToQByteArray(QString aStr)
+{
+	if ( Settings::IS_MAC ) {
+		return aStr.normalized( QString::NormalizationForm_D ).toUtf8();
+	} else if ( Settings::IS_WINDOWS ) {
+		return aStr.toUtf8();
+	} else {
+		return aStr.toUtf8();
+	}
+}
+
 
 void Rsync::testRsyncRulesConversion()
 {
