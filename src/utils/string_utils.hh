@@ -40,7 +40,7 @@ public:
 	static QString concatSep(const QString& aStr, const QString& bStr = "", const QString& tok = ",");
 //	static QString filenameShrink(const QString& filename, const int maxlen);
 	static QString filenameShrink(const QString& filename, const int maxlen, const QChar dirSeparator = QDir::separator());
-	static QString quoteText(QString text, QString tok, QString escapeCharacter = "\\");
+	static QString quoteText(QString text, QString tok, QString escapeCharacter = "\\", bool bashSaveSingleQuoteHandling = true);
 	static QString buf2QString(const char* buf);
 	static QString buf2QString(QString buf);
 
@@ -59,6 +59,7 @@ public:
 	static bool writeStringListToFile(const QList<QString>& include_dirs_list, const QString& include_dirs_filename, QString eolChar = "\n" );
 
 	static void testChar2StdString();
+	static void testQuoteText();
 
 private:
 	static QString unit_prefixes() { return QString(" kMGTPEZY"); };
@@ -66,8 +67,9 @@ private:
 
 namespace
 {
-	// run test by calling sepiola with parameter: -test testProgressTaskClass
-	int stringUtils_dummy = TestManager::registerTest( "testChar2StdString", StringUtils::testChar2StdString );
+	// run test by calling sepiola with parameter: -test testChar2StdString
+	int stringUtils_dummy1 = TestManager::registerTest( "testChar2StdString", StringUtils::testChar2StdString );
+	int stringUtils_dummy2 = TestManager::registerTest( "testQuoteText", StringUtils::testQuoteText );
 }
 
 inline void StringUtils::testChar2StdString() {
@@ -78,6 +80,29 @@ inline void StringUtils::testChar2StdString() {
 	std::string myString2 = myText;
 	cout << myString2;
 	cout << std::string(myText) << endl;
+}
+
+inline void StringUtils::testQuoteText() {
+	QStringList testTasks;
+	QStringList testSolutions;
+	QStringList testResults;
+
+	testTasks.append("It's a text with single quotes in it.");
+	testSolutions.append("'It'\\''s a text with single quotes in it.'");
+	testResults.append(quoteText(testTasks.last(), "'"));
+
+	testTasks.append("...and one with a single quote at the end'");
+	testSolutions.append("'...and one with a single quote at the end'\\'");
+	testResults.append(quoteText(testTasks.last(), "'"));
+
+	testTasks.append("'''''...and the last with \"double\" quotes and 'single' ones.'''''");
+	testSolutions.append("\\'\\'\\'\\'\\''...and the last with \"double\" quotes and '\\''single'\\'' ones.'\\'\\'\\'\\'\\'");
+	testResults.append(quoteText(testTasks.last(), "'"));
+
+	for (int i = 0; i < testTasks.length(); i++) {
+		bool success = testSolutions.at(i)==testResults.at(i);
+		qDebug() << (success ? "test successful:" : "test failed:   ") << "quoteText(\""+testTasks.at(i)+"\")" << QString(" = \n  ") << testResults.at(i) << QString(" ")+ (success ? "==" : "!=") +" \n  " << testSolutions.at(i);
+	}
 }
 
 
@@ -120,11 +145,21 @@ inline QString StringUtils::filenameShrink(const QString& filename, const int ma
 	}
 }
 
-inline QString StringUtils::quoteText(QString text, QString tok, QString escapeCharacter) {
-	tok = tok.at(0);
+inline QString StringUtils::quoteText(QString text, QString quote, QString escapeCharacter, bool bashSaveSingleQuoteHandling) {
+	quote = quote.at(0);
 	escapeCharacter = escapeCharacter.at(0);
-	if (tok != escapeCharacter) {
-		return(tok + text.replace(escapeCharacter,escapeCharacter+escapeCharacter).replace(tok,escapeCharacter+tok) + tok);
+	if (quote != escapeCharacter) {
+		if (bashSaveSingleQuoteHandling && quote == "'") {
+			QStringList textParts = text.split(quote, QString::KeepEmptyParts);
+			QStringList quotedParts;
+			for (int i = 0; i < textParts.length(); i++) {
+				QString textPart = textParts.at(i);
+				textParts[i] = encaps(textPart.replace(escapeCharacter,escapeCharacter+escapeCharacter).replace(quote,escapeCharacter+quote), quote, quote);
+			}
+			return(textParts.join(escapeCharacter+quote));
+		} else {
+			return(encaps(text.replace(escapeCharacter,escapeCharacter+escapeCharacter).replace(quote,escapeCharacter+quote), quote, quote));
+		}
 	} else {
 		return text;
 	}
