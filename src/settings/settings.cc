@@ -177,12 +177,12 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	QDir homeDir = QDir::home();
 	QString applicationDataDirName = "." + EXECUTABLE_NAME;
 	QString resellerSettingsFileName = configFile.absoluteFilePath() + resellerAffix;
-	QString appDataSettingsFileName  = configFile.absoluteFilePath() + appDataAffix;
 	if ( !homeDir.exists( applicationDataDirName ) )
 	{
 		homeDir.mkdir( applicationDataDirName );
 	}
 	applicationDataDir = homeDir.absolutePath() + "/" + applicationDataDirName + "/";
+	QString appDataSettingsFileName  = applicationDataDir + configFile.fileName() + appDataAffix;
 	applicationBinDir = configFile.absolutePath() + "/";
 	qRegisterMetaType<ScheduledTask>("ScheduledTask");
 	if (applicationSettings != 0) { delete applicationSettings; }
