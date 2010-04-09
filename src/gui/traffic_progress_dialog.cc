@@ -67,16 +67,12 @@ void TrafficProgressDialog::appendInfo( const QString& info )
 	const int msecs_to_wait_for_flush = 500;
 	QDateTime currentTime = QDateTime::currentDateTime();
 	this->outputCache.append( info );
+	this->outputCache.append( Settings::getInstance()->getEOLCharacter() );
 	if ( this->lastUpdateTextLog.addMSecs(msecs_to_wait_for_flush) <= currentTime )
 	{
 		// update, but only after a second, such that following messages ariving in the next second are also flushed
 		this->lastUpdateTextLog = currentTime;
 		QTimer::singleShot(msecs_to_wait_for_flush, this, SLOT(flushCache()));
-	}
-	else
-	{
-		// add a new line
-		this->outputCache.append( Settings::getInstance()->getEOLCharacter() );
 	}
 }
 
