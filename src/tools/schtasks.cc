@@ -237,16 +237,14 @@ bool Schtasks::updateExistingTask( const QString& execName, const QString& cliAr
 			if ( lineData.contains( getTranslationForWARNING( locale ) ) )
 			{
 				schtasks_success = false;
-				QString warning = lineData.right( lineData.size()
-																																						- lineData.indexOf( getTranslationForWARNING( locale ) ) );
+				QString warning = lineData.right( lineData.size() - lineData.indexOf( getTranslationForWARNING( locale ) ) );
 				qDebug() << warning;
 				LogFileUtils::getInstance()->writeLog( warning );
 			}
 			if ( lineData.contains( getTranslationForERROR( locale ) ) )
 			{
 				schtasks_success = false;
-				QString error = lineData.right( lineData.size()
-																																				- lineData.indexOf( getTranslationForERROR( locale ) ) );
+				QString error = lineData.right( lineData.size() - lineData.indexOf( getTranslationForERROR( locale ) ) );
 				qDebug() << error;
 				LogFileUtils::getInstance()->writeLog( error );
 			}
