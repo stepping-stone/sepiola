@@ -409,6 +409,8 @@ void MainModel::fullRestore( const QString& backup_prefix, const QString& backup
 					  this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::connect( restoreThread, SIGNAL( errorSignal( const QString& ) ),
 					  this, SIGNAL( errorSignal( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
+					  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
 	QObject::connect( restoreThread, SIGNAL( finishProgressDialog() ),
 						this, SIGNAL( finishProgressDialog() ) );
 	QObject::connect( this, SIGNAL( abortProcess() ),
@@ -460,6 +462,8 @@ void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const B
 					  this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::connect( restoreThread, SIGNAL( errorSignal( const QString& ) ),
 					  this, SIGNAL( errorSignal( const QString& ) ) );
+	QObject::connect( restoreThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
+					  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
 	QObject::connect( restoreThread, SIGNAL( finishProgressDialog() ),
 					  this, SIGNAL( finishProgressDialog() ) );
 	QObject::connect( this, SIGNAL( abortProcess() ),

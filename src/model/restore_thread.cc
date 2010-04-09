@@ -56,6 +56,7 @@ RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backu
 	this->backupName = backupName;
 	this->selectionRules = selectionRules;
 	this->destination = destination;
+	this->restoreState = ConstUtils::STATUS_UNDEFINED;
 	init();
 }
 
@@ -88,6 +89,11 @@ void RestoreThread::init()
 	connect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
+void RestoreThread::pushStateEvent(ConstUtils::StatusEnum eventState) {
+	// if necessary increases this->restoreState to eventState (no lowering of state is done: state cannot get "better", f.ex. from ERROR to OK)
+	this->restoreState = (ConstUtils::StatusEnum)std::max( (int)eventState, (int)(this->restoreState) );
+}
+
 void RestoreThread::run()
 {
 	try
@@ -106,19 +112,22 @@ void RestoreThread::run()
 		emit infoSignal( tr( "Applying Metadata" ) );
 		applyMetadata( backup_prefix, backupName, downloadedItems, destination );
 		checkAbortState();
+		this->pushStateEvent(ConstUtils::STATUS_OK);
 		emit infoSignal( tr( "Restore done." ) );
 	}
 	catch ( ProcessException e )
 	{
 		emit infoSignal( tr( "Restore failed." ) );
 		emit errorSignal( e.what() );
+		this->pushStateEvent(ConstUtils::STATUS_ERROR);
 	}
 	catch ( AbortException e )
 	{
-		emit infoSignal( tr( "Backup aborted." ) );
+		emit infoSignal( tr( "Restore aborted." ) );
 		emit errorSignal( e.what() );
+		this->pushStateEvent(ConstUtils::STATUS_ERROR);
 	}
-
+	emit finalStatusSignal( this->restoreState );
 	emit finishProgressDialog();
 }
 
@@ -132,7 +141,14 @@ void RestoreThread::applyMetadata( const QString& backup_prefix, const QString& 
 		QObject::connect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
 						  this, SIGNAL( errorSignal( const QString& ) ) );
 		QFileInfo metadataFile = rsync->downloadMetadata( backup_prefix, backupName, Settings::getInstance()->getApplicationDataDir() );
-		metadata->setMetadata( metadataFile, downloadedItems, downloadDestination );
+		if (metadataFile.fileName() != "" && metadataFile.exists()) {
+			metadata->setMetadata( metadataFile, downloadedItems, downloadDestination );
+		} else {
+			QString msg =  tr("WARNING: Setting of metadata failed. File %1 has not been found on the server. Possibly you are restoring data from a backup of another platform/os.").arg(Settings::getInstance()->getMetadataFileName());
+			qWarning() << msg;
+			emit infoSignal( msg );
+			this->pushStateEvent(ConstUtils::STATUS_WARNING);
+		}
 		FileSystemUtils::removeFile( metadataFile );
 		QObject::disconnect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
 							 this, SIGNAL( infoSignal( const QString& ) ) );

@@ -85,6 +85,7 @@ private:
 	void init();
 	void checkAbortState() throw ( AbortException );
 	void applyMetadata( const QString& backup_prefix, const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination );
+	void pushStateEvent(ConstUtils::StatusEnum eventState);
 
 	auto_ptr< AbstractRsync > rsync;
 	bool isAborted;
@@ -94,6 +95,7 @@ private:
 	QStringList items;
 	BackupSelectionHash selectionRules;
 	QString destination;
+	ConstUtils::StatusEnum restoreState; // class should be named TimedTask, but was once created only for backup_thread
 };
 
 #endif
