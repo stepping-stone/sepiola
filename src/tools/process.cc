@@ -82,7 +82,7 @@ void Process::setWorkingDirectory(const QString& directory)
 bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar)
 {
 	//assert(qProcess);
-	int BLOCKREAD_MAX_LINE_SIZE = 300;
+	int BLOCKREAD_MAX_LINE_SIZE = 4120; // arbitrarily chosen to 4096 plus file-information-prefix
 	if (!this->isAlive()) return false;
 	if (lineEndChar == 10) {
 		// simple case, where lineEndChar is "\n" -> canReadLine and readLine only support "\n"
@@ -92,7 +92,7 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 			{
 				if (qProcess->error() == QProcess::Timedout)
 				{
-					qWarning() << "Process timedout after " << msec << "msec";
+					qWarning() << "Process timed out after " << msec << "msec";
 					return false;
 				}
 				else if (qProcess->state() == QProcess::NotRunning)
@@ -121,7 +121,7 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 			{
 				if (qProcess->error() == QProcess::Timedout)
 				{
-					qWarning() << "Process timedout after " << msec << "msec";
+					qWarning() << "Process timed out after " << msec << "msec";
 					return false;
 				}
 				else if (qProcess->state() == QProcess::NotRunning)
@@ -151,7 +151,7 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 		}
 		int pos = std::min((readBuffer.indexOf(QChar(lineEndChar))+(2*BLOCKREAD_MAX_LINE_SIZE)) % (2*BLOCKREAD_MAX_LINE_SIZE), (readBuffer.indexOf("\n")+(2*BLOCKREAD_MAX_LINE_SIZE)) % (2*BLOCKREAD_MAX_LINE_SIZE));
 		if (pos > BLOCKREAD_MAX_LINE_SIZE) {
-			*byteArray = QByteArray(""); 
+			*byteArray = QByteArray("");
 			return false;
 		}
 		else
