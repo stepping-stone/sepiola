@@ -420,8 +420,8 @@ QFileInfo Rsync::downloadMetadata( const QString& backup_prefix, const QString& 
 	Settings* settings = Settings::getInstance();
 	QString source = backupName + "/" + backup_prefix + "/" + settings->getMetaFolderName() + "/";
 
-	downloadSingleFile( source, destination, settings->getMetadataFileName(), true, true );
-	return destination + settings->getMetadataFileName();
+	return downloadSingleFile( source, destination, settings->getMetadataFileName(), true, false );
+	// return destination + settings->getMetadataFileName(); // like that, it is not clear, if metadata was successfully downloaded or not
 }
 
 QFileInfo Rsync::downloadCurrentMetadata( const QString& destination, bool emitErrorSignal )
@@ -442,9 +442,13 @@ QFileInfo Rsync::downloadSingleFile( const QString& source, const QString& desti
 	{
 		qWarning() << "Download error for file " << fileName.fileName();
 		qDebug() << "Downloaded file(s): " << downloadedItems;
-		return destination + "/" + fileName.fileName();
+		return QFileInfo(""); // destination + "/" + fileName.fileName(); // now returns an empty QString, if download failed, so that no old metadata gets applied
 	}
-	return downloadedItems.at( 0 );
+	if (downloadedItems.at( 0 ) != "") {
+		return destination + "/" + downloadedItems.at( 0 );
+	} else {
+		return QFileInfo("");
+	}
 }
 
 QStringList Rsync::download( const QString& source, const QString& destination, bool compress ) throw ( ProcessException )
@@ -453,7 +457,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 }
 
 /**
- * deprecated
+ * only used for single files, not for whole restore-process anymore
  */
 QStringList Rsync::download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException )
 {
