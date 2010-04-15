@@ -58,8 +58,8 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	movie->start();*/
 
 	// $ERASE_PROGRESS: hide all progress information
-	this->progressBar->setVisible(false);
-	this->groupBoxInfos->setVisible(false);
+	this->progressBar->setVisible(!Settings::SHOW_PROGRESS);
+	this->groupBoxInfos->setVisible(!Settings::SHOW_PROGRESS);
 }
 
 TrafficProgressDialog::~TrafficProgressDialog()
