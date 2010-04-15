@@ -68,7 +68,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
 	arguments << getRsyncUploadArguments();
-	arguments << getRsyncProgressArguments();
+	if (Settings::SHOW_PROGRESS) { arguments << getRsyncProgressArguments(); }
 
 	if (dry_run) { 	this->last_calculatedLiteralData = 0; arguments << "-v" << "--stats" << "--only-write-batch=/dev/null"; }
 
@@ -88,7 +88,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QStringList include_dirs_list;
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
 	QList<QByteArray> convertedIncludeDirs;
-	foreach ( QString include_dir, include_dirs_list ) { qDebug() << "$$$" << include_dir; convertedIncludeDirs.append(convertFilenameForRsyncArgument(include_dir)); }
+	foreach ( QString include_dir, include_dirs_list ) { /* qDebug() << "$$$" << include_dir; */ convertedIncludeDirs.append(convertFilenameForRsyncArgument(include_dir)); }
 	if (StringUtils::writeQByteArrayListToFile(convertedIncludeDirs, include_dirs_filename, settings->getEOLCharacter())) {
 		arguments << "--files-from=" + convertFilenameForRsyncArgument(include_dirs_filename);
 		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
@@ -304,7 +304,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
 	QString lineData;
 	bool endReached = false;
-	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
+	while( blockingReadLine( &lineData, 2147483647 ) ) // -1 does not work on windows
 	{
 		//qDebug() << lineData;
 		lineData.replace( settings->getEOLCharacter(), "");
@@ -557,7 +557,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
 	arguments << getRsyncDownloadArguments();
-	arguments << getRsyncProgressArguments();
+	if (Settings::SHOW_PROGRESS) { arguments << getRsyncProgressArguments(); }
 	arguments << getRsyncSshArguments();
 	if (compress) arguments << "-z";
 	arguments << QDir::cleanPath( src ) + "/";

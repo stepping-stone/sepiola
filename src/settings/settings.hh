@@ -59,6 +59,11 @@ class Settings : public QObject
 		static const bool IS_WINDOWS;
 
 		/**
+		 * This flag is used to hide all progress information during backup and restore
+		 */
+		static const bool SHOW_PROGRESS;
+
+		/**
 		 * Gets a Settings instance
 		 * @return a Settings instance
 		 */

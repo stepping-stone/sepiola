@@ -39,9 +39,9 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	this->textEditError->setVisible( false );
 	this->isErrorVisible = false;
 
-	this->labelInfo->setVisible( false );
-	this->textEditInfo->setVisible( false );
-	this->isInfoVisible = false;
+	this->labelInfo->setVisible( !Settings::SHOW_PROGRESS );
+	this->textEditInfo->setVisible( !Settings::SHOW_PROGRESS );
+	this->isInfoVisible = !Settings::SHOW_PROGRESS;
 
 	this->btnClose->setEnabled( false );
 	this->btnClose->setVisible( false );
@@ -56,6 +56,10 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	this->label_animatedSepiolaLogo->setMovie(movie);
 	this->repaint();
 	movie->start();*/
+
+	// $ERASE_PROGRESS: hide all progress information
+	this->progressBar->setVisible(false);
+	this->groupBoxInfos->setVisible(false);
 }
 
 TrafficProgressDialog::~TrafficProgressDialog()

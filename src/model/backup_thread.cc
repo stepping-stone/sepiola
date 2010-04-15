@@ -134,8 +134,7 @@ void BackupThread::run()
 	this->setLastBackupState(ConstUtils::STATUS_UNDEFINED);
 	Settings* settings = Settings::getInstance();
 	settings->saveBackupSelectionRules( this->includeRules );
-	try
-	{
+	try {
 		checkAbortState();
 		Settings* settings = Settings::getInstance();
 		emit infoSignal( tr( "Creating/validating server directories" ) );
@@ -148,8 +147,11 @@ void BackupThread::run()
 		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/", "'");
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_ESTIMATE_BACKUP_SIZE);
 		emit infoSignal( QObject::tr( QString(TASKNAME_ESTIMATE_BACKUP_SIZE).toLocal8Bit() ) );
-		quint64 backupSize = this->estimateBackupSize( source, destination );
-		qDebug() << "calculated literal data:" << backupSize;
+		quint64 backupSize = 1;
+		if (Settings::SHOW_PROGRESS) {
+			backupSize = this->estimateBackupSize( source, destination );
+			qDebug() << "calculated literal data:" << backupSize;
+		}
 		if ((subPt = this->pt.getSubtask(TASKNAME_ESTIMATE_BACKUP_SIZE)) != 0) subPt->setTerminated(true);
 
 

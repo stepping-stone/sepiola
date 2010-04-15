@@ -185,7 +185,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBoxInfos">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -214,7 +214,7 @@
          </font>
         </property>
         <property name="text">
-         <string></string>
+         <string/>
         </property>
        </widget>
       </item>

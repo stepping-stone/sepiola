@@ -52,6 +52,8 @@ const bool Settings::IS_MAC = true;
 const bool Settings::IS_MAC = false;
 #endif
 
+const bool Settings::SHOW_PROGRESS = false;
+
 const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );
 const QString Settings::VERSION = QString::number( CPACK_PACKAGE_VERSION_MAJOR ) + "." + QString::number( CPACK_PACKAGE_VERSION_MINOR ) + "." + QString::number( CPACK_PACKAGE_VERSION_PATCH );
 const bool Settings::IS_RESELLER = ( CPACK_IS_RESELLER == 1 ? true : false );
