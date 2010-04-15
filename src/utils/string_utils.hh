@@ -100,7 +100,7 @@ inline void StringUtils::testQuoteText() {
 	testSolutions.append("\\'\\'\\'\\'\\''...and the last with \"double\" quotes and '\\''single'\\'' ones.'\\'\\'\\'\\'\\'");
 	testResults.append(quoteText(testTasks.last(), "'"));
 
-	for (int i = 0; i < testTasks.length(); i++) {
+	for (int i = 0; i < testTasks.size(); i++) {
 		bool success = testSolutions.at(i)==testResults.at(i);
 		qDebug() << (success ? "test successful:" : "test failed:   ") << "quoteText(\""+testTasks.at(i)+"\")" << QString(" = \n  ") << testResults.at(i) << QString(" ")+ (success ? "==" : "!=") +" \n  " << testSolutions.at(i);
 	}
@@ -153,7 +153,7 @@ inline QString StringUtils::quoteText(QString text, QString quote, QString escap
 		if (bashSaveSingleQuoteHandling && quote == "'") {
 			QStringList textParts = text.split(quote, QString::KeepEmptyParts);
 			QStringList quotedParts;
-			for (int i = 0; i < textParts.length(); i++) {
+			for (int i = 0; i < textParts.size(); i++) {
 				QString textPart = textParts.at(i);
 				textParts[i] = encaps(textPart.replace(escapeCharacter,escapeCharacter+escapeCharacter).replace(quote,escapeCharacter+quote), quote, quote);
 			}
