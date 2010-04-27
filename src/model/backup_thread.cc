@@ -238,26 +238,28 @@ void BackupThread::run()
 		emit errorSignal( e.what() );
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-		emit finalStatusSignal( ConstUtils::STATUS_ERROR );
+		emit finalStatusSignal( this->getLastBackupState() );
 	}
 	catch ( AbortException e )
 	{
+		qDebug() << "Backup aborted.";
 		emit infoSignal( tr( "Backup aborted." ) );
+		qDebug() << e.what();
 		emit errorSignal( e.what() );
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-		emit finalStatusSignal( ConstUtils::STATUS_ERROR );
+		emit finalStatusSignal( this->getLastBackupState() );
 	}
 	if ( failed )
 	{
 		emit infoSignal( tr( "Backup failed." ) );
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-		emit finalStatusSignal( ConstUtils::STATUS_ERROR );
+		emit finalStatusSignal( this->getLastBackupState() );
 	} else {
 		this->setLastBackupState(ConstUtils::STATUS_OK);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_OK )";
-		emit finalStatusSignal( ConstUtils::STATUS_OK );
+		emit finalStatusSignal( this->getLastBackupState() );
 	}
 	emit finishProgressDialog();
 	emit updateOverviewFormLastBackupsInfo();
@@ -265,9 +267,11 @@ void BackupThread::run()
 
 void BackupThread::checkAbortState() throw ( AbortException )
 {
+	qDebug() << "BackupThread::checkAbortState()";
 	if ( isRunning() && isAborted )
 	{
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
+		qDebug() << "BackupThread::checkAbortState(): Backup has been aborted";
 		throw AbortException( tr( "Backup has been aborted" ) );
 	}
 }
@@ -473,10 +477,9 @@ void BackupThread::abortBackupProcess()
 	qDebug() << "BackupThread::abortBackupProcess()";
 	isAborted = true;
 	this->setLastBackupState(ConstUtils::STATUS_ERROR);
-	emit terminate();
-	emit finalStatusSignal( this->getLastBackupState() );
-
-	this->wait();
 	emit abort_rsync();
 	emit updateOverviewFormLastBackupsInfo();
+	emit finalStatusSignal( this->getLastBackupState() );
+	/* this->terminate();
+	this->wait(); */
 }
