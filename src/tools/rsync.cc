@@ -1014,6 +1014,7 @@ void Rsync::removeSymlinkString( QString* path )
 
 void Rsync::abort()
 {
+	qDebug() << "Rsync::abort()";
 	terminate();
 }
 
