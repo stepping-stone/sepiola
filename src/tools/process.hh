@@ -102,7 +102,7 @@ protected:
 	/**
 	 * Terminates the process
 	 */
-	void terminate();
+	void terminate(bool commingFromDestructor = false);
 
 	void retrieveStream(QTextStream* textStream) const;
 
