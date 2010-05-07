@@ -60,6 +60,7 @@ TrafficProgressDialog::TrafficProgressDialog( const QString& title )
 	// $ERASE_PROGRESS: hide all progress information
 	this->progressBar->setVisible(Settings::SHOW_PROGRESS);
 	this->groupBoxInfos->setVisible(Settings::SHOW_PROGRESS);
+	this->btnShowHideDetails->setVisible(Settings::SHOW_PROGRESS);
 }
 
 TrafficProgressDialog::~TrafficProgressDialog()
@@ -244,6 +245,8 @@ void TrafficProgressDialog::setInfoLines(StringPairList label_and_values)
 
 void TrafficProgressDialog::updateProgress( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos )
 {
+	if (!Settings::SHOW_PROGRESS) return;
+
 	// qDebug() << "TrafficProgressDialog::updateProgress(" << "," << taskText << "," << percentFinished << "," << timeRemaining << "," << infos << ")";
 	// TODO: use the other parameters to fill GUI-elements
 	this->progressBar->setValue((int)(percentFinished*100.0f));
