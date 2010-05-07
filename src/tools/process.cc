@@ -88,6 +88,7 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 		// simple case, where lineEndChar is "\n" -> canReadLine and readLine only support "\n"
 		while ( !qProcess->canReadLine() )
 		{
+			if (!this->isAlive()) return false;
 			if ( !qProcess->waitForReadyRead(msec) )
 			{
 				if (qProcess->error() == QProcess::Timedout)
@@ -115,13 +116,17 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 		char buf[BLOCKREAD_MAX_LINE_SIZE];
 		int nCharsRead = 0;
 		bool result = true;
+//		QDateTime timeoutTime = QDateTime::currentDateTime().addMSecs(msec);
 		// qDebug() << "!readBuffer.contains(QChar(lineEndChar))=" << (!readBuffer.contains(QChar(lineEndChar))) << "!readBuffer.contains(\"\\n\")" << (!readBuffer.contains("\n")) << "!qProcess->canReadLine()" << (!qProcess->canReadLine()) << "BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()>0" << (BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()>0);
 		while ( !readBuffer.contains(QChar(lineEndChar)) && !readBuffer.contains("\n") && !qProcess->canReadLine() && BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()>0)
 		{
 			// qDebug() << "!readBuffer.contains(QChar(lineEndChar))=" << (!readBuffer.contains(QChar(lineEndChar))) << "!readBuffer.contains(\"\\n\")" << (!readBuffer.contains("\n")) << "!qProcess->canReadLine()" << (!qProcess->canReadLine()) << "BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()>0" << (BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()>0);
+			if (!this->isAlive()) return false;
 			if ( !qProcess->waitForReadyRead(msec) )
 			{
+				if (!this->isAlive()) return false;
 				if (qProcess->error() == QProcess::Timedout)
+				//if (qProcess->error() == QProcess::Timedout && QDateTime::currentDateTime() > timeoutTime)
 				{
 					qWarning() << "Process timed out after " << msec << "msec";
 					return false;
@@ -198,23 +203,24 @@ void Process::terminate(bool commingFromDestructor)
 	qDebug() << "Process::terminate()";
 	if (qProcess)
 	{
+		QProcess* process = qProcess;
+		qProcess = 0;
 		if (Settings::IS_WINDOWS) {
-			qProcess->kill();
+			process->kill();
 		} else {
-			qProcess->terminate();
+			process->terminate();
 		}
 		int n = 0;
-		while ((++n < 20) && qProcess->state() == QProcess::Running) {
-			qProcess->waitForFinished(500);
+		while ((++n < 20) && process->state() == QProcess::Running) {
+			process->waitForFinished(500);
 			qDebug() << "waiting...";
 		}
-		if (qProcess->state() == QProcess::Running) {
-			qProcess->kill();
+		if (process->state() == QProcess::Running) {
+			process->kill();
 		}
 		if (!commingFromDestructor) {
-			delete qProcess;
+			delete process;
 		}
-		qProcess = 0;
 	}
 }
 
