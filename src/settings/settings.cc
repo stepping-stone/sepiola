@@ -175,7 +175,7 @@ Settings* Settings::getInstance()
 
 void Settings::loadSettings( const QFileInfo& configFile, const QString& resellerAffix, const QString& appDataAffix )
 {
-	qDebug() << "Settings::loadSettings: Loading settings from file <" << configFile.filePath() << ">";
+	// qDebug() << "Settings::loadSettings: Loading settings from file <" << configFile.filePath() << ">";
 	QDir homeDir = QDir::home();
 	QString applicationDataDirName = "." + EXECUTABLE_NAME;
 	QString resellerSettingsFileName = configFile.absoluteFilePath() + resellerAffix;
@@ -216,7 +216,7 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 void Settings::reloadSettings()
 {
 	// [Client]
-	qDebug() << "Settings::reloadSettings()";
+	// qDebug() << "Settings::reloadSettings()";
 	applicationSettings->beginGroup( SETTINGS_GROUP_CLIENT );
 	applicationName = applicationSettings->value( SETTINGS_APPLICATION_FULL_NAME ).toString();
 	logFileName = applicationSettings->value( SETTINGS_LOG_FILE_NAME ).toString();
