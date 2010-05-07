@@ -124,7 +124,7 @@ protected:
 	void setTextModeEnabled( bool enabled );
 	void setReadChannel(QProcess::ProcessChannel channel);
 	QProcess::ProcessState state() const;
-	inline bool isAlive() { return (qProcess!=0); }
+	inline bool isAlive() { return (qProcess!=0) && qProcess->state() != QProcess::NotRunning; }
 
 private:
 	/**
