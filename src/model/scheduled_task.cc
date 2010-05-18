@@ -176,7 +176,7 @@ QString ScheduledTask::toString() const
 
 				// full info (not desired by stst
 				// return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"), nextBackupDatesList.at(0).toString());
-				return QObject::tr("%1").arg(nextBackupDatesList.at(0).toString());
+				return QObject::tr("%1").arg(nextBackupDatesList.at(0).toString("dddd,\tdd.MM.yyyy  hh:mm"));
 				break;
 			} else {
 				return QObject::tr("no weekdays selected");

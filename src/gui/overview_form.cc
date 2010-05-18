@@ -82,7 +82,7 @@ void OverviewForm::refreshLastBackupsOverview()
 	qDebug() << "OverviewForm::refreshLastBackupsOverview()";
 	Settings* settings = Settings::getInstance();
 	QStringList fieldnames_status;
-	fieldnames_status << "labelIconStatusLastBackup_%1" << "labelStatusLastBackup_%1" << "labelDateLastBackup_%1";
+	fieldnames_status << "labelIconStatusLastBackup_%1" << "labelStatusLastBackup_%1" << "labelDateLastBackup_%1" << "labelWeekdayLastBackup_%1";
 	QImage img;
 
 	// fill map with a pixmap for each status
@@ -111,7 +111,7 @@ void OverviewForm::refreshLastBackupsOverview()
 			ConstUtils::StatusEnum status = lastBackup.getStatus();
 			lab_icon->setPixmap( status_pixmap.value( status ) );
 			lab_status->setText( lastBackup.getStatusText() );
-			lab_date->setText( lastBackup.getDateTime().toString() );
+			lab_date->setText( lastBackup.getDateTime().toString("dddd,\tdd.MM.yyyy  hh:mm") );
 		}
 	}
 }
