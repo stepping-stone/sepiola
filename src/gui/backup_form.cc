@@ -33,7 +33,7 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 	this->model = model;
 	this->localDirModel = this->model->getLocalDirModel();
 	this->localDirModel->setSelectionRules(	settings->getLastBackupSelectionRules() );
-	
+
 	this->treeView->setModel( localDirModel );
 	this->treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
 	this->treeView->setColumnWidth( 0, 300 );
@@ -45,22 +45,32 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 		this->radioButtonMinutesAfterBooting->setEnabled( false );
 		this->spinBoxMinutesAfterBooting->setEnabled( false );
 	}
+
 	ScheduledTask rule = settings->getScheduleRule();
 	switch (rule.getType()) {
-		case ScheduleRule::NEVER: this->radioButtonNoSchedule->setChecked(true); break;
-		case ScheduleRule::AFTER_BOOT: this->radioButtonMinutesAfterBooting->setChecked(true); break;
-		case ScheduleRule::AT_WEEKDAYS_AND_TIME: this->radioButtonDaily->setChecked(true); break;
+		case ScheduleRule::NEVER:
+			this->radioButtonNoSchedule->setChecked(true);
+			on_radioButtonNoSchedule_clicked();
+		break;
+		case ScheduleRule::AFTER_BOOT:
+			this->radioButtonMinutesAfterBooting->setChecked(true);
+			on_radioButtonMinutesAfterBooting_clicked();
+			this->spinBoxMinutesAfterBooting->setValue(rule.getMinutesAfterStartup());
+		break;
+		case ScheduleRule::AT_WEEKDAYS_AND_TIME:
+			this->radioButtonDaily->setChecked(true);
+			on_radioButtonDaily_clicked();
+			this->checkBoxMonday->setChecked(rule.getWeekdays().contains(ScheduleRule::MONDAY));
+			this->checkBoxTuesday->setChecked(rule.getWeekdays().contains(ScheduleRule::TUESDAY));
+			this->checkBoxWednesday->setChecked(rule.getWeekdays().contains(ScheduleRule::WEDNESDAY));
+			this->checkBoxThursday->setChecked(rule.getWeekdays().contains(ScheduleRule::THURSDAY));
+			this->checkBoxFriday->setChecked(rule.getWeekdays().contains(ScheduleRule::FRIDAY));
+			this->checkBoxSaturday->setChecked(rule.getWeekdays().contains(ScheduleRule::SATURDAY));
+			this->checkBoxSunday->setChecked(rule.getWeekdays().contains(ScheduleRule::SUNDAY));
+			this->timeEditTime->setTime(rule.getTimeToRun());
+		break;
 	}
-	this->spinBoxMinutesAfterBooting->setValue(rule.getMinutesAfterStartup());
-	this->checkBoxMonday->setChecked(rule.getWeekdays().contains(ScheduleRule::MONDAY));
-	this->checkBoxTuesday->setChecked(rule.getWeekdays().contains(ScheduleRule::TUESDAY));
-	this->checkBoxWednesday->setChecked(rule.getWeekdays().contains(ScheduleRule::WEDNESDAY));
-	this->checkBoxThursday->setChecked(rule.getWeekdays().contains(ScheduleRule::THURSDAY));
-	this->checkBoxFriday->setChecked(rule.getWeekdays().contains(ScheduleRule::FRIDAY));
-	this->checkBoxSaturday->setChecked(rule.getWeekdays().contains(ScheduleRule::SATURDAY));
-	this->checkBoxSunday->setChecked(rule.getWeekdays().contains(ScheduleRule::SUNDAY));
-	this->timeEditTime->setTime(rule.getTimeToRun());
-	
+
 	new QShortcut( Qt::Key_F5, this, SLOT( refreshLocalDirModel() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ),
 					  parent, SIGNAL ( updateOverviewFormScheduleInfo() ) );
@@ -164,6 +174,37 @@ QString BackupForm::patternListToString( QStringList patternList )
 	}
 	return result;
 }
+
+void BackupForm::disableScheduleOptions() {
+	this->spinBoxMinutesAfterBooting->setEnabled(false);
+	this->timeEditTime->setEnabled(false);
+	QList<QCheckBox*> weekdaysCheckboxes;
+	weekdaysCheckboxes << this->checkBoxMonday << this->checkBoxTuesday << this->checkBoxWednesday << this->checkBoxThursday << this->checkBoxFriday << this->checkBoxSaturday << this->checkBoxSunday;
+	foreach (QCheckBox* cb, weekdaysCheckboxes ) {
+		cb->setChecked(true);
+		cb->setEnabled(false);
+	}
+}
+
+void BackupForm::on_radioButtonNoSchedule_clicked() {
+	disableScheduleOptions();
+}
+
+void BackupForm::on_radioButtonMinutesAfterBooting_clicked() {
+	disableScheduleOptions();
+	this->spinBoxMinutesAfterBooting->setEnabled(true);
+}
+
+void BackupForm::on_radioButtonDaily_clicked() {
+	disableScheduleOptions();
+	this->timeEditTime->setEnabled(true);
+	QList<QCheckBox*> weekdaysCheckboxes;
+	weekdaysCheckboxes << this->checkBoxMonday << this->checkBoxTuesday << this->checkBoxWednesday << this->checkBoxThursday << this->checkBoxFriday << this->checkBoxSaturday << this->checkBoxSunday;
+	foreach (QCheckBox* cb, weekdaysCheckboxes ) {
+		cb->setEnabled(true);
+	}
+}
+
 
 QStringList BackupForm::getSelectedFilesAndDirs()
 {

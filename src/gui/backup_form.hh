@@ -42,7 +42,7 @@ public:
 	 * Destroys the BackupForm
 	 */
 	virtual ~BackupForm();
-	
+
 private:
 	QStringList getSelectedFilesAndDirs();
 	QString patternListToString( QStringList patternList );
@@ -51,16 +51,20 @@ private slots:
 	void on_btnRefresh_clicked();
 	void on_btnSchedule_clicked();
 	void on_btnBackup_clicked();
+	void on_radioButtonNoSchedule_clicked();
+	void on_radioButtonMinutesAfterBooting_clicked();
+	void on_radioButtonDaily_clicked();
 	void refreshLocalDirModel();
 	void schedule();
-	
-signals:	
+
+signals:
 	void updateOverviewFormScheduleInfo();
 	void updateOverviewFormLastBackupsInfo();
 
 private:
+	void disableScheduleOptions();
 	void expandSelectedBranches();
-	
+
 	MainModel* model;
 	LocalDirModel* localDirModel;
 	bool detailsVisible;
