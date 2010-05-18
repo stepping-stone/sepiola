@@ -65,6 +65,8 @@ private:
 	void disableScheduleOptions();
 	void expandSelectedBranches();
 
+	static const QTime default_schedule_time;
+	static const int default_schedule_minutesAfterStartup;
 	MainModel* model;
 	LocalDirModel* localDirModel;
 	bool detailsVisible;

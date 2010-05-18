@@ -26,6 +26,12 @@
 
 #include "utils/log_file_utils.hh"
 
+// default const values
+/* it's not worth at this moment to add a new settings-variable, therefore default-schedule-values are set here */
+const QTime BackupForm::default_schedule_time = QTime(12,0,0,0);
+const int BackupForm::default_schedule_minutesAfterStartup = 10;
+
+
 BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 {
 	setupUi ( this );
@@ -177,7 +183,9 @@ QString BackupForm::patternListToString( QStringList patternList )
 
 void BackupForm::disableScheduleOptions() {
 	this->spinBoxMinutesAfterBooting->setEnabled(false);
+	this->spinBoxMinutesAfterBooting->setValue( default_schedule_minutesAfterStartup );
 	this->timeEditTime->setEnabled(false);
+	this->timeEditTime->setTime( default_schedule_time );
 	QList<QCheckBox*> weekdaysCheckboxes;
 	weekdaysCheckboxes << this->checkBoxMonday << this->checkBoxTuesday << this->checkBoxWednesday << this->checkBoxThursday << this->checkBoxFriday << this->checkBoxSaturday << this->checkBoxSunday;
 	foreach (QCheckBox* cb, weekdaysCheckboxes ) {
