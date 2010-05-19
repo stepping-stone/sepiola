@@ -162,8 +162,7 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 		closeProgressDialogSlot();
 		return;
 	}
-	bool setDeleteFlag = true;
-	BackupThread* backupThread = new BackupThread( includeRules, setDeleteFlag );
+	BackupThread* backupThread = new BackupThread( includeRules );
 
 	QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
 					  this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
@@ -491,10 +490,17 @@ LocalDirModel* MainModel::getLocalDirModel()
 {
 	if (!localDirModel)
 	{
-		localDirModel = new LocalDirModel( QStringList(),
-			QDir::Dirs | QDir::Files | QDir::Drives | QDir::Hidden | QDir::NoDotAndDotDot,
-			QDir::Name | QDir::IgnoreCase | QDir::DirsFirst
-		);
+		if (Settings::getInstance()->getShowHiddenFilesAndFolders()) {
+			localDirModel = new LocalDirModel( QStringList(),
+					QDir::Dirs | QDir::Files | QDir::Drives | QDir::Hidden | QDir::NoDotAndDotDot,
+					QDir::Name | QDir::IgnoreCase | QDir::DirsFirst
+			);
+		} else {
+			localDirModel = new LocalDirModel( QStringList(),
+					QDir::Dirs | QDir::Files | QDir::Drives | QDir::NoDotAndDotDot,
+					QDir::Name | QDir::IgnoreCase | QDir::DirsFirst
+			);
+		}
 	}
 	return localDirModel;
 }

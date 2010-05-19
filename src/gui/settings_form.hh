@@ -44,17 +44,17 @@ public:
 	 * Destroys the SettingsForm
 	 */
 	virtual ~SettingsForm();
-	
+
 	/**
 	 * Reloads the settings values
 	 */
 	void reload();
 	bool onLeave();
-	
+
 private:
 	MainModel *model;
 	bool formChanged;
-	
+
 signals:
 	void updateOverviewFormLastBackupsInfo();
 
@@ -66,6 +66,8 @@ private slots:
 	void on_lineEditBackupPrefix_textEdited( QString backupPrefix );
 	void on_comboBoxLanguage_currentIndexChanged ( int languageIndex );
 	void on_spinBoxNOfShownLastBackups_valueChanged( int i );
+	void on_checkBoxShowHiddenFiles_stateChanged( int state );
+	void on_checkBoxKeepDeletedFiles_stateChanged( int state );
 };
 
 #endif

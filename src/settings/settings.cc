@@ -110,6 +110,9 @@ const QString Settings::SETTINGS_PRIVATE_PUTTY_KEY = "PrivateKey";
 const QString Settings::SETTINGS_PRIVATE_OPEN_SSH_KEY = "PrivateOpenSshKey";
 const QString Settings::SETTINGS_WINDOW_POSITION = "WindowPosition";
 const QString Settings::SETTINGS_WINDOW_SIZE = "WindowSize";
+const QString Settings::SETTINGS_DELETE_EXTRANEOUS_ITEMS = "DeleteExtraneousItems";
+const QString Settings::SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS = "ShowHiddenFilesAndFolders";
+
 
 // [Reseller]
 const QString Settings::SETTINGS_GROUP_RESELLER = "Reseller";
@@ -290,7 +293,8 @@ void Settings::reloadSettings()
 	}
 	privatePuttyKey = userSettings->value( SETTINGS_PRIVATE_PUTTY_KEY ).toString();
 	privateOpenSshKey = userSettings->value( SETTINGS_PRIVATE_OPEN_SSH_KEY ).toString();
-	deleteExtraneousItems = true; // userSettings->value( SETTINGS_DELETE_EXTRANEOUS_ITEMS ).toBool();
+	deleteExtraneousItems = userSettings->value( SETTINGS_DELETE_EXTRANEOUS_ITEMS, true ).toBool();
+	showHiddenFilesAndFolders = userSettings->value( SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, false ).toBool();
 	windowSize = userSettings->value( SETTINGS_WINDOW_SIZE ).toSize();
 	windowPosition = userSettings->value( SETTINGS_WINDOW_POSITION, QPoint( 200, 200 ) ).toPoint();
 
@@ -485,6 +489,22 @@ void Settings::saveServerKey( const QString& serverKey )
 	{
 		this->serverKey = serverKey;
 		userSettings->setValue( SETTINGS_SERVER_KEY, serverKey );
+	}
+}
+
+void Settings::saveDeleteExtraneousItems( const bool& deleteExtraneousItems ) {
+	if ( this->deleteExtraneousItems != deleteExtraneousItems )
+	{
+		this->deleteExtraneousItems = deleteExtraneousItems;
+		userSettings->setValue( SETTINGS_DELETE_EXTRANEOUS_ITEMS, deleteExtraneousItems );
+	}
+}
+
+void Settings::saveShowHiddenFilesAndFolders( const bool showHiddenFilesAndFolders ) {
+	if ( this->showHiddenFilesAndFolders != showHiddenFilesAndFolders )
+	{
+		this->showHiddenFilesAndFolders = showHiddenFilesAndFolders;
+		userSettings->setValue( SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, showHiddenFilesAndFolders );
 	}
 }
 

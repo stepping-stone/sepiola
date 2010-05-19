@@ -44,12 +44,11 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	QString uid_param = settings->getQuotaModificationUrlUidParam();
 	uid_param = (uid_param == "") ? "$UID$" : uid_param;
 	if (settings->getQuotaModificationUrl() != "") {
-		this->labelInfoChangeQuota->setText(QObject::tr("<a href=\"%1\">Change quota</a> (opens a browser window)").arg(settings->getQuotaModificationUrl().replace(uid_param, settings->getServerUserName())));
-		this->labelInfoChangeQuota->setOpenExternalLinks(true);
+		this->labelChangeQuotaLink->setText(QObject::tr("<a href=\"%1\">Change quota</a> (opens a browser window)").arg(settings->getQuotaModificationUrl().replace(uid_param, settings->getServerUserName())));
+		this->labelChangeQuotaLink->setOpenExternalLinks(true);
 	} else {
-		this->labelInfoChangeQuota->setText("");
-		this->labelInfoChangeQuota->setVisible(false);
-		this->labelInfoChangeQuota_label->setVisible(false);
+		this->labelChangeQuotaLink->setText("");
+		this->labelChangeQuotaLink->setVisible(false);
 	}
 	QObject::connect( this->buttonBox, SIGNAL( accepted() ), this, SLOT( save() ) );
 	QObject::connect( this->buttonBox, SIGNAL( rejected() ), this, SLOT( reset() ) );
@@ -67,6 +66,8 @@ void SettingsForm::reload()
 	this->lineEditUsername->setText( settings->getServerUserName() );
 	this->lineEditBackupPrefix->setText( settings->getBackupPrefix() );
 	this->spinBoxNOfShownLastBackups->setValue( settings->getNOfLastBackups() );
+	this->checkBoxShowHiddenFiles->setChecked( settings->getShowHiddenFilesAndFolders() );
+	this->checkBoxKeepDeletedFiles->setChecked( !settings->getDeleteExtraneousItems() );
 
 	this->comboBoxLanguage->clear();
 	foreach( QString language, settings->getSupportedLanguages() )
@@ -86,6 +87,8 @@ void SettingsForm::save()
 		settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );
 		settings->saveLanguageIndex( this->comboBoxLanguage->currentIndex() );
 		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
+		settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
+		settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
 		emit updateOverviewFormLastBackupsInfo();
@@ -139,17 +142,17 @@ bool SettingsForm::onLeave()
 
 void SettingsForm::on_lineEditUsername_textEdited( QString username )
 {
-	formChanged = true;
+	formChanged = ( username != Settings::getInstance()->getServerUserName() );
 }
 
 void SettingsForm::on_comboBoxLanguage_currentIndexChanged( int languageIndex )
 {
-	formChanged = true;
+	formChanged = ( languageIndex != Settings::getInstance()->getLanguageIndex() );
 }
 
 void SettingsForm::on_lineEditBackupPrefix_textEdited( QString backupPrefix )
 {
-	formChanged = true;
+	formChanged = ( backupPrefix != Settings::getInstance()->getBackupPrefix() );
 }
 
 void SettingsForm::on_spinBoxNOfShownLastBackups_valueChanged( int i )
@@ -161,4 +164,12 @@ void SettingsForm::on_btnDefaultPrefix_clicked()
 {
 	this->lineEditBackupPrefix->setText( Settings::getInstance()->getLocalHostName() );
 	formChanged = true;
+}
+
+void SettingsForm::on_checkBoxShowHiddenFiles_stateChanged( int state ) {
+	formChanged = ((state==Qt::Checked) != Settings::getInstance()->getShowHiddenFilesAndFolders());
+}
+
+void SettingsForm::on_checkBoxKeepDeletedFiles_stateChanged( int state ) {
+	formChanged = ((state==Qt::Checked) != (!Settings::getInstance()->getDeleteExtraneousItems()));
 }

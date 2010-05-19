@@ -234,6 +234,11 @@ QStringList BackupForm::getSelectedFilesAndDirs()
 
 void BackupForm::refreshLocalDirModel()
 {
+	if (Settings::getInstance()->getShowHiddenFilesAndFolders()) {
+		this->localDirModel->setFilter(this->localDirModel->filter() | QDir::Hidden);
+	} else {
+		this->localDirModel->setFilter(this->localDirModel->filter() & (~QDir::Hidden));
+	}
 	this->localDirModel->refresh();
 }
 

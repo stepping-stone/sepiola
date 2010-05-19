@@ -52,14 +52,13 @@ Rsync::Rsync() {
 Rsync::~Rsync() {}
 
 
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
 {
-	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << compress << "," << errors << "," << dry_run << ")";
+	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << errors << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files";
 	Settings* settings = Settings::getInstance();
-	bool setDeleteFlag = settings->getDeleteExtraneousItems();
 	QString include_dirs_filename = settings->getApplicationDataDir() + "includes";
 
 	QString source(src);
@@ -362,9 +361,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 }
 
 
-long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool compress, QString* errors ) throw ( ProcessException )
+long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) throw ( ProcessException )
 {
-	this->upload( includeRules, src, destination, compress, errors, true );
+	this->upload( includeRules, src, destination, setDeleteFlag, compress, errors, true );
 	return this->last_calculatedLiteralData;
 }
 

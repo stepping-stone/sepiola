@@ -260,6 +260,9 @@ class Settings : public QObject
 		//void saveSchedulerDelay( const int& minutes );
 		void saveDeleteExtraneousItems( const bool& deleteExtraneousItems );
 		bool getDeleteExtraneousItems();
+		void saveShowHiddenFilesAndFolders( const bool showHiddenFilesAndFolders );
+		bool getShowHiddenFilesAndFolders();
+		bool isCompressedRsyncTraffic();
 		QSize getWindowSize();
 		void saveWindowSize( QSize size );
 		QPoint getWindowPosition();
@@ -334,6 +337,9 @@ class Settings : public QObject
 		static const QString SETTINGS_PRIVATE_OPEN_SSH_KEY;
 		static const QString SETTINGS_WINDOW_SIZE;
 		static const QString SETTINGS_WINDOW_POSITION;
+		static const QString SETTINGS_DELETE_EXTRANEOUS_ITEMS;
+		static const QString SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS;
+
 
 		// [Reseller]
 		static const QString SETTINGS_GROUP_RESELLER;
@@ -417,6 +423,8 @@ class Settings : public QObject
 		QString privatePuttyKey;
 		QString privateOpenSshKey;
 		bool deleteExtraneousItems;
+		bool showHiddenFilesAndFolders;
+		bool compressedRsyncTraffic; // read only at the moment
 		QSize windowSize;
 		QPoint windowPosition;
 
@@ -476,6 +484,15 @@ inline QString Settings::getServerName()
 inline bool Settings::getDeleteExtraneousItems()
 {
 	return deleteExtraneousItems;
+}
+
+inline bool Settings::getShowHiddenFilesAndFolders()
+{
+	return showHiddenFilesAndFolders;
+}
+
+inline bool Settings::isCompressedRsyncTraffic() {
+	return false;
 }
 
 inline QStringList Settings::getSupportedLanguages()
