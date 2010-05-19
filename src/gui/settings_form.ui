@@ -57,6 +57,9 @@
       <string/>
      </property>
      <layout class="QVBoxLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
       <property name="leftMargin">
        <number>6</number>
       </property>
@@ -249,6 +252,22 @@ default-button to use the system-settings.</string>
        </layout>
       </item>
       <item>
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>6</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <layout class="QGridLayout">
         <property name="verticalSpacing">
          <number>0</number>
@@ -273,7 +292,7 @@ default-button to use the system-settings.</string>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="labelQuotaSize">
+         <widget class="QLabel" name="labelQuotaInformation">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -304,6 +323,11 @@ default-button to use the system-settings.</string>
             <width>200</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</string>

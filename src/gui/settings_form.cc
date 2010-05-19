@@ -43,6 +43,8 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	Settings* settings = Settings::getInstance();
 	QString uid_param = settings->getQuotaModificationUrlUidParam();
 	uid_param = (uid_param == "") ? "$UID$" : uid_param;
+	QList<int> quotaValues = this->model->getServerQuota();
+	this->labelQuotaInformation->setText( QObject::tr("Total size: %1 GB, free: %2 GB").arg(quotaValues[0]/1024.0, 0, 'f', 1).arg((quotaValues[0]-quotaValues[2]-quotaValues[2])/1024.0, 0, 'f', 1) );
 	if (settings->getQuotaModificationUrl() != "") {
 		this->labelChangeQuotaLink->setText(QObject::tr("<a href=\"%1\">Change quota</a> (opens a browser window)").arg(settings->getQuotaModificationUrl().replace(uid_param, settings->getServerUserName())));
 		this->labelChangeQuotaLink->setOpenExternalLinks(true);
@@ -50,6 +52,7 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 		this->labelChangeQuotaLink->setText("");
 		this->labelChangeQuotaLink->setVisible(false);
 	}
+
 	QObject::connect( this->buttonBox, SIGNAL( accepted() ), this, SLOT( save() ) );
 	QObject::connect( this->buttonBox, SIGNAL( rejected() ), this, SLOT( reset() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), parent, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
