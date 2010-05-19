@@ -27,7 +27,7 @@
 #include "utils/datatypes.hh"
 
 /**
- * The RemoteDirModel class represents a remote file system
+ * The LocalDirModel class represents a local file system
  * @author Dominic Sydler, sydler@puzzle.ch
  * @source http://www.qtcentre.org/forum/f-qt-programming-2/t-qdirmodelqtreeview-and-checkable-items-6957.html
  */
