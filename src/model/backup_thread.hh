@@ -51,8 +51,7 @@ public:
 	 * @param excludePatternList Pattern list for exclude files
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
-	BackupThread( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag );
-	BackupThread( const BackupSelectionHash& includeRules, const bool& setDeleteFlag );
+	BackupThread( const BackupSelectionHash& includeRules );
 
 	/**
 	 * Destroys the BackupThread
@@ -107,6 +106,7 @@ private:
 	QStringList includePatternList;
 	QStringList excludePatternList;
 	bool setDeleteFlag;
+	bool compressedUpload;
 	QDateTime backupStartDateTime;
 	ConstUtils::StatusEnum backupCurrentStatus;
 	ProgressTask pt;

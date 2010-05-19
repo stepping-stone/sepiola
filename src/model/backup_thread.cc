@@ -43,46 +43,13 @@ const QString BackupThread::TASKNAME_UPLOAD_METADATA = "uploading metadata";
 const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
 
 
-/**
- * deprecated
- */
-BackupThread::BackupThread( const QStringList& items, const QStringList& includePatternList, const QStringList& excludePatternList, const bool& setDeleteFlag )
-{
-	isAborted = false;
-	this->items = items;
-	this->includePatternList = includePatternList;
-	this->excludePatternList = excludePatternList;
-	this->setDeleteFlag = setDeleteFlag;
-	this->backupStartDateTime = QDateTime(); // null-Time
-	this->backupCurrentStatus = ConstUtils::STATUS_UNDEFINED;
-
-	// TODO adjust the given values for subtask steps and durations
-	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
-	pt.appendTask(TASKNAME_PREPARE_DIRECTORIES, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
-	pt.appendTask(TASKNAME_ESTIMATE_BACKUP_SIZE, DateTimeUtils::getDateTimeFromSecs(3 /* time for dry run */), 30 /* steps??? */);
-	pt.appendTask(TASKNAME_FILE_UPLOAD, DateTimeUtils::getDateTimeFromSecs(100), 250/* enter bytes to upload */);
-	pt.appendTask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT, DateTimeUtils::getDateTimeFromSecs(2 /* time for dry run */), 3);
-	pt.appendTask(TASKNAME_UPLOAD_METADATA, DateTimeUtils::getDateTimeFromSecs(2), 1 /* steps??? */);
-	pt.appendTask(TASKNAME_METAINFO, DateTimeUtils::getDateTimeFromSecs(2), 1);
-	currentTaskNr = 0;
-
-
-	rsync = ToolFactory::getRsyncImpl();
-	QObject::connect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
-					  this, SIGNAL( infoSignal( const QString& ) ) );
-	QObject::connect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
-					  this, SIGNAL( errorSignal( const QString& ) ) );
-	QObject::connect( rsync.get(), SIGNAL( trafficInfoSignal( const QString&, float, quint64, quint64 ) ),
-					  this, SLOT( rsyncUploadProgressHandler( const QString&, float, quint64, quint64 ) ) );
-	QObject::connect( this, SIGNAL( abort_rsync() ), rsync.get(), SLOT( abort() ) );
-	QObject::connect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
-}
-
-BackupThread::BackupThread( const BackupSelectionHash& includeRules, const bool& setDeleteFlag )
+BackupThread::BackupThread( const BackupSelectionHash& includeRules )
 {
 	isAborted = false;
 	this->includeRules = includeRules;
-	this->setDeleteFlag = setDeleteFlag;
+	Settings* settings = Settings::getInstance();
+	this->setDeleteFlag = settings->getDeleteExtraneousItems();
+	this->compressedUpload = settings->isCompressedRsyncTraffic();
 	this->backupStartDateTime = QDateTime(); // null-Time
 	this->backupCurrentStatus = ConstUtils::STATUS_UNDEFINED;
 
@@ -157,7 +124,7 @@ void BackupThread::run()
 
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_FILE_UPLOAD);
 		emit infoSignal( tr( "Uploading files and directories" ) );
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, false, &errors );
+		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, &errors );
 		if ( errors != "" )
 		{
 			failed = true;
@@ -398,7 +365,7 @@ quint64 BackupThread::estimateBackupSize( const QString& src, const QString& des
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 	QObject::connect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
-	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, &errors );
+	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, &errors );
 	QObject::disconnect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
 	ProgressTask* uploadPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD);
