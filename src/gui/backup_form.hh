@@ -49,8 +49,10 @@ private:
 
 private slots:
 	void on_btnRefresh_clicked();
-	void on_btnSchedule_clicked();
-	void on_btnBackup_clicked();
+	void runBackupNow();
+	void save();
+	void reset();
+	void reload();
 	void on_radioButtonNoSchedule_clicked();
 	void on_radioButtonMinutesAfterBooting_clicked();
 	void on_radioButtonDaily_clicked();

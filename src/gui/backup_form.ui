@@ -338,16 +338,9 @@
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="btnSchedule">
-         <property name="text">
-          <string>S&amp;chedule</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnBackup">
-         <property name="text">
-          <string>B&amp;ackup</string>
+        <widget class="QDialogButtonBox" name="buttonBox">
+         <property name="standardButtons">
+          <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
          </property>
         </widget>
        </item>

@@ -35,15 +35,34 @@ const int BackupForm::default_schedule_minutesAfterStartup = 10;
 BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 {
 	setupUi ( this );
-	Settings* settings = Settings::getInstance();
 	this->model = model;
 	this->localDirModel = this->model->getLocalDirModel();
-	this->localDirModel->setSelectionRules(	settings->getLastBackupSelectionRules() );
 
+	this->reload();
+
+	new QShortcut( Qt::Key_F5, this, SLOT( refreshLocalDirModel() ) );
+	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ),
+					  parent, SIGNAL ( updateOverviewFormScheduleInfo() ) );
+	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ),
+					  parent, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
+	QObject::connect( this->buttonBox, SIGNAL( accepted() ), this, SLOT( save() ) );
+	QObject::connect( this->buttonBox, SIGNAL( rejected() ), this, SLOT( reset() ) );
+}
+
+BackupForm::~BackupForm()
+{
+	QObject::disconnect( this->buttonBox, SIGNAL( accepted() ), this, SLOT( save() ) );
+	QObject::disconnect( this->buttonBox, SIGNAL( rejected() ), this, SLOT( reset() ) );
+}
+
+void BackupForm::reload() {
+	Settings* settings = Settings::getInstance();
+	this->localDirModel->setSelectionRules(	settings->getLastBackupSelectionRules() );
 	this->treeView->setModel( localDirModel );
 	this->treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
-	this->treeView->setColumnWidth( 0, 300 );
+	this->treeView->setColumnWidth( 0, 280 );
 	this->expandSelectedBranches();
+
 
 		// disable option "minutes after booting" if the scheduler does not support it
 	if ( !this->model->isSchedulingOnStartSupported() )
@@ -76,16 +95,7 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 			this->timeEditTime->setTime(rule.getTimeToRun());
 		break;
 	}
-
-	new QShortcut( Qt::Key_F5, this, SLOT( refreshLocalDirModel() ) );
-	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ),
-					  parent, SIGNAL ( updateOverviewFormScheduleInfo() ) );
-	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ),
-					  parent, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
 }
-
-BackupForm::~BackupForm()
-{}
 
 void BackupForm::expandSelectedBranches()
 {
@@ -99,19 +109,30 @@ void BackupForm::expandSelectedBranches()
 	}
 }
 
-void BackupForm::on_btnSchedule_clicked()
+void BackupForm::save()
 {
+	qDebug() << "BackupForm::save()";
 	if ( this->localDirModel->getSelectionRules().size() == 0 && !this->radioButtonNoSchedule->isChecked() )
 	{
-		QMessageBox::information( this,
-									tr( "Empty backup list" ),
-									tr( "No items have been selected for scheduling" )
-								);
+		QMessageBox::information( this, tr( "Empty backup list" ), tr( "No items have been selected for scheduling" ) );
 		return;
+	}	this->schedule();
+	// Settings::getInstance()->saveBackupSelectionRules( this->model->getLocalDirModel()->getSelectionRules() ); // this is not necessary, because it is called in method schedule()
+}
+
+void BackupForm::reset()
+{
+	qDebug() << "BackupForm::reset()";
+	int answer = QMessageBox::warning( this, tr( "Reset" ), tr( "Are you sure you want to reset all form values?" ), QMessageBox::Yes | QMessageBox::Cancel );
+	switch ( answer )
+	{
+		case QMessageBox::Yes:
+			this->reload();
+			break;
+		default:
+			// do nothing
+			break;
 	}
-	/*ScheduleDialog scheduleDialog( this->model, backupItems, includePatternList, excludePatternList );
-	scheduleDialog.exec();*/
-	this->schedule();
 }
 
 void BackupForm::schedule()
@@ -153,7 +174,7 @@ void BackupForm::schedule()
 }
 
 
-void BackupForm::on_btnBackup_clicked()
+void BackupForm::runBackupNow()
 {
 	if ( this->localDirModel->getSelectionRules().size() == 0 )
 	{
@@ -244,5 +265,6 @@ void BackupForm::refreshLocalDirModel()
 
 void BackupForm::on_btnRefresh_clicked()
 {
+	qDebug() << "BackupForm::on_btnRefresh_clicked()";
 	refreshLocalDirModel();
 }

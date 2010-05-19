@@ -62,7 +62,7 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ), overviewForm, SLOT ( refreshScheduleOverview() ) );
 	QObject::connect( model, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
-	QObject::connect( this->overviewForm, SIGNAL( startBackupNow() ), this->backupForm, SLOT( on_btnBackup_clicked() ) );
+	QObject::connect( this->overviewForm, SIGNAL( startBackupNow() ), this->backupForm, SLOT( runBackupNow() ) );
 
 
 	stackedLayout = new QStackedLayout( frameMain );
