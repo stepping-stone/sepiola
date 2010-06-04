@@ -113,7 +113,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	DryrunStates dryrun_state = DRY_RUN_START;
 	long nOfFiles = -1;
 	QString lastFileName;
-	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
+	char rsyncEolChar = '\n';
+	if (Settings::SHOW_PROGRESS) rsyncEolChar = '\r';
+	while( blockingReadLine( &lineData, 2147483647, rsyncEolChar ) ) // -1 does not work on windows
 	{
 		// qDebug() << "first in while" << readAllStandardError(); // $$$ delete again
 		qDebug() << lineData;
@@ -578,8 +580,10 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	}
 	QStringList downloadedItems;
 
+	char rsyncEolChar = '\n';
+	if (Settings::SHOW_PROGRESS) rsyncEolChar = '\r';
 	QString lineData;
-	while( blockingReadLine( &lineData, 2147483647, 13 ) ) // -1 does not work on windows
+	while( blockingReadLine( &lineData, 2147483647, rsyncEolChar ) ) // -1 does not work on windows
 	{
 		lineData.replace( settings->getEOLCharacter(), "");
 		// qDebug() << lineData;
