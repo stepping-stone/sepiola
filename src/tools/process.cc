@@ -22,7 +22,6 @@
 #include <QLocale>
 #include <QDebug>
 #include <QProcess>
-#include <QWaitCondition>
 #include <QMutex>
 
 #include "settings/settings.hh"
@@ -33,13 +32,14 @@
 const int Process::MAX_LINE_SIZE = 60000;
 
 Process::Process() :
-	qProcess(0)
+	qProcess(0), abort(false), killed(false)
 {
 }
 
 Process::~Process()
 {
-	terminate(true);
+	terminate();
+	delete qProcess;
 }
 
 void Process::createProcess(const QString& executableName)
@@ -51,7 +51,10 @@ void Process::createProcess(const QString& executableName)
 void Process::createProcess(const QString& executableName, const QStringList& arguments)
 {
 	terminate();
-	qProcess = new QProcess;
+	delete qProcess;
+	abort = false;
+	killed = false;
+	qProcess = new ExtendedQProcess;
 	this->executableName = executableName;
 	this->arguments = arguments;
 }
@@ -81,24 +84,38 @@ void Process::setWorkingDirectory(const QString& directory)
 
 bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar)
 {
-	//assert(qProcess);
-	int BLOCKREAD_MAX_LINE_SIZE = 4120; // arbitrarily chosen to 4096 plus file-information-prefix
+	const int BLOCKREAD_MAX_LINE_SIZE = 4120; // arbitrarily chosen to 4096 plus file-information-prefix
+
 	if (!this->isAlive()) return false;
-	if (lineEndChar == 10) {
+
+	QDateTime endTime = QDateTime::currentDateTime().addMSecs(msec);
+	if (lineEndChar == '\n') {
 		// simple case, where lineEndChar is "\n" -> canReadLine and readLine only support "\n"
 		while ( !qProcess->canReadLine() )
 		{
-			if (!this->isAlive()) return false;
-			if ( !qProcess->waitForReadyRead(msec) )
+			// QProcess at least up to Qt 4.3.5 does not correctly reset error and errorString, reset manually.
+			qProcess->resetError();
+			if ( !qProcess->waitForReadyRead(100) )
 			{
-				if (qProcess->error() == QProcess::Timedout)
+				if (!qProcess->hasError())  // waitForReadyRead returned false but reports no error
 				{
-					qWarning() << "Process timed out after " << msec << "msec";
+					// eighter the process is dead or the read channel has been closed -> abort read operation
 					return false;
 				}
-				else if (qProcess->state() == QProcess::NotRunning)
+
+				if (qProcess->error() == QProcess::Timedout)
 				{
-					return false;
+					if (QDateTime::currentDateTime() >= endTime)
+					{
+						qWarning() << "Process timed out after " << msec << "msec";
+						return false;
+					}
+
+					if (abort)
+					{
+						abortCondition.wakeAll();
+						return false;
+					}
 				}
 				else
 				{
@@ -111,6 +128,8 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 		*byteArray = QByteArray(buf);
 		return result;
 	} else {
+		assert(Settings::SHOW_PROGRESS);
+
 		// when need to break _additionally_ to "\n" also at certain lineEndChar (for ex. at "\r" to read progress-info of rsync)
 		// more tricky case, where lineEndChar isn't "\n" -> canReadLine and readLine can not be used lonely
 		char buf[BLOCKREAD_MAX_LINE_SIZE];
@@ -122,18 +141,30 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 		{
 			// qDebug() << "!readBuffer.contains(QChar(lineEndChar))=" << (!readBuffer.contains(QChar(lineEndChar))) << "!readBuffer.contains(\"\\n\")" << (!readBuffer.contains("\n")) << "!qProcess->canReadLine()" << (!qProcess->canReadLine()) << "BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()>0" << (BLOCKREAD_MAX_LINE_SIZE-readBuffer.length()>0);
 			if (!this->isAlive()) return false;
-			if ( !qProcess->waitForReadyRead(msec) )
+
+			// QProcess at least up to Qt 4.3.5 does not correctly reset error and errorString, reset manually.
+			qProcess->resetError();
+			if ( !qProcess->waitForReadyRead(100) )
 			{
-				if (!this->isAlive()) return false;
-				if (qProcess->error() == QProcess::Timedout)
-				//if (qProcess->error() == QProcess::Timedout && QDateTime::currentDateTime() > timeoutTime)
+				if (!qProcess->hasError())  // waitForReadyRead returned false but reports no error
 				{
-					qWarning() << "Process timed out after " << msec << "msec";
+					// eighter the process is dead or the read channel has been closed -> abort read operation
 					return false;
 				}
-				else if (qProcess->state() == QProcess::NotRunning)
+
+				if (qProcess->error() == QProcess::Timedout)
 				{
-					return false;
+					if (QDateTime::currentDateTime() >= endTime)
+					{
+						qWarning() << "Process timed out after " << msec << "msec";
+						return false;
+					}
+
+					if (abort)
+					{
+						abortCondition.wakeAll();
+						return false;
+					}
 				}
 				else
 				{
@@ -198,29 +229,45 @@ void Process::logAll()
 	qCritical() << "Error: " << qProcess->readAllStandardError();
 }
 
-void Process::terminate(bool commingFromDestructor)
+void Process::terminate()
 {
-	qDebug() << "Process::terminate()";
-	if (qProcess)
+	if (this->isAlive())
 	{
-		QProcess* process = qProcess;
-		qProcess = 0;
+		qDebug() << "Process::terminate()";
+		abort = true;
+		QMutex mutex;
+		mutex.lock();
+		abortCondition.wait(&mutex, 500);
 		if (Settings::IS_WINDOWS) {
-			process->kill();
+			killed = true;
+			qProcess->kill();
 		} else {
-			process->terminate();
-		}
-		int n = 0;
-		while ((++n < 20) && process->state() == QProcess::Running) {
-			process->waitForFinished(500);
-			qDebug() << "waiting...";
-		}
-		if (process->state() == QProcess::Running) {
-			process->kill();
-		}
-		if (!commingFromDestructor) {
-			delete process;
+			qProcess->terminate();
+
+			int n = 0;
+			while ((++n < 20) && qProcess->state() == QProcess::Running) {
+				qProcess->waitForFinished(500);
+				qDebug() << "waiting...";
+			}
+			if (qProcess->state() == QProcess::Running) {
+				killed = true;
+				qProcess->kill();
+			}
 		}
 	}
+}
+
+bool Process::isAlive()
+{
+	if (qProcess == 0 || qProcess->state() == QProcess::NotRunning || killed) return false;
+	if (abort)
+	{
+		QMutex mutex;
+		mutex.lock();
+		abortCondition.wait(&mutex, 1000);
+		return false;
+	}
+
+	return true;
 }
 

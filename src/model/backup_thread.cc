@@ -234,7 +234,6 @@ void BackupThread::run()
 
 void BackupThread::checkAbortState() throw ( AbortException )
 {
-	qDebug() << "BackupThread::checkAbortState()";
 	if ( isRunning() && isAborted )
 	{
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);

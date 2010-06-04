@@ -20,11 +20,12 @@
 #define PROCESS_HH
 
 #include <cassert>
-#include <QProcess>
 #include <QTextStream>
+#include <QWaitCondition>
 
 #include "exception/process_exception.hh"
 #include "tools/abstract_informing_process.hh"
+#include "tools/extended_qprocess.hh"
 
 /**
  * The Process class provides the basic implementation for starting an external program
@@ -79,7 +80,7 @@ protected:
 	 * @param byteArray a byte array to store the characters into
 	 * @param msec milliseconds to block
 	 */
-	bool blockingReadLine(QByteArray* byteArray, int msec = 30000, char lineEndChar=10 );
+	bool blockingReadLine(QByteArray* byteArray, int msec = 30000, char lineEndChar = '\n');
 
 	/**
 	 * Reads a line of data and stores the characters in string. This method blocks until a line
@@ -87,7 +88,7 @@ protected:
 	 * @param string a string to store the characters into
 	 * @param msec milliseconds to block
 	 */
-	bool blockingReadLine( QString* string, int msec = 30000, char lineEndChar=10 );
+	bool blockingReadLine( QString* string, int msec = 30000, char lineEndChar = '\n' );
 
 	/**
 	 * Blocks until the process has finished
@@ -102,7 +103,7 @@ protected:
 	/**
 	 * Terminates the process
 	 */
-	void terminate(bool commingFromDestructor = false);
+	void terminate();
 
 	void retrieveStream(QTextStream* textStream) const;
 
@@ -124,14 +125,17 @@ protected:
 	void setTextModeEnabled( bool enabled );
 	void setReadChannel(QProcess::ProcessChannel channel);
 	QProcess::ProcessState state() const;
-	inline bool isAlive() { return (qProcess!=0) && qProcess->state() != QProcess::NotRunning; }
+	bool isAlive();
 
 private:
 	/**
 	 * A QProcess instance
 	 */
+	ExtendedQProcess* qProcess;
 	QString readBuffer;
-	QProcess* qProcess;
+	bool abort;
+	bool killed;
+	QWaitCondition abortCondition;
 
 	static const int MAX_LINE_SIZE;
 	QString executableName;
@@ -242,7 +246,7 @@ inline void Process::retrieveStream(QTextStream* textStream) const
 
 inline bool Process::waitForFinished(int msecs)
 {
-	if (qProcess)
+	if (this->isAlive())
 	{
 		return qProcess->waitForFinished(msecs);
 	}
