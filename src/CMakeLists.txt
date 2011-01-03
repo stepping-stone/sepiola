@@ -215,7 +215,8 @@ SET(SOURCE_FILES
 	tools/rsync.cc 
 	tools/set_acl.cc
 	tools/unix_permissions.cc
-	tools/tool_factory.cc 
+	tools/tool_factory.cc
+	utils/string_utils.cc 
 	utils/extended_file.cc
 	utils/file_system_utils.cc
 	utils/log_file_utils.cc

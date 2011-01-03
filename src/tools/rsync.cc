@@ -52,7 +52,7 @@ Rsync::Rsync() {
 Rsync::~Rsync() {}
 
 
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings, bool dry_run ) throw ( ProcessException )
 {
 	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << errors << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
@@ -100,7 +100,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	foreach ( QByteArray rule, convertedRules )
 	{
 		write(rule); // write( convertFilenameForRsyncArgument(rule) );
-		qDebug() << rule; // $$$ delete again
+		qDebug() << rule; // TODO: delete again
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
@@ -178,7 +178,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 						default:
 							break;
 					}
-					qDebug() << outputText; // $$$ comment out again
+					qDebug() << outputText; // TODO: comment out again
 					emit infoSignal( outputText );
 				} else {
 					emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
@@ -197,11 +197,25 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 			if (errors) *errors = standardErrors;
 		}
 	} else {
-		if ( this->exitCode() != 0)
+		int exitCode = this->exitCode();
+		switch (exitCode)
 		{
-			throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
+			case 0:
+				break;
+			case 23:  // Partial transfer due to error
+				*warnings = StringUtils::fromLocalEnc(readAllStandardError());
+				break;
+			case 24:  // Partial transfer due to vanished source files
+				*warnings = StringUtils::fromLocalEnc(readAllStandardError());
+				*warnings += "\n";
+				*warnings += tr("Some files have been renamed, moved or deleted during backup before they could be uploaded to the server."
+							   "\nUsually this concerns temporary files and this warning can be ignored.");
+				break;
+			default:
+				throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(exitCode).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
 		}
 	}
+
 	return uploadedItems;
 }
 
@@ -275,7 +289,6 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
 	createProcess( settings->getRsyncName() , arguments );
 	start();
-
 	foreach ( QString item, items )
 	{
 		FileSystemUtils::convertToServerPath( &item );
@@ -297,7 +310,6 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
-
 
 	closeWriteChannel();
 
@@ -363,9 +375,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 }
 
 
-long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) throw ( ProcessException )
+long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings ) throw ( ProcessException )
 {
-	this->upload( includeRules, src, destination, setDeleteFlag, compress, errors, true );
+	this->upload( includeRules, src, destination, setDeleteFlag, compress, errors, warnings, true );
 	return this->last_calculatedLiteralData;
 }
 

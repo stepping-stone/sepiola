@@ -98,6 +98,7 @@ void BackupThread::run()
 	qDebug() << "BackupThread::run()";
 	ProgressTask* subPt;
 	bool failed = false;
+	QString warnings;
 	this->setLastBackupState(ConstUtils::STATUS_UNDEFINED);
 	Settings* settings = Settings::getInstance();
 	settings->saveBackupSelectionRules( this->includeRules );
@@ -124,8 +125,9 @@ void BackupThread::run()
 
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_FILE_UPLOAD);
 		emit infoSignal( tr( "Uploading files and directories" ) );
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, &errors );
-		if ( errors != "" )
+		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, &errors, &warnings );
+
+		if ( !errors.isEmpty() )
 		{
 			failed = true;
 			emit errorSignal( errors );
@@ -195,7 +197,17 @@ void BackupThread::run()
 								 this, SIGNAL( errorSignal( const QString& ) ) );
 			if( !failed )
 			{
-				emit infoSignal( tr( "Backup succeeded." ) );
+				if (warnings.isEmpty())
+				{
+					emit infoSignal( tr( "Backup succeeded." ) );
+				}
+				else
+				{
+					emit infoSignal(" ");
+					emit infoSignal(warnings);
+					emit infoSignal(" ");
+					emit infoSignal( tr( "Backup succeeded with warnings." ) );
+				}
 			}
 		}
 	}
@@ -222,12 +234,16 @@ void BackupThread::run()
 		emit infoSignal( tr( "Backup failed." ) );
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-		emit finalStatusSignal( this->getLastBackupState() );
+
+	}
+	else if (!warnings.isEmpty())
+	{
+		this->setLastBackupState(ConstUtils::STATUS_WARNING);
 	} else {
 		this->setLastBackupState(ConstUtils::STATUS_OK);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_OK )";
-		emit finalStatusSignal( this->getLastBackupState() );
 	}
+	emit finalStatusSignal( this->getLastBackupState() );
 	emit finishProgressDialog();
 	emit updateOverviewFormLastBackupsInfo();
 }
@@ -357,14 +373,14 @@ void BackupThread::prepareServerDirectories()
  * estimates the backup size by running rsync with option --only-write-batch ans updates the progressTask's stepNumber to this size.
  */
 quint64 BackupThread::estimateBackupSize( const QString& src, const QString& destination ) {
-	QString errors;
+	QString errors, warnings;
 	ProgressTask * mySubPt = this->pt.getCurrentTask();
 	StringPairList vars;
 	vars.append(QPair<QString,QString>(tr("current task"), mySubPt->getName()));
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 	QObject::connect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
-	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, &errors );
+	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, &errors, &warnings );
 	QObject::disconnect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
 	ProgressTask* uploadPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD);
