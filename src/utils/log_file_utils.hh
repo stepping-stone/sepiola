@@ -23,6 +23,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include <QMutex>
 
 /**
  * The LogFileUtils class provides convenience methods for reading and writing the
@@ -77,5 +78,6 @@ private:
 	int maxLines;
 	QTextStream output;
 	QStringList newLines;
+	QMutex mutex;
 };
 #endif

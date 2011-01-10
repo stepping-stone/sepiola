@@ -16,18 +16,21 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef DATATYPES_HH
-#define DATATYPES_HH
+#include "utils/string_utils.hh"
+#include "settings/settings.hh"
 
-#include <QMetaType>
-#include <QHash>
-#include <QString>
-#include <QPair>
-#include <QList>
-
-typedef QList<QPair<QString,QString> > StringPairList;
-Q_DECLARE_METATYPE( StringPairList );
-typedef QHash<QString,bool> BackupSelectionHash;
-Q_DECLARE_METATYPE( BackupSelectionHash );
-
-#endif /*DATATYPES_HH*/
+QString StringUtils::fromLocalEnc(QByteArray byteArray)
+{
+	if (Settings::IS_WINDOWS)
+	{
+		return QString::fromUtf8(byteArray);
+	}
+	else if ( Settings::IS_MAC )
+	{
+		return QString::fromUtf8(byteArray).normalized(QString::NormalizationForm_C);
+	}
+	else
+	{
+		return QString::fromLocal8Bit(byteArray);
+	}
+}

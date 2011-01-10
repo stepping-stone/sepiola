@@ -98,6 +98,7 @@ void BackupThread::run()
 	qDebug() << "BackupThread::run()";
 	ProgressTask* subPt;
 	bool failed = false;
+	QString warnings;
 	this->setLastBackupState(ConstUtils::STATUS_UNDEFINED);
 	Settings* settings = Settings::getInstance();
 	settings->saveBackupSelectionRules( this->includeRules );
@@ -109,7 +110,6 @@ void BackupThread::run()
 		prepareServerDirectories();
 		checkAbortState();
 
-		QString errors;
 		QString source = "/";
 		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/", "'");
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_ESTIMATE_BACKUP_SIZE);
@@ -124,12 +124,8 @@ void BackupThread::run()
 
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_FILE_UPLOAD);
 		emit infoSignal( tr( "Uploading files and directories" ) );
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, &errors );
-		if ( errors != "" )
-		{
-			failed = true;
-			emit errorSignal( errors );
-		}
+		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, &warnings, false );
+
 		checkAbortState();
 		if ((subPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD)) != 0) subPt->setTerminated(true);
 
@@ -151,7 +147,8 @@ void BackupThread::run()
 			this->pt.debugIsCorrectCurrentTask(TASKNAME_UPLOAD_METADATA);
 			updateBackupContentFile( currentBackupContentFile, processedItems );
 			//ssh->uploadToMetaFolder( currentBackupContentFile, false );
-			rsync->upload( currentBackupContentFile, metaDataDir, true );
+			QString warning;
+			rsync->upload( currentBackupContentFile, metaDataDir, true, 0 );
 			//FileSystemUtils::removeFile( currentBackupContentFile );
 			checkAbortState();
 			if ((subPt = this->pt.getSubtask(TASKNAME_UPLOAD_METADATA)) != 0) subPt->setTerminated(true);
@@ -161,7 +158,7 @@ void BackupThread::run()
 			this->pt.debugIsCorrectCurrentTask(TASKNAME_METAINFO);
 			QString currentBackupTimeFile = createCurrentBackupTimeFile();
 			//ssh->uploadToMetaFolder( currentBackupTimeFile, false );
-			rsync->upload( currentBackupTimeFile, metaDataDir, true );
+			rsync->upload( currentBackupTimeFile, metaDataDir, true, 0 );
 			FileSystemUtils::removeFile( currentBackupTimeFile );
 			checkAbortState();
 
@@ -176,13 +173,28 @@ void BackupThread::run()
 							  this, SIGNAL( errorSignal( const QString& ) ) );
 			QFileInfo currentMetadataFileName = rsync->downloadCurrentMetadata( settings->getApplicationDataDir(), false );
 			checkAbortState();
-			QFileInfo newMetadataFileName = metadata->getMetadata( processedItems );
+			QFileInfo newMetadataFileName = metadata->getMetadata( processedItems, &warning );
+			if (!warning.isEmpty()) warnings.append(warning);
 			checkAbortState();
 			metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, processedItems );
 			checkAbortState();
 			emit infoSignal( tr( "Uploading permission meta data" ) );
 			//ssh->uploadToMetaFolder( currentMetadataFileName, false );
-			rsync->upload( currentMetadataFileName, metaDataDir, true );
+			try
+			{
+				rsync->upload( currentMetadataFileName, metaDataDir, true, &warning );
+			}
+			catch (ProcessException& e)
+			{
+				warning = e.what();
+			}
+			if (!warning.isEmpty())
+			{
+				warnings.append("\n");
+				warnings.append(tr("Warning: Could not backup file permissions due to following problem:"));
+				warnings.append("\n");
+				warnings.append(warning);
+			}
 			checkAbortState();
 			if ((subPt = this->pt.getSubtask(TASKNAME_METAINFO)) != 0) { subPt->addFixpointNow(subPt->getNumberOfSteps()); subPt->setTerminated(true); }
 			updateInformationToDisplay();
@@ -193,9 +205,19 @@ void BackupThread::run()
 								 this, SIGNAL( infoSignal( const QString& ) ) );
 			QObject::disconnect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
 								 this, SIGNAL( errorSignal( const QString& ) ) );
-			if( !failed )
+			if( !failed && !isAborted)
 			{
-				emit infoSignal( tr( "Backup succeeded." ) );
+				if (warnings.isEmpty())
+				{
+					emit infoSignal( tr( "Backup succeeded." ) );
+				}
+				else
+				{
+					emit infoSignal(" ");
+					emit infoSignal(warnings);
+					emit infoSignal(" ");
+					emit infoSignal( tr( "Backup succeeded with warnings." ) );
+				}
 			}
 		}
 	}
@@ -203,9 +225,6 @@ void BackupThread::run()
 	{
 		failed = true;
 		emit errorSignal( e.what() );
-		this->setLastBackupState(ConstUtils::STATUS_ERROR);
-		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-		emit finalStatusSignal( this->getLastBackupState() );
 	}
 	catch ( AbortException e )
 	{
@@ -213,21 +232,23 @@ void BackupThread::run()
 		emit infoSignal( tr( "Backup aborted." ) );
 		qDebug() << e.what();
 		emit errorSignal( e.what() );
-		this->setLastBackupState(ConstUtils::STATUS_ERROR);
-		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-		emit finalStatusSignal( this->getLastBackupState() );
 	}
 	if ( failed )
 	{
 		emit infoSignal( tr( "Backup failed." ) );
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-		emit finalStatusSignal( this->getLastBackupState() );
+
+	}
+	else if (!warnings.isEmpty())
+	{
+		this->setLastBackupState(ConstUtils::STATUS_WARNING);
 	} else {
 		this->setLastBackupState(ConstUtils::STATUS_OK);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_OK )";
-		emit finalStatusSignal( this->getLastBackupState() );
 	}
+	emit infoSignal( "==================================================" );
+	emit finalStatusSignal( this->getLastBackupState() );
 	emit finishProgressDialog();
 	emit updateOverviewFormLastBackupsInfo();
 }
@@ -333,12 +354,11 @@ void BackupThread::prepareServerDirectories()
 
 
 	//AbstractRsync* rsync = ToolFactory::getRsyncImpl();
-	QString errors;
-	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, &errors );
+	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, false );
 	checkAbortState();
 	backupPrefixDir.mkdir( settings->getMetaFolderName() );
 	backupPrefixDir.mkdir( settings->getBackupFolderName() );
-	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, &errors );
+	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, false );
 	checkAbortState();
 	//delete rsync;
 	mySubPt->addFixpointNow(2);
@@ -357,14 +377,14 @@ void BackupThread::prepareServerDirectories()
  * estimates the backup size by running rsync with option --only-write-batch ans updates the progressTask's stepNumber to this size.
  */
 quint64 BackupThread::estimateBackupSize( const QString& src, const QString& destination ) {
-	QString errors;
+	QString errors, warnings;
 	ProgressTask * mySubPt = this->pt.getCurrentTask();
 	StringPairList vars;
 	vars.append(QPair<QString,QString>(tr("current task"), mySubPt->getName()));
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 	QObject::connect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
-	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, &errors );
+	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, &warnings, false );
 	QObject::disconnect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
 	ProgressTask* uploadPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD);

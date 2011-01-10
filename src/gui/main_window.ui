@@ -19,9 +19,7 @@
    <string>Sepiola Online Backup Client</string>
   </property>
   <property name="windowIcon" >
-   <iconset>
-    <normaloff/>
-   </iconset>
+   <iconset resource="resources/screen.qrc" >:/main/icon.png</iconset>
   </property>
   <property name="iconSize" >
    <size>
@@ -46,7 +44,7 @@
        </size>
       </property>
       <property name="styleSheet" >
-       <string notr="true" >background-color: white</string>
+       <string>background-color: white</string>
       </property>
       <property name="frameShape" >
        <enum>QFrame::StyledPanel</enum>
@@ -76,8 +74,7 @@
           <string>&amp;Overview</string>
          </property>
          <property name="icon" >
-          <iconset resource="resources/screen.qrc" >
-           <normaloff>:/main/home.png</normaloff>:/main/home.png</iconset>
+          <iconset resource="resources/screen.qrc" >:/main/home.png</iconset>
          </property>
          <property name="iconSize" >
           <size>
@@ -108,8 +105,7 @@
           <string>&amp;Backup</string>
          </property>
          <property name="icon" >
-          <iconset resource="resources/screen.qrc" >
-           <normaloff>:/main/backup.png</normaloff>:/main/backup.png</iconset>
+          <iconset resource="resources/screen.qrc" >:/main/backup.png</iconset>
          </property>
          <property name="iconSize" >
           <size>
@@ -140,8 +136,7 @@
           <string>&amp;Restore</string>
          </property>
          <property name="icon" >
-          <iconset resource="resources/screen.qrc" >
-           <normaloff>:/main/restore.png</normaloff>:/main/restore.png</iconset>
+          <iconset resource="resources/screen.qrc" >:/main/restore.png</iconset>
          </property>
          <property name="iconSize" >
           <size>
@@ -172,8 +167,7 @@
           <string>&amp;Settings</string>
          </property>
          <property name="icon" >
-          <iconset resource="resources/screen.qrc" >
-           <normaloff>:/main/settings.png</normaloff>:/main/settings.png</iconset>
+          <iconset resource="resources/screen.qrc" >:/main/settings.png</iconset>
          </property>
          <property name="iconSize" >
           <size>
@@ -204,8 +198,7 @@
           <string>&amp;Logfile</string>
          </property>
          <property name="icon" >
-          <iconset resource="resources/screen.qrc" >
-           <normaloff>:/main/logfile.png</normaloff>:/main/logfile.png</iconset>
+          <iconset resource="resources/screen.qrc" >:/main/logfile.png</iconset>
          </property>
          <property name="iconSize" >
           <size>
@@ -223,7 +216,7 @@
          <property name="orientation" >
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" >
           <size>
            <width>129</width>
            <height>141</height>
@@ -261,7 +254,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>23</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -293,8 +286,7 @@
   <widget class="QStatusBar" name="statusbar" />
   <action name="actionExit" >
    <property name="icon" >
-    <iconset resource="resources/screen.qrc" >
-     <normaloff>:/main/exit.png</normaloff>:/main/exit.png</iconset>
+    <iconset resource="resources/screen.qrc" >:/main/exit.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Exit</string>
@@ -302,8 +294,7 @@
   </action>
   <action name="actionOverview" >
    <property name="icon" >
-    <iconset resource="resources/screen.qrc" >
-     <normaloff>:/main/home.png</normaloff>:/main/home.png</iconset>
+    <iconset resource="resources/screen.qrc" >:/main/home.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Overview</string>
@@ -311,8 +302,7 @@
   </action>
   <action name="actionBackup" >
    <property name="icon" >
-    <iconset resource="resources/screen.qrc" >
-     <normaloff>:/main/backup.png</normaloff>:/main/backup.png</iconset>
+    <iconset resource="resources/screen.qrc" >:/main/backup.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Backup</string>
@@ -320,8 +310,7 @@
   </action>
   <action name="actionRestore" >
    <property name="icon" >
-    <iconset resource="resources/screen.qrc" >
-     <normaloff>:/main/restore.png</normaloff>:/main/restore.png</iconset>
+    <iconset resource="resources/screen.qrc" >:/main/restore.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Restore</string>
@@ -329,8 +318,7 @@
   </action>
   <action name="actionSettings" >
    <property name="icon" >
-    <iconset resource="resources/screen.qrc" >
-     <normaloff>:/main/settings.png</normaloff>:/main/settings.png</iconset>
+    <iconset resource="resources/screen.qrc" >:/main/settings.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Settings</string>
@@ -338,8 +326,7 @@
   </action>
   <action name="actionAbout" >
    <property name="icon" >
-    <iconset resource="resources/screen.qrc" >
-     <normaloff>:/main/about.png</normaloff>:/main/about.png</iconset>
+    <iconset resource="resources/screen.qrc" >:/main/about.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;About</string>
@@ -353,9 +340,7 @@
   </action>
   <action name="actionHelpContents" >
    <property name="icon" >
-    <iconset>
-     <normaloff/>
-    </iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Help Contents</string>
@@ -368,8 +353,7 @@
   </action>
   <action name="actionLogfile" >
    <property name="icon" >
-    <iconset resource="resources/screen.qrc" >
-     <normaloff>:/main/logfile.png</normaloff>:/main/logfile.png</iconset>
+    <iconset resource="resources/screen.qrc" >:/main/logfile.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Logfile</string>

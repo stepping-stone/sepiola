@@ -10,6 +10,7 @@ LogFileName=sepiola.log
 LogDebugMessage=false
 MaxLogLines=10000
 RsyncTimeout=43200
+IgnoreReinstall=false
 
 [Server]
 ServerKey=e3:6d:87:79:1c:e3:0e:bc:ea:89:54:20:d9:2c:f5:cb

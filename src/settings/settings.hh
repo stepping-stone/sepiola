@@ -295,6 +295,7 @@ class Settings : public QObject
 		static const QString SETTINGS_LOCK_FILE_NAME;
 		static const QString SETTINGS_LOG_FILE_NAME;
 		static const QString SETTINGS_LOG_DEBUG_MESSAGE;
+		static const QString SETTINGS_IGNORE_REINSTALL;
 		static const QString SETTINGS_INCLUDE_PATTERN_FILE_NAME;
 		static const QString SETTINGS_EXCLUDE_PATTERN_FILE_NAME;
 		static const QString SETTINGS_MAX_LOG_LINES;
@@ -386,6 +387,7 @@ class Settings : public QObject
 		QString lockFileName;
 		QString logFileName;
 		bool logDebugMessage;
+		bool ignoreReinstall;
 		int maxLogLines;
 		int rsyncTimeout;
 

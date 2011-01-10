@@ -52,10 +52,11 @@ Rsync::Rsync() {
 Rsync::~Rsync() {}
 
 
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) throw ( ProcessException )
 {
-	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << errors << "," << dry_run << ")";
+	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << warnings << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
+	QRegExp vanishedRegExp("file has vanished: \"([^\"]+)\".*");
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files";
 	Settings* settings = Settings::getInstance();
@@ -88,6 +89,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
 	QList<QByteArray> convertedIncludeDirs;
 	foreach ( QString include_dir, include_dirs_list ) { /* qDebug() << "$$$" << include_dir; */ convertedIncludeDirs.append(convertFilenameForRsyncArgument(include_dir)); }
+
 	if (StringUtils::writeQByteArrayListToFile(convertedIncludeDirs, include_dirs_filename, settings->getEOLCharacter())) {
 		arguments << "--files-from=" + convertFilenameForRsyncArgument(include_dirs_filename);
 		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
@@ -100,7 +102,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	foreach ( QByteArray rule, convertedRules )
 	{
 		write(rule); // write( convertFilenameForRsyncArgument(rule) );
-		qDebug() << rule; // $$$ delete again
+		qDebug() << rule; // TODO: delete again
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
@@ -156,16 +158,16 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 			}
 
 			if (!dry_run) {
-				if (!endReached && item.first != "" && item.first != "./") {
+				if (!endReached && item.first != "./") {
 					item.first.prepend( "/" );
 					this->progress_lastFilename = item.first;
 					removeSymlinkString( &item.first );
 					FileSystemUtils::convertToLocalPath( &item.first );
-					uploadedItems << item;
+					if (item.second != UNKNOWN) uploadedItems << item;
 					QString outputText;
 					switch( item.second )
 					{
-						case UPLOADED:
+						case TRANSFERRED:
 							outputText = tr( "Uploading %1" ).arg( item.first.trimmed() );
 							emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
 							break;
@@ -176,9 +178,17 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 							outputText = tr( "Deleting %1" ).arg( item.first.trimmed() );
 							break;
 						default:
+							if (vanishedRegExp.exactMatch(lineData))
+							{
+								if (warnings)
+								{
+									warnings->append(lineData);
+									warnings->append('\n');
+								}
+							}
 							break;
 					}
-					qDebug() << outputText; // $$$ comment out again
+					qDebug() << outputText; // TODO: comment out again
 					emit infoSignal( outputText );
 				} else {
 					emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
@@ -189,19 +199,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	qDebug() <<  QString::number( uploadedItems.size() ) << "files and/or directories processed";
 	emit infoSignal( tr( "%1 files and/or directories processed" ).arg( uploadedItems.size() ) );
 	waitForFinished();
-	if (this->isAlive()) {
-		QString standardErrors = readAllStandardError();
-		if ( standardErrors != "" )
-		{
-			qWarning() << "Error occurred while uploading: " + standardErrors;
-			if (errors) *errors = standardErrors;
-		}
-	} else {
-		if ( this->exitCode() != 0)
-		{
-			throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
-		}
-	}
+
+	processWarningsAndErrors(warnings);
+
 	return uploadedItems;
 }
 
@@ -228,7 +228,7 @@ void Rsync::bufferedInfoOutput() // prevents direct flush
 /**
  * deprecated
  */
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors, bool dry_run ) throw ( ProcessException )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) throw ( ProcessException )
 {
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files:";
@@ -275,7 +275,6 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
 	createProcess( settings->getRsyncName() , arguments );
 	start();
-
 	foreach ( QString item, items )
 	{
 		FileSystemUtils::convertToServerPath( &item );
@@ -297,7 +296,6 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
-
 
 	closeWriteChannel();
 
@@ -324,7 +322,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 			QString outputText;
 			switch( item.second )
 			{
-				case UPLOADED:
+				case TRANSFERRED:
 					outputText = tr( "Uploading %1" ).arg( item.first );
 					emit trafficInfoSignal( this->progress_lastFilename, this->progress_trafficB_s, this->progress_bytesRead, this->progress_bytesWritten );
 					break;
@@ -346,26 +344,16 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	qDebug() <<  QString::number( uploadedItems.size() ) << "files and/or directories processed";
 	emit infoSignal( tr( "%1 files and/or directories processed" ).arg( uploadedItems.size() ) );
 	waitForFinished();
-	if (this->isAlive()) {
-		QString standardErrors = readAllStandardError();
-		if ( standardErrors != "" )
-		{
-			qWarning() << "Rsync::upload with itemlist -> Error occurred while uploading: " + standardErrors;
-			if (errors) *errors = standardErrors;
-		}
-	} else {
-		if ( this->exitCode() != 0)
-		{
-			throw ProcessException( QObject::tr( "rsync exited with with exitCode %1 (%2 %3).").arg(this->exitCode() ).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
-		}
-	}
+
+	processWarningsAndErrors(warnings);
+
 	return uploadedItems;
 }
 
 
-long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) throw ( ProcessException )
+long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings ) throw ( ProcessException )
 {
-	this->upload( includeRules, src, destination, setDeleteFlag, compress, errors, true );
+	this->upload( includeRules, src, destination, setDeleteFlag, compress, warnings, true );
 	return this->last_calculatedLiteralData;
 }
 
@@ -827,30 +815,36 @@ QString Rsync::getValidDestinationPath( const QString& destination )
 
 QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsyncOutputLine )
 {
-	QTextStream textStream( &rsyncOutputLine, QIODevice::ReadOnly );
-	QString flags;
-	textStream >> flags;
-	textStream.skipWhiteSpace();
-	QString itemName = textStream.readAll();
+	static QRegExp itemRegExp("([<>ch.][fdLDS][cstpogz. +?]{7}|\\*deleted) (.*)");
 
-	ITEMIZE_CHANGE_TYPE type;
-	if( flags.startsWith( "<" ) )
+	if (itemRegExp.exactMatch(rsyncOutputLine))
 	{
-		type = UPLOADED;
+		QString flags = itemRegExp.capturedTexts()[1];
+		QString itemName = itemRegExp.capturedTexts()[2];
+
+		ITEMIZE_CHANGE_TYPE type;
+		switch (flags.at(0).toLatin1())
+		{
+			case '<':
+			case '>':
+			case 'c':
+			case 'h':
+				type = TRANSFERRED;
+				break;
+			case '.':
+				type = SKIPPED;
+				break;
+			case '*':
+				type = DELETED;
+				break;
+			default:
+				type = UNKNOWN;
+				break;
+		}
+		return qMakePair( itemName, type );
 	}
-	else if( flags.startsWith( ">" ) )
-	{
-		type = DOWNLOADED;
-	}
-	else if( flags.startsWith( "*deleting" ) )
-	{
-		type = DELETED;
-	}
-	else
-	{
-		type = SKIPPED;
-	}
-	return qMakePair( itemName, type );
+
+	return qMakePair(QString(), UNKNOWN);
 }
 
 QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, QStringList* files_from_list )
@@ -1021,6 +1015,40 @@ void Rsync::abort()
 	terminate();
 }
 
+void Rsync::processWarningsAndErrors(QString* warnings)
+{
+	if (this->isAlive()) {
+		QString standardErrors = readAllStandardError();
+		if ( standardErrors != "" )
+		{
+			qWarning() << "Error occurred while uploading: " + standardErrors;
+			throw ProcessException(standardErrors);
+		}
+	} else {
+		int exitCode = this->exitCode();
+		if (exitCode == 0) return;
+		if (warnings)
+		{
+			switch (exitCode)
+			{
+				case 23:  // Partial transfer due to error
+					*warnings += StringUtils::fromLocalEnc(readAllStandardError());
+					*warnings += "\n";
+					*warnings += tr("Warning: At least one file could not be backuped up. See above for details.");
+					return;
+				case 24:  // Partial transfer due to vanished source files
+					*warnings += StringUtils::fromLocalEnc(readAllStandardError());
+					*warnings += "\n";
+					*warnings += tr("Warning: Some files have been renamed, moved or deleted during backup before they could be uploaded to the server.\n"
+								   "Usually this concerns temporary files and this warning can be ignored. See above for details.");
+					return;
+			}
+		}
+
+		throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(exitCode).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
+	}
+}
+
 void Rsync::testGetItem()
 {
 	Rsync rsync;
@@ -1046,9 +1074,9 @@ void Rsync::testUpload()
 	QString source = "/";
 	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + backup_prefix + "/" + settings->getBackupFolderName() + "/", "'");
 	Rsync rsync;
-	QString errors;
-	rsync.upload( files, source, destination, QStringList(), QStringList(), false, false, &errors );
-	qDebug() << "errors: " << errors;
+	QString warnings;
+	rsync.upload( files, source, destination, QStringList(), QStringList(), false, false, &warnings, false );
+	qDebug() << "warnings: " << warnings;
 }
 
 void Rsync::testDownloadCurrentMetadata()

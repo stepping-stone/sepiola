@@ -62,6 +62,8 @@ public:
 	static void testChar2StdString();
 	static void testQuoteText();
 
+	static QString fromLocalEnc(QByteArray byteArray);
+
 private:
 	static QString unit_prefixes() { return QString(" kMGTPEZY"); };
 };
@@ -278,6 +280,5 @@ inline bool StringUtils::writeQByteArrayListToFile(const QList<QByteArray>& item
 		return false;
 	}
 }
-
 
 #endif /*STRING_UTILS_HH_*/

@@ -32,7 +32,7 @@ SetAcl::~SetAcl() {}
 const QString SetAcl::ITEM_NAME_PREFIX = "\"\\\\?\\";
 const uint SetAcl::ITEM_NAME_PREFIX_SIZE = 5;
 
-QString SetAcl::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
+QString SetAcl::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings )
 {
 	qDebug() << "SetAcl::getMetadata( processedItems )";
 	Settings* settings = Settings::getInstance();
@@ -276,7 +276,7 @@ void SetAcl::writeMapContentToFile( const QMap<QString, QString>& aclMap, const 
 void SetAcl::testGetMetadata()
 {
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair( QString( "c:/tmp/test.exe" ), AbstractRsync::UPLOADED );
+	processedItems << qMakePair( QString( "c:/tmp/test.exe" ), AbstractRsync::TRANSFERRED );
 	processedItems << qMakePair( QString( "c:/tmp/include.txt" ), AbstractRsync::DELETED );
 	SetAcl setAcl;
 	setAcl.getMetadata( processedItems );

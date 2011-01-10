@@ -128,6 +128,7 @@ void BackupForm::reset()
 	{
 		case QMessageBox::Yes:
 			this->reload();
+			this->refreshLocalDirModel();
 			break;
 		default:
 			// do nothing

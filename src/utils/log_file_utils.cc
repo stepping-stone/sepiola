@@ -41,6 +41,8 @@ LogFileUtils* LogFileUtils::instance = 0;
 
 LogFileUtils* LogFileUtils::getInstance()
 {
+	QMutex mutex;
+	QMutexLocker locker(&mutex);
 	if ( !instance )
 	{
 		Settings* settings = Settings::getInstance();
@@ -56,6 +58,7 @@ LogFileUtils::LogFileUtils( const QString& logfilePath, int maxLines ) : logFile
 
 void LogFileUtils::open()
 {
+	QMutexLocker locker(&mutex);
 	if ( !logFile.open( QIODevice::ReadWrite ) )
 	{
 		fprintf(stderr, "Can not write to log file " + logFile.fileName().toUtf8() );
@@ -100,6 +103,14 @@ LogFileUtils::~LogFileUtils()
 
 void LogFileUtils::writeLog( const QString& message )
 {
+	static const QChar* lastMessage = 0;
+
+	QMutexLocker locker(&mutex);
+
+	// Filter duplicate messages
+	if (message.constData() == lastMessage) return;
+	lastMessage = message.constData();
+
 	QString dateTime = QDateTime::currentDateTime ().toString( "dd.MM.yy hh:mm:ss");
 	QString line;
 	line.append( dateTime );
@@ -112,6 +123,7 @@ void LogFileUtils::writeLog( const QString& message )
 
 QStringList LogFileUtils::getNewLines()
 {
+	QMutexLocker locker(&mutex);
 	QStringList result = newLines;
 	newLines.clear();
 	return result;
@@ -119,6 +131,7 @@ QStringList LogFileUtils::getNewLines()
 
 void LogFileUtils::close()
 {
+	QMutexLocker locker(&mutex);
 	logFile.close();
 }
 

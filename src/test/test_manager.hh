@@ -23,7 +23,7 @@
 #include <QMap>
 
 /**
- * The TestManager class is used to test the application while development
+ * The TestManager class is used to test the application during development
  * @author Daniel Tschan, tschan@puzzle.ch
  */
 class TestManager

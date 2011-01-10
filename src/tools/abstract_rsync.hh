@@ -47,7 +47,7 @@ public:
 	/**
 	 * Transfer type
 	 */
-	enum ITEMIZE_CHANGE_TYPE { UPLOADED, DOWNLOADED, SKIPPED, DELETED };
+	enum ITEMIZE_CHANGE_TYPE { UNKNOWN, TRANSFERRED, SKIPPED, DELETED };
 
 	/**
 	 * Uploads the files and directory in the given list
@@ -60,12 +60,12 @@ public:
 	 * @param errors a QString pointer for saving errors
 	 * @return a list of transfered items
 	 */
-	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
-	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* errors, bool dry_run=false ) = 0;
+	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) = 0;
+	virtual QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) = 0;
 
-	virtual long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors ) = 0;
+	virtual long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings ) = 0;
 
-	void upload( const QFileInfo& fileInfo, const QString& destination, bool bCompress, QString* errors = NULL );
+	void upload( const QFileInfo& fileInfo, const QString& destination, bool bCompress, QString* warnings);
 
 	/**
 	 * Downloads a full backup of the given name
@@ -147,12 +147,11 @@ inline AbstractRsync::~AbstractRsync()
 {
 }
 
-inline void AbstractRsync::upload( const QFileInfo& fileInfo, const QString& destination, bool compress, QString* errors )
+inline void AbstractRsync::upload( const QFileInfo& fileInfo, const QString& destination, bool compress, QString* warnings )
 {
 	QStringList fileNameList;
 	fileNameList << fileInfo.fileName();
-	upload(fileNameList, fileInfo.absolutePath(), destination, QStringList(), QStringList(), false, compress, errors );
+	upload(fileNameList, fileInfo.absolutePath(), destination, QStringList(), QStringList(), false, compress, warnings, false );
 }
 
 #endif
-

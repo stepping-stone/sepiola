@@ -206,19 +206,8 @@ bool Process::blockingReadLine(QString* string, int msec, char lineEndChar)
 {
 	QByteArray line;
 	bool result = blockingReadLine( &line, msec, lineEndChar);
-	if (Settings::IS_WINDOWS)
-	{
-		*string = QString::fromUtf8(line);
-	}
-	else if ( Settings::IS_MAC )
-	{
-		QString inputString = QString::fromUtf8(line);
-		*string = inputString.normalized(QString::NormalizationForm_C);
-	}
-	else
-	{
-		*string = QString::fromLocal8Bit(line);
-	}
+	*string = StringUtils::fromLocalEnc(line);
+
 	return result;
 }
 
