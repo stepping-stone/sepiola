@@ -37,14 +37,14 @@ public:
 	 * Destroys the AbstractMetadata
 	 */
 	virtual ~AbstractMetadata();
-	
+
 	/**
 	 * Creates a metadata file for the given file and directory list
 	 * @param processedItems list of file and directory names
 	 * @return the full name of the created metadata file
 	 */
-	virtual QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems ) = 0;
-	
+	virtual QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 ) = 0;
+
 	/**
 	 * Merges the data from the new and the existing metadata file and deletes items if necessary
 	 * @param newMetadataFileName the name of the new file
@@ -52,7 +52,7 @@ public:
 	 * @param processedItems list of file and directory names
 	 */
 	virtual void mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems ) = 0;
-	
+
 	/**
 	 * Sets the metadata from a metadata file for the items in the list
 	 * @param metadataFile file containing the metadata
@@ -60,7 +60,7 @@ public:
 	 * @param downloadDestination destination path of the restore
 	 */
 	virtual void setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination ) = 0;
-	
+
 	/**
 	 * Returns a list of files and directories from a given ACL file
 	 * @param metadataFile file containing the metadata

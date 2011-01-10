@@ -134,6 +134,7 @@ void TrafficProgressDialog::finished()
 	this->btnClose->setVisible( true );
 	this->btnCancel->setEnabled( false );
 	this->btnCancel->setVisible( false );
+	this->textEditInfo->ensureCursorVisible();
 }
 
 void TrafficProgressDialog::showFinalStatus(ConstUtils::StatusEnum status)
@@ -156,7 +157,8 @@ void TrafficProgressDialog::showFinalStatus(ConstUtils::StatusEnum status)
 			statusText = tr("finished with warnings");
 			text_color = QColor(255,191,0);
 			break;
-		case ConstUtils::STATUS_ERROR: default:
+		case ConstUtils::STATUS_ERROR:
+		default:
 			img.load( ":/main/sign_error.svg" );
 			statusText = tr("failed");
 			text_color = QColor(223,0,0);

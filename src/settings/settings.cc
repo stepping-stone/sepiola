@@ -69,6 +69,7 @@ const QString Settings::SETTINGS_PRIVATE_OPEN_SSH_KEY_FILE_NAME = "PrivateOpenSs
 const QString Settings::SETTINGS_LOCK_FILE_NAME = "LockFileName";
 const QString Settings::SETTINGS_LOG_FILE_NAME = "LogFileName";
 const QString Settings::SETTINGS_LOG_DEBUG_MESSAGE = "LogDebugMessage";
+const QString Settings::SETTINGS_IGNORE_REINSTALL = "IgnoreReinstall";
 const QString Settings::SETTINGS_INCLUDE_PATTERN_FILE_NAME = "InlcudePatternFileName";
 const QString Settings::SETTINGS_EXCLUDE_PATTERN_FILE_NAME = "ExcludePatternFileName";
 const QString Settings::SETTINGS_MAX_LOG_LINES = "MaxLogLines";
@@ -228,6 +229,7 @@ void Settings::reloadSettings()
 	lockFileName = applicationSettings->value( SETTINGS_LOCK_FILE_NAME ).toString();
 	logFileName = applicationSettings->value( SETTINGS_LOG_FILE_NAME ).toString();
 	logDebugMessage = applicationSettings->value( SETTINGS_LOG_DEBUG_MESSAGE ).toBool();
+	ignoreReinstall = applicationSettings->value( SETTINGS_IGNORE_REINSTALL ).toBool();
 	maxLogLines = applicationSettings->value( SETTINGS_MAX_LOG_LINES ).toInt();
 	includePatternFileName = applicationSettings->value( SETTINGS_INCLUDE_PATTERN_FILE_NAME ).toString();
 	excludePatternFileName = applicationSettings->value( SETTINGS_EXCLUDE_PATTERN_FILE_NAME ).toString();
@@ -341,7 +343,7 @@ QDateTime Settings::getInstallDate()
 
 bool Settings::isReinstalled()
 {
-	return installDate < getInstallDate();
+	return !ignoreReinstall && (installDate < getInstallDate());
 }
 
 bool Settings::isInevitableSettingsMissing()

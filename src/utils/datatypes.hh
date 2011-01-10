@@ -19,6 +19,7 @@
 #ifndef DATATYPES_HH
 #define DATATYPES_HH
 
+#include <QMetaType>
 #include <QHash>
 #include <QString>
 #include <QPair>

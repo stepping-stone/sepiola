@@ -35,7 +35,7 @@ UnixPermissions::~UnixPermissions()
 {
 }
 
-QString UnixPermissions::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
+QString UnixPermissions::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings )
 {
 	qDebug() << "UnixPermissions::getMetadata( processedItems )";
 	Settings* settings = Settings::getInstance();
@@ -208,7 +208,7 @@ void UnixPermissions::writeMapContentToFile( const QMap<QString, QStringList>& m
 void UnixPermissions::testGetMetadata()
 {
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair( QString( "/Users/test/tools/putty-0.60.tar.gz" ), AbstractRsync::UPLOADED );
+	processedItems << qMakePair( QString( "/Users/test/tools/putty-0.60.tar.gz" ), AbstractRsync::TRANSFERRED );
 	processedItems << qMakePair( QString( "/Users/test/tools/info.txt" ), AbstractRsync::DELETED );
 	UnixPermissions unixPermissions;
 	unixPermissions.getMetadata( processedItems );
@@ -217,7 +217,7 @@ void UnixPermissions::testGetMetadata()
 void UnixPermissions::testInsertMetadata()
 {
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair( QString( "/Users/test/tools/putty-0.60.tar.gz" ), AbstractRsync::UPLOADED );
+	processedItems << qMakePair( QString( "/Users/test/tools/putty-0.60.tar.gz" ), AbstractRsync::TRANSFERRED );
 	processedItems << qMakePair( QString( "/Users/test/tools/info.txt" ), AbstractRsync::DELETED );
 	UnixPermissions unixPermissions;
 	QString metadataFile = unixPermissions.getMetadata( processedItems );

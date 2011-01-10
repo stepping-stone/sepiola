@@ -37,7 +37,7 @@ PosixAcl::~PosixAcl()
 {
 }
 
-QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems)
+QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings)
 		throw (ProcessException )
 {
 	qDebug() << "PosixAcl::getMetadata( processedItems )";
@@ -78,12 +78,15 @@ QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE
 		qWarning() << QString( e.what() );
 	}
 
-	QString errors = readAllStandardError();
-	if (errors != "")
+	if (warnings)
 	{
-		qWarning() << "Error occurred while getting ACL's: " << errors;
-		throw ProcessException( QObject::tr( "Error occurred while getting ACL's:\n" ) + errors );
+		*warnings = readAllStandardError();
+		if (!warnings->isEmpty())
+		{
+			warnings->append(tr("\nWarning: The permissions of some files could not be backed up. See above for details."));
+		}
 	}
+
 	return aclFileName;
 }
 
@@ -332,7 +335,7 @@ void PosixAcl::testUnescapeOctalCharacters()
 void PosixAcl::testGetMetadata()
 {
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair(QString("/tmp2/umläöü.txt"), AbstractRsync::UPLOADED);
+	processedItems << qMakePair(QString("/tmp2/umläöü.txt"), AbstractRsync::TRANSFERRED);
 	PosixAcl posixAcl;
 	posixAcl.getMetadata(processedItems);
 }

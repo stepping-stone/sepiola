@@ -4,6 +4,7 @@
         <file>backup.png</file>
         <file>exit.png</file>
         <file>home.png</file>
+        <file>icon.png</file>
         <file>logfile.png</file>
         <file>logo_puzzle.png</file>
         <file>logo_stepping_stone.png</file>
@@ -13,6 +14,5 @@
         <file>sign_ok.svg</file>
         <file>sign_warning.svg</file>
         <file>splash.png</file>
-        <file>sepiola_logo_anim.gif</file>
     </qresource>
 </RCC>

@@ -58,8 +58,8 @@ public:
 	/**
 	 * @see AbstractRsync::upload( const QStringList& items, const QString& source, const QString& destination, const QString& includePattern, const QString& excludePattern, QString* errors )
 	 */
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings, bool dry_run=false ) throw ( ProcessException );
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* errors, bool dry_run=false ) throw ( ProcessException );
+	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) throw ( ProcessException );
+	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* warnings, bool dry_run ) throw ( ProcessException );
 
 	/**
 	 *
@@ -182,6 +182,7 @@ private:
 	QStringList download( const QString& source, const QString& destination, bool compress) throw ( ProcessException );
 	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException );
 	QStringList download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal ) throw ( ProcessException );
+	void processWarningsAndErrors(QString* warnings);
 
 	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
 	static QByteArray convertRuleToByteArray(QString rule, bool modifier );
