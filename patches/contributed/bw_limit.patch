@@ -1,0 +1,257 @@
+Index: model/backup_thread.cc
+===================================================================
+--- model/backup_thread.cc	(revision 267)
++++ model/backup_thread.cc	(working copy)
+@@ -50,6 +50,8 @@
+ 	Settings* settings = Settings::getInstance();
+ 	this->setDeleteFlag = settings->getDeleteExtraneousItems();
+ 	this->compressedUpload = settings->isCompressedRsyncTraffic();
++	this->limitBandwidth = settings->getLimitBandwidth();
++	this->bandWidth = settings->getBandwidth();
+ 	this->backupStartDateTime = QDateTime(); // null-Time
+ 	this->backupCurrentStatus = ConstUtils::STATUS_UNDEFINED;
+ 
+Index: model/backup_thread.hh
+===================================================================
+--- model/backup_thread.hh	(revision 267)
++++ model/backup_thread.hh	(working copy)
+@@ -107,6 +107,8 @@
+ 	QStringList excludePatternList;
+ 	bool setDeleteFlag;
+ 	bool compressedUpload;
++	bool limitBandwidth;
++	QString bandWidth;
+ 	QDateTime backupStartDateTime;
+ 	ConstUtils::StatusEnum backupCurrentStatus;
+ 	ProgressTask pt;
+Index: settings/settings.cc
+===================================================================
+--- settings/settings.cc	(revision 267)
++++ settings/settings.cc	(working copy)
+@@ -112,8 +112,9 @@
+ const QString Settings::SETTINGS_WINDOW_SIZE = "WindowSize";
+ const QString Settings::SETTINGS_DELETE_EXTRANEOUS_ITEMS = "DeleteExtraneousItems";
+ const QString Settings::SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS = "ShowHiddenFilesAndFolders";
++const QString Settings::SETTINGS_LIMIT_BANDWIDTH = "LimitBandwidth";
++const QString Settings::SETTINGS_BANDWIDTH = "Bandwidth";
+ 
+-
+ // [Reseller]
+ const QString Settings::SETTINGS_GROUP_RESELLER = "Reseller";
+ const QString Settings::SETTINGS_RESELLER_ADDRESS = "ResellerAddress";
+@@ -295,6 +296,8 @@
+ 	privateOpenSshKey = userSettings->value( SETTINGS_PRIVATE_OPEN_SSH_KEY ).toString();
+ 	deleteExtraneousItems = userSettings->value( SETTINGS_DELETE_EXTRANEOUS_ITEMS, true ).toBool();
+ 	showHiddenFilesAndFolders = userSettings->value( SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, false ).toBool();
++	limitBandwidth = userSettings->value( SETTINGS_LIMIT_BANDWIDTH, false ).toBool();
++	bandWidth = userSettings->value( SETTINGS_BANDWIDTH ).toString();
+ 	windowSize = userSettings->value( SETTINGS_WINDOW_SIZE ).toSize();
+ 	windowPosition = userSettings->value( SETTINGS_WINDOW_POSITION, QPoint( 200, 200 ) ).toPoint();
+ 
+@@ -508,6 +511,23 @@
+ 	}
+ }
+ 
++void Settings::saveLimitBandwidth( const bool limitBandwidth ) {
++	if ( this->limitBandwidth != limitBandwidth )
++	{
++		this->limitBandwidth = limitBandwidth;
++		userSettings->setValue( SETTINGS_LIMIT_BANDWIDTH, limitBandwidth );
++	}
++}
++
++void Settings::saveBandwidth( const QString &bandWidth )
++{
++        if ( this->bandWidth != bandWidth )
++	{
++		this->bandWidth = bandWidth;
++		userSettings->setValue( SETTINGS_BANDWIDTH, bandWidth );
++	}
++}
++
+ void Settings::saveServerUserName( const QString &userName )
+ {
+ 	if ( this->serverUserName != userName )
+Index: settings/settings.hh
+===================================================================
+--- settings/settings.hh	(revision 267)
++++ settings/settings.hh	(working copy)
+@@ -261,7 +261,11 @@
+ 		void saveDeleteExtraneousItems( const bool& deleteExtraneousItems );
+ 		bool getDeleteExtraneousItems();
+ 		void saveShowHiddenFilesAndFolders( const bool showHiddenFilesAndFolders );
++		void saveLimitBandwidth( const bool limitBandwidth );
++                QString getBandwidth();
++                void saveBandwidth( const QString& bandwidth );
+ 		bool getShowHiddenFilesAndFolders();
++		bool getLimitBandwidth();
+ 		bool isCompressedRsyncTraffic();
+ 		QSize getWindowSize();
+ 		void saveWindowSize( QSize size );
+@@ -339,6 +343,8 @@
+ 		static const QString SETTINGS_WINDOW_POSITION;
+ 		static const QString SETTINGS_DELETE_EXTRANEOUS_ITEMS;
+ 		static const QString SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS;
++		static const QString SETTINGS_LIMIT_BANDWIDTH;
++                static const QString SETTINGS_BANDWIDTH;
+ 
+ 
+ 		// [Reseller]
+@@ -424,6 +430,8 @@
+ 		QString privateOpenSshKey;
+ 		bool deleteExtraneousItems;
+ 		bool showHiddenFilesAndFolders;
++		bool limitBandwidth;
++                QString bandWidth;
+ 		bool compressedRsyncTraffic; // read only at the moment
+ 		QSize windowSize;
+ 		QPoint windowPosition;
+@@ -491,6 +499,16 @@
+ 	return showHiddenFilesAndFolders;
+ }
+ 
++inline bool Settings::getLimitBandwidth()
++{
++	return limitBandwidth;
++}
++
++inline QString Settings::getBandwidth()
++{
++	return bandWidth;
++}
++
+ inline bool Settings::isCompressedRsyncTraffic() {
+ 	return false;
+ }
+Index: tools/rsync.cc
+===================================================================
+--- tools/rsync.cc	(revision 267)
++++ tools/rsync.cc	(working copy)
+@@ -80,6 +80,12 @@
+ 	{
+ 		arguments << "-z";
+ 	}
++        this->limitBandwidth = Settings::getInstance()->getLimitBandwidth();
++        this->bandWidth = Settings::getInstance()->getBandwidth();
++	if ( this->limitBandwidth && this->bandWidth > 0 ) 
++	{
++		arguments << "--bwlimit=" + bandWidth;
++	}
+ 	arguments << source;
+ 	arguments << getValidDestinationPath( destination );
+ 	arguments << "--include-from=-";
+Index: tools/rsync.hh
+===================================================================
+--- tools/rsync.hh	(revision 267)
++++ tools/rsync.hh	(working copy)
+@@ -186,6 +186,8 @@
+ 	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
+ 	static QByteArray convertRuleToByteArray(QString rule, bool modifier );
+ 	static QByteArray convertQStringToQByteArray(QString aStr);
++	bool limitBandwidth;
++	QString bandWidth;
+ };
+ 
+ #endif
+Index: gui/settings_form.hh
+===================================================================
+--- gui/settings_form.hh	(revision 267)
++++ gui/settings_form.hh	(working copy)
+@@ -68,6 +68,8 @@
+ 	void on_spinBoxNOfShownLastBackups_valueChanged( int i );
+ 	void on_checkBoxShowHiddenFiles_stateChanged( int state );
+ 	void on_checkBoxKeepDeletedFiles_stateChanged( int state );
++        void on_checkBoxLimitBandwidth_stateChanged( int state );
++	void on_lineEditBandwidth_textEdited( QString bandWidth );
+ };
+ 
+ #endif
+Index: gui/settings_form.cc
+===================================================================
+--- gui/settings_form.cc	(revision 267)
++++ gui/settings_form.cc	(working copy)
+@@ -70,6 +70,8 @@
+ 	this->lineEditBackupPrefix->setText( settings->getBackupPrefix() );
+ 	this->spinBoxNOfShownLastBackups->setValue( settings->getNOfLastBackups() );
+ 	this->checkBoxShowHiddenFiles->setChecked( settings->getShowHiddenFilesAndFolders() );
++	this->checkBoxLimitBandwidth->setChecked( settings->getLimitBandwidth() );
++	this->lineEditBandwidth->setText( settings->getBandwidth() );
+ 	this->checkBoxKeepDeletedFiles->setChecked( !settings->getDeleteExtraneousItems() );
+ 
+ 	this->comboBoxLanguage->clear();
+@@ -91,6 +93,8 @@
+ 		settings->saveLanguageIndex( this->comboBoxLanguage->currentIndex() );
+ 		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
+ 		settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
++		settings->saveLimitBandwidth( this->checkBoxLimitBandwidth->isChecked() );
++		settings->saveBandwidth( this->lineEditBandwidth->text() );
+ 		settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
+ 
+ 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
+@@ -173,6 +177,15 @@
+ 	formChanged = ((state==Qt::Checked) != Settings::getInstance()->getShowHiddenFilesAndFolders());
+ }
+ 
++void SettingsForm::on_checkBoxLimitBandwidth_stateChanged( int state ) {
++	formChanged = ((state==Qt::Checked) != Settings::getInstance()->getLimitBandwidth());
++}
++
++void SettingsForm::on_lineEditBandwidth_textEdited( QString bandWidth )
++{
++	formChanged = ( bandWidth != Settings::getInstance()->getBandwidth() );
++}
++
+ void SettingsForm::on_checkBoxKeepDeletedFiles_stateChanged( int state ) {
+ 	formChanged = ((state==Qt::Checked) != (!Settings::getInstance()->getDeleteExtraneousItems()));
+ }
+Index: gui/settings_form.ui
+===================================================================
+--- gui/settings_form.ui	(revision 267)
++++ gui/settings_form.ui	(working copy)
+@@ -578,6 +578,46 @@
+         </item>
+        </layout>
+       </item>
++      <item>
++       <widget class="QCheckBox" name="checkBoxLimitBandwidth">
++        <property name="text">
++         <string>Limit bandwidth</string>
++        </property>
++       </widget>
++      </item>
++      <item>
++       <layout class="QHBoxLayout" name="horizontalLayout">
++        <item>
++         <widget class="QLineEdit" name="lineEditBandwidth">
++          <property name="enabled">
++           <bool>true</bool>
++          </property>
++          <property name="sizePolicy">
++           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
++            <horstretch>0</horstretch>
++            <verstretch>0</verstretch>
++           </sizepolicy>
++          </property>
++          <property name="maximumSize">
++           <size>
++            <width>50</width>
++            <height>16777215</height>
++           </size>
++          </property>
++          <property name="inputMethodHints">
++           <set>Qt::ImhDigitsOnly</set>
++          </property>
++         </widget>
++        </item>
++        <item>
++         <widget class="QLabel" name="label">
++          <property name="text">
++           <string>KB</string>
++          </property>
++         </widget>
++        </item>
++       </layout>
++      </item>
+      </layout>
+     </widget>
+    </item>
