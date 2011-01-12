@@ -27,7 +27,7 @@ BackupTimeFileName=backupTime
 QuotaScript=/bin/getQuota
 AuthorizedKeyFolderName=.ssh/
 AuthorizedKeyFileName=authorized_keys
-QuotaModificationUrl=http://www.stepping-stone.ch/modifyQuota.php?uid=$UID$
+QuotaModificationUrl=https://selfcare.stepping-stone.ch/backup/login.php?uid=$UID$
 QuotaModificationUrlUidParam=$UID$
 
 [Executables]
