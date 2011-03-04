@@ -142,7 +142,7 @@ void OverviewForm::refreshSpaceStatistic()
 	qDebug() << "OverviewForm::refreshSpaceStatistic()";
 	QList<int> quotaValues = this->model->getServerQuota();
 	// definition of formats for output
-	QString format_percent = QString( "%1\%" ), format_MB = QString( "%1 MB" ), format_GB = QString( "%1 GB" ), format_TB = QString( "%1 TB" );
+	QString format_percent( "%1%" ), format_MB( "%1 MB" ), format_GB( "%1 GB" ), format_TB( "%1 TB" );
 	QStringList sizeNames; sizeNames << "Backup" << "Snapshot" << "Free" << "Quota";
 	int precision_MB = 0, precision_GB = 1, precision_TB = 2;
 
