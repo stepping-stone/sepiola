@@ -115,13 +115,13 @@ void RestoreThread::run()
 		this->pushStateEvent(ConstUtils::STATUS_OK);
 		emit infoSignal( tr( "Restore done." ) );
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		emit infoSignal( tr( "Restore failed." ) );
 		emit errorSignal( e.what() );
 		this->pushStateEvent(ConstUtils::STATUS_ERROR);
 	}
-	catch ( AbortException e )
+	catch ( const AbortException& e )
 	{
 		emit infoSignal( tr( "Restore aborted." ) );
 		emit errorSignal( e.what() );

@@ -184,7 +184,7 @@ void BackupThread::run()
 			{
 				rsync->upload( currentMetadataFileName, metaDataDir, true, &warning );
 			}
-			catch (ProcessException& e)
+			catch ( const ProcessException& e )
 			{
 				warning = e.what();
 			}
@@ -221,12 +221,12 @@ void BackupThread::run()
 			}
 		}
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		failed = true;
 		emit errorSignal( e.what() );
 	}
-	catch ( AbortException e )
+	catch ( const AbortException& e )
 	{
 		qDebug() << "Backup aborted.";
 		emit infoSignal( tr( "Backup aborted." ) );

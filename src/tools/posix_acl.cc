@@ -73,7 +73,7 @@ QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE
 	{
 		FileSystemUtils::convertFile(aclFileName, "", "utf-8");
 	}
-	catch (ProcessException e)
+	catch ( const ProcessException& e )
 	{
 		qWarning() << QString( e.what() );
 	}
@@ -176,7 +176,7 @@ void PosixAcl::setMetadata(const QFileInfo& metadataFileName, const QStringList&
 	{
 		FileSystemUtils::convertFile(metadataFileName.absoluteFilePath(), "utf-8", "");
 	}
-	catch (ProcessException e)
+	catch ( const ProcessException& e )
 	{
 		qWarning() << QString( e.what() );
 	}

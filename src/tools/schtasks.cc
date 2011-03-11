@@ -531,7 +531,7 @@ void Schtasks::testSchtasksScheduleTask()
 	{
 		schtasks.scheduleTask( "c:\\program files\\sepiola 0.3.0\\bin\\sepiola.exe", CliManager::SCHEDULE_ARGUMENT, time, days );
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		qWarning() << QString( e.what() );
 	}

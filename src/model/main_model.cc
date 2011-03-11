@@ -147,7 +147,7 @@ bool MainModel::initConnection()
 		QObject::disconnect( ssh.get(), SIGNAL( infoSignal( const QString& ) ),
 							 this, SIGNAL( infoSignal( const QString& ) ) );
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		emit showCriticalMessageBox( e.what() );
 	}
@@ -243,7 +243,7 @@ void MainModel::schedule( const BackupSelectionHash& includeRules, const Schedul
 		}
 		settings->saveScheduleRule(scheduleRule);
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		emit showCriticalMessageBox( e.what() );
 	}
@@ -268,7 +268,7 @@ QStringList MainModel::getPrefixes()
 		auto_ptr< AbstractRsync > rsync = ToolFactory::getRsyncImpl();
 		prefixes = rsync->getPrefixes();
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		emit showCriticalMessageBox( e.what() );
 	}
@@ -288,7 +288,7 @@ QList<int> MainModel::getServerQuota()
 		auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
 		quota = ssh->getServerQuotaValues();
 	//}
-	//catch ( ProcessException e )
+	//catch ( const ProcessException& e )
 	//{
 	//	emit showCriticalMessageBox( e.what() );
 	//}
@@ -353,7 +353,7 @@ QList<RestoreName> MainModel::getRestoreNames( const QString & backup_prefix )
 		}
 		return backupNames;
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		emit showCriticalMessageBox( e.what() );
 	}
@@ -385,7 +385,7 @@ QStringList MainModel::getRestoreContent( const QString & backup_prefix, const Q
 		}
 		backupContentFile.remove();
 	}
-	catch ( ProcessException e )
+	catch ( const ProcessException& e )
 	{
 		emit showCriticalMessageBox( e.what() );
 	}
