@@ -54,7 +54,7 @@ Rsync::~Rsync() {}
 
 QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) throw ( ProcessException )
 {
-	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << warnings << "," << dry_run << ")";
+	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << (warnings ? *warnings : "(no warnings)") << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
 	QRegExp vanishedRegExp("file has vanished: \"([^\"]+)\".*");
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
@@ -350,7 +350,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 }
 
 
-long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings ) throw ( ProcessException )
+long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* /* errors */, QString* warnings ) throw ( ProcessException )
 {
 	this->upload( includeRules, src, destination, setDeleteFlag, compress, warnings, true );
 	return this->last_calculatedLiteralData;

@@ -377,14 +377,14 @@ void BackupThread::prepareServerDirectories()
  * estimates the backup size by running rsync with option --only-write-batch ans updates the progressTask's stepNumber to this size.
  */
 quint64 BackupThread::estimateBackupSize( const QString& src, const QString& destination ) {
-	QString errors, warnings;
+	QString warnings;
 	ProgressTask * mySubPt = this->pt.getCurrentTask();
 	StringPairList vars;
 	vars.append(QPair<QString,QString>(tr("current task"), mySubPt->getName()));
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 	QObject::connect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
-	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, &warnings, false );
+	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, NULL, &warnings );
 	QObject::disconnect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
 	ProgressTask* uploadPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD);
