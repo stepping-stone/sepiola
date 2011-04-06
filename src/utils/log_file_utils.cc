@@ -61,7 +61,7 @@ void LogFileUtils::open()
 	QMutexLocker locker(&mutex);
 	if ( !logFile.open( QIODevice::ReadWrite ) )
 	{
-		fprintf(stderr, "Can not write to log file " + logFile.fileName().toUtf8() );
+		fprintf(stderr, "Can not write to log file %s", logFile.fileName().toUtf8().data() );
 		return;
 	}
 
@@ -83,7 +83,7 @@ void LogFileUtils::open()
 
 	if ( !logFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		fprintf( stderr, "Can not truncate log file " + logFile.fileName().toUtf8() );
+		fprintf( stderr, "Can not truncate log file %s", logFile.fileName().toUtf8().data() );
 	}
 	output.setDevice( &logFile );
 	{

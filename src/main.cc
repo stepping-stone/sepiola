@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 		QCoreApplication app(argc, argv);
 		if ( !initSettings( &app) || !assertCliDependencies() )
 		{
-			fprintf( stderr, DEPENDENCY_MISSING);
+			fprintf( stderr, "%s", DEPENDENCY_MISSING);
 			return -1;
 		}
 		CliManager::printUsage(argc, argv);
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
 		QCoreApplication app(argc, argv);
 		if ( !initSettings( &app) || !assertCliDependencies() )
 		{
-			fprintf( stderr, DEPENDENCY_MISSING);
+			fprintf( stderr, "%s", DEPENDENCY_MISSING);
 			return -1;
 		}
 		LogFileUtils::getInstance()->open();
@@ -266,12 +266,12 @@ int main(int argc, char *argv[])
 		QCoreApplication app(argc, argv);
 		if ( !initSettings( &app) || !assertCliDependencies() )
 		{
-			fprintf( stderr, DEPENDENCY_MISSING);
+			fprintf( stderr, "%s", DEPENDENCY_MISSING);
 			return -1;
 		}
 		if ( !assertSingleApplication() )
 		{
-			fprintf( stderr, SINGLE_APPLICATION_ERROR);
+			fprintf( stderr, "%s", SINGLE_APPLICATION_ERROR);
 			return -1;
 		}
 		LogFileUtils::getInstance()->open();
@@ -288,12 +288,12 @@ int main(int argc, char *argv[])
 		QCoreApplication app(argc, argv);
 		if ( !initSettings( &app) || !assertCliDependencies() )
 		{
-			fprintf( stderr, DEPENDENCY_MISSING);
+			fprintf( stderr, "%s", DEPENDENCY_MISSING);
 			return -1;
 		}
 		if ( !assertSingleApplication() )
 		{
-			fprintf( stderr, SINGLE_APPLICATION_ERROR);
+			fprintf( stderr, "%s", SINGLE_APPLICATION_ERROR);
 			return -1;
 		}
 		LogFileUtils::getInstance()->open();
