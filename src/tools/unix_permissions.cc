@@ -35,7 +35,7 @@ UnixPermissions::~UnixPermissions()
 {
 }
 
-QString UnixPermissions::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings )
+QString UnixPermissions::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
 {
 	qDebug() << "UnixPermissions::getMetadata( processedItems )";
 	Settings* settings = Settings::getInstance();

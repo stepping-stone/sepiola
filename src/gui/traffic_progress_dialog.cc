@@ -245,7 +245,7 @@ void TrafficProgressDialog::setInfoLines(StringPairList label_and_values)
 	}
 }
 
-void TrafficProgressDialog::updateProgress( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos )
+void TrafficProgressDialog::updateProgress( const QString& /*taskText*/, float percentFinished, const QDateTime& /*timeRemaining*/, StringPairList infos )
 {
 	if (!Settings::SHOW_PROGRESS) return;
 

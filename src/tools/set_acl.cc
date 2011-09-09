@@ -32,7 +32,7 @@ SetAcl::~SetAcl() {}
 const QString SetAcl::ITEM_NAME_PREFIX = "\"\\\\?\\";
 const uint SetAcl::ITEM_NAME_PREFIX_SIZE = 5;
 
-QString SetAcl::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings )
+QString SetAcl::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
 {
 	qDebug() << "SetAcl::getMetadata( processedItems )";
 	Settings* settings = Settings::getInstance();

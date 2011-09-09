@@ -462,7 +462,7 @@ void Settings::setServerUserNameAndPassword( const QString& userName, const QStr
 	}
 }
 
-void Settings::setClientUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable )
+void Settings::setClientUserNameAndPassword( const QString& /*userName*/, const QString& password, const bool /*isUsernameEditable*/ )
 {
 	this->setClientPassword( password );
 }
@@ -615,7 +615,7 @@ void Settings::addLastBackup( const BackupTask& lastBackup )
 		// identical values are not repeated
 		this->lastBackups.prepend( lastBackup );
 	}
-	this->saveLastBackups(this->lastBackups);
+	this->saveLastBackups();
 }
 
 void Settings::replaceLastBackup( const BackupTask& newBackupInfo ) {
@@ -623,10 +623,10 @@ void Settings::replaceLastBackup( const BackupTask& newBackupInfo ) {
 		this->lastBackups.takeFirst();
 		this->lastBackups.prepend( newBackupInfo );
 	}
-	this->saveLastBackups(this->lastBackups);
+	this->saveLastBackups();
 }
 
-void Settings::saveLastBackups( const QList<BackupTask>& lastBackups )
+void Settings::saveLastBackups()
 {
 	qDebug() << "Settings::saveLastBackups(...)";
 	qDebug() << "saving lastBackup-settings into file:" << this->appData->fileName();

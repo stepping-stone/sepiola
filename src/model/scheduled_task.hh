@@ -71,8 +71,8 @@ class ScheduledTask
 QDataStream &operator<<(QDataStream &out, const ScheduledTask& sched);
 QDataStream &operator>>(QDataStream &in, ScheduledTask& sched);
 
-Q_DECLARE_METATYPE(ScheduledTask);
-Q_DECLARE_METATYPE(ScheduleRule::ScheduleType);
-Q_DECLARE_METATYPE(ScheduleRule::Weekdays);
+Q_DECLARE_METATYPE(ScheduledTask)
+Q_DECLARE_METATYPE(ScheduleRule::ScheduleType)
+Q_DECLARE_METATYPE(ScheduleRule::Weekdays)
 
 #endif /*SCHEDULEDTASK_H_*/

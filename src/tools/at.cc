@@ -185,7 +185,7 @@ bool At::updateExistingTask(const QString& execName, const QString& cliArgument)
 	}
 }
 
-void At::deleteExistingTask( const QString& execName, const QString& cliArgument )
+void At::deleteExistingTask( const QString& /*execName*/, const QString& cliArgument )
 {
 	// ignoring the passed cliArgument, deleting AT based on settings->getApplicationName()
 	// read at entries

@@ -273,7 +273,7 @@ class Settings : public QObject
 		const QList<BackupTask>& getLastBackups() const;
 		void addLastBackup( const BackupTask& lastBackup );
 		void replaceLastBackup( const BackupTask& newBackupInfo );
-		void saveLastBackups( const QList<BackupTask>& lastBackups );
+		void saveLastBackups();
 		const ScheduledTask& getScheduleRule() const;
 		void saveScheduleRule( const ScheduledTask& scheduleRule );
 		const BackupSelectionHash& getLastBackupSelectionRules() const;

@@ -246,8 +246,8 @@ QDateTime ProgressTask::getEstimatedTimeLeft()
 		int i_from = fp_steps.size()-2; // earliest fixpoint to take into account
 		while (i_from > 0 && t_last_secs - DateTimeUtils::getSeconds(fp_times[i_from])<=DURATION_CALCULATION_TIME_RANGE) i_from--;
 		int n = fp_steps.size()-i_from;
-		double times[n];
-		double steps[n];
+		QVector<double> times(n);
+		QVector<double> steps(n);
 		for (int i = 0; i < n; i++) {
 			int j = i + i_from;
 			times[i] = DateTimeUtils::getSeconds(fp_times[j]);

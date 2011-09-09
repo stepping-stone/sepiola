@@ -85,7 +85,7 @@ private:
 	QLocale getAtBinaryLocale();
 };
 
-inline void At::scheduleTask( const QString& execName, const QString& cliArgument, const int& minutesToDelay )
+inline void At::scheduleTask( const QString& /*execName*/, const QString& /*cliArgument*/, const int& /*minutesToDelay*/ )
 {
 	qWarning() << "Scheduling on start is not supported, test this with AbstractScheduler::isSchedulingOnStartSupported() before calling this method";
 }

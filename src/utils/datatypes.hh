@@ -26,8 +26,8 @@
 #include <QList>
 
 typedef QList<QPair<QString,QString> > StringPairList;
-Q_DECLARE_METATYPE( StringPairList );
+Q_DECLARE_METATYPE( StringPairList )
 typedef QHash<QString,bool> BackupSelectionHash;
-Q_DECLARE_METATYPE( BackupSelectionHash );
+Q_DECLARE_METATYPE( BackupSelectionHash )
 
 #endif /*DATATYPES_HH*/

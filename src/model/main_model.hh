@@ -176,13 +176,11 @@ public:
 
 	/**
 	 * Restores a custom list of items
-	 * @param remoteDirModel remote dir model
 	 * @param selectionList selected items
 	 * @param backupName name of the backup for fetching the restore items
 	 * @param destination a destination path for restoring
 	 */
-	// void customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backup_prefix, const QString& backupName, const QString& destination );
-	void customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backup_prefix, const QString& backupName, const QString& destination );
+	void customRestore( const BackupSelectionHash& selectionRules, const QString& backup_prefix, const QString& backupName, const QString& destination );
 
 	/**
 	 * Shows an information message box with the given text

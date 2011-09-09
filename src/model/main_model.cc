@@ -418,35 +418,7 @@ void MainModel::fullRestore( const QString& backup_prefix, const QString& backup
 	//TODO: disconnect signal/slot connections
 }
 
-/* void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const QModelIndexList selectionList, const QString& backup_prefix, const QString& backupName, const QString& destination )
-{
-	if( !initConnection() )
-	{
-		return;
-	}
-	QStringList itemList;
-	foreach( QModelIndex selectedItem, selectionList )
-	{
-		DirTreeItem* item = (DirTreeItem*)remoteDirModel->itemFromIndex( selectedItem );
-		itemList << item->getAbsoluteName();
-	}
-	RestoreThread* restoreThread = new RestoreThread( backup_prefix, backupName, itemList, destination );
-
-	QObject::connect( restoreThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
-						this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
-	QObject::connect( restoreThread, SIGNAL( infoSignal( const QString& ) ),
-					  this, SIGNAL( infoSignal( const QString& ) ) );
-	QObject::connect( restoreThread, SIGNAL( errorSignal( const QString& ) ),
-					  this, SIGNAL( errorSignal( const QString& ) ) );
-	QObject::connect( restoreThread, SIGNAL( finishProgressDialog() ),
-						this, SIGNAL( finishProgressDialog() ) );
-	QObject::connect( this, SIGNAL( abortProcess() ),
-						restoreThread, SLOT( abortRestoreProcess() ) );
-	restoreThread->start();
-	//TODO: disconnect signal/slot connections
-} */
-
-void MainModel::customRestore( const QStandardItemModel* remoteDirModel, const BackupSelectionHash& selectionRules, const QString& backup_prefix, const QString& backupName, const QString& destination )
+void MainModel::customRestore( const BackupSelectionHash& selectionRules, const QString& backup_prefix, const QString& backupName, const QString& destination )
 {
 	if( !initConnection() )
 	{

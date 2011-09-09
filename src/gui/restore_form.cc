@@ -287,6 +287,6 @@ void RestoreForm::startRestore(bool isFullRestore, QString destination)
 		// custom restore
 		this->model->showProgressDialogSlot( tr( "Custom restore" ) );
 		BackupSelectionHash selectionRules = this->model->getCurrentRemoteDirModel()->getSelectionRules();
-		this->model->customRestore( this->model->getCurrentRemoteDirModel(), selectionRules, selectedBackupPrefix, selectedBackupName, destination );
+		this->model->customRestore( selectionRules, selectedBackupPrefix, selectedBackupName, destination );
 	}
 }

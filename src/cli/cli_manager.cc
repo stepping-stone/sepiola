@@ -80,7 +80,7 @@ bool CliManager::isHelpApplication( int argc, char* argv[] )
 	return hasArgument( argc, argv, HELP_ARGUMENT );
 }
 
-void CliManager::printUsage( int argc, char* argv[] )
+void CliManager::printUsage( int /*argc*/, char* argv[] )
 {
 	QString usage;
 	usage.append( Settings::getInstance()->getThisApplicationFullPathExecutable() + " Version " + Settings::VERSION + "\n" );
