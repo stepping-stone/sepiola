@@ -14,6 +14,11 @@
 #| along with this program; if not, write to the Free Software
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+cmake_minimum_required(VERSION 2.6.2)
+if(POLICY CMP0005)
+    cmake_policy(SET CMP0005 NEW)
+endif(POLICY CMP0005)
+
 IF(NOT SSBACKUP_EXECUTABLE_NAME)
   SET(SSBACKUP_EXECUTABLE_NAME sepiola)
 ENDIF(NOT SSBACKUP_EXECUTABLE_NAME)
