@@ -44,7 +44,10 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	QString uid_param = settings->getQuotaModificationUrlUidParam();
 	uid_param = (uid_param == "") ? "$UID$" : uid_param;
 	QList<int> quotaValues = this->model->getServerQuota();
-	this->labelQuotaInformation->setText( QObject::tr("Total size: %1 GB, free: %2 GB").arg(quotaValues[0]/1024.0, 0, 'f', 1).arg((quotaValues[0]-quotaValues[2]-quotaValues[2])/1024.0, 0, 'f', 1) );
+    if (quotaValues.size() > 0)
+	    this->labelQuotaInformation->setText( QObject::tr("Total size: %1 GB, free: %2 GB").arg(quotaValues[0]/1024.0, 0, 'f', 1).arg((quotaValues[0]-quotaValues[2]-quotaValues[2])/1024.0, 0, 'f', 1) );
+    else
+        this->labelQuotaInformation->setText( QObject::tr("Total size: %1 GB, free: %2 GB").arg("-").arg("-") );
 	if (settings->getQuotaModificationUrl() != "") {
 		this->labelChangeQuotaLink->setText(QObject::tr("<a href=\"%1\">Change quota</a> (opens a browser window)").arg(settings->getQuotaModificationUrl().replace(uid_param, settings->getServerUserName())));
 		this->labelChangeQuotaLink->setOpenExternalLinks(true);
