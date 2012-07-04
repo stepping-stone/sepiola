@@ -123,6 +123,12 @@ bool Plink::assertCorrectFingerprint()
 			emit errorSignal( QObject::tr( "Unable to open connection" ) );
 			return false;
 		}
+        if ( line.startsWith("FATAL ERROR") )
+        {
+            qDebug() << "Key has already been cached but connection failed (probably wrong username)";
+            terminate();
+            return true;
+        }
 		while ( !line.startsWith( "ssh-rsa") )
 		{
 			blockingReadLine( &line );
