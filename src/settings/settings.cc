@@ -683,3 +683,275 @@ void Settings::saveBackupSelectionRules( const BackupSelectionHash& backupSelect
 	appData->endArray();
 	appData->endGroup();
 }
+
+int Settings::getMaxLogLines()
+{
+	return maxLogLines;
+}
+
+QString Settings::getDefaultServerName()
+{
+	return defaultServerName;
+}
+
+QString Settings::getDefaultServerKey()
+{
+	return defaultServerKey;
+}
+
+QString Settings::getServerName()
+{
+	return serverName;
+}
+
+bool Settings::getDeleteExtraneousItems()
+{
+	return deleteExtraneousItems;
+}
+
+bool Settings::getShowHiddenFilesAndFolders()
+{
+	return showHiddenFilesAndFolders;
+}
+
+bool Settings::isCompressedRsyncTraffic() {
+	return false;
+}
+
+QStringList Settings::getSupportedLanguages()
+{
+	return supportedLanguages;
+}
+
+bool Settings::isLogDebugMessageEnabled()
+{
+	return logDebugMessage;
+}
+
+QString Settings::getPrivatePuttyKey()
+{
+	return privatePuttyKey;
+}
+
+QString Settings::getPrivateOpenSshKey()
+{
+	return privateOpenSshKey;
+}
+
+QString Settings::getBackupTimeFileName()
+{
+	return backupTimeFileName;
+}
+
+QString Settings::getServerQuotaScriptName()
+{
+	return serverQuotaScriptName;
+}
+
+QString Settings::getLogFileName()
+{
+	return logFileName;
+}
+
+QString Settings::getApplicationBinDir()
+{
+	return applicationBinDir;
+}
+
+QString Settings::getApplicationDataDir()
+{
+	return applicationDataDir;
+}
+
+
+QString Settings::getSetAclName()
+{
+	return getApplicationBinDir() + setacl;
+}
+
+QString Settings::getLockFileName()
+{
+	return lockFileName;
+}
+
+QString Settings::getThisApplicationFullPathExecutable()
+{
+	return getApplicationBinDir() + thisApplication;
+}
+
+QString Settings::getThisApplicationExecutable()
+{
+	return thisApplication;
+}
+
+QString Settings::getServerUserName()
+{
+	return serverUserName;
+}
+
+QString Settings::getServerPassword()
+{
+	return server_password;
+}
+
+QString Settings::getClientUserName()
+{
+	return QString(getenv("USER"));
+}
+
+QString Settings::getClientPassword()
+{
+	return client_password;
+}
+
+int Settings::getEffectiveUserId()
+{
+	return this->effectiveUserId;
+}
+
+QString Settings::getApplicationName()
+{
+	return applicationName;
+}
+
+QString Settings::getServerKey()
+{
+	return serverKey;
+}
+
+QString Settings::getGetfaclName()
+{
+	return getApplicationBinDir() + getfacl;
+}
+
+QString Settings::getSetfaclName()
+{
+	return getApplicationBinDir() + setfacl;
+}
+
+QString Settings::getBackupFolderName()
+{
+	return backupFolderName;
+}
+
+QString Settings::getMetaFolderName()
+{
+	return metaFolderName;
+}
+
+QString Settings::getBackupRootFolder()
+{
+	return backupRootFolder;
+}
+
+QString Settings::getRestoreRootFolder()
+{
+	return restoreRootFolder;
+}
+
+QString Settings::getAuthorizedKeyFolderName()
+{
+	return authorizedKeyFolderName;
+}
+
+QString Settings::getAuthorizedKeyFileName()
+{
+	return authorizedKeyFileName;
+}
+
+QString Settings::getQuotaModificationUrl()
+{
+	return quotaModificationUrl;
+}
+
+QString Settings::getQuotaModificationUrlUidParam()
+{
+	return quotaModificationUrlUidParam;
+}
+
+QString Settings::getRsyncName()
+{
+	return getApplicationBinDir() + rsync;
+}
+
+QString Settings::getPlinkName()
+{
+	return getApplicationBinDir() + plink;
+}
+
+QString Settings::getSshName()
+{
+	return getApplicationBinDir() + ssh;
+}
+
+int Settings::getLanguageIndex()
+{
+	return languageIndex;
+}
+
+QString Settings::getBackupContentFileName()
+{
+	return backupContentFileName;
+}
+
+QString Settings::getBackupPrefix()
+{
+	return backupPrefix;
+}
+
+QString Settings::getLogFileAbsolutePath()
+{
+	return this->getApplicationDataDir() + this->getLogFileName();
+}
+
+int Settings::getRsyncTimeout()
+{
+	return rsyncTimeout;
+}
+
+QSize Settings::getWindowSize()
+{
+	return windowSize;
+}
+
+QPoint Settings::getWindowPosition()
+{
+	return windowPosition;
+}
+
+bool Settings::useOpenSshInsteadOfPlinkForRsync()
+{
+	return Settings::IS_MAC  || Settings::IS_UNIX;
+}
+
+bool Settings::isReseller()
+{
+	return Settings::IS_RESELLER;
+}
+
+QString Settings::getResellerAddress()
+{
+	return resellerAddress;
+}
+
+int Settings::getNOfLastBackups() const
+{
+	return nOfLastBackups;
+}
+
+const QList<BackupTask>& Settings::getLastBackups() const
+{
+	return lastBackups;
+}
+
+const ScheduledTask& Settings::getScheduleRule() const
+{
+	return scheduleRule;
+}
+
+const BackupSelectionHash& Settings::getLastBackupSelectionRules() const
+{
+	return lastBackupRules;
+}
+
+
