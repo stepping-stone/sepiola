@@ -140,17 +140,18 @@ const int Settings::DEFAULT_NUM_OF_LAST_BACKUPS = 3;
 
 Settings* Settings::instance = 0;
 
-Settings::Settings()
+Settings::Settings() :
+    applicationSettings(0),
+    resellerSettings(0),
+    userSettings(0),
+    appData(0),
+    logDebugMessage(true),
+    effectiveUserId(0)
 {
 	//TODO: load language name translations after setting the current langauge
-	this->applicationSettings = 0;
-	this->resellerSettings = 0;
-	this->userSettings = 0;
-	this->appData = 0;
+
 #ifdef Q_OS_UNIX
 	this->effectiveUserId = getuid();
-#else
-	this->effectiveUserId = 0;
 #endif
 
 	supportedLanguages << QObject::tr( "English" ); // default language has to be at the top (position zero)
