@@ -103,7 +103,6 @@ void BackupThread::run()
 	settings->saveBackupSelectionRules( this->includeRules );
 	try {
 		checkAbortState();
-		Settings* settings = Settings::getInstance();
 		emit infoSignal( tr( "Creating/validating server directories" ) );
 
 		prepareServerDirectories();
