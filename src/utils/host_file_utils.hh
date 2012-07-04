@@ -40,20 +40,7 @@ public:
 	 */
 	static void addPuttyKeyToOpenSshKeyFile();
 	
-	/**
-	 * Tests the getPuttyKey method
-	 */
-	static void testGetPuttyKey();
 
-	/**
-	 * Tests the addHostToHostFile method
-	 */
-	static void testConvertPuttyKey();
-
-	/**
-	 * Tests the addPuttyKeyToOpenSshKeyFile method
-	 */
-	static void testAddPuttyKeyToOpenSshKeyFile();
 
 private:	
 	/**

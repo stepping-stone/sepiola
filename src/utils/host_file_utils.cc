@@ -137,29 +137,3 @@ QString HostFileUtils::getIpAddress( const QString& host )
 	qWarning() << "can not get IP adress";
 	return "";
 }
-
-void HostFileUtils::testGetPuttyKey()
-{
-	qDebug() << getPuttyKey( Settings::getInstance()->getServerName() );
-}
-
-void HostFileUtils::testConvertPuttyKey()
-{
-	QByteArray puttyKey;
-	puttyKey.append( "rsa2@22:" );
-	puttyKey.append( Settings::getInstance()->getServerName() );
-	puttyKey.append( " 0x23,0xc0b87f346acc9af567c8b2af13af01c56303f0a2bd1039a87e901851376eb531b014ce2ec81420669c00feaa772b41307fdbbbabb6131a69c34682677dedb7d7629df1388861588632d7d2ec0c22b17d65ae3ced72c393209ecadfca1c692254af8a37d806996412f303fa602fac0c39a33d959f6b977e9c95af1f1ccb9a52b4be63b28af6c08c965965c7a16561555e2d71c48f2d70c7a06b2ab77246453c384996869527a2081e7f1c8fcfc38dc1432441318a325f749f7f7570e2c692d8876c69ec964685831a3d66f84c9c0c9abea0199f978cd2a2b31ba8bc1c2ab2f65ee0c64c6d64261bb5a4fc79933888d32dbdc3d8ee69942fb8ead42df8de1c6abf" );
-	qDebug() << convertPuttyKey( puttyKey, Settings::getInstance()->getServerName() );
-}
-
-void HostFileUtils::testAddPuttyKeyToOpenSshKeyFile()
-{
-	addPuttyKeyToOpenSshKeyFile();
-}
-
-namespace
-{
-	int dummy1 = TestManager::registerTest( "testAddPuttyKeyToOpenSshKeyFile", HostFileUtils::testAddPuttyKeyToOpenSshKeyFile );
-	int dummy2 = TestManager::registerTest( "testConvertPuttyKey", HostFileUtils::testConvertPuttyKey );
-	int dummy3 = TestManager::registerTest( "testGetPuttyKey", HostFileUtils::testGetPuttyKey );
-}
