@@ -16,7 +16,6 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QDebug>
 #include <QDir>
 #include <QPair>
 #include <QSet>
@@ -43,15 +42,16 @@ const QString BackupThread::TASKNAME_UPLOAD_METADATA = "uploading metadata";
 const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
 
 
-BackupThread::BackupThread( const BackupSelectionHash& includeRules )
+BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
+	rsync(ToolFactory::getRsyncImpl()),
+    isAborted(false),
+    includeRules(incRules),
+    backupStartDateTime(QDateTime()), // null-Time
+    backupCurrentStatus(ConstUtils::STATUS_UNDEFINED)
 {
-	isAborted = false;
-	this->includeRules = includeRules;
 	Settings* settings = Settings::getInstance();
 	this->setDeleteFlag = settings->getDeleteExtraneousItems();
 	this->compressedUpload = settings->isCompressedRsyncTraffic();
-	this->backupStartDateTime = QDateTime(); // null-Time
-	this->backupCurrentStatus = ConstUtils::STATUS_UNDEFINED;
 
 	// TODO adjust the given values for subtask steps and durations
 	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
@@ -64,7 +64,6 @@ BackupThread::BackupThread( const BackupSelectionHash& includeRules )
 	currentTaskNr = 0;
 
 
-	rsync = ToolFactory::getRsyncImpl();
 	QObject::connect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
 					  this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::connect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -132,7 +131,6 @@ void BackupThread::run()
 		if ( processedItems.size() > 0 )
 		{
 			QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName(), "'");
-			//auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
 
 			// backup content file list
 			this->pt.debugIsCorrectCurrentTask(TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT);
@@ -146,10 +144,10 @@ void BackupThread::run()
 			emit infoSignal( tr( "Uploading backup content meta data" ) );
 			this->pt.debugIsCorrectCurrentTask(TASKNAME_UPLOAD_METADATA);
 			updateBackupContentFile( currentBackupContentFile, processedItems );
-			//ssh->uploadToMetaFolder( currentBackupContentFile, false );
+
 			QString warning;
 			rsync->upload( currentBackupContentFile, metaDataDir, true, 0 );
-			//FileSystemUtils::removeFile( currentBackupContentFile );
+
 			checkAbortState();
 			if ((subPt = this->pt.getSubtask(TASKNAME_UPLOAD_METADATA)) != 0) subPt->setTerminated(true);
 
@@ -157,7 +155,7 @@ void BackupThread::run()
 			emit infoSignal( tr( "Uploading backup info data" ) );
 			this->pt.debugIsCorrectCurrentTask(TASKNAME_METAINFO);
 			QString currentBackupTimeFile = createCurrentBackupTimeFile();
-			//ssh->uploadToMetaFolder( currentBackupTimeFile, false );
+
 			rsync->upload( currentBackupTimeFile, metaDataDir, true, 0 );
 			FileSystemUtils::removeFile( currentBackupTimeFile );
 			checkAbortState();
@@ -179,7 +177,7 @@ void BackupThread::run()
 			metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, processedItems );
 			checkAbortState();
 			emit infoSignal( tr( "Uploading permission meta data" ) );
-			//ssh->uploadToMetaFolder( currentMetadataFileName, false );
+
 			try
 			{
 				rsync->upload( currentMetadataFileName, metaDataDir, true, &warning );
@@ -199,8 +197,6 @@ void BackupThread::run()
 			if ((subPt = this->pt.getSubtask(TASKNAME_METAINFO)) != 0) { subPt->addFixpointNow(subPt->getNumberOfSteps()); subPt->setTerminated(true); }
 			updateInformationToDisplay();
 
-			//FileSystemUtils::removeFile( currentMetadataFileName );
-			//FileSystemUtils::removeFile( newMetadataFileName );
 			QObject::disconnect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
 								 this, SIGNAL( infoSignal( const QString& ) ) );
 			QObject::disconnect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -352,15 +348,12 @@ void BackupThread::prepareServerDirectories()
 	vars.append(QPair<QString,QString>(tr("current task"), infoText));
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 
-
-	//AbstractRsync* rsync = ToolFactory::getRsyncImpl();
 	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, false );
 	checkAbortState();
 	backupPrefixDir.mkdir( settings->getMetaFolderName() );
 	backupPrefixDir.mkdir( settings->getBackupFolderName() );
 	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, false );
 	checkAbortState();
-	//delete rsync;
 	mySubPt->addFixpointNow(2);
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 
@@ -466,6 +459,4 @@ void BackupThread::abortBackupProcess()
 	emit abort_rsync();
 	emit updateOverviewFormLastBackupsInfo();
 	emit finalStatusSignal( this->getLastBackupState() );
-	/* this->terminate();
-	this->wait(); */
 }
