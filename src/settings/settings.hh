@@ -63,6 +63,7 @@ class Settings : public QObject
 		 */
 		static const bool SHOW_PROGRESS;
 
+        static const char* EOL_CHARACTER;
 		/**
 		 * Gets a Settings instance
 		 * @return a Settings instance
