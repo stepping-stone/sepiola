@@ -242,7 +242,6 @@ class Settings : public QObject
 		QString getClientPassword();
 		QString getServerUserName();
 		QString getServerPassword();
-		int getEffectiveUserId();
 		int getLanguageIndex();
 		void saveServerUserName( const QString& userName );
 		void setServerPassword( const QString& password );

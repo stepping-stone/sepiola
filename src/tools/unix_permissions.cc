@@ -21,6 +21,8 @@
 #include <QFlags>
 #include <QTextStream>
 
+#include <unistd.h>
+
 #include "settings/settings.hh"
 #include "test/test_manager.hh"
 #include "tools/unix_permissions.hh"
@@ -98,7 +100,6 @@ void UnixPermissions::mergeMetadata( const QFileInfo& newMetadataFileName, const
 void UnixPermissions::setMetadata( const QFileInfo& metadataFileName, const QStringList& downloadedItems, const QString& downloadDestination )
 {
 	qDebug() << "UnixPermissions::setMetadata( " << metadataFileName.absoluteFilePath() << ", " << downloadedItems << " )";
-	Settings* settings = Settings::getInstance();
 
 	QMap<QString, QStringList>* metadataMap = new QMap<QString, QStringList>(); // key: file or dir name, value meta data (four lines)
 	populateMapFromFile( metadataFileName, metadataMap );
@@ -127,7 +128,7 @@ void UnixPermissions::setMetadata( const QFileInfo& metadataFileName, const QStr
 			int permissions = QVariant( metadata.at( 3 ) ).toInt();
 			QFlags<QFile::Permission> permission( permissions );
 			file.setPermissions( permission );
-			if( !file.setOwnerAndGroup( owner, group ) && settings->getEffectiveUserId() == 0 )
+			if( !file.setOwnerAndGroup( owner, group ) && geteuid() == 0 )
 			{
 				errors.append( QObject::tr( "Cannot change owner/group for %1\n" ).arg( fileName ) );
 			}

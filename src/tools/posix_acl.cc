@@ -28,6 +28,8 @@
 #include "utils/log_file_utils.hh"
 #include "utils/file_system_utils.hh"
 
+#include <unistd.h>
+
 const QString PosixAcl::ITEM_NAME_PREFIX = "# file: /";
 
 PosixAcl::PosixAcl()
@@ -195,7 +197,7 @@ void PosixAcl::setMetadata(const QFileInfo& metadataFileName, const QStringList&
 		QStringList errList = errors.split("\n");
 		for (int i = 0; i < errList.size();) {
 			QString errStr = errList.at(i);
-			if ( (settings->getEffectiveUserId() != 0 && errStr.contains("setfacl:")  && errStr.contains("Cannot change owner/group: Operation not permitted")) || errStr == "" ) {
+			if ( (geteuid() != 0 && errStr.contains("setfacl:")  && errStr.contains("Cannot change owner/group: Operation not permitted")) || errStr == "" ) {
 				errList.removeAt(i);
 			} else {
 				i++;

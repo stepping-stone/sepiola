@@ -155,11 +155,6 @@ Settings::Settings() :
     effectiveUserId(0)
 {
 	//TODO: load language name translations after setting the current langauge
-
-#ifdef Q_OS_UNIX
-	this->effectiveUserId = getuid();
-#endif
-
 	supportedLanguages << QObject::tr( "English" ); // default language has to be at the top (position zero)
 	supportedLanguages << QObject::tr( "German" );
 	qRegisterMetaType<BackupSelectionHash>("BackupSelectionHash");
@@ -807,11 +802,6 @@ QString Settings::getClientUserName()
 QString Settings::getClientPassword()
 {
 	return client_password;
-}
-
-int Settings::getEffectiveUserId()
-{
-	return this->effectiveUserId;
 }
 
 QString Settings::getApplicationName()
