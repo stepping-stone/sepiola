@@ -227,22 +227,22 @@ void Process::terminate()
 		QMutex mutex;
 		mutex.lock();
 		abortCondition.wait(&mutex, 500);
-		if (Settings::IS_WINDOWS) {
-			killed = true;
-			qProcess->kill();
-		} else {
-			qProcess->terminate();
+#if Q_OS_WIN
+        killed = true;
+        qProcess->kill();
+#else
+        qProcess->terminate();
 
-			int n = 0;
-			while ((++n < 20) && qProcess->state() == QProcess::Running) {
-				qProcess->waitForFinished(500);
-				qDebug() << "waiting...";
-			}
-			if (qProcess->state() == QProcess::Running) {
-				killed = true;
-				qProcess->kill();
-			}
-		}
+        int n = 0;
+        while ((++n < 20) && qProcess->state() == QProcess::Running) {
+            qProcess->waitForFinished(500);
+            qDebug() << "waiting...";
+        }
+        if (qProcess->state() == QProcess::Running) {
+            killed = true;
+            qProcess->kill();
+        }
+#endif
 	}
 }
 

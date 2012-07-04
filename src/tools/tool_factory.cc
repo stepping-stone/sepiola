@@ -61,14 +61,14 @@ auto_ptr< AbstractSsh > ToolFactory::getSshImpl()
 
 auto_ptr< AbstractScheduler > ToolFactory::getSchedulerImpl()
 {
-	if ( Settings::IS_WINDOWS )
-	{
-		if ( Schtasks::isSchtasksSupported() )
-		{
-			return auto_ptr< AbstractScheduler >( new Schtasks );
-		}
-		return auto_ptr< AbstractScheduler >( new At );
-	}
+#if Q_OS_WIN
+    if ( Schtasks::isSchtasksSupported() )
+    {
+        return auto_ptr< AbstractScheduler >( new Schtasks );
+    }
+    return auto_ptr< AbstractScheduler >( new At );
+#else
 	return auto_ptr< AbstractScheduler >( new Crontab );
+#endif
 }
 

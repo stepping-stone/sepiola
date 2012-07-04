@@ -25,7 +25,7 @@
 
 #include "utils/file_system_utils.hh"
 #include "test/test_manager.hh"
-#include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "exception/runtime_exception.hh"
 
 FileSystemUtils::FileSystemUtils()
@@ -104,36 +104,42 @@ void FileSystemUtils::convertFile(const QString& fileName, const QString& fromEn
 		throw RuntimeException( QObject::tr( "Could not rename file %1 to %2." ).arg(tmpFile.fileName(), file.fileName()) );
 }
 
+#if Q_OS_WIN
 void FileSystemUtils::convertToServerPath(QString* path)
 {
-	if (Settings::IS_WINDOWS)
-	{
-		*path = QDir::fromNativeSeparators( *path);
-		if (path->size()> 2 && (*path)[0].isLetter() && (*path)[1] == ':' && (*path)[2] == '/')
-		{
-			*path = QString("/") + (*path)[0].toUpper() + path->right(path->size() - 2);
-		}
-	}
+    *path = QDir::fromNativeSeparators( *path);
+    if (path->size()> 2 && (*path)[0].isLetter() && (*path)[1] == ':' && (*path)[2] == '/')
+    {
+        *path = QString("/") + (*path)[0].toUpper() + path->right(path->size() - 2);
+    }
 }
+#else
+void FileSystemUtils::convertToServerPath(QString*)
+{
+}
+#endif
 
+#if Q_OS_WIN
 void FileSystemUtils::convertToLocalPath(QString* path)
 {
-	if (Settings::IS_WINDOWS)
-	{
-		if (path->size()> 2 && (*path)[0] == '/' && (*path)[1].isLetter() && (*path)[2] == '/')
-		{
-			*path = (*path)[1] + ":" + path->right(path->size() - 2);
-			*path = QDir::toNativeSeparators( *path);
-			return;
-		}
-		if (path->size()> 1 && (*path)[0].isLetter() && (*path)[1] == '/')
-		{
-			*path = (*path)[0] + ":" + path->right(path->size() - 1);
-			*path = QDir::toNativeSeparators( *path);
-			return;
-		}
-	}
+    if (path->size()> 2 && (*path)[0] == '/' && (*path)[1].isLetter() && (*path)[2] == '/')
+    {
+        *path = (*path)[1] + ":" + path->right(path->size() - 2);
+        *path = QDir::toNativeSeparators( *path);
+        return;
+    }
+    if (path->size()> 1 && (*path)[0].isLetter() && (*path)[1] == '/')
+    {
+        *path = (*path)[0] + ":" + path->right(path->size() - 1);
+        *path = QDir::toNativeSeparators( *path);
+        return;
+    }
 }
+#else
+void FileSystemUtils::convertToLocalPath(QString*)
+{
+}
+#endif
 
 bool FileSystemUtils::isRoot(const QString& path)
 {
@@ -162,7 +168,7 @@ void FileSystemUtils::writeLinesToFile(const QString& fileName, const QStringLis
 	}
 	foreach( QString line, lines )
 	{
-		out << line << Settings::getInstance()->getEOLCharacter();
+		out << line << Platform::EOL_CHARACTER;
 	}
 }
 

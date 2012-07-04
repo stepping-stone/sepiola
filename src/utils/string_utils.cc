@@ -21,16 +21,11 @@
 
 QString StringUtils::fromLocalEnc(QByteArray byteArray)
 {
-	if (Settings::IS_WINDOWS)
-	{
-		return QString::fromUtf8(byteArray);
-	}
-	else if ( Settings::IS_MAC )
-	{
-		return QString::fromUtf8(byteArray).normalized(QString::NormalizationForm_C);
-	}
-	else
-	{
-		return QString::fromLocal8Bit(byteArray);
-	}
+#if Q_OS_WIN
+    return QString::fromUtf8(byteArray);
+#elif Q_OS_MAC
+    return QString::fromUtf8(byteArray).normalized(QString::NormalizationForm_C);
+#else
+    return QString::fromLocal8Bit(byteArray);
+#endif
 }
