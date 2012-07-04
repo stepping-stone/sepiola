@@ -60,6 +60,8 @@ public:
 	 * @see AbstractSsh::assertCorrectFingerprint()
 	 */
 	bool assertCorrectFingerprint();
+
+    bool assertCorrectFingerprint(const QString& userName, const QString& serverName, const QString& savedKey);
 	
 	/**
 	 * @see AbstractSsh::getServerQuotaValues()
@@ -90,7 +92,9 @@ private:
 	static const QString END_PRIVATE_KEY_ECHO_MESSAGE;
 	static const QString START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
 	static const QString END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
-	
+
+    const QString plinkName;
+
 	static QString extractKey( const QStringList& keyLines, const QString& startLine, const QString& endLine );
 };
 

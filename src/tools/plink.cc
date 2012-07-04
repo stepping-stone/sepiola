@@ -43,7 +43,10 @@ const QString Plink::END_PRIVATE_KEY_ECHO_MESSAGE = "EndPrivateKey";
 const QString Plink::START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE = "StartPrivateOpenSshKey";
 const QString Plink::END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE = "EndPrivateOpenSshKey";
 
-Plink::Plink() {}
+Plink::Plink() :
+    plinkName(Settings::getInstance()->getPlinkName())
+{
+}
 
 Plink::~Plink() {}
 
@@ -94,14 +97,19 @@ bool Plink::loginWithKey()
 
 bool Plink::assertCorrectFingerprint()
 {
-	qDebug() << "Plink::assertCorrectFingerprint()";
 	Settings* settings = Settings::getInstance();
+    return assertCorrectFingerprint(settings->getServerUserName(), settings->getServerName(), settings->getServerKey());
+}
 
+bool Plink::assertCorrectFingerprint(const QString& userName, const QString& serverName, const QString& savedKey)
+{
+    qDebug() << "Plink::assertCorrectFingerprint(userName=" << userName << ", serverName=" << serverName << ", savedKey=" << savedKey << ")";
 	QStringList arguments;
-	arguments << settings->getServerUserName() + "@" + settings->getServerName();
+	arguments << userName + "@" + serverName;
+//    arguments << serverName;
 	arguments << "sh -c \":\"";
 
-	createProcess( settings->getPlinkName(), arguments );
+	createProcess( this->plinkName, arguments );
 	setProcessChannelMode( QProcess::MergedChannels );
 	start();
 
@@ -141,7 +149,6 @@ bool Plink::assertCorrectFingerprint()
 		}
 		QString serverKey = splittedLine.at( 2 );
 		serverKey = serverKey.left( serverKey.lastIndexOf( ":" ) + 3 );
-		QString savedKey = settings->getServerKey();
 		if ( serverKey.compare( savedKey ) == 0 )
 		{
 			qDebug() << "Correct server key";

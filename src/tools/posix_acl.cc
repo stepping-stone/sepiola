@@ -33,9 +33,18 @@
 
 const QString PosixAcl::ITEM_NAME_PREFIX = "# file: /";
 
-PosixAcl::PosixAcl()
+PosixAcl::PosixAcl() :
+    getfaclName(Settings::getInstance()->getGetfaclName()),
+    setfaclName(Settings::getInstance()->getGetfaclName())
 {
 }
+
+PosixAcl::PosixAcl(const QString& getfacl, const QString& setfacl) :
+    getfaclName(getfacl),
+    setfaclName(setfacl)
+{
+}
+
 PosixAcl::~PosixAcl()
 {
 }
@@ -44,14 +53,24 @@ QString PosixAcl::getMetadata(
         const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
         QString* warnings)
 {
+    Settings* settings(Settings::getInstance());
+    return getMetadata(
+            settings->getApplicationDataDir() + settings->getTempMetadataFileName(),
+            processedItems,
+            warnings);
+}
+
+QString PosixAcl::getMetadata(
+        const QString& aclFileName,
+        const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
+        QString* warnings)
+{
 	qDebug() << "PosixAcl::getMetadata( processedItems )";
-	Settings* settings = Settings::getInstance();
-	QString aclFileName = settings->getApplicationDataDir() + settings->getTempMetadataFileName();
 	QStringList arguments;
 	arguments << "--absolute-names";
 	arguments << "--physical";
 	arguments << "-";
-	createProcess(settings->getGetfaclName(), arguments);
+	createProcess(this->getfaclName, arguments);
 	setStandardOutputFile(aclFileName);
 	start();
 
@@ -186,10 +205,9 @@ void PosixAcl::setMetadata(const QFileInfo& metadataFileName, const QStringList&
 	}
 
 	// apply acl
-	Settings* settings = Settings::getInstance();
 	QStringList arguments;
 	arguments << "--restore=" + metadataFileName.absoluteFilePath();
-	createProcess(settings->getSetfaclName() , arguments);
+	createProcess(setfaclName, arguments);
 	start();
 	waitForFinished();
 	QString errors = readAllStandardError();

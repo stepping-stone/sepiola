@@ -36,8 +36,8 @@ public:
 	/**
 	 * Constructs a PosixAcl
 	 */
-	PosixAcl();
-
+    PosixAcl();
+    PosixAcl(const QString& getfacl, const QString& setfacl);
 	/**
 	 * Destroys the PosixAcl
 	 */
@@ -47,6 +47,11 @@ public:
 	 * @see AbstractMetadata::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
 	 */
 	QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 );
+
+    QString getMetadata(
+        const QString& aclFileName,
+        const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
+        QString* warnings);
 
 	/**
 	 * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
@@ -84,6 +89,9 @@ private:
 
 	void populateMapFromFile( const QFileInfo& aclFileName, QMap<QString, QStringList>* aclMap);
 	void writeMapContentToFile( const QMap<QString, QStringList>& aclMap, const QFileInfo& aclFileName);
+
+    const QString getfaclName;
+    const QString setfaclName;
 };
 
 #endif
