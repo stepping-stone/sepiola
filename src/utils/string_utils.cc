@@ -21,9 +21,9 @@
 
 QString StringUtils::fromLocalEnc(QByteArray byteArray)
 {
-#if Q_OS_WIN
+#ifdef Q_OS_WIN32
     return QString::fromUtf8(byteArray);
-#elif Q_OS_MAC
+#elif defined Q_OS_MAC
     return QString::fromUtf8(byteArray).normalized(QString::NormalizationForm_C);
 #else
     return QString::fromLocal8Bit(byteArray);

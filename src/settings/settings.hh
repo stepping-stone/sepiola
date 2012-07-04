@@ -44,21 +44,6 @@ class Settings : public QObject
 
 	public:
 		/**
-		 * True if the current operating system is Unix
-		 */
-		static const bool IS_UNIX;
-
-		/**
-		 * True if the current operating system is Mac
-		 */
-		static const bool IS_MAC;
-
-		/**
-		 * True if the current operating system is windows
-		 */
-		static const bool IS_WINDOWS;
-
-		/**
 		 * This flag is used to hide all progress information during backup and restore
 		 */
 		static const bool SHOW_PROGRESS;

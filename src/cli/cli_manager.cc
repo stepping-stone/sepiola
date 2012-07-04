@@ -28,7 +28,7 @@
 #ifdef Q_OS_UNIX
 #include <termios.h>
 #endif
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN32
 #include <windows.h>
 #endif
 
@@ -317,7 +317,7 @@ QString CliManager::readPassword()
 	#endif
 
 		// Turn echoing off and info not able to.
-	#ifdef Q_OS_WIN
+	#ifdef Q_OS_WIN32
 		HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
 		DWORD fdwOldMode;
 		if (hStdin == INVALID_HANDLE_VALUE || !GetConsoleMode(hStdin, &fdwOldMode) || !SetConsoleMode(hStdin, fdwOldMode & ~ENABLE_ECHO_INPUT)) {
@@ -330,7 +330,7 @@ QString CliManager::readPassword()
 	QTextStream cin( stdin, QIODevice::ReadOnly );
 	cin >> password;
 
-	#ifdef Q_OS_WIN
+	#ifdef Q_OS_WIN32
 		SetConsoleMode(hStdin, fdwOldMode);
 	#endif
 

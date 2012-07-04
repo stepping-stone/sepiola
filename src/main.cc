@@ -31,7 +31,7 @@
 #include <pwd.h>
 #endif
 
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN32
 #include <windows.h>
 #endif
 
@@ -124,7 +124,7 @@ bool assertCliDependencies()
         }
 	}
     
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN32
 	QFileInfo setaclFile(settings->getSetAclName() );
 	return setaclFile.exists();
 #endif
@@ -211,7 +211,7 @@ void setHomeDir()
 
 void createConsole()
 {
-#ifdef Q_OS_WIN
+#ifdef Q_OS_WIN32
 	int hConHandle;
 	long lStdHandle;
 	FILE *fp;

@@ -34,25 +34,12 @@
 
 #include "config.h"
 
-#ifdef Q_OS_UNIX
-const bool Settings::IS_UNIX = true;
-#else
-const bool Settings::IS_UNIX = false;
-#endif
-
 #ifdef Q_OS_WIN32
-const bool Settings::IS_WINDOWS = true;
 const QString Settings::SETTINGS_EXECUTABLE_EXTENSION = ".exe";
 #else
-const bool Settings::IS_WINDOWS = false;
 const QString Settings::SETTINGS_EXECUTABLE_EXTENSION = "";
 #endif
 
-#ifdef Q_OS_MAC
-const bool Settings::IS_MAC = true;
-#else
-const bool Settings::IS_MAC = false;
-#endif
 
 const bool Settings::SHOW_PROGRESS = false;
 
@@ -550,15 +537,13 @@ void Settings::saveServerName( const QString& serverName )
 
 QString Settings::getMetadataFileName()
 {
-	if ( IS_MAC )
-	{
-		return metadataFileName + "_mac";
-	}
-	if ( IS_WINDOWS )
-	{
-		return metadataFileName + "_win";
-	}
+#ifdef Q_OS_MAC
+    return metadataFileName + "_mac";
+#elif defined Q_OS_WIN32
+    return metadataFileName + "_win";
+#else
 	return metadataFileName + "_unix";
+#endif
 }
 
 QString Settings::getTempMetadataFileName()
@@ -577,11 +562,11 @@ void Settings::saveBackupPrefix( const QString& backupPrefix )
 
 const char* Settings::getEOLCharacter()
 {
-	if ( IS_WINDOWS )
-	{
-		return "\r\n";
-	}
+#ifdef Q_OS_WIN32
+    return "\r\n";
+#else
 	return "\n";
+#endif
 }
 
 void Settings::saveWindowSize( QSize size )
@@ -916,7 +901,11 @@ QPoint Settings::getWindowPosition()
 
 bool Settings::useOpenSshInsteadOfPlinkForRsync()
 {
-	return Settings::IS_MAC  || Settings::IS_UNIX;
+#if defined Q_OS_MAC || defined Q_OS_UNIX
+    return true;
+#else
+    return false;
+#endif
 }
 
 bool Settings::isReseller()

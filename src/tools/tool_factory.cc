@@ -26,9 +26,9 @@
 #include "tools/plink.hh"
 #include "tools/rsync.hh"
 
-#if Q_OS_MAC
+#ifdef Q_OS_MAC
 #include "tools/unix_permissions.hh"
-#elif Q_OS_WIN
+#elif defined Q_OS_WIN32
 #include "tools/set_acl.hh"
 #else
 #include "tools/posix_acl.hh"
@@ -46,9 +46,9 @@ ToolFactory::~ToolFactory()
 
 auto_ptr< AbstractMetadata > ToolFactory::getMetadataImpl()
 {
-#if Q_OS_MAC
+#ifdef Q_OS_MAC
 	return auto_ptr< AbstractMetadata >( new UnixPermissions );
-#elif Q_OS_WIN
+#elif defined Q_OS_WIN32
 	return auto_ptr< AbstractMetadata >( new SetAcl(Settings::getInstance()->getSetAclName()) );
 #else
 	return auto_ptr< AbstractMetadata >( new PosixAcl(Settings::getInstance()->getGetfaclName(), Settings::getInstance()->getGetfaclName()) );
@@ -68,7 +68,7 @@ auto_ptr< AbstractSsh > ToolFactory::getSshImpl()
 
 auto_ptr< AbstractScheduler > ToolFactory::getSchedulerImpl()
 {
-#if Q_OS_WIN
+#ifdef Q_OS_WIN32
     if ( Schtasks::isSchtasksSupported() )
     {
         return auto_ptr< AbstractScheduler >( new Schtasks );

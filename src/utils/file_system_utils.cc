@@ -104,7 +104,7 @@ void FileSystemUtils::convertFile(const QString& fileName, const QString& fromEn
 		throw RuntimeException( QObject::tr( "Could not rename file %1 to %2." ).arg(tmpFile.fileName(), file.fileName()) );
 }
 
-#if Q_OS_WIN
+#ifdef Q_OS_WIN32
 void FileSystemUtils::convertToServerPath(QString* path)
 {
     *path = QDir::fromNativeSeparators( *path);
@@ -119,7 +119,7 @@ void FileSystemUtils::convertToServerPath(QString*)
 }
 #endif
 
-#if Q_OS_WIN
+#ifdef Q_OS_WIN32
 void FileSystemUtils::convertToLocalPath(QString* path)
 {
     if (path->size()> 2 && (*path)[0] == '/' && (*path)[1].isLetter() && (*path)[2] == '/')

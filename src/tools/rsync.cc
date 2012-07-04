@@ -278,20 +278,15 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	{
 		FileSystemUtils::convertToServerPath( &item );
 
-		if ( Settings::IS_MAC )
-		{
-			QString outputString = item.normalized( QString::NormalizationForm_D );
-			QByteArray output = outputString.toUtf8();
-			write( output );
-		}
-		else if ( Settings::IS_WINDOWS )
-		{
-			write( item.toUtf8() );
-		}
-		else
-		{
-			write( item.toLocal8Bit() );
-		}
+#ifdef Q_OS_MAC
+        QString outputString = item.normalized( QString::NormalizationForm_D );
+        QByteArray output = outputString.toUtf8();
+        write( output );
+#elif defined Q_OS_WIN32
+        write( item.toUtf8() );
+#else
+        write( item.toLocal8Bit() );
+#endif
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
@@ -471,20 +466,15 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 		foreach ( QString item, customItemList )
 		{
 			FileSystemUtils::convertToServerPath( &item );
-			if ( Settings::IS_WINDOWS )
-			{
-				write( item.toUtf8() );
-			}
-			else if ( Settings::IS_MAC )
-			{
-				QString outputString = item.normalized( QString::NormalizationForm_D );
-				QByteArray output = outputString.toUtf8();
-				write( output );
-			}
-			else
-			{
-				write( item.toLocal8Bit() );
-			}
+#ifdef Q_OS_WIN32
+            write( item.toUtf8() );
+#elif defined Q_OS_MAC
+            QString outputString = item.normalized( QString::NormalizationForm_D );
+            QByteArray output = outputString.toUtf8();
+            write( output );
+#else
+            write( item.toLocal8Bit() );
+#endif
 			write( settings->getEOLCharacter() );
 			waitForBytesWritten();
 		}
@@ -741,15 +731,12 @@ QStringList Rsync::getRsyncGeneralArguments()
 {
 	QStringList result;
 	result << "--timeout=" + QString::number(Settings::getInstance()->getRsyncTimeout());
-	if ( Settings::IS_WINDOWS )
-	{
-		result << "-iirtxS8";
-	}
-	else
-	{
-		result << "-iilrtxHS8";
-		result << "--specials";
-	}
+#ifdef Q_OS_WIN32
+    result << "-iirtxS8";
+#else
+    result << "-iilrtxHS8";
+    result << "--specials";
+#endif
 	return result;
 }
 
@@ -925,37 +912,37 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 
 QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
 	FileSystemUtils::convertToServerPath( &filename );
-	if ( Settings::IS_WINDOWS ) {
-		return( filename.toUtf8() );
-	} else if ( Settings::IS_MAC ) {
-		return(filename.normalized( QString::NormalizationForm_D ).toUtf8());
-	} else {
-		return( filename.toLocal8Bit() );
-	}
+#ifdef Q_OS_WIN32
+    return( filename.toUtf8() );
+#elif defined Q_OS_MAC
+    return(filename.normalized( QString::NormalizationForm_D ).toUtf8());
+#else
+    return( filename.toLocal8Bit() );
+#endif
 }
 
 QByteArray Rsync::convertRuleToByteArray(QString rule, bool modifier)
 {
 	FileSystemUtils::convertToServerPath( &rule );
 	QString rule_modifier = modifier ? "+ " : "- ";
-	if ( Settings::IS_MAC ) {
-		return (rule_modifier + rule.normalized( QString::NormalizationForm_D )).toUtf8();
-	} else if ( Settings::IS_WINDOWS ) {
-		return (rule_modifier + rule).toUtf8();
-	} else {
-		return (rule_modifier + rule).toUtf8();
-	}
+#ifdef Q_OS_MAC
+    return (rule_modifier + rule.normalized( QString::NormalizationForm_D )).toUtf8();
+#elif defined Q_OS_WIN32
+    return (rule_modifier + rule).toUtf8();
+#else
+    return (rule_modifier + rule).toUtf8();
+#endif
 }
 
 QByteArray Rsync::convertQStringToQByteArray(QString aStr)
 {
-	if ( Settings::IS_MAC ) {
-		return aStr.normalized( QString::NormalizationForm_D ).toUtf8();
-	} else if ( Settings::IS_WINDOWS ) {
-		return aStr.toUtf8();
-	} else {
-		return aStr.toUtf8();
-	}
+#ifdef Q_OS_MAC
+    return aStr.normalized( QString::NormalizationForm_D ).toUtf8();
+#elif defined Q_OS_WIN32
+    return aStr.toUtf8();
+#else
+    return aStr.toUtf8();
+#endif
 }
 
 

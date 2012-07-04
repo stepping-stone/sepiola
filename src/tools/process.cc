@@ -227,7 +227,7 @@ void Process::terminate()
 		QMutex mutex;
 		mutex.lock();
 		abortCondition.wait(&mutex, 500);
-#if Q_OS_WIN
+#ifdef Q_OS_WIN32
         killed = true;
         qProcess->kill();
 #else
