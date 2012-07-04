@@ -23,10 +23,10 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfo>
+#include <QDateTime>
 
 #include "utils/log_file_utils.hh"
 #include "test/test_manager.hh"
-#include "settings/settings.hh"
 
 using std::copy;
 using std::back_inserter;
@@ -43,36 +43,41 @@ LogFileUtils* LogFileUtils::getInstance()
 {
 	QMutex mutex;
 	QMutexLocker locker(&mutex);
+
 	if ( !instance )
-	{
-		Settings* settings = Settings::getInstance();
-		instance = new LogFileUtils( settings->getLogFileAbsolutePath(), settings->getMaxLogLines() );
-	}
+		instance = new LogFileUtils;
+
 	return instance;
 }
 
-LogFileUtils::LogFileUtils( const QString& logfilePath, int maxLines ) : logFile(logfilePath)
+LogFileUtils::LogFileUtils() :
+    logFile(NULL)
 {
-	this->maxLines = maxLines;
 }
 
-void LogFileUtils::open()
+void LogFileUtils::open( const QString& logfilePath, int maxLines )
 {
 	QMutexLocker locker(&mutex);
-	if ( !logFile.open( QIODevice::ReadWrite ) )
+
+    if (logFile)
+        close();
+
+    logFile = new QFile(logfilePath);
+
+	if ( !logFile->open( QIODevice::ReadWrite ) )
 	{
-		fprintf(stderr, "Can not write to log file %s", logFile.fileName().toUtf8().data() );
+		fprintf(stderr, "Can not write to log file %s", logfilePath.toUtf8().data() );
 		return;
 	}
 
 	// read the logfile line by line
 	QStringList existingLines;
-	QTextStream input( &logFile );
+	QTextStream input( logFile );
 	while ( !input.atEnd() )
 	{
 		existingLines << input.readLine();
 	}
-	logFile.close();
+	logFile->close();
 
 
 	// truncate the log file if necessary
@@ -81,11 +86,11 @@ void LogFileUtils::open()
 		existingLines.removeAt( 0 );
 	}
 
-	if ( !logFile.open( QIODevice::WriteOnly | QIODevice::Truncate ) )
+	if ( !logFile->open( QIODevice::WriteOnly | QIODevice::Truncate ) )
 	{
-		fprintf( stderr, "Can not truncate log file %s", logFile.fileName().toUtf8().data() );
+		fprintf( stderr, "Can not truncate log file %s", logfilePath.toUtf8().data() );
 	}
-	output.setDevice( &logFile );
+	output.setDevice( logFile );
 	{
 		foreach( QString line, existingLines )
 		{
@@ -132,7 +137,13 @@ QStringList LogFileUtils::getNewLines()
 void LogFileUtils::close()
 {
 	QMutexLocker locker(&mutex);
-	logFile.close();
+
+    if (logFile)
+    {
+    	logFile->close();
+        delete logFile;
+        logFile = NULL;
+    }
 }
 
 void LogFileUtils::logToHex( const QString& string )

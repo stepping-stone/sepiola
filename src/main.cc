@@ -275,7 +275,7 @@ int main(int argc, char *argv[])
 			fprintf( stderr, "%s", DEPENDENCY_MISSING);
 			return -1;
 		}
-		LogFileUtils::getInstance()->open();
+		LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
 		qInstallMsgHandler(messageHandler);
 		TestManager::run(argc, argv);
 		app.exit();
@@ -297,7 +297,7 @@ int main(int argc, char *argv[])
 			fprintf( stderr, "%s", SINGLE_APPLICATION_ERROR);
 			return -1;
 		}
-		LogFileUtils::getInstance()->open();
+		LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
 		qInstallMsgHandler(messageHandler);
 		CliManager cliManager;
 		cliManager.runCli(argc, argv);
@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
 			fprintf( stderr, "%s", SINGLE_APPLICATION_ERROR);
 			return -1;
 		}
-		LogFileUtils::getInstance()->open();
+		LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
 		qInstallMsgHandler(messageHandler);
 		CliManager::runSchedule();
 		app.exit();
@@ -345,7 +345,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	//createConsole();
-	LogFileUtils::getInstance()->open();
+	LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
 	MainModel model;
 
 	QTranslator translator;

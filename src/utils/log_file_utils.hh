@@ -53,7 +53,7 @@ public:
 	/**
 	 * Opens the log file
 	 */
-	void open();
+	void open( const QString& logfilePath, int maxLines );
 
 	/**
 	 * Gets a list of new log lines
@@ -70,11 +70,11 @@ public:
 	static void logToHex( const QByteArray& data );
 
 private:
-	LogFileUtils( const QString& logfilePath, int maxLines );
+	LogFileUtils();
 	virtual ~LogFileUtils();
 
 	static LogFileUtils* instance;
-	QFile logFile;
+	QFile* logFile;
 	int maxLines;
 	QTextStream output;
 	QStringList newLines;
