@@ -65,7 +65,10 @@ bool Plink::loginWithKey()
 
 	if ( settings->useOpenSshInsteadOfPlinkForRsync() )
 	{
-		HostFileUtils::addPuttyKeyToOpenSshKeyFile(); // add the putty key to the open ssh host file
+		HostFileUtils::addPuttyKeyToOpenSshKeyFile(
+                settings->getServerName(),
+                QDir::home().absolutePath() + "/.putty/sshhostkeys",
+                QDir::home().absolutePath() + "/.ssh/known_hosts" );
 	}
 
 	QStringList arguments;

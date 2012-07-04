@@ -16,115 +16,102 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "settings/settings.hh"
-#include "test/test_manager.hh"
 #include "utils/host_file_utils.hh"
 #include "utils/file_system_utils.hh"
 
 #include <QDebug>
-#include <QDir>
-#include <QFile>
-#include <QString>
 #include <QtEndian>
 #include <QHostInfo>
+#include <QByteArray>
+#include <QStringList>
 
-HostFileUtils::HostFileUtils()
+void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QString& sshhostkeysFileName, const QString& sshKnownHostsFileName )
 {
-}
-HostFileUtils::~HostFileUtils()
-{
-}
-
-void HostFileUtils::addPuttyKeyToOpenSshKeyFile()
-{
-	QString host = Settings::getInstance()->getServerName();
-	QString puttyKey = getPuttyKey( host );
-	if( puttyKey == "" )
+	QString puttyKey = getPuttyKey( host, sshhostkeysFileName );
+	if( puttyKey.isEmpty() )
 	{
 		qDebug() << "no putty key found for host " << host;
 	}
 	else
 	{
 		QString sshKey = convertPuttyKey( puttyKey, host );
-		addOpenSshKey( sshKey, host );
+		addOpenSshKey( sshKey, host, sshKnownHostsFileName );
 	}
 }
 
-QString HostFileUtils::getPuttyKey( const QString& host )
+QString HostFileUtils::getPuttyKey( const QString& host, const QString& sshhostkeysFileName )
 {
-	QString sshhostkeysFileName = QDir::home().absolutePath() + "/.putty/sshhostkeys"; //TODO: move string to config
 	QStringList allKeys = FileSystemUtils::readLinesFromFile( sshhostkeysFileName );
 
-		QString hostSearchPattern = ":" + host + " "; //rsa2@22:host 0x23,0x
-		foreach( QString key, allKeys )
-		{
-			if( key.contains( hostSearchPattern )) {
-				return key;
-			}
-		}
-		qDebug() << "key not found";
-		return "";
+    QString hostSearchPattern = ":" + host + " "; //rsa2@22:host 0x23,0x
+    foreach( QString key, allKeys )
+    {
+        if( key.contains( hostSearchPattern )) {
+            return key;
+        }
+    }
+    qDebug() << "key not found";
+    return QString();
 }
 
 QString HostFileUtils::convertPuttyKey( const QString& puttyKeyString, const QString& host )
 {
-	QByteArray puttyKey;
-	int keyStartPosition = 16 + host.length(); //rsa2@22:host 0x23,0x
-	puttyKey.append( puttyKeyString.mid( keyStartPosition ) );
+    QByteArray puttyKey;
+    int keyStartPosition = 16 + host.length(); //rsa2@22:host 0x23,0x
+    puttyKey.append( puttyKeyString.mid( keyStartPosition ) );
 
-	// key example: 00 00 00 07  73 73 68 2D  72 73 61 00  00 00 01 23  00 00 00 81  00 9F 5F 3C  AB 99 A2 D
-	QByteArray entry = QByteArray::fromHex( "00000007" );
-	entry.append("ssh-rsa");
-	entry.append( QByteArray::fromHex( "0000000123" ) );
+    // key example: 00 00 00 07  73 73 68 2D  72 73 61 00  00 00 01 23  00 00 00 81  00 9F 5F 3C  AB 99 A2 D
+    QByteArray entry = QByteArray::fromHex( "00000007" );
+    entry.append("ssh-rsa");
+    entry.append( QByteArray::fromHex( "0000000123" ) );
 
-	// key length
-	qDebug() << QByteArray::fromHex( puttyKey ).length();
-	int length = qToBigEndian( QByteArray::fromHex( puttyKey ).length() + 1 );
-	//TODO:  mit right die rechten 4 bytes der Länge nehmen.
-	// Auf 32 und 64 pcs ist int 32 bt breit -> auf Mac tetsten
-	QByteArray lengthBytes((const char*)&length, sizeof(length));
-	entry.append( lengthBytes );
+    // key length
+    qDebug() << QByteArray::fromHex( puttyKey ).length();
+    int length = qToBigEndian( QByteArray::fromHex( puttyKey ).length() + 1 );
+    //TODO:  mit right die rechten 4 bytes der Länge nehmen.
+    // Auf 32 und 64 pcs ist int 32 bt breit -> auf Mac tetsten
+    QByteArray lengthBytes((const char*)&length, sizeof(length));
+    entry.append( lengthBytes );
 
-	entry.append( QByteArray::fromHex( "00" ) );
+    entry.append( QByteArray::fromHex( "00" ) );
 
-	// putty key
-	entry.append( QByteArray::fromHex( puttyKey ) );
-	QString result;
-	result.append( host );
-	result.append( "," );
-	result.append( getIpAddress( host ) );
-	result.append( " ssh-rsa ");
-	result.append( entry.toBase64() );
-	return result;
+    // putty key
+    entry.append( QByteArray::fromHex( puttyKey ) );
+    QString result;
+    result.append( host );
+    result.append( "," );
+    result.append( getIpAddress( host ) );
+    result.append( " ssh-rsa ");
+    result.append( entry.toBase64() );
+    return result;
 }
 
-void HostFileUtils::addOpenSshKey( const QString& openSshKey, const QString& host )
+void HostFileUtils::addOpenSshKey( const QString& openSshKey, const QString& host, const QString& knownHostsFile )
 {
-	QString knownHostsFile = QDir::home().absolutePath() + "/.ssh/known_hosts"; //TODO: move string to config
-	QStringList oldKeys = FileSystemUtils::readLinesFromFile( knownHostsFile );
-	QStringList newKeys;
+    QStringList oldKeys = FileSystemUtils::readLinesFromFile( knownHostsFile );
+    QStringList newKeys;
 
-		QString hostSearchPattern = host + ",";
-		bool added = false;
-		foreach( QString key, oldKeys )
-		{
-			if( key.startsWith( hostSearchPattern ) )
-			{
-				// replace the key
-				newKeys << openSshKey;
-				added = true;
-			}
-			else
-			{
-				newKeys << key;
-			}
-		}
-		if( !added )
-		{
-			newKeys << openSshKey;
-		}
+    QString hostSearchPattern = host + ",";
+    bool added = false;
+    foreach( QString key, oldKeys )
+    {
+        if( key.startsWith( hostSearchPattern ) )
+        {
+            // replace the key
+            newKeys << openSshKey;
+            added = true;
+        }
+        else
+        {
+            newKeys << key;
+        }
+    }
+    if( !added )
+    {
+        newKeys << openSshKey;
+    }
 
-		FileSystemUtils::writeLinesToFile( knownHostsFile, newKeys );
+    FileSystemUtils::writeLinesToFile( knownHostsFile, newKeys );
 }
 
 QString HostFileUtils::getIpAddress( const QString& host )

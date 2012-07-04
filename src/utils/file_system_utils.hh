@@ -21,6 +21,9 @@
 
 #include "exception/runtime_exception.hh"
 
+#include <QFileInfo>
+#include <QString>
+
 /**
  * The FileSystemUtils class provides convenience methods for file system specific tasks
  * @author Bruno Santschi, santschi@puzzle.ch
