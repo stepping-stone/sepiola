@@ -196,7 +196,12 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	}
 	applicationDataDir = homeDir.absolutePath() + "/" + applicationDataDirName + "/";
 	QString appDataSettingsFileName  = applicationDataDir + configFile.fileName() + appDataAffix;
+
+#ifndef PORTABLE_INSTALLATION
+    applicationBinDir = "/";
+#else
 	applicationBinDir = configFile.absolutePath() + "/";
+#endif
 	qRegisterMetaType<ScheduledTask>("ScheduledTask");
 	if (applicationSettings != 0) { delete applicationSettings; }
 	applicationSettings = new QSettings( configFile.absoluteFilePath(), QSettings::IniFormat );
