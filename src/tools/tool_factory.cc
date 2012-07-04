@@ -16,16 +16,24 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QDebug>
-
+#if Q_OS_WIN
 #include "tools/at.hh"
 #include "tools/schtasks.hh"
+#else
 #include "tools/crontab.hh"
+#endif
+
 #include "tools/plink.hh"
-#include "tools/posix_acl.hh"
 #include "tools/rsync.hh"
-#include "tools/set_acl.hh"
+
+#if Q_OS_MAC
 #include "tools/unix_permissions.hh"
+#elif Q_OS_WIN
+#include "tools/set_acl.hh"
+#else
+#include "tools/posix_acl.hh"
+#endif
+
 #include "tools/tool_factory.hh"
 
 ToolFactory::ToolFactory()
@@ -38,15 +46,14 @@ ToolFactory::~ToolFactory()
 
 auto_ptr< AbstractMetadata > ToolFactory::getMetadataImpl()
 {
-	if ( Settings::IS_MAC )
-	{
-		return auto_ptr< AbstractMetadata >( new UnixPermissions );
-	}
-	if ( Settings::IS_WINDOWS )
-	{
-		return auto_ptr< AbstractMetadata >( new SetAcl );
-	}
-	return auto_ptr< AbstractMetadata >( new PosixAcl );
+#if Q_OS_MAC
+	return auto_ptr< AbstractMetadata >( new UnixPermissions );
+#elif Q_OS_WIN
+	return auto_ptr< AbstractMetadata >( new SetAcl(Settings::getInstance()->getSetAclName()) );
+#else
+	return auto_ptr< AbstractMetadata >( new PosixAcl(Settings::getInstance()->getGetfaclName(), Settings::getInstance()->getGetfaclName()) );
+#endif
+
 }
 
 auto_ptr< AbstractRsync > ToolFactory::getRsyncImpl()

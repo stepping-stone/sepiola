@@ -21,25 +21,27 @@
 #include <QMap>
 #include <QDir>
 
-#include "settings/settings.hh"
-#include "test/test_manager.hh"
 #include "tools/set_acl.hh"
 #include "utils/file_system_utils.hh"
 
-SetAcl::SetAcl() {}
-SetAcl::~SetAcl() {}
+SetAcl::SetAcl(const QString& setAcl) :
+    setAclName(setAcl)
+{
+}
+
+SetAcl::~SetAcl()
+{
+}
 
 const QString SetAcl::ITEM_NAME_PREFIX = "\"\\\\?\\";
 const uint SetAcl::ITEM_NAME_PREFIX_SIZE = 5;
 
-QString SetAcl::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
+QString SetAcl::getMetadata(const QString& aclFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
 {
 	qDebug() << "SetAcl::getMetadata( processedItems )";
-	Settings* settings = Settings::getInstance();
-	QString aclFileName = settings->getApplicationDataDir() + settings->getTempMetadataFileName();
 	QStringList arguments;
 	arguments << "-ot" << "file" << "-rec" << "no" << "-actn" << "list" << "-lst" << "f:sddl;w:d,s,o,g" << "-bckp" << aclFileName;
-	createProcess( settings->getSetAclName(), arguments );
+	createProcess( setAclName, arguments );
 	start();
 	setTextModeEnabled(true);
 	//waitForStarted();
@@ -147,11 +149,10 @@ void SetAcl::setMetadata( const QFileInfo& metadataFileName, const QStringList& 
 	newAclMap.clear();
 
 	// apply acl
-	Settings* settings = Settings::getInstance();
 	QStringList arguments;
 	arguments << "-ot" << "file" << "-rec" << "no" << "-actn" << "restore" << "-bckp" << metadataFileName.absoluteFilePath();
 
-	createProcess( settings->getSetAclName() , arguments );
+	createProcess( setAclName , arguments );
 
 	setReadChannel(QProcess::StandardOutput);
 	/*setProcessChannelMode(QProcess::MergedChannels);
@@ -271,31 +272,4 @@ void SetAcl::writeMapContentToFile( const QMap<QString, QString>& aclMap, const 
 	}
 	textStream.flush();
 	aclFile.close();
-}
-
-void SetAcl::testGetMetadata()
-{
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair( QString( "c:/tmp/test.exe" ), AbstractRsync::TRANSFERRED );
-	processedItems << qMakePair( QString( "c:/tmp/include.txt" ), AbstractRsync::DELETED );
-	SetAcl setAcl;
-	setAcl.getMetadata( processedItems );
-}
-
-void SetAcl::testSetMetadata()
-{
-	Settings* settings = Settings::getInstance();
-	QString aclFile = settings->getApplicationDataDir() + settings->getMetadataFileName();
-
-	QStringList downloadedFiles;
-	downloadedFiles << "c:/tmp/include.txt";
-
-	SetAcl setAcl;
-	setAcl.setMetadata( aclFile, downloadedFiles, "c:/tmp/tmp2/" );
-}
-
-namespace
-{
-	int dummy = TestManager::registerTest( "setAcl_testGetMetadata", SetAcl::testGetMetadata );
-	int dummy2 = TestManager::registerTest( "setAcl_testSetMetadata", SetAcl::testSetMetadata );
 }

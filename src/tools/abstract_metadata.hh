@@ -44,7 +44,10 @@ public:
 	 * @param warnings string to append warnings to. Warnings are discarded if it is 0.
 	 * @return the full name of the created metadata file
 	 */
-	virtual QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 ) = 0;
+	virtual QString getMetadata(
+            const QString& metadataFileName,
+            const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
+            QString* warnings = 0 ) = 0;
 
 	/**
 	 * Merges the data from the new and the existing metadata file and deletes items if necessary

@@ -35,7 +35,7 @@ public:
 	/**
 	 * Constructs a SetAcl
 	 */
-	SetAcl();
+	SetAcl(const QString& setAcl);
 
 	/**
 	 * Destroys the SetAcl
@@ -45,7 +45,7 @@ public:
 	/**
 	 * @see AbstractMetadata::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
 	 */
-	QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 );
+	QString getMetadata( const QString& aclFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 );
 
 	/**
 	 * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
@@ -62,19 +62,11 @@ public:
 	 */
 	QStringList extractItems( const QFileInfo& metadataFile );
 
-	/**
-	 * Tests the getMetadata method
-	 */
-	static void testGetMetadata();
-
-	/**
-	 * Tests the setMetadata method
-	 */
-	static void testSetMetadata();
-
 private:
 	static const QString ITEM_NAME_PREFIX;
 	static const uint ITEM_NAME_PREFIX_SIZE;
+
+    QString setAclName;
 
 	void populateMapFromFile( const QFileInfo& aclFileName, QMap<QString, QString>* aclMap);
 	void writeMapContentToFile( const QMap<QString, QString>& aclMap, const QFileInfo& aclFileName);

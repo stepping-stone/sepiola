@@ -36,7 +36,6 @@ public:
 	/**
 	 * Constructs a PosixAcl
 	 */
-    PosixAcl();
     PosixAcl(const QString& getfacl, const QString& setfacl);
 	/**
 	 * Destroys the PosixAcl
@@ -46,8 +45,6 @@ public:
 	/**
 	 * @see AbstractMetadata::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
 	 */
-	QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 );
-
     QString getMetadata(
         const QString& aclFileName,
         const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
@@ -68,24 +65,12 @@ public:
 	 */
 	QStringList extractItems( const QFileInfo& metadataFile );
 
-	/**
-	 * Tests the getMetadata method
-	 */
-	static void testGetMetadata();
-
-	/**
-	 * Tests the setMetadata method
-	 */
-	static void testSetMetadata();
-
-	/**
-	 * Tests the unescapeOctalCharacters method
-	 */
-	static void testUnescapeOctalCharacters();
+protected:
+    friend class TestPosixAcl;
+	static QString unescapeOctalCharacters( const QString& escapedString, bool* ok );
 
 private:
 	static const QString ITEM_NAME_PREFIX;
-	static QString unescapeOctalCharacters( const QString& escapedString, bool* ok );
 
 	void populateMapFromFile( const QFileInfo& aclFileName, QMap<QString, QStringList>* aclMap);
 	void writeMapContentToFile( const QMap<QString, QStringList>& aclMap, const QFileInfo& aclFileName);

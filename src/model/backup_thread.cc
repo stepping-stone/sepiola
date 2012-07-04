@@ -173,7 +173,7 @@ void BackupThread::run()
 							  this, SIGNAL( errorSignal( const QString& ) ) );
 			QFileInfo currentMetadataFileName = rsync->downloadCurrentMetadata( settings->getApplicationDataDir(), false );
 			checkAbortState();
-			QFileInfo newMetadataFileName = metadata->getMetadata( processedItems, &warning );
+			QFileInfo newMetadataFileName = metadata->getMetadata( settings->getApplicationDataDir() + settings->getTempMetadataFileName(), processedItems, &warning );
 			if (!warning.isEmpty()) warnings.append(warning);
 			checkAbortState();
 			metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, processedItems );

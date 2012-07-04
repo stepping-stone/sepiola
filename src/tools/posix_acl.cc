@@ -20,9 +20,7 @@
 #include <QFile>
 #include <QMap>
 
-#include "settings/settings.hh"
 #include "settings/platform.hh"
-#include "test/test_manager.hh"
 #include "tools/abstract_rsync.hh"
 #include "tools/posix_acl.hh"
 #include "utils/unicode_text_stream.hh"
@@ -33,12 +31,6 @@
 
 const QString PosixAcl::ITEM_NAME_PREFIX = "# file: /";
 
-PosixAcl::PosixAcl() :
-    getfaclName(Settings::getInstance()->getGetfaclName()),
-    setfaclName(Settings::getInstance()->getGetfaclName())
-{
-}
-
 PosixAcl::PosixAcl(const QString& getfacl, const QString& setfacl) :
     getfaclName(getfacl),
     setfaclName(setfacl)
@@ -47,17 +39,6 @@ PosixAcl::PosixAcl(const QString& getfacl, const QString& setfacl) :
 
 PosixAcl::~PosixAcl()
 {
-}
-
-QString PosixAcl::getMetadata(
-        const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
-        QString* warnings)
-{
-    Settings* settings(Settings::getInstance());
-    return getMetadata(
-            settings->getApplicationDataDir() + settings->getTempMetadataFileName(),
-            processedItems,
-            warnings);
 }
 
 QString PosixAcl::getMetadata(
@@ -345,38 +326,4 @@ QString PosixAcl::unescapeOctalCharacters(const QString& escapedString, bool* ok
 	qDebug() << "unescaped : " << result;
 	*ok = true;
 	return result;
-}
-
-void PosixAcl::testUnescapeOctalCharacters()
-{
-	bool ok;
-	qDebug() << unescapeOctalCharacters("/tmp2/uml\\303\\244\\303\\266\\303\\274.txt", &ok);
-	qDebug() << unescapeOctalCharacters("tmp/permtest/sub1/2.txt", &ok);
-}
-
-void PosixAcl::testGetMetadata()
-{
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair(QString("/tmp2/umläöü.txt"), AbstractRsync::TRANSFERRED);
-	PosixAcl posixAcl;
-	posixAcl.getMetadata(processedItems);
-}
-
-void PosixAcl::testSetMetadata()
-{
-	Settings* settings = Settings::getInstance();
-	QString aclFile = settings->getApplicationDataDir() + settings->getMetadataFileName();
-
-	QStringList downloadedFiles;
-	downloadedFiles << "/tmp2/umläöü.txt";
-
-	PosixAcl posixAcl;
-	posixAcl.setMetadata(aclFile, downloadedFiles, "/");
-}
-
-namespace
-{
-int dummy = TestManager::registerTest("posixAcl_testGetMetadata", PosixAcl::testGetMetadata);
-int dummy2 = TestManager::registerTest("posixAcl_testSetMetadata", PosixAcl::testSetMetadata);
-int dummy3 = TestManager::registerTest("testUnescapeOctalCharacters", PosixAcl::testUnescapeOctalCharacters);
 }

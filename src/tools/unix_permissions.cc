@@ -20,11 +20,10 @@
 #include <QFile>
 #include <QFlags>
 #include <QTextStream>
+#include <QVariant>
 
 #include <unistd.h>
 
-#include "settings/settings.hh"
-#include "test/test_manager.hh"
 #include "tools/unix_permissions.hh"
 #include "utils/extended_file.hh"
 #include "utils/unicode_text_stream.hh"
@@ -37,13 +36,11 @@ UnixPermissions::~UnixPermissions()
 {
 }
 
-QString UnixPermissions::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
+QString UnixPermissions::getMetadata(const QString& metadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
 {
 	qDebug() << "UnixPermissions::getMetadata( processedItems )";
-	Settings* settings = Settings::getInstance();
 
 	// metadata format: filename \n owner \n group \n permission
-	QString metadataFileName = settings->getApplicationDataDir() + settings->getTempMetadataFileName();
 	QFile metadataFile( metadataFileName );
 	if ( !metadataFile.open( QIODevice::WriteOnly ) )
 	{
@@ -204,42 +201,4 @@ void UnixPermissions::writeMapContentToFile( const QMap<QString, QStringList>& m
 		out << "\n";
 	}
 	metadataFile.close();
-}
-
-void UnixPermissions::testGetMetadata()
-{
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair( QString( "/Users/test/tools/putty-0.60.tar.gz" ), AbstractRsync::TRANSFERRED );
-	processedItems << qMakePair( QString( "/Users/test/tools/info.txt" ), AbstractRsync::DELETED );
-	UnixPermissions unixPermissions;
-	unixPermissions.getMetadata( processedItems );
-}
-
-void UnixPermissions::testInsertMetadata()
-{
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
-	processedItems << qMakePair( QString( "/Users/test/tools/putty-0.60.tar.gz" ), AbstractRsync::TRANSFERRED );
-	processedItems << qMakePair( QString( "/Users/test/tools/info.txt" ), AbstractRsync::DELETED );
-	UnixPermissions unixPermissions;
-	QString metadataFile = unixPermissions.getMetadata( processedItems );
-	unixPermissions.mergeMetadata( metadataFile, metadataFile, processedItems );
-}
-
-void UnixPermissions::testSetMetadata()
-{
-	Settings* settings = Settings::getInstance();
-	QString aclFile = settings->getApplicationDataDir() + settings->getMetadataFileName();
-
-	QStringList downloadedFiles;
-	downloadedFiles << "Users/test/tools/putty-0.60.tar.gz";
-
-	UnixPermissions unixPermissions;
-	unixPermissions.setMetadata( aclFile, downloadedFiles, "/tmp" );
-}
-
-namespace
-{
-	int dummy = TestManager::registerTest( "unixPermissions_testGetMetadata", UnixPermissions::testGetMetadata );
-	int dummy2 = TestManager::registerTest( "unixPermissions_testSetMetadata", UnixPermissions::testSetMetadata );
-	int dummy3 = TestManager::registerTest( "unixPermissions_testInsertMetadata", UnixPermissions::testInsertMetadata );
 }
