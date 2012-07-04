@@ -41,7 +41,7 @@ void HostFileUtils::addPuttyKeyToOpenSshKeyFile()
 	QString puttyKey = getPuttyKey( host );
 	if( puttyKey == "" )
 	{
-		qDebug() << "no putty key found";
+		qDebug() << "no putty key found for host " << host;
 	}
 	else
 	{
@@ -129,11 +129,13 @@ void HostFileUtils::addOpenSshKey( const QString& openSshKey, const QString& hos
 
 QString HostFileUtils::getIpAddress( const QString& host )
 {
-	QHostInfo hostInfo = QHostInfo::fromName( host ); // blocking lookup
-	if (!hostInfo.addresses().isEmpty())
-	{
-			return hostInfo.addresses().first().toString(); // use the first IP address
-	}
-	qWarning() << "can not get IP adress";
-	return "";
+    QHostInfo hostInfo = QHostInfo::fromName( host ); // blocking lookup
+
+    if (hostInfo.error() != QHostInfo::NoError)
+    {
+        qWarning() << "IP address lookup failed:" << hostInfo.errorString();
+        return QString();
+    }
+    
+    return hostInfo.addresses().first().toString(); // use the first IP address
 }
