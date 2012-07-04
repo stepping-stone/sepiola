@@ -47,6 +47,8 @@
 #include "test/test_manager.hh"
 #include "utils/log_file_utils.hh"
 
+#include "config.h"
+
 namespace
 {
 static const QString CONFIG_FILE_NAME = "config";
@@ -59,7 +61,11 @@ static const char* SINGLE_APPLICATION_ERROR =
 
 bool initSettings(QCoreApplication* app)
 {
+#ifdef PORTABLE_INSTALLATION
 	QString applicationDirPath = app->applicationDirPath();
+#else
+    QString applicationDirPath = APPLICATION_SHARE_DIR;
+#endif
 	QFileInfo configFile(applicationDirPath, CONFIG_FILE_NAME);
 	if ( !configFile.exists() )
 	{

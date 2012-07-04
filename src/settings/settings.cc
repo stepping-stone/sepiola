@@ -32,6 +32,8 @@
 #include "utils/datatypes.hh"
 #include "model/scheduled_task.hh"
 
+#include "config.h"
+
 #ifdef Q_OS_UNIX
 const bool Settings::IS_UNIX = true;
 #else
@@ -55,8 +57,12 @@ const bool Settings::IS_MAC = false;
 const bool Settings::SHOW_PROGRESS = false;
 
 const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );
-const QString Settings::VERSION = QString::number( CPACK_PACKAGE_VERSION_MAJOR ) + "." + QString::number( CPACK_PACKAGE_VERSION_MINOR ) + "." + QString::number( CPACK_PACKAGE_VERSION_PATCH );
-const bool Settings::IS_RESELLER = ( CPACK_IS_RESELLER == 1 ? true : false );
+const QString Settings::VERSION = QString::number( VERSION_MAJOR ) + "." + QString::number( VERSION_MINOR ) + "." + QString::number( VERSION_PATCH );
+#ifdef IS_RESELLER
+const bool Settings::IS_RESELLER = true;
+#else
+const bool Settings::IS_RESELLER = false;
+#endif
 
 // [Application]
 const QString Settings::SETTINGS_GROUP_APPLICATION = "Application";
