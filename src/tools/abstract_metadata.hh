@@ -20,7 +20,9 @@
 #define ABSTRACT_ACL_HH
 
 #include <QString>
+#include <QStringList>
 #include <QFileInfo>
+#include <QPair>
 
 #include "tools/abstract_rsync.hh"
 #include "tools/abstract_informing_process.hh"

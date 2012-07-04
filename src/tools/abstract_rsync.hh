@@ -24,9 +24,7 @@
 #include <QFileInfo>
 #include <QObject>
 #include <QPair>
-#include <QHash>
 
-#include "model/restore_name.hh"
 #include "tools/abstract_informing_process.hh"
 
 /**
