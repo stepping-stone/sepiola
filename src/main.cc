@@ -108,7 +108,7 @@ bool assertCliDependencies()
     // plink and rsync are required on all platforms
     if (!plinkFile.exists() || !rsyncFile.exists())
     {
-        qDebug() << "plink or rsync could not be found";
+        qDebug() << "plink" << settings->getPlinkName() << "or rsync" << settings->getRsyncName() << "could not be found";
         return false;
     }
 
