@@ -457,7 +457,6 @@ class Settings : public QObject
 	private:
 		Settings();
 		virtual ~Settings();
-		void setCurrentOS( const QString& osName );
 		bool createKeyFile( const QString& key, const QString& keyFilePath );
 
 };
