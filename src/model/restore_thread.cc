@@ -23,32 +23,6 @@
 #include "tools/tool_factory.hh"
 #include "utils/file_system_utils.hh"
 
-
-/**
- * deprecated, fullRestore is done by passing selectionRule("/",true)
- */
-/* RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const QString& destination )
-{
-	this->isCustomRestore = false;
-	this->backup_prefix = backup_prefix;
-	this->backupName = backupName;
-	this->destination = destination;
-	init();
-} */
-
-/**
- * deprecated
- */
-/* RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const QStringList& items, const QString& destination )
-{
-	this->isCustomRestore = true;
-	this->backup_prefix = backup_prefix;
-	this->backupName = backupName;
-	this->items = items;
-	this->destination = destination;
-	init();
-} */
-
 RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )
 {
 	this->isCustomRestore = true;

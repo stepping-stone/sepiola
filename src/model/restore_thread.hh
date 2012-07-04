@@ -44,15 +44,6 @@ public:
 	 * @param backupName name of the backup for fetching the restore items
 	 * @param destination a destination path for restoring
 	 */
-//	RestoreThread( const QString& backup_prefix, const QString& backupName, const QString& destination );
-
-	/**
-	 * Creates a RestoreThread
-	 * @param backupName name of the backup for fetching the restore items
-	 * @param items selected items
-	 * @param destination a destination path for restoring
-	 */
-//	RestoreThread( const QString& backup_prefix, const QString& backupName, const QStringList& items, const QString& destination );
 	RestoreThread( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
 
 	/**
