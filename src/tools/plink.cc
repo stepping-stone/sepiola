@@ -30,6 +30,7 @@
 #include "exception/login_exception.hh"
 #include "model/restore_name.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "test/test_manager.hh"
 #include "tools/plink.hh"
 #include "utils/host_file_utils.hh"
@@ -139,14 +140,14 @@ bool Plink::assertCorrectFingerprint()
 		{
 			qDebug() << "Correct server key";
 			write( "y" );
-			write( settings->getEOLCharacter() );
+			write( Platform::EOL_CHARACTER );
 			waitForReadyRead();
 			terminate();
 			return true;
 		}
 		qWarning() << "Wrong server key: " << serverKey << " instead of " << savedKey;
 		write( "n" );
-		write( settings->getEOLCharacter() );
+		write( Platform::EOL_CHARACTER );
 		terminate();
 		return false;
 	}

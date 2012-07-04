@@ -21,6 +21,7 @@
 #include <QMap>
 
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "test/test_manager.hh"
 #include "tools/abstract_rsync.hh"
 #include "tools/posix_acl.hh"
@@ -64,7 +65,7 @@ QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE
 			//LogFileUtils::getInstance()->logToHex(processedItem.first.toLocal8Bit());
 			emit infoSignal(QObject::tr( "Getting metadata for %1" ).arg(processedItem.first) );
 			write(processedItem.first.toLocal8Bit().data() );
-			write(settings->getEOLCharacter() );
+			write(Platform::EOL_CHARACTER);
 		}
 	}
 
