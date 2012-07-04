@@ -52,6 +52,7 @@ namespace
 static const QString CONFIG_FILE_NAME = "config";
 static const QString VERSION_ARGUMENT = "-version";
 static const char* DEPENDENCY_MISSING = "Dependent files are missing. Please reinstall the application.\n";
+static const char* TRANSLATION_MISSING = "Translation files are missing, using default language. Please reinstall the application.\n";
 static const char* SINGLE_APPLICATION_ERROR =
 		"The application is already running. Only one instance of this application can be run concurrently.\n";
 }
@@ -97,40 +98,56 @@ bool assertCliDependencies()
 	Settings* settings = Settings::getInstance();
 	QFileInfo plinkFile(settings->getPlinkName() );
 	QFileInfo rsyncFile(settings->getRsyncName() );
-	bool sshClient = true;
-	if (settings->useOpenSshInsteadOfPlinkForRsync() )
+
+    // plink and rsync are required on all platforms
+    if (!plinkFile.exists() || !rsyncFile.exists())
+    {
+        qDebug() << "plink or rsync could not be found";
+        return false;
+    }
+
+	if (settings->useOpenSshInsteadOfPlinkForRsync())
 	{
+        // return if the user chose to use the ssh client instead
+        // of plink and the client could not befound
 		QFileInfo sshFile(settings->getSshName() );
-		sshClient = sshFile.exists();
+		if (!sshFile.exists())
+        {
+            qDebug() << "OpenSSH instead of plink selected, but ssh could not be found";
+            return false;
+        }
 	}
-	if (Settings::IS_WINDOWS)
-	{
-		QFileInfo setaclFile(settings->getSetAclName() );
-		return plinkFile.exists() && rsyncFile.exists() && setaclFile.exists() && sshClient;
-	}
-	else if (Settings::IS_MAC)
-	{
-		return plinkFile.exists() && rsyncFile.exists() && sshClient;
-	}
+    
+#ifdef Q_OS_WIN
+	QFileInfo setaclFile(settings->getSetAclName() );
+	return setaclFile.exists();
+#endif
+
+#ifdef Q_OS_UNIX
 	QFileInfo getfaclFile(settings->getGetfaclName() );
 	QFileInfo setfaclFile(settings->getSetfaclName() );
-	return getfaclFile.exists() && plinkFile.exists() && rsyncFile.exists() && setfaclFile.exists() && sshClient;
+	return getfaclFile.exists() && setfaclFile.exists();
+#endif
+
+    return true;
 }
 
-bool assertGuiDependencies()
+bool loadTranslations()
 {
 	QTranslator translator;
 	Settings* settings = Settings::getInstance();
 	QStringList supportedLanguages = settings->getSupportedLanguages();
+
+	// skip the default langauge, because there is no translation file for it
 	for (int i=1; i<supportedLanguages.size(); i++)
 	{
-		// skip the default langauge, because there is no translation file for it
 		if (!translator.load(supportedLanguages.at(i), settings->getApplicationBinDir() ) )
 		{
+            qDebug() << "translation for" << supportedLanguages.at(i) << "could not be found";
 			return false;
 		}
 	}
-	return assertCliDependencies();
+	return true;
 }
 
 bool isProcessRunning(const int& processId)
@@ -307,11 +324,15 @@ int main(int argc, char *argv[])
 	// run with gui
 	QApplication app(argc, argv);
 	qInstallMsgHandler(messageHandler);
-	if ( !initSettings( &app) || !assertGuiDependencies() )
+	if ( !initSettings( &app) || !assertCliDependencies())
 	{
 		QMessageBox::critical( 0, "Dependency missing", DEPENDENCY_MISSING);
 		return -1;
 	}
+    if (!loadTranslations())
+    {
+   		QMessageBox::critical( 0, "Translations missing", TRANSLATION_MISSING);
+    }
 	if ( !assertSingleApplication() )
 	{
 		QMessageBox::critical( 0, "Application is already running", SINGLE_APPLICATION_ERROR);
