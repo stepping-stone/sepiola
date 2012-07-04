@@ -93,7 +93,7 @@ private:
 	static const QString TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT;
 	static const QString TASKNAME_UPLOAD_METADATA;
 	static const QString TASKNAME_METAINFO;
-	void checkAbortState() throw ( AbortException );
+	void checkAbortState();
 	void prepareServerDirectories();
 	quint64 estimateBackupSize( const QString& src, const QString& destination );
 	void updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList );

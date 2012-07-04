@@ -157,7 +157,7 @@ void RestoreThread::applyMetadata( const QString& backup_prefix, const QString& 
 	}
 }
 
-void RestoreThread::checkAbortState() throw ( AbortException )
+void RestoreThread::checkAbortState()
 {
 	if ( isRunning() && isAborted )
 	{

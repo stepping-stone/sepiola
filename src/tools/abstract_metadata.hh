@@ -41,6 +41,7 @@ public:
 	/**
 	 * Creates a metadata file for the given file and directory list
 	 * @param processedItems list of file and directory names
+	 * @param warnings string to append warnings to. Warnings are discarded if it is 0.
 	 * @return the full name of the created metadata file
 	 */
 	virtual QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 ) = 0;

@@ -52,7 +52,7 @@ Rsync::Rsync() {
 Rsync::~Rsync() {}
 
 
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) throw ( ProcessException )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run )
 {
 	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << (warnings ? *warnings : "(no warnings)") << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
@@ -227,7 +227,7 @@ void Rsync::bufferedInfoOutput() // prevents direct flush
 /**
  * deprecated
  */
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) throw ( ProcessException )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run )
 {
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files:";
@@ -350,7 +350,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 }
 
 
-long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* /* errors */, QString* warnings ) throw ( ProcessException )
+long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* /* errors */, QString* warnings )
 {
 	this->upload( includeRules, src, destination, setDeleteFlag, compress, warnings, true );
 	return this->last_calculatedLiteralData;
@@ -439,7 +439,7 @@ QFileInfo Rsync::downloadSingleFile( const QString& source, const QString& desti
 	}
 }
 
-QStringList Rsync::download( const QString& source, const QString& destination, bool compress ) throw ( ProcessException )
+QStringList Rsync::download( const QString& source, const QString& destination, bool compress )
 {
 	return download( source, destination, QStringList(), compress, true );
 }
@@ -447,7 +447,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 /**
  * only used for single files, not for whole restore-process anymore
  */
-QStringList Rsync::download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException )
+QStringList Rsync::download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal )
 {
 	qDebug() << "Rsync::download(" << source << ", " << destination << ", ... )";
 
@@ -535,7 +535,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	return downloadedItems;
 }
 
-QStringList Rsync::download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal ) throw ( ProcessException )
+QStringList Rsync::download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal )
 {
 	qDebug() << "Rsync::download(" << source << ", " << destination << "," << includeRules << ", ... )";
 

@@ -253,7 +253,7 @@ void BackupThread::run()
 	emit updateOverviewFormLastBackupsInfo();
 }
 
-void BackupThread::checkAbortState() throw ( AbortException )
+void BackupThread::checkAbortState()
 {
 	if ( isRunning() && isAborted )
 	{

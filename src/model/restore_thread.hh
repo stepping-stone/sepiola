@@ -83,7 +83,7 @@ protected:
 
 private:
 	void init();
-	void checkAbortState() throw ( AbortException );
+	void checkAbortState();
 	void applyMetadata( const QString& backup_prefix, const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination );
 	void pushStateEvent(ConstUtils::StatusEnum eventState);
 

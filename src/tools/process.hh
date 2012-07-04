@@ -72,7 +72,7 @@ protected:
 	 * @see Process::createProcess( const QString& executableName, const QStringList& arguments )
 	 * @see Process::createProcess( const QString& executableName )
 	 */
-	void start() throw ( ProcessException );
+	void start();
 
 	/**
 	 * Reads a line of data and stores the characters in byteArray. This method blocks until a line

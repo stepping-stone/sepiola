@@ -59,7 +59,7 @@ void Process::createProcess(const QString& executableName, const QStringList& ar
 	this->arguments = arguments;
 }
 
-void Process::start() throw (ProcessException )
+void Process::start()
 {
 	assert(qProcess);
 	qDebug() << "Started: " << executableName << arguments;

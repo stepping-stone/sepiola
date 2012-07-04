@@ -46,7 +46,7 @@ public:
 	/**
 	 * @see AbstractMetadata::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
 	 */
-	QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 ) throw ( ProcessException );
+	QString getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 );
 
 	/**
 	 * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
@@ -56,7 +56,7 @@ public:
 	/**
 	 * @see AbstractMetadata::setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination )
 	 */
-	void setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination ) throw ( ProcessException );
+	void setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination );
 
 	/**
 	 * @see AbstractMetadata::extractItems( const QFileInfo& metadataFile )

@@ -65,7 +65,7 @@ void FileSystemUtils::removeFile(const QFileInfo& fileInfo)
 	file.remove();
 }
 
-void FileSystemUtils::convertFile(const QString& fileName, const QString& fromEncoding, const QString& toEncoding) throw ( RuntimeException )
+void FileSystemUtils::convertFile(const QString& fileName, const QString& fromEncoding, const QString& toEncoding)
 {
 	qDebug() << "FileSystemUtils::convertFile" << " " << fileName << " " << fromEncoding << " " << toEncoding;
 

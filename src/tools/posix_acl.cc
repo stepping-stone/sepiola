@@ -40,8 +40,9 @@ PosixAcl::~PosixAcl()
 {
 }
 
-QString PosixAcl::getMetadata(const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings)
-		throw (ProcessException )
+QString PosixAcl::getMetadata(
+        const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
+        QString* warnings)
 {
 	qDebug() << "PosixAcl::getMetadata( processedItems )";
 	Settings* settings = Settings::getInstance();
@@ -121,7 +122,7 @@ void PosixAcl::mergeMetadata(const QFileInfo& newMetadataFileName, const QFileIn
 }
 
 void PosixAcl::setMetadata(const QFileInfo& metadataFileName, const QStringList& downloadedItems,
-	const QString& downloadDestination) throw (ProcessException )
+	const QString& downloadDestination)
 {
 	qDebug() << "PosixAcl::setMetadata( " << metadataFileName.absoluteFilePath() << ", " << downloadedItems << ", "
 			<< downloadDestination << " )";

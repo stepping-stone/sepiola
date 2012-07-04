@@ -48,7 +48,7 @@ public:
 	/**
 	 * Converts \a file \a fromEncoding \a toEncoding.
 	 */
-	static void convertFile(const QString& file, const QString& fromEncoding, const QString& toEncoding) throw ( RuntimeException );
+	static void convertFile(const QString& file, const QString& fromEncoding, const QString& toEncoding);
 
 	/**
 	 * Converts the given path so that rsync supports it.

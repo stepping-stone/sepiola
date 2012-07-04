@@ -58,13 +58,13 @@ public:
 	/**
 	 * @see AbstractRsync::upload( const QStringList& items, const QString& source, const QString& destination, const QString& includePattern, const QString& excludePattern, QString* errors )
 	 */
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run ) throw ( ProcessException );
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* warnings, bool dry_run ) throw ( ProcessException );
+	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run );
+	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, QString* warnings, bool dry_run );
 
 	/**
 	 *
 	 */
-	long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings ) throw ( ProcessException );
+	long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* errors, QString* warnings );
 
 	/**
 	 * @see AbstractRsync::downloadFullBackup( const QString& backup_prefix, const QString& backupName, const QString& destination )
@@ -179,9 +179,9 @@ private:
 	QDateTime lastUpdateTime;
 
 	QFileInfo downloadSingleFile( const QString& source, const QString& destination, const QFileInfo& fileName, bool compress, bool emitErrorSignal );
-	QStringList download( const QString& source, const QString& destination, bool compress) throw ( ProcessException );
-	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal ) throw ( ProcessException );
-	QStringList download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal ) throw ( ProcessException );
+	QStringList download( const QString& source, const QString& destination, bool compress);
+	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal );
+	QStringList download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal );
 	void processWarningsAndErrors(QString* warnings);
 
 	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
