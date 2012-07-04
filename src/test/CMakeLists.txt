@@ -19,4 +19,21 @@ TARGET_LINK_LIBRARIES(test_posix_acl
     ${QT_QTCORE_LIBRARY}
     ${QT_QTNETWORK_LIBRARY})
 
+QT4_WRAP_CPP(test_host_file_utils_MOC
+    test_host_file_utils.hh
+    ../utils/host_file_utils.hh
+    )
+
+ADD_EXECUTABLE(test_host_file_utils test_host_file_utils.cc
+    ${test_host_file_utils_MOC}
+    ../utils/host_file_utils.cc
+    ../utils/file_system_utils.cc
+    )
+
+TARGET_LINK_LIBRARIES(test_host_file_utils
+    ${QT_QTTEST_LIBRARY}
+    ${QT_QTCORE_LIBRARY}
+    ${QT_QTNETWORK_LIBRARY})
+
 ADD_TEST(test_posix_acl ${CMAKE_CURRENT_BINARY_DIR}/test_posix_acl)
+ADD_TEST(test_host_file_utils ${CMAKE_CURRENT_BINARY_DIR}/test_host_file_utils)
