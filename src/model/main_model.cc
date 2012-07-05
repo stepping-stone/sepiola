@@ -119,7 +119,7 @@ bool MainModel::initConnection()
 					{
 						isLoggedIn = true;
 					}
-				} catch ( LoginException e )
+				} catch ( const LoginException& e )
 				{
 					emit infoSignal( tr( "Login failed." ) );
 					emit showInformationMessageBox( e.what() );

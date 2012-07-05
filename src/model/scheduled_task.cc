@@ -150,7 +150,11 @@ QString ScheduledTask::toString() const
 {
 	switch (this->type)
 	{
-		case ScheduleRule::NEVER: { return QString(QObject::tr("never")); break; }
+		case ScheduleRule::NEVER:
+        {
+            return QString(QObject::tr("never"));
+        }
+
 		case ScheduleRule::AT_WEEKDAYS_AND_TIME:
 		{
 			if (weekdays.size() > 0) {
@@ -177,20 +181,17 @@ QString ScheduledTask::toString() const
 				// full info (not desired by stst
 				// return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"), nextBackupDatesList.at(0).toString());
 				return QObject::tr("%1").arg(nextBackupDatesList.at(0).toString("dddd,\tdd.MM.yyyy  hh:mm"));
-				break;
-			} else {
-				return QObject::tr("no weekdays selected");
-			}
+            } else {
+    			return QObject::tr("no weekdays selected");
+            }
 		}
+
 		case ScheduleRule::AFTER_BOOT:
-		{
-			return QObject::tr("%1 minutes after startup").arg(this->minutesAfterStartup);
-			break;
-		}
-		default:
-			return "";
+        {
+            return QObject::tr("%1 minutes after startup").arg(this->minutesAfterStartup);
+        }
 	}
-	return "";
+	return QString();
 }
 
 bool ScheduledTask::equals(const ScheduledTask& scheduledTask) const
