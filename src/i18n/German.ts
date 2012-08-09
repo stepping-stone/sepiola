@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="1.1" language="de_CH">
+<!DOCTYPE TS>
+<TS version="2.0" language="de_CH">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -56,7 +57,9 @@ CH-3007 Bern</translation>
         <source>stepping stone GmbH
 Neufeldstrasse 9
 CH-3012 Bern</source>
-        <translation type="unfinished"></translation>
+        <translation>stepping stone GmbH
+Neufeldstrasse 9
+CH-3012 Bern</translation>
     </message>
 </context>
 <context>
@@ -74,7 +77,7 @@ CH-3012 Bern</source>
     <message>
         <location filename="../gui/backup_form.cc" line="117"/>
         <source>No items have been selected for scheduling</source>
-        <translation type="unfinished">Es wurden keine Dateien oder Verzeichnisse ausgewählt</translation>
+        <translation>Es wurden keine Dateien oder Verzeichnisse für eine Datensicherung ausgewählt</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="14"/>
@@ -99,7 +102,7 @@ CH-3012 Bern</source>
     <message>
         <location filename="../gui/backup_form.ui" line="29"/>
         <source>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Backup&lt;/span&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Backup&lt;/span&gt;</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="227"/>
@@ -144,47 +147,47 @@ CH-3012 Bern</source>
     <message>
         <location filename="../gui/backup_form.cc" line="126"/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Zurücksetzen</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.cc" line="126"/>
         <source>Are you sure you want to reset all form values?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sind Sie sicher, dass Sie alle Werte zurücksetzen wollen?</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="58"/>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup Planung</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="86"/>
         <source>No schedule, only manual backups</source>
-        <translation type="unfinished"></translation>
+        <translation>Nur Manuelle Backups</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="112"/>
         <source>minutes after starting the computer</source>
-        <translation type="unfinished"></translation>
+        <translation>Minuten nach Starten des Computers</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="142"/>
         <source>At</source>
-        <translation type="unfinished"></translation>
+        <translation>Um</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="152"/>
         <source>on selected weekdays</source>
-        <translation type="unfinished"></translation>
+        <translation>an ausgewählten Wochentagen</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="273"/>
         <source>Files and folders</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateien und Verzeichnisse</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="318"/>
         <source>Select which files and folders you want to back up:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie die gewünschten Dateien und Verzeichnisse aus, welche Sie backupen wollen</translation>
     </message>
 </context>
 <context>
@@ -197,52 +200,52 @@ CH-3012 Bern</source>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="37"/>
         <source>Backup in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup wird durchgeführt...</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="103"/>
         <source>Backing up</source>
-        <translation type="unfinished"></translation>
+        <translation>Sichern</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="110"/>
         <source>currentFile</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Datei</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="123"/>
         <source>Uploading</source>
-        <translation type="unfinished"></translation>
+        <translation>Hochladen</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="136"/>
         <source>Time remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbleibende Zeit</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="143"/>
         <source>remainingTime</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbleibende Zeit</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="163"/>
         <source>traffic</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenverkehr</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="204"/>
         <source>&amp;Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Pause</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="214"/>
         <source>&amp;Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="224"/>
         <source>C&amp;lose</source>
-        <translation>&amp;Schliessen</translation>
+        <translation>S&amp;chliessen</translation>
     </message>
 </context>
 <context>
@@ -260,12 +263,12 @@ CH-3012 Bern</source>
     <message>
         <location filename="../model/backup_thread.cc" line="145"/>
         <source>Getting backup content meta data</source>
-        <translation>Metadaten des Backup Inhalts werden ermittelt</translation>
+        <translation>Metadaten des Backupinhalts werden ermittelt</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="150"/>
         <source>Uploading backup content meta data</source>
-        <translation>Metadaten des Backup Inhalts werden übertragen</translation>
+        <translation>Metadaten des Backupinhalts werden übertragen</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="160"/>
@@ -310,27 +313,27 @@ CH-3012 Bern</source>
     <message>
         <location filename="../model/backup_thread.cc" line="364"/>
         <source>current task</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktueller Prozess</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="299"/>
         <source>current file</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle Datei</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="285"/>
         <source>files processed</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateien abgearbeitet</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="301"/>
         <source>estimated remaining time</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschätzte Restdauer</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="300"/>
         <source>traffic / transferred</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenverkehr / übertragen</translation>
     </message>
 </context>
 <context>
@@ -356,7 +359,7 @@ CH-3012 Bern</source>
     <message>
         <location filename="../gui/logfile_form.ui" line="27"/>
         <source>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Logfile&lt;/span&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Logdatei</translation>
     </message>
 </context>
 <context>
@@ -429,7 +432,7 @@ CH-3012 Bern</source>
     <message>
         <location filename="../model/main_model.cc" line="348"/>
         <source>Some restore info files could not be opened</source>
-        <translation type="unfinished"></translation>
+        <translation>Einige Wiederhergestellten Info Dokumente konnten nicht geöffnet werden</translation>
     </message>
 </context>
 <context>
@@ -447,7 +450,7 @@ CH-3012 Bern</source>
     <message>
         <location filename="../gui/main_window.ui" line="327"/>
         <source>&amp;Restore</source>
-        <translation>&amp;Restore</translation>
+        <translation>&amp;Wiederherstellen</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="336"/>
@@ -514,17 +517,17 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
     <message>
         <location filename="../gui/main_window.cc" line="88"/>
         <source>Missing Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehlende Einstellung</translation>
     </message>
     <message>
         <location filename="../gui/main_window.cc" line="88"/>
         <source>Please fill in username (as provided by the backup-space provider) as well as the computername.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte geben sie Ihren Benutzernamen sowie Computernamen ein.</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="309"/>
         <source>&amp;Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Übersicht</translation>
     </message>
 </context>
 <context>
@@ -565,12 +568,12 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
     <message>
         <location filename="../gui/overview_form.ui" line="29"/>
         <source>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Overview&lt;/span&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Übersicht&lt;/span&gt;</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="51"/>
         <source>Backup space usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup Speichernutzung</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="738"/>
@@ -580,93 +583,93 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
     <message>
         <location filename="../gui/overview_form.ui" line="118"/>
         <source>Incremental backups</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkrementelles Backup</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="125"/>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Freier Speicherplatz</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="132"/>
         <source>Quota</source>
-        <translation type="unfinished"></translation>
+        <translation>Quota</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="139"/>
         <source>30%</source>
-        <translation type="unfinished"></translation>
+        <translation>30%</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="153"/>
         <source>35%</source>
-        <translation type="unfinished"></translation>
+        <translation>35%</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="166"/>
         <source>711 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>711 MB</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="182"/>
         <source>2 GB</source>
-        <translation type="unfinished"></translation>
+        <translation>2 GB</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="198"/>
         <source>598 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>598 MB</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="214"/>
         <source>739 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>739 MB</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="270"/>
         <source>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="387"/>
         <source>Backup schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup Planung</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="420"/>
         <source>Last Backups</source>
-        <translation type="unfinished"></translation>
+        <translation>Letzte Backups</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="779"/>
         <source>
 Next Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplante Backups</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="820"/>
         <source>next Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Nächster Backup</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="854"/>
         <source>B&amp;ackup now</source>
-        <translation type="unfinished"></translation>
+        <translation>B&amp;ackup jetzt starten</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="751"/>
         <source>Freitag, 10.03.2011  12:34</source>
-        <translation type="unfinished"></translation>
+        <translation>Freitag, 10.03.2011  12:34</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="547"/>
         <source>Donnerstag, 10.03.2011  12:34</source>
-        <translation type="unfinished"></translation>
+        <translation>Donnerstag, 10.03.2011  12:34</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="827"/>
         <source>Freitag, 04.06.2012  23:05</source>
-        <translation type="unfinished"></translation>
+        <translation>Freitag, 04.06.2012  23:05</translation>
     </message>
 </context>
 <context>
@@ -936,62 +939,62 @@ Next Backup</source>
     <message>
         <location filename="../cli/cli_manager.cc" line="324"/>
         <source>Caution: Cannot turn off the password echoing! Password will be shown when typed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Achtung: Die Passwortanzeige kann nicht ausgeschaltet werden! Passwort wird beim eintippen angezeigt.</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.cc" line="53"/>
         <source>&lt;a href=&quot;%1&quot;&gt;Change quota&lt;/a&gt; (opens a browser window)</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&quot;%1&quot;&gt;Quota ändern&lt;/a&gt; (Öffnet ein Browserfenster)</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.cc" line="126"/>
         <source>Scheduled</source>
-        <translation type="unfinished"></translation>
+        <translation>Geplant</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.cc" line="131"/>
         <source>Not scheduled</source>
-        <translation type="unfinished"></translation>
+        <translation>Momentan sind keine Backups vorhanden</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.cc" line="190"/>
         <source>&amp;mdash; GB</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;mdash; GB</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.cc" line="195"/>
         <source>&amp;mdash; %</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;mdash; %</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.cc" line="217"/>
         <source>Restore destination folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Zielordner Wiederherstellen</translation>
     </message>
     <message>
         <location filename="../model/backup_task.cc" line="62"/>
         <source>&lt;font color=&quot;green&quot;&gt;Successful&lt;/font&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;font color=&quot;grün&quot;&gt;Erfolgreich&lt;/font&gt;</translation>
     </message>
     <message>
         <location filename="../model/backup_task.cc" line="63"/>
         <source>&lt;font color=&quot;orange&quot;&gt;Warnings&lt;/font&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;font color=&quot;orange&quot;&gt;Warnungen&lt;/font&gt;</translation>
     </message>
     <message>
         <location filename="../model/backup_task.cc" line="64"/>
         <source>&lt;font color=&quot;red&quot;&gt;Failed&lt;/font&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;font color=&quot;rot&quot;&gt;Fehlgeschlagen&lt;/font&gt;</translation>
     </message>
     <message>
         <location filename="../model/backup_task.cc" line="65"/>
         <source>undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>Nicht definiert</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="315"/>
         <source>creating server directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Erstellen von Serververzeichnissen</translation>
     </message>
     <message>
         <location filename="../model/scheduled_task.cc" line="33"/>
@@ -1041,12 +1044,12 @@ Next Backup</source>
     <message>
         <location filename="../model/scheduled_task.cc" line="182"/>
         <source>no weekdays selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Wochentage ausgewählt</translation>
     </message>
     <message>
         <location filename="../model/scheduled_task.cc" line="187"/>
         <source>%1 minutes after startup</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Minuten nach dem Hochfahren der Computers</translation>
     </message>
     <message>
         <location filename="../settings/settings.cc" line="266"/>
@@ -1056,23 +1059,24 @@ Next Backup</source>
     <message>
         <location filename="../tools/rsync.cc" line="622"/>
         <source>rsync exited with with exitCode %1 (%2 %3).</source>
-        <translation type="unfinished"></translation>
+        <translation>rsync beendern mit dem exitCode %1 (%2 %3).</translation>
     </message>
     <message>
         <location filename="../utils/file_system_utils.cc" line="102"/>
         <source>Trying to rename file %1 to %2:
   -&gt; file %1 could nod be removed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Versuch die Datei %1 zu %2 umzubenennen:
+  -&gt;Datei %1 konnte nicht entfernt werden. </translation>
     </message>
     <message>
         <location filename="../gui/settings_form.cc" line="47"/>
         <source>Total size: %1 GB, free: %2 GB</source>
-        <translation type="unfinished"></translation>
+        <translation>Gesamtgrösse: %1 GB, Frei: %2 GB</translation>
     </message>
     <message>
         <location filename="../tools/rsync.cc" line="202"/>
         <source>rsync exited with exitCode %1 (%2 %3).</source>
-        <translation type="unfinished"></translation>
+        <translation>rsync beendern mit dem exitCode %1 (%2 %3).</translation>
     </message>
 </context>
 <context>
@@ -1100,7 +1104,7 @@ Next Backup</source>
     <message>
         <location filename="../gui/restore_form.ui" line="14"/>
         <source>Restore</source>
-        <translation>Restore</translation>
+        <translation>Wiederherstellen</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="214"/>
@@ -1110,12 +1114,12 @@ Next Backup</source>
     <message>
         <location filename="../gui/restore_form.cc" line="284"/>
         <source>Full restore</source>
-        <translation>Komplettes Restore</translation>
+        <translation>Vollständige Wiederherstellung</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.cc" line="288"/>
         <source>Custom restore</source>
-        <translation>Benutzerdefiniertes Restore</translation>
+        <translation>Benutzerdefiniertes Wiederherstellen</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.cc" line="133"/>
@@ -1135,7 +1139,7 @@ Next Backup</source>
     <message>
         <location filename="../gui/restore_form.cc" line="94"/>
         <source>Downloading restore meta data</source>
-        <translation>Lade Restore Metadaten herunter</translation>
+        <translation>Lade zurückzusichernde Metadaten herunter</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.cc" line="253"/>
@@ -1145,7 +1149,7 @@ Next Backup</source>
     <message>
         <location filename="../gui/restore_form.ui" line="29"/>
         <source>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Restore&lt;/span&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Wiederherstellen&lt;/span&gt;</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="52"/>
@@ -1155,37 +1159,37 @@ Next Backup</source>
     <message>
         <location filename="../gui/restore_form.ui" line="102"/>
         <source>Select name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Name auwsählen:</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="188"/>
         <source>Select date:</source>
-        <translation type="unfinished"></translation>
+        <translation>Datum auswählen:</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="251"/>
         <source>F&amp;ull Restore (restore all files)</source>
-        <translation type="unfinished"></translation>
+        <translation>V&amp;ollständige Wiederherstellung </translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="261"/>
         <source>Restore selected &amp;files and folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung der ausgewählten &amp;Dateien und Ordner</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="312"/>
         <source>Restore to &amp;custom location</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung an &amp;Alternativpfad</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="319"/>
         <source>Restore to &amp;original location</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellung an &amp;Originalpfad</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="139"/>
         <source>Backups are saved under the computer name you chose under settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Backups wurden unter dem Computernamen gesichert, welchen Sie unter Einstellungen gewählt haben</translation>
     </message>
 </context>
 <context>
@@ -1218,12 +1222,12 @@ Next Backup</source>
     <message>
         <location filename="../model/restore_thread.cc" line="126"/>
         <source>Restore aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederherstellen abgebrochen.</translation>
     </message>
     <message>
         <location filename="../model/restore_thread.cc" line="147"/>
         <source>WARNING: Setting of metadata failed. File %1 has not been found on the server. Possibly you are restoring data from a backup of another platform/os.</source>
-        <translation type="unfinished"></translation>
+        <translation>WARNUNG: Die Einstellung der Metadaten ist fehlgeschlagen. Die Datei %1 ist nicht auf dem Server gefunden worden. Eventuell ist die Wiederherstellung der Daten auseinem Backup oder einer anderen Plattform/OS.</translation>
     </message>
 </context>
 <context>
@@ -1281,7 +1285,7 @@ Next Backup</source>
         <source>Your settings have been modified.
 Do you want to restore the original settings?</source>
         <translation>Ihre Einstellungen wurden geändert.
-Wollen Sie Ihre Original Einstellungen wiederherstellen?</translation>
+Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="14"/>
@@ -1317,17 +1321,18 @@ Wollen Sie Ihre Original Einstellungen wiederherstellen?</translation>
         <location filename="../gui/settings_form.cc" line="125"/>
         <source>Your settings have been modified.
 Do you want to save the settings before leaving this view?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ihre Einstellungen wurden geändert.
+Wollen Sie die Einstellungen vor dem verlassen speichern?</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="35"/>
         <source>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Settings&lt;/span&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Einstellungen&lt;/span&gt;</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="153"/>
         <source>Computername:</source>
-        <translation type="unfinished"></translation>
+        <translation>Computername:</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="180"/>
@@ -1336,57 +1341,59 @@ to backup files from different computers onto the
 same backup-server.
 Provide a unique name in this field or press the 
 default-button to use the system-settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Durch die benutzung verschiedener Computernamen ist es möglich
+Dokumente von verschiedenen Computern auf den gleichen Backup-Server zu sichern.
+Geben Sie einen eindeutigen Namen in dieses Feld ein, oder dürcken Sie die Standardschaltfläche um die Systemeinstellungen zu verwenden</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="377"/>
         <source>Language (requires restart):</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprache (Neustart erforderlich)</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="333"/>
         <source>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="248"/>
         <source>Backups are saved under this name</source>
-        <translation type="unfinished"></translation>
+        <translation>Backups werden unter diesem Namen gespeichert</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="290"/>
         <source>Quota:</source>
-        <translation type="unfinished"></translation>
+        <translation>Quota:</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="309"/>
         <source>current quota: xx GB</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuelle quota: xx GB</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="435"/>
         <source>Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Anzeige</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="467"/>
         <source>elapsed backups in the Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>letzte Backups im Überblick</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="508"/>
         <source>Show hidden files &amp; folders</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige versteckte Dokumente  Verzeichnisse</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="551"/>
         <source>Keep locally deleted files on the server forever</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Halten Sie lokal gelöschten Dateien für immer auf dem Server</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="575"/>
         <source>(it is recommended not to choose this option, as your backups would grow very big very rapidly)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(Es wird empfohlen diese Option nicht zu wählen, weil Ihre Backups sehr schnell gross werden)</translation>
     </message>
 </context>
 <context>
@@ -1399,7 +1406,7 @@ default-button to use the system-settings.</source>
     <message>
         <location filename="../gui/text_input_dialog.ui" line="19"/>
         <source>TextLabel</source>
-        <translation>Textbeschriftung</translation>
+        <translation type="unfinished">Textbeschriftung</translation>
     </message>
 </context>
 <context>
@@ -1407,37 +1414,37 @@ default-button to use the system-settings.</source>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="104"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="104"/>
         <source>Do you really want to cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Wollen Sie wirklich abbrechen?</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="119"/>
         <source>Hide details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details ausblenden</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="119"/>
         <source>Show details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details anzeigen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="151"/>
         <source>successfully finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Erfolgreich beendet</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="156"/>
         <source>finished with warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Beendet mit Warnungen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="161"/>
         <source>failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="17"/>
@@ -1452,47 +1459,47 @@ default-button to use the system-settings.</source>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="160"/>
         <source>Backup failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Backup fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="249"/>
         <source>Uploading</source>
-        <translation type="unfinished"></translation>
+        <translation>Hochladen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="288"/>
         <source>Time remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>Verbleibende Zeit</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="363"/>
         <source>Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Info</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="386"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="415"/>
         <source>Show Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Details anzeigen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="438"/>
         <source>&amp;Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Pause</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="448"/>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="458"/>
         <source>C&amp;lose</source>
-        <translation>&amp;Schliessen</translation>
+        <translation>S&amp;chliessen</translation>
     </message>
 </context>
 </TS>
