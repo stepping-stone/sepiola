@@ -18,11 +18,16 @@
 
 IF(Q_WS_X11)
 
+# TODO:
+# - remove Settings::SHOW_PROGRESS in process.cc such that we can
+#   remove settings.{cc,hh} and it's rev-deps here
+
 QT4_WRAP_CPP(test_posix_acl_MOC
     test_posix_acl.hh
     ../tools/posix_acl.hh
     ../tools/abstract_informing_process.hh
     ../utils/log_file_utils.hh
+    ../settings/settings.hh
     )
 
 ADD_EXECUTABLE(test_posix_acl test_posix_acl.cc
@@ -32,6 +37,9 @@ ADD_EXECUTABLE(test_posix_acl test_posix_acl.cc
     ../utils/log_file_utils.cc
     ../utils/file_system_utils.cc
     ../utils/string_utils.cc
+    ../settings/settings.cc
+    ../model/backup_task.cc
+    ../model/scheduled_task.cc
     )
 
 TARGET_LINK_LIBRARIES(test_posix_acl
