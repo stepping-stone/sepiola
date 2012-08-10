@@ -45,12 +45,12 @@ CH-3007 Bern</translation>
     <message>
         <location filename="../gui/about_dialog.ui" line="41"/>
         <source>Reseller</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederverkäufer</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="56"/>
         <source>[ResellerAddress]</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederverkäufer Adresse</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="88"/>
@@ -65,12 +65,13 @@ CH-3012 Bern</translation>
 <context>
     <name>BackupForm</name>
     <message>
-        <location filename="../gui/backup_form.cc" line="181"/>
+        <location filename="../gui/backup_form.cc" line="117"/>
+        <location filename="../gui/backup_form.cc" line="182"/>
         <source>Empty backup list</source>
         <translation>Leere Backup Liste</translation>
     </message>
     <message>
-        <location filename="../gui/backup_form.cc" line="181"/>
+        <location filename="../gui/backup_form.cc" line="182"/>
         <source>No items have been selected for backup</source>
         <translation>Es wurden keine Dateien oder Verzeichnisse ausgewählt</translation>
     </message>
@@ -86,6 +87,7 @@ CH-3012 Bern</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.ui" line="98"/>
+        <location filename="../gui/backup_form.cc" line="185"/>
         <source>Backup</source>
         <translation>Backup</translation>
     </message>
@@ -95,7 +97,7 @@ CH-3012 Bern</translation>
         <translation>&amp;Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../gui/backup_form.cc" line="157"/>
+        <location filename="../gui/backup_form.cc" line="158"/>
         <source>Check at least one day</source>
         <translation>Mindestens ein Tag muss ausgewählt sein</translation>
     </message>
@@ -251,87 +253,102 @@ CH-3012 Bern</translation>
 <context>
     <name>BackupThread</name>
     <message>
-        <location filename="../model/backup_thread.cc" line="107"/>
+        <location filename="../model/backup_thread.cc" line="106"/>
         <source>Creating/validating server directories</source>
         <translation>Server Verzeichnisse werden erstellt und überprüft</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="126"/>
+        <location filename="../model/backup_thread.cc" line="124"/>
         <source>Uploading files and directories</source>
         <translation>Lade Dateien und Verzeichnisse hoch</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="145"/>
+        <location filename="../model/backup_thread.cc" line="138"/>
         <source>Getting backup content meta data</source>
         <translation>Metadaten des Backupinhalts werden ermittelt</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="150"/>
+        <location filename="../model/backup_thread.cc" line="143"/>
         <source>Uploading backup content meta data</source>
         <translation>Metadaten des Backupinhalts werden übertragen</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="160"/>
+        <location filename="../model/backup_thread.cc" line="154"/>
         <source>Uploading backup info data</source>
         <translation>Backup Infodaten werden übertragen</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="171"/>
+        <location filename="../model/backup_thread.cc" line="165"/>
         <source>Getting permission meta data</source>
         <translation>Dateiberechtigungen werden ermittelt</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="183"/>
+        <location filename="../model/backup_thread.cc" line="178"/>
         <source>Uploading permission meta data</source>
         <translation>Lade Berechtigungs Metadaten hoch</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="198"/>
+        <location filename="../model/backup_thread.cc" line="191"/>
+        <source>Warning: Could not backup file permissions due to following problem:</source>
+        <translation>Warnung: Konnte keine Backup Dateiberechtigungen erstellen aufgrund folgenden Problem:</translation>
+    </message>
+    <message>
+        <location filename="../model/backup_thread.cc" line="207"/>
         <source>Backup succeeded.</source>
         <translation>Backup erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="222"/>
+        <location filename="../model/backup_thread.cc" line="214"/>
+        <source>Backup succeeded with warnings.</source>
+        <translation>Backup gelungen (mit Warnungen)</translation>
+    </message>
+    <message>
+        <location filename="../model/backup_thread.cc" line="233"/>
         <source>Backup failed.</source>
         <translation>Backup fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="433"/>
+        <location filename="../model/backup_thread.cc" line="446"/>
         <source>Can not create a backup info file</source>
         <translation>Backup Infodatei konnte nicht erstellt werden</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="213"/>
+        <location filename="../model/backup_thread.cc" line="227"/>
         <source>Backup aborted.</source>
         <translation>Backup abgebrochen.</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="242"/>
+        <location filename="../model/backup_thread.cc" line="257"/>
         <source>Backup has been aborted</source>
         <translation>Backup wurde abgebrochen</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="364"/>
+        <location filename="../model/backup_thread.cc" line="298"/>
+        <location filename="../model/backup_thread.cc" line="313"/>
+        <location filename="../model/backup_thread.cc" line="347"/>
+        <location filename="../model/backup_thread.cc" line="374"/>
         <source>current task</source>
         <translation>Aktueller Prozess</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="299"/>
+        <location filename="../model/backup_thread.cc" line="314"/>
         <source>current file</source>
         <translation>Aktuelle Datei</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="285"/>
+        <location filename="../model/backup_thread.cc" line="300"/>
         <source>files processed</source>
         <translation>Dateien abgearbeitet</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="301"/>
+        <location filename="../model/backup_thread.cc" line="316"/>
         <source>estimated remaining time</source>
         <translation>Geschätzte Restdauer</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="300"/>
+        <location filename="../model/backup_thread.cc" line="315"/>
         <source>traffic / transferred</source>
         <translation>Datenverkehr / übertragen</translation>
     </message>
@@ -443,52 +460,61 @@ CH-3012 Bern</translation>
         <translation>Einstellungen beibehalten?</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="318"/>
+        <location filename="../gui/main_window.ui" line="47"/>
+        <source>background-color: white</source>
+        <translation>Hintergrundfarbe: weiss</translation>
+    </message>
+    <message>
+        <location filename="../gui/main_window.ui" line="105"/>
+        <location filename="../gui/main_window.ui" line="308"/>
         <source>&amp;Backup</source>
         <translation>&amp;Backup</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="327"/>
+        <location filename="../gui/main_window.ui" line="136"/>
+        <location filename="../gui/main_window.ui" line="316"/>
         <source>&amp;Restore</source>
         <translation>&amp;Wiederherstellen</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="336"/>
+        <location filename="../gui/main_window.ui" line="167"/>
+        <location filename="../gui/main_window.ui" line="324"/>
         <source>&amp;Settings</source>
         <translation>&amp;Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="269"/>
+        <location filename="../gui/main_window.ui" line="262"/>
         <source>&amp;Help</source>
         <translation>&amp;Hilfe</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="275"/>
+        <location filename="../gui/main_window.ui" line="268"/>
         <source>&amp;File</source>
         <translation>&amp;Datei</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="281"/>
+        <location filename="../gui/main_window.ui" line="274"/>
         <source>&amp;Tools</source>
         <translation>&amp;Werkzeuge</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="300"/>
+        <location filename="../gui/main_window.ui" line="292"/>
         <source>&amp;Exit</source>
         <translation>&amp;Beenden</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="345"/>
+        <location filename="../gui/main_window.ui" line="332"/>
         <source>&amp;About</source>
         <translation>&amp;Über Sepiola</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="351"/>
+        <location filename="../gui/main_window.ui" line="335"/>
+        <location filename="../gui/main_window.ui" line="338"/>
         <source>About</source>
         <translation>Über Sepiola</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="361"/>
+        <location filename="../gui/main_window.ui" line="346"/>
         <source>&amp;Help Contents</source>
         <translation>&amp;Hilfe Inhalte</translation>
     </message>
@@ -505,12 +531,13 @@ Do you want to keep the settings?</source>
 Möchten Sie Ihre Einstellungen beibehalten?</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="366"/>
+        <location filename="../gui/main_window.ui" line="351"/>
         <source>View Logfile</source>
         <translation>Logdatei ansehen</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="375"/>
+        <location filename="../gui/main_window.ui" line="198"/>
+        <location filename="../gui/main_window.ui" line="359"/>
         <source>&amp;Logfile</source>
         <translation>&amp;Logdatei</translation>
     </message>
@@ -525,7 +552,8 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
         <translation>Bitte geben sie Ihren Benutzernamen sowie Computernamen ein.</translation>
     </message>
     <message>
-        <location filename="../gui/main_window.ui" line="309"/>
+        <location filename="../gui/main_window.ui" line="74"/>
+        <location filename="../gui/main_window.ui" line="300"/>
         <source>&amp;Overview</source>
         <translation>&amp;Übersicht</translation>
     </message>
@@ -576,6 +604,11 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
         <translation>Backup Speichernutzung</translation>
     </message>
     <message>
+        <location filename="../gui/overview_form.ui" line="111"/>
+        <location filename="../gui/overview_form.ui" line="466"/>
+        <location filename="../gui/overview_form.ui" line="534"/>
+        <location filename="../gui/overview_form.ui" line="602"/>
+        <location filename="../gui/overview_form.ui" line="670"/>
         <location filename="../gui/overview_form.ui" line="738"/>
         <source>Backup</source>
         <translation>Backup</translation>
@@ -601,6 +634,7 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
         <translation>30%</translation>
     </message>
     <message>
+        <location filename="../gui/overview_form.ui" line="146"/>
         <location filename="../gui/overview_form.ui" line="153"/>
         <source>35%</source>
         <translation>35%</translation>
@@ -657,6 +691,9 @@ Next Backup</source>
         <translation>B&amp;ackup jetzt starten</translation>
     </message>
     <message>
+        <location filename="../gui/overview_form.ui" line="479"/>
+        <location filename="../gui/overview_form.ui" line="615"/>
+        <location filename="../gui/overview_form.ui" line="683"/>
         <location filename="../gui/overview_form.ui" line="751"/>
         <source>Freitag, 10.03.2011  12:34</source>
         <translation>Freitag, 10.03.2011  12:34</translation>
@@ -756,9 +793,18 @@ Next Backup</source>
 <context>
     <name>Plink</name>
     <message>
-        <location filename="../tools/plink.cc" line="249"/>
+        <location filename="../tools/plink.cc" line="266"/>
         <source>Username or password not valid</source>
         <translation>Benutzername oder Password ungültig</translation>
+    </message>
+</context>
+<context>
+    <name>PosixAcl</name>
+    <message>
+        <location filename="../tools/posix_acl.cc" line="90"/>
+        <source>
+Warning: The permissions of some files could not be backed up. See above for details.</source>
+        <translation>Warnung: Die Berechtigungen von einigen Dateien konten nicht gebackupt werden. Siehe oben für weitere Details.</translation>
     </message>
 </context>
 <context>
@@ -769,27 +815,28 @@ Next Backup</source>
         <translation>Der Prozess %1 ist wurde nicht gestartet. Entweder ist das aufgerufene Programm nicht vorhanden, oder Sie haben nicht genügend Rechte um es auszuführen.</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="155"/>
+        <location filename="../settings/settings.cc" line="145"/>
         <source>English</source>
         <translation>Englisch</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="156"/>
+        <location filename="../settings/settings.cc" line="146"/>
         <source>German</source>
         <translation>Deutsch</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="343"/>
+        <location filename="../main.cc" line="370"/>
         <source>Application started</source>
         <translation>Applikation wurde gestartet</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="345"/>
+        <location filename="../main.cc" line="372"/>
         <source>Application closed</source>
         <translation>Applikation wurde beendet</translation>
     </message>
     <message>
         <location filename="../tools/at.cc" line="83"/>
+        <location filename="../tools/schtasks.cc" line="154"/>
         <source>Scheduled task has been created</source>
         <translation>Zeitgesteuertes Backup wurde eingerichtet</translation>
     </message>
@@ -814,24 +861,25 @@ Next Backup</source>
         <translation>Zeitplanung fehlgeschlagen. Grund:</translation>
     </message>
     <message>
-        <location filename="../tools/posix_acl.cc" line="63"/>
+        <location filename="../tools/posix_acl.cc" line="67"/>
         <source>Getting metadata for %1</source>
         <translation>Dateiberechtigungen werden für %1 ermittelt</translation>
     </message>
     <message>
-        <location filename="../tools/posix_acl.cc" line="167"/>
+        <location filename="../tools/posix_acl.cc" line="174"/>
+        <location filename="../tools/unix_permissions.cc" line="120"/>
         <source>Setting metadata for %1</source>
         <translation>Dateiberechtigungen werden für %1 gesetzt</translation>
     </message>
     <message>
-        <location filename="../tools/unix_permissions.cc" line="132"/>
+        <location filename="../tools/unix_permissions.cc" line="130"/>
         <source>Cannot change owner/group for %1
 </source>
         <translation>Besitzer/Gruppe können für %1 nicht gesetzt werden
 </translation>
     </message>
     <message>
-        <location filename="../tools/posix_acl.cc" line="140"/>
+        <location filename="../tools/posix_acl.cc" line="147"/>
         <source>Can not set metadata for %1 because the metadata are broken</source>
         <translation>Dateiberechtigungen für %1 können nicht gesetzt werden, da die Metadaten fehlerhaft sind</translation>
     </message>
@@ -841,33 +889,34 @@ Next Backup</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../tools/posix_acl.cc" line="204"/>
+        <location filename="../tools/posix_acl.cc" line="210"/>
+        <location filename="../tools/set_acl.cc" line="197"/>
         <source>Error occurred while setting ACL&apos;s:
 </source>
         <translation>Während dem setzen der ACLs ist ein Fehler aufgetreten:
 </translation>
     </message>
     <message>
-        <location filename="../tools/posix_acl.cc" line="85"/>
+        <location filename="../tools/set_acl.cc" line="82"/>
         <source>Error occurred while getting ACL&apos;s:
 </source>
         <translation>Während dem lesen der ACLs ist ein Fehler aufgetreten:
 </translation>
     </message>
     <message>
-        <location filename="../tools/unix_permissions.cc" line="139"/>
+        <location filename="../tools/unix_permissions.cc" line="137"/>
         <source>Error occurred while setting permissions:
 </source>
         <translation>Während dem setzen der Berechtigungen ist ein Fehler aufgetreten:
 </translation>
     </message>
     <message>
-        <location filename="../main.cc" line="335"/>
+        <location filename="../main.cc" line="362"/>
         <source>Update started</source>
         <translation>Aktualisierung gestartet</translation>
     </message>
     <message>
-        <location filename="../tools/set_acl.cc" line="114"/>
+        <location filename="../tools/set_acl.cc" line="116"/>
         <source>Preparing metadata</source>
         <translation>Bereite Metadaten vor</translation>
     </message>
@@ -907,32 +956,32 @@ Next Backup</source>
         <translation>Konnte Datei %1 nicht nach %2 umbenennen.</translation>
     </message>
     <message>
-        <location filename="../tools/plink.cc" line="122"/>
+        <location filename="../tools/plink.cc" line="134"/>
         <source>Unable to open connection</source>
         <translation>Verbindung konnte nicht hergestellt werden</translation>
     </message>
     <message>
-        <location filename="../tools/plink.cc" line="217"/>
+        <location filename="../tools/plink.cc" line="234"/>
         <source>Log in ...</source>
         <translation>Anmelden ...</translation>
     </message>
     <message>
-        <location filename="../tools/plink.cc" line="251"/>
+        <location filename="../tools/plink.cc" line="268"/>
         <source>Login successful</source>
         <translation>Anmeldung erfolgreich</translation>
     </message>
     <message>
-        <location filename="../tools/plink.cc" line="252"/>
+        <location filename="../tools/plink.cc" line="269"/>
         <source>Generating key pair ... (This may take a while)</source>
         <translation>Generiere Schlüssel Paar ...(Dies kann einen Moment dauern)</translation>
     </message>
     <message>
-        <location filename="../tools/plink.cc" line="276"/>
+        <location filename="../tools/plink.cc" line="293"/>
         <source>Key has not been generated</source>
         <translation>Schlüssel konnte nicht generiert werden</translation>
     </message>
     <message>
-        <location filename="../tools/plink.cc" line="284"/>
+        <location filename="../tools/plink.cc" line="301"/>
         <source>Key has been generated</source>
         <translation>Schlüssel wurde generiert</translation>
     </message>
@@ -943,6 +992,7 @@ Next Backup</source>
     </message>
     <message>
         <location filename="../gui/overview_form.cc" line="53"/>
+        <location filename="../gui/settings_form.cc" line="52"/>
         <source>&lt;a href=&quot;%1&quot;&gt;Change quota&lt;/a&gt; (opens a browser window)</source>
         <translation>&lt;a href=&quot;%1&quot;&gt;Quota ändern&lt;/a&gt; (Öffnet ein Browserfenster)</translation>
     </message>
@@ -992,7 +1042,7 @@ Next Backup</source>
         <translation>Nicht definiert</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="315"/>
+        <location filename="../model/backup_thread.cc" line="330"/>
         <source>creating server directories</source>
         <translation>Erstellen von Serververzeichnissen</translation>
     </message>
@@ -1032,32 +1082,33 @@ Next Backup</source>
         <translation>Sonntag</translation>
     </message>
     <message>
-        <location filename="../model/scheduled_task.cc" line="153"/>
+        <location filename="../model/scheduled_task.cc" line="155"/>
         <source>never</source>
         <translation>nie</translation>
     </message>
     <message>
-        <location filename="../model/scheduled_task.cc" line="179"/>
+        <location filename="../model/scheduled_task.cc" line="183"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
     <message>
-        <location filename="../model/scheduled_task.cc" line="182"/>
+        <location filename="../model/scheduled_task.cc" line="185"/>
         <source>no weekdays selected</source>
         <translation>Keine Wochentage ausgewählt</translation>
     </message>
     <message>
-        <location filename="../model/scheduled_task.cc" line="187"/>
+        <location filename="../model/scheduled_task.cc" line="191"/>
         <source>%1 minutes after startup</source>
         <translation>%1 Minuten nach dem Hochfahren der Computers</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="266"/>
+        <location filename="../settings/settings.cc" line="262"/>
         <source>reseller address (missing)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiederverkäufer Adresse (fehlend)</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="622"/>
+        <location filename="../tools/rsync.cc" line="522"/>
+        <location filename="../tools/rsync.cc" line="599"/>
         <source>rsync exited with with exitCode %1 (%2 %3).</source>
         <translation>rsync beendern mit dem exitCode %1 (%2 %3).</translation>
     </message>
@@ -1069,12 +1120,13 @@ Next Backup</source>
   -&gt;Datei %1 konnte nicht entfernt werden. </translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="47"/>
+        <location filename="../gui/settings_form.cc" line="48"/>
+        <location filename="../gui/settings_form.cc" line="50"/>
         <source>Total size: %1 GB, free: %2 GB</source>
         <translation>Gesamtgrösse: %1 GB, Frei: %2 GB</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="202"/>
+        <location filename="../tools/rsync.cc" line="1034"/>
         <source>rsync exited with exitCode %1 (%2 %3).</source>
         <translation>rsync beendern mit dem exitCode %1 (%2 %3).</translation>
     </message>
@@ -1107,6 +1159,7 @@ Next Backup</source>
         <translation>Wiederherstellen</translation>
     </message>
     <message>
+        <location filename="../gui/restore_form.ui" line="125"/>
         <location filename="../gui/restore_form.ui" line="214"/>
         <source>info</source>
         <translation>Info</translation>
@@ -1195,37 +1248,37 @@ Next Backup</source>
 <context>
     <name>RestoreThread</name>
     <message>
-        <location filename="../model/restore_thread.cc" line="101"/>
+        <location filename="../model/restore_thread.cc" line="75"/>
         <source>Downloading files and/or directories ...</source>
         <translation>Lade Daten und/oder Verzeichnisse herunter ...</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="112"/>
+        <location filename="../model/restore_thread.cc" line="86"/>
         <source>Applying Metadata</source>
         <translation>Metadaten werden übernommen</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="116"/>
+        <location filename="../model/restore_thread.cc" line="90"/>
         <source>Restore done.</source>
         <translation>Wiederherstellung der Daten abgeschlossen.</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="120"/>
+        <location filename="../model/restore_thread.cc" line="94"/>
         <source>Restore failed.</source>
         <translation>Wiederherstellung fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="164"/>
+        <location filename="../model/restore_thread.cc" line="138"/>
         <source>Restore has been aborted</source>
         <translation>Wiederherstellung wurde abgebrochen</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="126"/>
+        <location filename="../model/restore_thread.cc" line="100"/>
         <source>Restore aborted.</source>
         <translation>Wiederherstellen abgebrochen.</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="147"/>
+        <location filename="../model/restore_thread.cc" line="121"/>
         <source>WARNING: Setting of metadata failed. File %1 has not been found on the server. Possibly you are restoring data from a backup of another platform/os.</source>
         <translation>WARNUNG: Die Einstellung der Metadaten ist fehlgeschlagen. Die Datei %1 ist nicht auf dem Server gefunden worden. Eventuell ist die Wiederherstellung der Daten auseinem Backup oder einer anderen Plattform/OS.</translation>
     </message>
@@ -1233,37 +1286,57 @@ Next Backup</source>
 <context>
     <name>Rsync</name>
     <message>
-        <location filename="../tools/rsync.cc" line="603"/>
+        <location filename="../tools/rsync.cc" line="506"/>
+        <location filename="../tools/rsync.cc" line="579"/>
+        <location filename="../tools/rsync.cc" line="580"/>
         <source>%1 files and/or directories downloaded</source>
         <translation>%1 Dateien und/oder Verzeichnisse heruntergeladen</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="614"/>
+        <location filename="../tools/rsync.cc" line="515"/>
+        <location filename="../tools/rsync.cc" line="591"/>
         <source>Error occurred while downloading: </source>
         <translation>Während dem Herunterladen ist ein Fehler aufgetreten:</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="347"/>
+        <location filename="../tools/rsync.cc" line="199"/>
+        <location filename="../tools/rsync.cc" line="339"/>
         <source>%1 files and/or directories processed</source>
         <translation>%1 Dateien und/oder Verzeichnisse bearbeitet</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="328"/>
+        <location filename="../tools/rsync.cc" line="170"/>
+        <location filename="../tools/rsync.cc" line="320"/>
         <source>Uploading %1</source>
         <translation>Lade %1 hoch</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="335"/>
+        <location filename="../tools/rsync.cc" line="177"/>
+        <location filename="../tools/rsync.cc" line="327"/>
         <source>Deleting %1</source>
         <translation>Lösche %1</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="595"/>
+        <location filename="../tools/rsync.cc" line="499"/>
+        <location filename="../tools/rsync.cc" line="572"/>
         <source>Downloading %1</source>
         <translation>Lade %1 herunter</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="332"/>
+        <location filename="../tools/rsync.cc" line="1023"/>
+        <source>Warning: At least one file could not be backuped up. See above for details.</source>
+        <translation>Warnung: Mindestens eine Datei konnte nicht gesichert werden. Siehe oben für weitere Details </translation>
+    </message>
+    <message>
+        <location filename="../tools/rsync.cc" line="1028"/>
+        <source>Warning: Some files have been renamed, moved or deleted during backup before they could be uploaded to the server.
+Usually this concerns temporary files and this warning can be ignored. See above for details.</source>
+        <translation>Warnung: Einige Dateien wurden währen des backups umbenannt, verschoben oder gelöscht bevor sie auf den Server hochgeladen werden konnten.
+In der Regel betrifft dies temporäre Dateien und diese Warnung kann ignoriert werden. Siehe oben für weitere Details.</translation>
+    </message>
+    <message>
+        <location filename="../tools/rsync.cc" line="174"/>
+        <location filename="../tools/rsync.cc" line="324"/>
         <source>Skipping %1</source>
         <translation>Überspringe %1</translation>
     </message>
@@ -1271,17 +1344,18 @@ Next Backup</source>
 <context>
     <name>SettingsForm</name>
     <message>
-        <location filename="../gui/settings_form.cc" line="96"/>
+        <location filename="../gui/settings_form.cc" line="99"/>
         <source>Settings saved</source>
         <translation>Einstellungen gespeichert</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="125"/>
+        <location filename="../gui/settings_form.cc" line="110"/>
+        <location filename="../gui/settings_form.cc" line="128"/>
         <source>Unsaved settings</source>
         <translation>Nicht gespeicherte Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="107"/>
+        <location filename="../gui/settings_form.cc" line="110"/>
         <source>Your settings have been modified.
 Do you want to restore the original settings?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1293,7 +1367,7 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="98"/>
+        <location filename="../gui/settings_form.ui" line="87"/>
         <source>Username:</source>
         <translation>Benutzername:</translation>
     </message>
@@ -1303,12 +1377,12 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>S&amp;peichern</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="96"/>
+        <location filename="../gui/settings_form.cc" line="99"/>
         <source>Settings have been saved.</source>
         <translation>Einstellungen wurden gespeichert.</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="197"/>
+        <location filename="../gui/settings_form.ui" line="167"/>
         <source>Defa&amp;ult</source>
         <translation>St&amp;andard</translation>
     </message>
@@ -1318,7 +1392,7 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="125"/>
+        <location filename="../gui/settings_form.cc" line="128"/>
         <source>Your settings have been modified.
 Do you want to save the settings before leaving this view?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1330,12 +1404,12 @@ Wollen Sie die Einstellungen vor dem verlassen speichern?</translation>
         <translation>&lt;span style=&quot; color:#5f5f67;&quot;&gt;Einstellungen&lt;/span&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="153"/>
+        <location filename="../gui/settings_form.ui" line="122"/>
         <source>Computername:</source>
         <translation>Computername:</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="180"/>
+        <location filename="../gui/settings_form.ui" line="144"/>
         <source>By using different computer names it is possible
 to backup files from different computers onto the 
 same backup-server.
@@ -1346,54 +1420,59 @@ Dokumente von verschiedenen Computern auf den gleichen Backup-Server zu sichern.
 Geben Sie einen eindeutigen Namen in dieses Feld ein, oder dürcken Sie die Standardschaltfläche um die Systemeinstellungen zu verwenden</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="377"/>
+        <location filename="../gui/settings_form.ui" line="315"/>
         <source>Language (requires restart):</source>
         <translation>Sprache (Neustart erforderlich)</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="333"/>
-        <source>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;quotaChangeLink&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <location filename="../gui/settings_form.ui" line="248"/>
+        <location filename="../gui/settings_form.ui" line="192"/>
         <source>Backups are saved under this name</source>
         <translation>Backups werden unter diesem Namen gespeichert</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="290"/>
+        <location filename="../gui/settings_form.ui" line="211"/>
         <source>Quota:</source>
         <translation>Quota:</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="309"/>
+        <location filename="../gui/settings_form.ui" line="224"/>
         <source>current quota: xx GB</source>
         <translation>Aktuelle quota: xx GB</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="435"/>
+        <location filename="../gui/settings_form.ui" line="237"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Liberation Sans&apos;; font-size:6pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;quotaChangeLink&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Liberation Sans&apos;; font-size:6pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;quotaChangeLink&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../gui/settings_form.ui" line="373"/>
         <source>Display</source>
         <translation>Anzeige</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="467"/>
+        <location filename="../gui/settings_form.ui" line="405"/>
         <source>elapsed backups in the Overview</source>
         <translation>letzte Backups im Überblick</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="508"/>
-        <source>Show hidden files &amp; folders</source>
-        <translation>Zeige versteckte Dokumente  Verzeichnisse</translation>
+        <location filename="../gui/settings_form.ui" line="446"/>
+        <source>Show hidden files &amp;&amp; folders</source>
+        <translation>Versteckte Dateien und Ordner anzeigen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="551"/>
-        <source>Keep locally deleted files on the server forever</source>
-        <translation type="unfinished">Halten Sie lokal gelöschten Dateien für immer auf dem Server</translation>
-    </message>
-    <message>
-        <location filename="../gui/settings_form.ui" line="575"/>
-        <source>(it is recommended not to choose this option, as your backups would grow very big very rapidly)</source>
-        <translation type="unfinished">(Es wird empfohlen diese Option nicht zu wählen, weil Ihre Backups sehr schnell gross werden)</translation>
+        <location filename="../gui/settings_form.ui" line="453"/>
+        <source>Keep locally deleted files on the server forever
+(it is recommended not to choose this option, as your backups would grow very big very rapidly)</source>
+        <translation>Halten Sie lokal gelöschten Dateien für immer auf dem Server 
+(es wird empfohlen diese Option nicht zu wählen, weil die Backups sehr schnell gross werden)</translation>
     </message>
 </context>
 <context>
@@ -1406,7 +1485,7 @@ Geben Sie einen eindeutigen Namen in dieses Feld ein, oder dürcken Sie die Stan
     <message>
         <location filename="../gui/text_input_dialog.ui" line="19"/>
         <source>TextLabel</source>
-        <translation type="unfinished">Textbeschriftung</translation>
+        <translation>Textbeschriftung</translation>
     </message>
 </context>
 <context>
@@ -1432,17 +1511,17 @@ Geben Sie einen eindeutigen Namen in dieses Feld ein, oder dürcken Sie die Stan
         <translation>Details anzeigen</translation>
     </message>
     <message>
-        <location filename="../gui/traffic_progress_dialog.cc" line="151"/>
+        <location filename="../gui/traffic_progress_dialog.cc" line="152"/>
         <source>successfully finished</source>
         <translation>Erfolgreich beendet</translation>
     </message>
     <message>
-        <location filename="../gui/traffic_progress_dialog.cc" line="156"/>
+        <location filename="../gui/traffic_progress_dialog.cc" line="157"/>
         <source>finished with warnings</source>
         <translation>Beendet mit Warnungen</translation>
     </message>
     <message>
-        <location filename="../gui/traffic_progress_dialog.cc" line="161"/>
+        <location filename="../gui/traffic_progress_dialog.cc" line="163"/>
         <source>failed</source>
         <translation>Fehlgeschlagen</translation>
     </message>
@@ -1467,6 +1546,7 @@ Geben Sie einen eindeutigen Namen in dieses Feld ein, oder dürcken Sie die Stan
         <translation>Hochladen</translation>
     </message>
     <message>
+        <location filename="../gui/traffic_progress_dialog.ui" line="262"/>
         <location filename="../gui/traffic_progress_dialog.ui" line="288"/>
         <source>Time remaining</source>
         <translation>Verbleibende Zeit</translation>
@@ -1482,22 +1562,22 @@ Geben Sie einen eindeutigen Namen in dieses Feld ein, oder dürcken Sie die Stan
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../gui/traffic_progress_dialog.ui" line="415"/>
+        <location filename="../gui/traffic_progress_dialog.ui" line="402"/>
         <source>Show Details</source>
         <translation>Details anzeigen</translation>
     </message>
     <message>
-        <location filename="../gui/traffic_progress_dialog.ui" line="438"/>
+        <location filename="../gui/traffic_progress_dialog.ui" line="425"/>
         <source>&amp;Pause</source>
         <translation>&amp;Pause</translation>
     </message>
     <message>
-        <location filename="../gui/traffic_progress_dialog.ui" line="448"/>
+        <location filename="../gui/traffic_progress_dialog.ui" line="435"/>
         <source>&amp;Cancel</source>
         <translation>&amp;Abbrechen</translation>
     </message>
     <message>
-        <location filename="../gui/traffic_progress_dialog.ui" line="458"/>
+        <location filename="../gui/traffic_progress_dialog.ui" line="445"/>
         <source>C&amp;lose</source>
         <translation>S&amp;chliessen</translation>
     </message>
