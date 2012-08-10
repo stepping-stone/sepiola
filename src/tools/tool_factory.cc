@@ -16,7 +16,9 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#if Q_OS_WIN
+#include <QtCore/QtGlobal>
+
+#ifdef Q_OS_WIN32
 #include "tools/at.hh"
 #include "tools/schtasks.hh"
 #else
