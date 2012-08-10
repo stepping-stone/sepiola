@@ -22,9 +22,7 @@
 #include <QTextCodec>
 #include <QStringList>
 #include <QRegExp>
-#ifdef Q_OS_WIN32
 #include <windows.h>
-#endif
 
 #include "tools/schtasks.hh"
 #include "settings/settings.hh"
@@ -95,10 +93,7 @@ bool Schtasks::schedule( const QString& execName, const QString& cliArgument, co
 {
 	qDebug() << "Schtasks::schedule( " << execName << ", " << cliArgument << ", " << schtasksArguments << ", " << locale << " )";
 
-	QString username = "";
-#ifdef Q_OS_WIN32
-	username = QString::fromWCharArray( _wgetenv( L"USERDOMAIN" ) ) + "\\" + QString::fromWCharArray( _wgetenv( L"USERNAME" ) );
-#endif
+	QString username = QString::fromWCharArray( _wgetenv( L"USERDOMAIN" ) ) + "\\" + QString::fromWCharArray( _wgetenv( L"USERNAME" ) );
 
 	QString password;
 	bool schtasks_success = false;
@@ -197,10 +192,7 @@ bool Schtasks::updateExistingTask( const QString& execName, const QString& cliAr
 	if ( taskExists() )
 	{
 		QLocale locale = getSchtasksBinaryLocale();
-		QString username = "";
-#ifdef Q_OS_WIN32
-		username = QString::fromWCharArray( _wgetenv( L"USERDOMAIN" ) ) + "\\" + QString::fromWCharArray( _wgetenv( L"USERNAME" ) );
-#endif
+		QString username = QString::fromWCharArray( _wgetenv( L"USERDOMAIN" ) ) + "\\" + QString::fromWCharArray( _wgetenv( L"USERNAME" ) );
 		QString password;
 		bool password_ok = getWindowsPassword( username, password, QObject::tr( "Enter login information to update the existing schedule task." ) );
 
@@ -419,11 +411,9 @@ QLocale Schtasks::getSchtasksBinaryLocale()
 QString Schtasks::getCodecName()
 {
 	QString codecName = "";
-#ifdef Q_OS_WIN32
 	char oemCodePage[6];
 	GetLocaleInfo( LOCALE_USER_DEFAULT, LOCALE_IDEFAULTCODEPAGE, oemCodePage, sizeof( oemCodePage ) / sizeof( char ) );
 	codecName = QString( oemCodePage );
-#endif
 	return codecName;
 }
 

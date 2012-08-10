@@ -30,7 +30,6 @@ IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized -Winit-self")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wstrict-null-sentinel")
@@ -39,17 +38,18 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal -Wno-long-long")
 
-	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")# -Werror")
+	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG -ggdb")# -Werror")
     SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" )
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 SET(CMAKE_CXX_FLAGS_DEPLOY ${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO})
 
 IF(Q_WS_WIN)
+    include(CMakeDetermineRCCompiler)
 	# add windows icon
 	SET(ICON_RC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/icon/windows)
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icon.o
-		COMMAND windres.exe -I${ICON_RC_DIR}
+		COMMAND ${CMAKE_RC_COMPILER} -I${ICON_RC_DIR}
 		-i${CMAKE_CURRENT_SOURCE_DIR}/icon/windows/icon.rc
 		-o ${CMAKE_CURRENT_BINARY_DIR}/icon.o
 	)
@@ -193,7 +193,7 @@ QT4_ADD_RESOURCES(
 )
 
 SET(SOURCE_FILES
-	main.cc 
+	main.cc
 	cli/cli_manager.cc
 	gui/about_dialog.cc
 	gui/backup_form.cc 
@@ -218,15 +218,9 @@ SET(SOURCE_FILES
 	model/backup_task.cc
 	settings/settings.cc
 	test/test_manager.cc
-	tools/at.cc 
-	tools/schtasks.cc
-	tools/crontab.cc
 	tools/plink.cc 
-	tools/posix_acl.cc 
 	tools/process.cc 
 	tools/rsync.cc 
-	tools/set_acl.cc
-	tools/unix_permissions.cc
 	tools/tool_factory.cc
 	utils/string_utils.cc 
 	utils/extended_file.cc
@@ -234,11 +228,31 @@ SET(SOURCE_FILES
 	utils/log_file_utils.cc
 	utils/host_file_utils.cc
 	utils/progress_task.cc
-	${sepiola_UI} 
-	${sepiola_MOC} 
+	${sepiola_UI}
+	${sepiola_MOC}
 	${sepiola_RC}
 	${sepiola_CFG}
 )
+
+# Use Q_WS_WIN from Qt-module instead of WIN32 from cmake
+# to make it work when cross-compiling using MinGW
+IF(Q_WS_WIN)
+    LIST(APPEND SOURCE_FILES
+        tools/at.cc
+        tools/schtasks.cc
+        tools/set_acl.cc
+    )
+ELSEIF(Q_WS_MAC)
+    LIST(APPEND SOURCE_FILES
+	    tools/unix_permissions.cc
+    )
+ELSEIF(Q_WS_X11)
+    LIST(APPEND SOURCE_FILES
+        tools/crontab.cc
+        tools/posix_acl.cc
+    )
+ENDIF(Q_WS_WIN)
+
 
 ADD_EXECUTABLE(
 	${SSBACKUP_EXECUTABLE_NAME}
