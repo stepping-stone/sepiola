@@ -209,6 +209,7 @@ void setHomeDir()
 #endif
 }
 
+#if 0
 void createConsole()
 {
 #ifdef Q_OS_WIN32
@@ -244,6 +245,7 @@ void createConsole()
 	// ios::sync_with_stdio();
 #endif
 }
+#endif
 
 int main(int argc, char *argv[])
 {
