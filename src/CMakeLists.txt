@@ -145,7 +145,20 @@ ENDIF (NOT PORTABLE_INSTALLATION)
 CONFIGURE_FILE(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 QT4_WRAP_CPP(
-	sepiola_MOC 
+	sepiola_base_MOC
+	tools/abstract_informing_process.hh
+	tools/abstract_rsync.hh
+	tools/abstract_scheduler.hh
+	tools/rsync.hh
+	settings/settings.hh
+	utils/log_file_utils.hh
+	model/backup_thread.hh
+	model/main_model.hh
+	model/restore_thread.hh
+)
+
+QT4_WRAP_CPP(
+	sepiola_ui_MOC
 	cli/cli_manager.hh
 	gui/about_dialog.hh
 	gui/backup_form.hh 
@@ -159,15 +172,6 @@ QT4_WRAP_CPP(
 	gui/pattern_dialog.hh
 	gui/output_dialog.hh 
 	gui/traffic_progress_dialog.hh
-	model/backup_thread.hh
-	model/main_model.hh
-	model/restore_thread.hh
-	tools/abstract_informing_process.hh
-	tools/abstract_rsync.hh
-	tools/abstract_scheduler.hh
-	tools/rsync.hh
-	settings/settings.hh
-	utils/log_file_utils.hh
 )
 
 QT4_WRAP_UI(
@@ -192,7 +196,31 @@ QT4_ADD_RESOURCES(
 	${RESELLER_LOGO_QRC_FULLFILENAME}
 )
 
-SET(SOURCE_FILES
+SET(BASE_SOURCE_FILES
+	settings/settings.cc
+	tools/plink.cc
+	tools/process.cc
+	tools/rsync.cc
+	tools/tool_factory.cc
+	utils/string_utils.cc
+	utils/extended_file.cc
+	utils/file_system_utils.cc
+	utils/log_file_utils.cc
+	utils/host_file_utils.cc
+	utils/progress_task.cc
+	model/backup_thread.cc
+	model/dir_tree_item.cc
+	model/main_model.cc
+	model/restore_name.cc
+	model/restore_thread.cc
+	model/remote_dir_model.cc
+	model/local_dir_model.cc
+	model/scheduled_task.cc
+	model/backup_task.cc
+	${sepiola_base_MOC}
+)
+
+SET(UI_SOURCE_FILES
 	main.cc
 	cli/cli_manager.cc
 	gui/about_dialog.cc
@@ -207,64 +235,49 @@ SET(SOURCE_FILES
 	gui/restore_form.cc 
 	gui/settings_form.cc
 	gui/text_input_dialog.cc
-	model/backup_thread.cc
-	model/dir_tree_item.cc
-	model/main_model.cc 
-	model/restore_name.cc
-	model/restore_thread.cc
-	model/remote_dir_model.cc
-	model/local_dir_model.cc
-	model/scheduled_task.cc
-	model/backup_task.cc
-	settings/settings.cc
 	test/test_manager.cc
-	tools/plink.cc 
-	tools/process.cc 
-	tools/rsync.cc 
-	tools/tool_factory.cc
-	utils/string_utils.cc 
-	utils/extended_file.cc
-	utils/file_system_utils.cc
-	utils/log_file_utils.cc
-	utils/host_file_utils.cc
-	utils/progress_task.cc
 	${sepiola_UI}
-	${sepiola_MOC}
-	${sepiola_RC}
+	${sepiola_ui_MOC}
 	${sepiola_CFG}
 )
 
 # Use Q_WS_WIN from Qt-module instead of WIN32 from cmake
 # to make it work when cross-compiling using MinGW
 IF(Q_WS_WIN)
-    LIST(APPEND SOURCE_FILES
+    LIST(APPEND BASE_SOURCE_FILES
         tools/at.cc
         tools/schtasks.cc
         tools/set_acl.cc
     )
 ELSEIF(Q_WS_MAC)
-    LIST(APPEND SOURCE_FILES
+    LIST(APPEND BASE_SOURCE_FILES
 	    tools/unix_permissions.cc
     )
 ELSEIF(Q_WS_X11)
-    LIST(APPEND SOURCE_FILES
+    LIST(APPEND BASE_SOURCE_FILES
         tools/crontab.cc
         tools/posix_acl.cc
     )
 ENDIF(Q_WS_WIN)
 
+ADD_LIBRARY(sepiola_base_objects OBJECT ${BASE_SOURCE_FILES})
+ADD_LIBRARY(sepiola_ui_objects OBJECT ${UI_SOURCE_FILES})
 
 ADD_EXECUTABLE(
 	${SSBACKUP_EXECUTABLE_NAME}
 	WIN32
 	MACOSX_BUNDLE
-	${SOURCE_FILES}
+    $<TARGET_OBJECTS:sepiola_base_objects>
+    $<TARGET_OBJECTS:sepiola_ui_objects>
+    ${sepiola_RC}
 )
 
 IF(Q_WS_WIN)
 	ADD_EXECUTABLE(
 		${SSBACKUP_EXECUTABLE_NAME}.com
-		${SOURCE_FILES}
+        $<TARGET_OBJECTS:sepiola_base_objects>
+        $<TARGET_OBJECTS:sepiola_ui_objects>
+   	    ${sepiola_RC}
 	)
 	SET_TARGET_PROPERTIES(${SSBACKUP_EXECUTABLE_NAME}.com PROPERTIES SUFFIX "")  # don't add .exe suffix
 
