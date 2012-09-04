@@ -30,6 +30,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized -Winit-self")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wstrict-null-sentinel")
@@ -92,6 +93,7 @@ FIND_PROGRAM(QT_LRELEASE
 )
 
 SET(translation_sources ${translation_sources} i18n/app_de.ts)
+SET(qt_translations /usr/share/qt4/translations/qt_de.qm)
 
 # Update translations (note that lupdate target write to source directory)
 IF(QT_LUPDATE)
@@ -262,6 +264,8 @@ ENDIF(Q_WS_WIN)
 
 ADD_LIBRARY(sepiola_base_objects OBJECT ${BASE_SOURCE_FILES})
 ADD_LIBRARY(sepiola_ui_objects OBJECT ${UI_SOURCE_FILES})
+
+FILE(COPY ${qt_translations} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ADD_EXECUTABLE(
 	${SSBACKUP_EXECUTABLE_NAME}
