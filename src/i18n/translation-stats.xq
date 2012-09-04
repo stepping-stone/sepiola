@@ -29,7 +29,7 @@ declare function local:translation-file-stats ($file as xs:string) as node()
 };
 
 (: space-delimited list of translation files :)
-let $translations := ( 'German.ts' )
+let $translations := ( 'app_de.ts' )
 
 return
     <translations>

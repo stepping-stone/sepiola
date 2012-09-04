@@ -91,7 +91,7 @@ FIND_PROGRAM(QT_LRELEASE
 	DOC "Path to the lrelease program"
 )
 
-SET(translation_sources ${translation_sources} i18n/German.ts)
+SET(translation_sources ${translation_sources} i18n/app_de.ts)
 
 # Update translations (note that lupdate target write to source directory)
 IF(QT_LUPDATE)
