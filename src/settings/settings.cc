@@ -23,7 +23,8 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QLocale>
-#include <stdio.h>
+#include <cstdio>
+#include <QtCore/QTranslator>
 
 #include "settings/settings.hh"
 #include "utils/file_system_utils.hh"
@@ -275,7 +276,17 @@ void Settings::reloadSettings()
 
 	serverName = userSettings->value( SETTINGS_HOST, serverName ).toString();
 	serverUserName = userSettings->value( SETTINGS_USERNAME ).toString();
-	languageIndex = userSettings->value( SETTINGS_LANGUAGE ).toInt();
+    
+    language = userSettings->value( SETTINGS_LANGUAGE ).toString();
+
+    // Convert old index values to new language codes
+    bool languageIsIndex(false);
+    int languageIndex = language.toInt(&languageIsIndex);
+    if ( languageIsIndex )
+    {
+        qDebug() << "converting deprecated language index to new language code";
+        saveLanguage((languageIndex == 1) ? "de" : "en");
+    }
 
 	backupPrefix = userSettings->value( SETTINGS_BACKUP_PREFIX ).toString();
 	if ( backupPrefix == "" )
@@ -516,12 +527,12 @@ void Settings::saveServerUserName( const QString &userName )
 	}
 }
 
-void Settings::saveLanguageIndex( const int& languageIndex )
+void Settings::saveLanguage( const QString& language )
 {
-	if ( this->languageIndex != languageIndex )
+	if ( this->language != language )
 	{
-		this->languageIndex = languageIndex;
-		userSettings->setValue( SETTINGS_LANGUAGE, languageIndex );
+		this->language = language;
+		userSettings->setValue( SETTINGS_LANGUAGE, language );
 	}
 }
 
@@ -703,9 +714,23 @@ bool Settings::isCompressedRsyncTraffic() {
 	return false;
 }
 
-QStringList Settings::getSupportedLanguages()
+QList<std::pair<QString, QString>> Settings::getAvailableLanguages()
 {
-	return supportedLanguages;
+    QList<std::pair<QString, QString>> languages;
+    languages << std::make_pair("English", "en"); // the native language
+    
+    QDir translationDir(getApplicationBinDir());
+
+    QRegExp regex("^app_(.*)\\.qm$");
+    QStringList translationFiles(translationDir.entryList(QStringList("app_*.qm"), QDir::Files, QDir::Name));
+    for ( auto l: translationFiles )
+    {
+        QTranslator translator;
+        translator.load(translationDir.filePath(l));
+        regex.indexIn(l);
+        languages << std::make_pair(translator.translate("SettingsForm", "English"), regex.cap(1));
+    }
+    return languages;
 }
 
 bool Settings::isLogDebugMessageEnabled()
@@ -747,7 +772,6 @@ QString Settings::getApplicationDataDir()
 {
 	return applicationDataDir;
 }
-
 
 QString Settings::getSetAclName()
 {
@@ -864,9 +888,9 @@ QString Settings::getSshName()
 	return getApplicationBinDir() + ssh;
 }
 
-int Settings::getLanguageIndex()
+QString Settings::getLanguage() const
 {
-	return languageIndex;
+	return language;
 }
 
 QString Settings::getBackupContentFileName()

@@ -54,7 +54,6 @@ namespace
 static const QString CONFIG_FILE_NAME = "config";
 static const QString VERSION_ARGUMENT = "-version";
 static const char* DEPENDENCY_MISSING = "Dependent files are missing. Please reinstall the application.\n";
-static const char* TRANSLATION_MISSING = "Translation files are missing, using default language. Please reinstall the application.\n";
 static const char* SINGLE_APPLICATION_ERROR =
 		"The application is already running. Only one instance of this application can be run concurrently.\n";
 }
@@ -136,24 +135,6 @@ bool assertCliDependencies()
 #endif
 
     return true;
-}
-
-bool loadTranslations()
-{
-	QTranslator translator;
-	Settings* settings = Settings::getInstance();
-	QStringList supportedLanguages = settings->getSupportedLanguages();
-
-	// skip the default langauge, because there is no translation file for it
-	for (int i=1; i<supportedLanguages.size(); i++)
-	{
-		if (!translator.load(supportedLanguages.at(i), settings->getApplicationBinDir() ) )
-		{
-            qDebug() << "translation for" << supportedLanguages.at(i) << "could not be found";
-			return false;
-		}
-	}
-	return true;
 }
 
 bool isProcessRunning(const int& processId)
@@ -337,10 +318,6 @@ int main(int argc, char *argv[])
 		QMessageBox::critical( 0, "Dependency missing", DEPENDENCY_MISSING);
 		return -1;
 	}
-    if (!loadTranslations())
-    {
-   		QMessageBox::critical( 0, "Translations missing", TRANSLATION_MISSING);
-    }
 	if ( !assertSingleApplication() )
 	{
 		QMessageBox::critical( 0, "Application is already running", SINGLE_APPLICATION_ERROR);
@@ -350,10 +327,13 @@ int main(int argc, char *argv[])
 	LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
 	MainModel model;
 
-	QTranslator translator;
 	Settings* settings = Settings::getInstance();
-	translator.load(settings->getSupportedLanguages().at(settings->getLanguageIndex() ), settings->getApplicationBinDir() );
-	app.installTranslator( &translator);
+
+	QTranslator appTranslator, qtTranslator;
+	appTranslator.load("app_" + settings->getLanguage(), settings->getApplicationBinDir());
+    qtTranslator.load("qt_" + settings->getLanguage(), settings->getApplicationBinDir());
+	app.installTranslator(&appTranslator);
+	app.installTranslator(&qtTranslator);
 
 	MainWindow mainWindow( &model);
 	QObject::connect( &mainWindow, SIGNAL( writeLog( const QString& ) ), LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ));

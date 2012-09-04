@@ -76,11 +76,10 @@ void SettingsForm::reload()
 	this->checkBoxKeepDeletedFiles->setChecked( !settings->getDeleteExtraneousItems() );
 
 	this->comboBoxLanguage->clear();
-	foreach( QString language, settings->getSupportedLanguages() )
-	{
-		this->comboBoxLanguage->addItem( language );
-	}
-	this->comboBoxLanguage->setCurrentIndex( settings->getLanguageIndex() );
+    for ( auto language: settings->getAvailableLanguages() )
+		this->comboBoxLanguage->addItem( language.first, language.second );
+
+	this->comboBoxLanguage->setCurrentIndex( this->comboBoxLanguage->findData(settings->getLanguage()) );
 	formChanged = false;
 }
 
@@ -91,7 +90,7 @@ void SettingsForm::save()
 		Settings* settings = Settings::getInstance();
 		settings->saveServerUserName( this->lineEditUsername->text() );
 		settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );
-		settings->saveLanguageIndex( this->comboBoxLanguage->currentIndex() );
+		settings->saveLanguage( this->comboBoxLanguage->itemData(this->comboBoxLanguage->currentIndex()).toString() );
 		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
 		settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
 		settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
@@ -153,7 +152,7 @@ void SettingsForm::on_lineEditUsername_textEdited( QString username )
 
 void SettingsForm::on_comboBoxLanguage_currentIndexChanged( int languageIndex )
 {
-	formChanged = ( languageIndex != Settings::getInstance()->getLanguageIndex() );
+	formChanged = ( this->comboBoxLanguage->itemData(languageIndex).toString() != Settings::getInstance()->getLanguage() );
 }
 
 void SettingsForm::on_lineEditBackupPrefix_textEdited( QString backupPrefix )

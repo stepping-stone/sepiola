@@ -19,16 +19,15 @@
 #ifndef SETTINGS_HH
 #define SETTINGS_HH
 
-#include <stdlib.h>
 #include <QObject>
 #include <QFileInfo>
 #include <QSettings>
 #include <QString>
 #include <QStringList>
+#include <QList>
 #include <QDateTime>
 #include <QSize>
 #include <QPoint>
-#include <QHash>
 
 #include "model/backup_task.hh"
 #include "model/scheduled_task.hh"
@@ -78,10 +77,10 @@ class Settings : public QObject
 		const char* getEOLCharacter();
 
 		/**
-		 * Gets a list of supported application languages
+		 * Gets a list of available application languages
 		 * @return list of languages
 		 */
-		QStringList getSupportedLanguages();
+		QList<std::pair<QString, QString>> getAvailableLanguages();
 
 		/**
 		 * Creates a file containing the private putty key
@@ -226,11 +225,11 @@ class Settings : public QObject
 		QString getClientPassword();
 		QString getServerUserName();
 		QString getServerPassword();
-		int getLanguageIndex();
+		QString getLanguage() const;
 		void saveServerUserName( const QString& userName );
 		void setServerPassword( const QString& password );
 		void setClientPassword( const QString& password );
-		void saveLanguageIndex( const int& languageIndex );
+		void saveLanguage( const QString& language );
 		QString getBackupPrefix();
 		void saveBackupPrefix( const QString& backupPrefix );
 		QString getServerKey();
@@ -404,7 +403,7 @@ class Settings : public QObject
 		// writable
 		QString serverName;
 		QString serverUserName;
-		int languageIndex;
+		QString language;
 		QString serverKey;
 		QString privatePuttyKey;
 		QString privateOpenSshKey;
