@@ -189,7 +189,7 @@ CH-3012 Bern</translation>
     <message>
         <location filename="../gui/backup_form.ui" line="318"/>
         <source>Select which files and folders you want to back up:</source>
-        <translation>Wählen Sie die gewünschten Dateien und Verzeichnisse aus, welche Sie backupen wollen</translation>
+        <translation>Wählen Sie die zu sichernden Dateien und Verzeichnisse aus:</translation>
     </message>
 </context>
 <context>
@@ -300,7 +300,7 @@ CH-3012 Bern</translation>
     <message>
         <location filename="../model/backup_thread.cc" line="214"/>
         <source>Backup succeeded with warnings.</source>
-        <translation>Backup gelungen (mit Warnungen)</translation>
+        <translation>Backup erfolgreich (mit Warnungen).</translation>
     </message>
     <message>
         <location filename="../model/backup_thread.cc" line="233"/>
@@ -815,28 +815,28 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Der Prozess %1 ist wurde nicht gestartet. Entweder ist das aufgerufene Programm nicht vorhanden, oder Sie haben nicht genügend Rechte um es auszuführen.</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="145"/>
+        <location filename="../settings/settings.cc" line="146"/>
         <source>English</source>
         <translation>Englisch</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="146"/>
+        <location filename="../settings/settings.cc" line="147"/>
         <source>German</source>
         <translation>Deutsch</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="370"/>
+        <location filename="../main.cc" line="351"/>
         <source>Application started</source>
         <translation>Applikation wurde gestartet</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="372"/>
+        <location filename="../main.cc" line="353"/>
         <source>Application closed</source>
         <translation>Applikation wurde beendet</translation>
     </message>
     <message>
         <location filename="../tools/at.cc" line="83"/>
-        <location filename="../tools/schtasks.cc" line="154"/>
+        <location filename="../tools/schtasks.cc" line="149"/>
         <source>Scheduled task has been created</source>
         <translation>Zeitgesteuertes Backup wurde eingerichtet</translation>
     </message>
@@ -866,8 +866,8 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Dateiberechtigungen werden für %1 ermittelt</translation>
     </message>
     <message>
-        <location filename="../tools/posix_acl.cc" line="174"/>
         <location filename="../tools/unix_permissions.cc" line="120"/>
+        <location filename="../tools/posix_acl.cc" line="174"/>
         <source>Setting metadata for %1</source>
         <translation>Dateiberechtigungen werden für %1 gesetzt</translation>
     </message>
@@ -889,8 +889,8 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../tools/posix_acl.cc" line="210"/>
         <location filename="../tools/set_acl.cc" line="197"/>
+        <location filename="../tools/posix_acl.cc" line="210"/>
         <source>Error occurred while setting ACL&apos;s:
 </source>
         <translation>Während dem setzen der ACLs ist ein Fehler aufgetreten:
@@ -911,7 +911,7 @@ Warning: The permissions of some files could not be backed up. See above for det
 </translation>
     </message>
     <message>
-        <location filename="../main.cc" line="362"/>
+        <location filename="../main.cc" line="343"/>
         <source>Update started</source>
         <translation>Aktualisierung gestartet</translation>
     </message>
@@ -921,27 +921,27 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Bereite Metadaten vor</translation>
     </message>
     <message>
-        <location filename="../tools/schtasks.cc" line="105"/>
+        <location filename="../tools/schtasks.cc" line="100"/>
         <source>Enter login information to create the schedule task.</source>
         <translation>Geben sie ihre Login Informationen ein um den geplanten Task zu erzeugen.</translation>
     </message>
     <message>
-        <location filename="../tools/schtasks.cc" line="158"/>
+        <location filename="../tools/schtasks.cc" line="153"/>
         <source>Scheduled task could not be created</source>
         <translation>Geplanter Task konnte nicht erzeugt werden</translation>
     </message>
     <message>
-        <location filename="../tools/schtasks.cc" line="205"/>
+        <location filename="../tools/schtasks.cc" line="197"/>
         <source>Enter login information to update the existing schedule task.</source>
         <translation>Geben sie ihre Login Informationen ein um den geplanten Task zu aktualisieren.</translation>
     </message>
     <message>
-        <location filename="../tools/schtasks.cc" line="254"/>
+        <location filename="../tools/schtasks.cc" line="246"/>
         <source>Scheduled task has been updated</source>
         <translation>Geplanter Task wurde aktualisiert</translation>
     </message>
     <message>
-        <location filename="../tools/schtasks.cc" line="258"/>
+        <location filename="../tools/schtasks.cc" line="250"/>
         <source>Scheduled task could not be updated</source>
         <translation>Geplanter Task konnte nicht aktualisiert werden</translation>
     </message>
@@ -1102,7 +1102,7 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>%1 Minuten nach dem Hochfahren der Computers</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="262"/>
+        <location filename="../settings/settings.cc" line="263"/>
         <source>reseller address (missing)</source>
         <translation>Wiederverkäufer Adresse (fehlend)</translation>
     </message>
@@ -1325,7 +1325,7 @@ Warning: The permissions of some files could not be backed up. See above for det
     <message>
         <location filename="../tools/rsync.cc" line="1023"/>
         <source>Warning: At least one file could not be backuped up. See above for details.</source>
-        <translation>Warnung: Mindestens eine Datei konnte nicht gesichert werden. Siehe oben für weitere Details </translation>
+        <translation>Warnung: Mindestens eine Datei konnte nicht gesichert werden. Siehe oben für weitere Details.</translation>
     </message>
     <message>
         <location filename="../tools/rsync.cc" line="1028"/>
@@ -1344,18 +1344,18 @@ In der Regel betrifft dies temporäre Dateien und diese Warnung kann ignoriert w
 <context>
     <name>SettingsForm</name>
     <message>
-        <location filename="../gui/settings_form.cc" line="99"/>
+        <location filename="../gui/settings_form.cc" line="98"/>
         <source>Settings saved</source>
         <translation>Einstellungen gespeichert</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="110"/>
-        <location filename="../gui/settings_form.cc" line="128"/>
+        <location filename="../gui/settings_form.cc" line="109"/>
+        <location filename="../gui/settings_form.cc" line="127"/>
         <source>Unsaved settings</source>
         <translation>Nicht gespeicherte Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="110"/>
+        <location filename="../gui/settings_form.cc" line="109"/>
         <source>Your settings have been modified.
 Do you want to restore the original settings?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1377,7 +1377,7 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>S&amp;peichern</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="99"/>
+        <location filename="../gui/settings_form.cc" line="98"/>
         <source>Settings have been saved.</source>
         <translation>Einstellungen wurden gespeichert.</translation>
     </message>
@@ -1392,7 +1392,7 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="128"/>
+        <location filename="../gui/settings_form.cc" line="127"/>
         <source>Your settings have been modified.
 Do you want to save the settings before leaving this view?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1417,12 +1417,12 @@ Provide a unique name in this field or press the
 default-button to use the system-settings.</source>
         <translation>Durch die benutzung verschiedener Computernamen ist es möglich
 Dokumente von verschiedenen Computern auf den gleichen Backup-Server zu sichern.
-Geben Sie einen eindeutigen Namen in dieses Feld ein, oder dürcken Sie die Standardschaltfläche um die Systemeinstellungen zu verwenden</translation>
+Geben Sie einen eindeutigen Namen in dieses Feld ein, oder drücken Sie die Standardschaltfläche um die Systemeinstellungen zu verwenden.</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="315"/>
         <source>Language (requires restart):</source>
-        <translation>Sprache (Neustart erforderlich)</translation>
+        <translation>Sprache (Neustart erforderlich):</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="192"/>
@@ -1453,22 +1453,29 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://www.quotaChangeTemp.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;quotaChangeLink&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="373"/>
+        <location filename="../gui/settings_form.ui" line="323"/>
+        <location filename="../settings/settings.cc" line="721"/>
+        <source>English</source>
+        <translatorcomment>Hier wird die Sprache in der jeweiligen Sprache eingetragen.</translatorcomment>
+        <translation>Deutsch</translation>
+    </message>
+    <message>
+        <location filename="../gui/settings_form.ui" line="379"/>
         <source>Display</source>
         <translation>Anzeige</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="405"/>
+        <location filename="../gui/settings_form.ui" line="411"/>
         <source>elapsed backups in the Overview</source>
         <translation>letzte Backups im Überblick</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="446"/>
+        <location filename="../gui/settings_form.ui" line="452"/>
         <source>Show hidden files &amp;&amp; folders</source>
         <translation>Versteckte Dateien und Ordner anzeigen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.ui" line="453"/>
+        <location filename="../gui/settings_form.ui" line="459"/>
         <source>Keep locally deleted files on the server forever
 (it is recommended not to choose this option, as your backups would grow very big very rapidly)</source>
         <translation>Halten Sie lokal gelöschten Dateien für immer auf dem Server 
