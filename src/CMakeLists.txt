@@ -119,23 +119,39 @@ IF(QT_LRELEASE)
 	# Clear list
 	SET(qms)
 
-	# Add command to build X.qm from X.po
-	FOREACH(po ${translation_sources})
-		GET_FILENAME_COMPONENT(qm ${po} NAME_WE)
+	# Add command to build X.qm from X.ts
+	FOREACH(ts ${translation_sources})
+		GET_FILENAME_COMPONENT(qm ${ts} NAME_WE)
 		SET(qm "${CMAKE_CURRENT_BINARY_DIR}/${qm}.qm")
-		SET(po "${CMAKE_CURRENT_SOURCE_DIR}/${po}")
+		SET(ts "${CMAKE_CURRENT_SOURCE_DIR}/${ts}")
 		ADD_CUSTOM_COMMAND(OUTPUT ${qm} 
-		COMMAND ${QT_LRELEASE} ${po} -qm ${qm}
-		DEPENDS ${po})
+		COMMAND ${QT_LRELEASE} ${ts} -qm ${qm}
+		DEPENDS ${ts})
 		SET(qms ${qms} ${qm})
 		SET(translation_binaries ${translation_binaries} ${qm})
-	ENDFOREACH(po)
+	ENDFOREACH(ts)
 
 	# Finish off with a command that builds *.qm
 	ADD_CUSTOM_TARGET(lrelease ALL DEPENDS ${qms})
 ELSE(QT_LRELEASE)
 	MESSAGE(STATUS "lrelease could not be found. You're losing the localisation.")
 ENDIF(QT_LRELEASE)
+
+# Clear list
+SET(qms)
+
+FOREACH(qt_translation ${qt_translations})
+    GET_FILENAME_COMPONENT(qm ${qt_translation} NAME_WE)
+    SET(qm "${CMAKE_CURRENT_BINARY_DIR}/${qm}.qm")
+    ADD_CUSTOM_COMMAND(OUTPUT ${qm} 
+        COMMAND ${CMAKE_COMMAND} -E copy ${qt_translation} ${qm}
+        DEPENDS ${qt_translation})
+    SET(qms ${qms} ${qm})
+    SET(translation_binaries ${translation_binaries} ${qm})
+ENDFOREACH(qt_translation)
+
+# Finish off with a command that builds *.qm
+ADD_CUSTOM_TARGET(copy-qt-translation ALL DEPENDS ${qms})
 
 SET(PORTABLE_INSTALLATION TRUE CACHE BOOL "Build a portable version (ignore installation prefix)")
 
@@ -264,8 +280,6 @@ ENDIF(Q_WS_WIN)
 
 ADD_LIBRARY(sepiola_base_objects OBJECT ${BASE_SOURCE_FILES})
 ADD_LIBRARY(sepiola_ui_objects OBJECT ${UI_SOURCE_FILES})
-
-FILE(COPY ${qt_translations} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ADD_EXECUTABLE(
 	${SSBACKUP_EXECUTABLE_NAME}
