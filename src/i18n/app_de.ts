@@ -825,12 +825,12 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Deutsch</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="351"/>
+        <location filename="../main.cc" line="352"/>
         <source>Application started</source>
         <translation>Applikation wurde gestartet</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="353"/>
+        <location filename="../main.cc" line="354"/>
         <source>Application closed</source>
         <translation>Applikation wurde beendet</translation>
     </message>
@@ -911,7 +911,7 @@ Warning: The permissions of some files could not be backed up. See above for det
 </translation>
     </message>
     <message>
-        <location filename="../main.cc" line="343"/>
+        <location filename="../main.cc" line="344"/>
         <source>Update started</source>
         <translation>Aktualisierung gestartet</translation>
     </message>
@@ -992,7 +992,7 @@ Warning: The permissions of some files could not be backed up. See above for det
     </message>
     <message>
         <location filename="../gui/overview_form.cc" line="53"/>
-        <location filename="../gui/settings_form.cc" line="52"/>
+        <location filename="../gui/settings_form.cc" line="53"/>
         <source>&lt;a href=&quot;%1&quot;&gt;Change quota&lt;/a&gt; (opens a browser window)</source>
         <translation>&lt;a href=&quot;%1&quot;&gt;Quota ändern&lt;/a&gt; (Öffnet ein Browserfenster)</translation>
     </message>
@@ -1102,7 +1102,7 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>%1 Minuten nach dem Hochfahren der Computers</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="263"/>
+        <location filename="../settings/settings.cc" line="262"/>
         <source>reseller address (missing)</source>
         <translation>Wiederverkäufer Adresse (fehlend)</translation>
     </message>
@@ -1120,8 +1120,8 @@ Warning: The permissions of some files could not be backed up. See above for det
   -&gt;Datei %1 konnte nicht entfernt werden. </translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="48"/>
-        <location filename="../gui/settings_form.cc" line="50"/>
+        <location filename="../gui/settings_form.cc" line="49"/>
+        <location filename="../gui/settings_form.cc" line="51"/>
         <source>Total size: %1 GB, free: %2 GB</source>
         <translation>Gesamtgrösse: %1 GB, Frei: %2 GB</translation>
     </message>
@@ -1344,18 +1344,18 @@ In der Regel betrifft dies temporäre Dateien und diese Warnung kann ignoriert w
 <context>
     <name>SettingsForm</name>
     <message>
-        <location filename="../gui/settings_form.cc" line="98"/>
+        <location filename="../gui/settings_form.cc" line="101"/>
         <source>Settings saved</source>
         <translation>Einstellungen gespeichert</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="109"/>
-        <location filename="../gui/settings_form.cc" line="127"/>
+        <location filename="../gui/settings_form.cc" line="112"/>
+        <location filename="../gui/settings_form.cc" line="130"/>
         <source>Unsaved settings</source>
         <translation>Nicht gespeicherte Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="109"/>
+        <location filename="../gui/settings_form.cc" line="112"/>
         <source>Your settings have been modified.
 Do you want to restore the original settings?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1372,12 +1372,12 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>Benutzername:</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="34"/>
+        <location filename="../gui/settings_form.cc" line="35"/>
         <source>S&amp;ave</source>
         <translation>S&amp;peichern</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="98"/>
+        <location filename="../gui/settings_form.cc" line="101"/>
         <source>Settings have been saved.</source>
         <translation>Einstellungen wurden gespeichert.</translation>
     </message>
@@ -1387,12 +1387,12 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>St&amp;andard</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="37"/>
+        <location filename="../gui/settings_form.cc" line="38"/>
         <source>&amp;Cancel</source>
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="127"/>
+        <location filename="../gui/settings_form.cc" line="130"/>
         <source>Your settings have been modified.
 Do you want to save the settings before leaving this view?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1454,7 +1454,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="323"/>
-        <location filename="../settings/settings.cc" line="721"/>
+        <location filename="../settings/settings.cc" line="731"/>
         <source>English</source>
         <translatorcomment>Hier wird die Sprache in der jeweiligen Sprache eingetragen.</translatorcomment>
         <translation>Deutsch</translation>
@@ -1480,6 +1480,11 @@ p, li { white-space: pre-wrap; }
 (it is recommended not to choose this option, as your backups would grow very big very rapidly)</source>
         <translation>Halten Sie lokal gelöschten Dateien für immer auf dem Server 
 (es wird empfohlen diese Option nicht zu wählen, weil die Backups sehr schnell gross werden)</translation>
+    </message>
+    <message>
+        <location filename="../gui/settings_form.ui" line="467"/>
+        <source>Verbose logging</source>
+        <translation>Ausführliche Protokollierung</translation>
     </message>
 </context>
 <context>
