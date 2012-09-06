@@ -139,7 +139,7 @@ Settings::Settings() :
     resellerSettings(0),
     userSettings(0),
     appData(0),
-    logDebugMessage(true),
+    logDebugMessage(false),
     effectiveUserId(0)
 {
 	//TODO: load language name translations after setting the current langauge
@@ -223,7 +223,6 @@ void Settings::reloadSettings()
 	privateOpenSshKeyFileName = applicationSettings->value( SETTINGS_PRIVATE_OPEN_SSH_KEY_FILE_NAME ).toString();
 	lockFileName = applicationSettings->value( SETTINGS_LOCK_FILE_NAME ).toString();
 	logFileName = applicationSettings->value( SETTINGS_LOG_FILE_NAME ).toString();
-	logDebugMessage = applicationSettings->value( SETTINGS_LOG_DEBUG_MESSAGE ).toBool();
 	ignoreReinstall = applicationSettings->value( SETTINGS_IGNORE_REINSTALL ).toBool();
 	maxLogLines = applicationSettings->value( SETTINGS_MAX_LOG_LINES ).toInt();
 	includePatternFileName = applicationSettings->value( SETTINGS_INCLUDE_PATTERN_FILE_NAME ).toString();
@@ -304,6 +303,7 @@ void Settings::reloadSettings()
 	showHiddenFilesAndFolders = userSettings->value( SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, false ).toBool();
 	windowSize = userSettings->value( SETTINGS_WINDOW_SIZE ).toSize();
 	windowPosition = userSettings->value( SETTINGS_WINDOW_POSITION, QPoint( 200, 200 ) ).toPoint();
+	logDebugMessage = userSettings->value( SETTINGS_LOG_DEBUG_MESSAGE ).toBool();
 
 	// [AppData]
 	appData->beginGroup( SETTINGS_GROUP_APPDATA );
@@ -962,4 +962,16 @@ const BackupSelectionHash& Settings::getLastBackupSelectionRules() const
 	return lastBackupRules;
 }
 
+void Settings::saveLogDebugMessages(bool logDebugMessage)
+{
+	if (this->logDebugMessage != logDebugMessage)
+	{
+		this->logDebugMessage = logDebugMessage;
+		userSettings->setValue(SETTINGS_LOG_DEBUG_MESSAGE, logDebugMessage);
+	}
+}
 
+bool Settings::getLogDebugMessages() const
+{
+    return logDebugMessage;
+}

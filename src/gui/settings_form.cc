@@ -19,6 +19,7 @@
 #include <QDebug>
 
 #include "gui/settings_form.hh"
+#include "model/main_model.hh"
 
 SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( parent )
 {
@@ -74,6 +75,7 @@ void SettingsForm::reload()
 	this->spinBoxNOfShownLastBackups->setValue( settings->getNOfLastBackups() );
 	this->checkBoxShowHiddenFiles->setChecked( settings->getShowHiddenFilesAndFolders() );
 	this->checkBoxKeepDeletedFiles->setChecked( !settings->getDeleteExtraneousItems() );
+	this->checkBoxVerboseLogging->setChecked( settings->getLogDebugMessages() );
 
 	this->comboBoxLanguage->clear();
     for ( auto language: settings->getAvailableLanguages() )
@@ -94,6 +96,7 @@ void SettingsForm::save()
 		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
 		settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
 		settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
+		settings->saveLogDebugMessages( this->checkBoxVerboseLogging->isChecked() );
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
 		emit updateOverviewFormLastBackupsInfo();
@@ -171,10 +174,17 @@ void SettingsForm::on_btnDefaultPrefix_clicked()
 	formChanged = true;
 }
 
-void SettingsForm::on_checkBoxShowHiddenFiles_stateChanged( int state ) {
+void SettingsForm::on_checkBoxShowHiddenFiles_stateChanged( int state )
+{
 	formChanged = ((state==Qt::Checked) != Settings::getInstance()->getShowHiddenFilesAndFolders());
 }
 
-void SettingsForm::on_checkBoxKeepDeletedFiles_stateChanged( int state ) {
+void SettingsForm::on_checkBoxKeepDeletedFiles_stateChanged( int state )
+{
 	formChanged = ((state==Qt::Checked) != (!Settings::getInstance()->getDeleteExtraneousItems()));
+}
+
+void SettingsForm::on_checkBoxVerboseLogging_stateChanged( int state )
+{
+	formChanged = ((state==Qt::Checked) != (Settings::getInstance()->getLogDebugMessages()));
 }

@@ -25,7 +25,8 @@
 
 #include "ui_settings_form.h"
 
-#include "model/main_model.hh"
+// forward declarations
+class MainModel;
 
 /**
  * The SettingsForm class is the form displaying the settings
@@ -68,6 +69,7 @@ private slots:
 	void on_spinBoxNOfShownLastBackups_valueChanged( int i );
 	void on_checkBoxShowHiddenFiles_stateChanged( int state );
 	void on_checkBoxKeepDeletedFiles_stateChanged( int state );
+    void on_checkBoxVerboseLogging_stateChanged( int state );
 };
 
 #endif

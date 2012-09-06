@@ -461,6 +461,13 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxVerboseLogging">
+        <property name="text">
+         <string>Verbose logging</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

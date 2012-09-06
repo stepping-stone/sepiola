@@ -262,6 +262,9 @@ class Settings : public QObject
 		const BackupSelectionHash& getLastBackupSelectionRules() const;
 		void saveBackupSelectionRules( const BackupSelectionHash& selectionRules );
 
+        void saveLogDebugMessages(bool logDebugMessage);
+        bool getLogDebugMessages() const;
+
 		static const QString VERSION;
 
 	private:
