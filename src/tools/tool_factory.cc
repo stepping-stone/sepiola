@@ -53,7 +53,7 @@ auto_ptr< AbstractMetadata > ToolFactory::getMetadataImpl()
 #elif defined Q_OS_WIN32
 	return auto_ptr< AbstractMetadata >( new SetAcl(Settings::getInstance()->getSetAclName()) );
 #else
-	return auto_ptr< AbstractMetadata >( new PosixAcl(Settings::getInstance()->getGetfaclName(), Settings::getInstance()->getGetfaclName()) );
+	return auto_ptr< AbstractMetadata >( new PosixAcl(Settings::getInstance()->getGetfaclName(), Settings::getInstance()->getSetfaclName()) );
 #endif
 
 }
