@@ -76,6 +76,7 @@ void SettingsForm::reload()
 	this->checkBoxShowHiddenFiles->setChecked( settings->getShowHiddenFilesAndFolders() );
 	this->checkBoxKeepDeletedFiles->setChecked( !settings->getDeleteExtraneousItems() );
 	this->checkBoxVerboseLogging->setChecked( settings->getLogDebugMessages() );
+	this->spinBoxBandwidthLimit->setValue( settings->getBandwidthLimit() );
 
 	this->comboBoxLanguage->clear();
     for ( auto language: settings->getAvailableLanguages() )
@@ -97,6 +98,7 @@ void SettingsForm::save()
 		settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
 		settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
 		settings->saveLogDebugMessages( this->checkBoxVerboseLogging->isChecked() );
+		settings->saveBandwidthLimit( this->spinBoxBandwidthLimit->value() );
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
 		emit updateOverviewFormLastBackupsInfo();
@@ -166,6 +168,11 @@ void SettingsForm::on_lineEditBackupPrefix_textEdited( QString backupPrefix )
 void SettingsForm::on_spinBoxNOfShownLastBackups_valueChanged( int i )
 {
 	formChanged = (i != Settings::getInstance()->getNOfLastBackups());
+}
+
+void SettingsForm::on_spinBoxBandwidthLimit_valueChanged( int i )
+{
+	formChanged = (i != Settings::getInstance()->getBandwidthLimit());
 }
 
 void SettingsForm::on_btnDefaultPrefix_clicked()
