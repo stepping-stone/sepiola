@@ -348,7 +348,6 @@ class Settings : public QObject
 
 
 		// Settings given at build-time or by platform
-		static const QString SETTINGS_EXECUTABLE_EXTENSION;
 		static const bool IS_RESELLER;
 
 		static Settings* instance;

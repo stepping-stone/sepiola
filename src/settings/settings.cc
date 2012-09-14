@@ -26,6 +26,7 @@
 #include <cstdio>
 #include <QtCore/QTranslator>
 
+#include "settings/platform.hh"
 #include "settings/settings.hh"
 #include "utils/file_system_utils.hh"
 #include "utils/string_utils.hh"
@@ -34,13 +35,6 @@
 #include "model/scheduled_task.hh"
 
 #include "config.h"
-
-#ifdef Q_OS_WIN32
-const QString Settings::SETTINGS_EXECUTABLE_EXTENSION = ".exe";
-#else
-const QString Settings::SETTINGS_EXECUTABLE_EXTENSION = "";
-#endif
-
 
 const bool Settings::SHOW_PROGRESS = false;
 
@@ -249,13 +243,13 @@ void Settings::reloadSettings()
 
 	// [Executables]
 	applicationSettings->beginGroup( SETTINGS_GROUP_EXECUTABLES );
-	thisApplication = StringUtils::encaps( EXECUTABLE_NAME, "", SETTINGS_EXECUTABLE_EXTENSION );
-	rsync = StringUtils::encaps( applicationSettings->value( SETTINGS_RSYNC ).toString(), "", SETTINGS_EXECUTABLE_EXTENSION );
-	plink = StringUtils::encaps( applicationSettings->value( SETTINGS_PLINK ).toString(), "", SETTINGS_EXECUTABLE_EXTENSION );
-	ssh = StringUtils::encaps( applicationSettings->value( SETTINGS_SSH ).toString(), "", SETTINGS_EXECUTABLE_EXTENSION );
-	getfacl = StringUtils::encaps( applicationSettings->value( SETTINGS_GETFACL ).toString(), "", SETTINGS_EXECUTABLE_EXTENSION );
-	setfacl = StringUtils::encaps( applicationSettings->value( SETTINGS_SETFACL ).toString(), "", SETTINGS_EXECUTABLE_EXTENSION );
-	setacl = StringUtils::encaps( applicationSettings->value( SETTINGS_SETACL ).toString(), "", SETTINGS_EXECUTABLE_EXTENSION );
+	thisApplication = StringUtils::encaps( EXECUTABLE_NAME, "", Platform::EXECUTABLE_SUFFIX );
+	rsync = StringUtils::encaps( applicationSettings->value( SETTINGS_RSYNC ).toString(), "", Platform::EXECUTABLE_SUFFIX );
+	plink = StringUtils::encaps( applicationSettings->value( SETTINGS_PLINK ).toString(), "", Platform::EXECUTABLE_SUFFIX );
+	ssh = StringUtils::encaps( applicationSettings->value( SETTINGS_SSH ).toString(), "", Platform::EXECUTABLE_SUFFIX );
+	getfacl = StringUtils::encaps( applicationSettings->value( SETTINGS_GETFACL ).toString(), "", Platform::EXECUTABLE_SUFFIX );
+	setfacl = StringUtils::encaps( applicationSettings->value( SETTINGS_SETFACL ).toString(), "", Platform::EXECUTABLE_SUFFIX );
+	setacl = StringUtils::encaps( applicationSettings->value( SETTINGS_SETACL ).toString(), "", Platform::EXECUTABLE_SUFFIX );
 	applicationSettings->endGroup();
 
 	// [Reseller]

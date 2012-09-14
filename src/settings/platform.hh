@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2011 stepping stone GmbH
+#| Copyright (C) 2007-2012 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -24,9 +24,11 @@
 namespace Platform {
 
 #ifdef Q_OS_WIN32
-    static const char* EOL_CHARACTER = "\r\n";
+    static const char EOL_CHARACTER[] = "\r\n";
+    static const char EXECUTABLE_SUFFIX[] = ".exe";
 #else
-    static const char* EOL_CHARACTER = "\n";
+    static const char EOL_CHARACTER[] = "\n";
+    static const char EXECUTABLE_SUFFIX[] = "";
 #endif
 
 }
