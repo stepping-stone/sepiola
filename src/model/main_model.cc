@@ -29,6 +29,8 @@
 #include "model/restore_thread.hh"
 #include "tools/abstract_rsync.hh"
 #include "tools/abstract_metadata.hh"
+#include "tools/abstract_ssh.hh"
+#include "tools/abstract_scheduler.hh"
 #include "tools/rsync.hh"
 #include "tools/posix_acl.hh"
 #include "tools/tool_factory.hh"

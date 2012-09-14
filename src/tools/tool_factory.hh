@@ -21,11 +21,10 @@
 
 #include <memory>
 
-#include "settings/settings.hh"
-#include "tools/abstract_metadata.hh"
-#include "tools/abstract_rsync.hh"
-#include "tools/abstract_ssh.hh"
-#include "tools/abstract_scheduler.hh"
+class AbstractMetadata;
+class AbstractRsync;
+class AbstractSsh;
+class AbstractScheduler;
 
 using std::auto_ptr;
 

@@ -27,6 +27,8 @@
 #include "model/main_model.hh"
 #include "settings/settings.hh"
 #include "tools/tool_factory.hh"
+#include "tools/abstract_metadata.hh"
+#include "tools/abstract_rsync.hh"
 #include "tools/rsync.hh"
 #include "utils/file_system_utils.hh"
 #include "utils/log_file_utils.hh"

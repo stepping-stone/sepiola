@@ -21,6 +21,7 @@
 #include "model/restore_thread.hh"
 #include "settings/settings.hh"
 #include "tools/tool_factory.hh"
+#include "tools/abstract_metadata.hh"
 #include "utils/file_system_utils.hh"
 
 RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )

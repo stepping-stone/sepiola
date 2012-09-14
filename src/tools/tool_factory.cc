@@ -18,6 +18,12 @@
 
 #include <QtCore/QtGlobal>
 
+#include "settings/settings.hh"
+#include "tools/abstract_metadata.hh"
+#include "tools/abstract_rsync.hh"
+#include "tools/abstract_ssh.hh"
+#include "tools/abstract_scheduler.hh"
+
 #ifdef Q_OS_WIN32
 #include "tools/at.hh"
 #include "tools/schtasks.hh"
