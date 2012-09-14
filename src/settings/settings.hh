@@ -250,6 +250,10 @@ class Settings : public QObject
 		void saveWindowSize( QSize size );
 		QPoint getWindowPosition();
 		void saveWindowPosition( QPoint position );
+        void saveLogDebugMessages(bool logDebugMessage);
+        bool getLogDebugMessages() const;
+        void saveBandwidthLimit(int bandwidthLimit);
+        int getBandwidthLimit() const;
 
 		int getNOfLastBackups() const;
 		void saveNOfLastBackups( int nOfLastBackups );
@@ -261,9 +265,6 @@ class Settings : public QObject
 		void saveScheduleRule( const ScheduledTask& scheduleRule );
 		const BackupSelectionHash& getLastBackupSelectionRules() const;
 		void saveBackupSelectionRules( const BackupSelectionHash& selectionRules );
-
-        void saveLogDebugMessages(bool logDebugMessage);
-        bool getLogDebugMessages() const;
 
 		static const QString VERSION;
 
@@ -326,7 +327,7 @@ class Settings : public QObject
 		static const QString SETTINGS_WINDOW_POSITION;
 		static const QString SETTINGS_DELETE_EXTRANEOUS_ITEMS;
 		static const QString SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS;
-
+        static const QString SETTINGS_BANDWITH_LIMIT;
 
 		// [Reseller]
 		static const QString SETTINGS_GROUP_RESELLER;
@@ -412,6 +413,7 @@ class Settings : public QObject
 		bool deleteExtraneousItems;
 		bool showHiddenFilesAndFolders;
 		bool compressedRsyncTraffic; // read only at the moment
+        int bandwidthLimit;
 		QSize windowSize;
 		QPoint windowPosition;
 

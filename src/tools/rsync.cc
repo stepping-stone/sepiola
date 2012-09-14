@@ -39,20 +39,21 @@
 #include "utils/log_file_utils.hh"
 #include "utils/string_utils.hh"
 
-Rsync::Rsync() {
-	this->files_total = -1;
-	this->cur_n_files_done = 0;
-	this->lastUpdateTime = QDateTime::currentDateTime();
-
-	this->progress_trafficB_s = 0;
-	this->progress_bytesRead = 0;
-	this->progress_bytesWritten = 0;
+Rsync::Rsync() :
+    progress_bytesRead(0),
+    progress_bytesWritten(0),
+    progress_trafficB_s(0),
+    files_total(-1),
+    cur_n_files_done(0),
+    lastUpdateTime(QDateTime::currentDateTime())
+{
 }
 
-Rsync::~Rsync() {}
+Rsync::~Rsync()
+{
+}
 
-
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, int bandwidthLimit, QString* warnings, bool dry_run )
 {
 	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << (warnings ? *warnings : "(no warnings)") << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
@@ -81,6 +82,10 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	{
 		arguments << "-z";
 	}
+
+    if (bandwidthLimit > 0)
+        arguments << QString("--bwlimit=%1").arg(bandwidthLimit);
+
 	arguments << source;
 	arguments << getValidDestinationPath( destination );
 	arguments << "--include-from=-";
@@ -227,7 +232,7 @@ void Rsync::bufferedInfoOutput() // prevents direct flush
 /**
  * deprecated
  */
-QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, QString* warnings, bool dry_run )
+QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const QStringList& items, const QString& src, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool compress, int bandwidthLimit, QString* warnings, bool dry_run )
 {
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files:";
@@ -251,6 +256,10 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	{
 		arguments << "-z";
 	}
+
+    if (bandwidthLimit > 0)
+        arguments << QString("--bwlimit=%1").arg(bandwidthLimit);
+
 	arguments << source;
 	arguments << getValidDestinationPath( destination );
 
@@ -345,9 +354,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 }
 
 
-long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, QString* /* errors */, QString* warnings )
+long Rsync::calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, int bandwidthLimit, QString* /* errors */, QString* warnings )
 {
-	this->upload( includeRules, src, destination, setDeleteFlag, compress, warnings, true );
+	this->upload( includeRules, src, destination, setDeleteFlag, compress, bandwidthLimit, warnings, true );
 	return this->last_calculatedLiteralData;
 }
 
@@ -1061,7 +1070,7 @@ void Rsync::testUpload()
 	QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + backup_prefix + "/" + settings->getBackupFolderName() + "/", "'");
 	Rsync rsync;
 	QString warnings;
-	rsync.upload( files, source, destination, QStringList(), QStringList(), false, false, &warnings, false );
+	rsync.upload( files, source, destination, QStringList(), QStringList(), false, false, 0, &warnings, false );
 	qDebug() << "warnings: " << warnings;
 }
 

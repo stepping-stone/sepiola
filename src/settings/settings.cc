@@ -56,7 +56,6 @@ const QString Settings::SETTINGS_PRIVATE_PUTTY_KEY_FILE_NAME = "PrivateKeyFileNa
 const QString Settings::SETTINGS_PRIVATE_OPEN_SSH_KEY_FILE_NAME = "PrivateOpenSshKeyFileName";
 const QString Settings::SETTINGS_LOCK_FILE_NAME = "LockFileName";
 const QString Settings::SETTINGS_LOG_FILE_NAME = "LogFileName";
-const QString Settings::SETTINGS_LOG_DEBUG_MESSAGE = "LogDebugMessage";
 const QString Settings::SETTINGS_IGNORE_REINSTALL = "IgnoreReinstall";
 const QString Settings::SETTINGS_INCLUDE_PATTERN_FILE_NAME = "InlcudePatternFileName";
 const QString Settings::SETTINGS_EXCLUDE_PATTERN_FILE_NAME = "ExcludePatternFileName";
@@ -101,7 +100,8 @@ const QString Settings::SETTINGS_WINDOW_POSITION = "WindowPosition";
 const QString Settings::SETTINGS_WINDOW_SIZE = "WindowSize";
 const QString Settings::SETTINGS_DELETE_EXTRANEOUS_ITEMS = "DeleteExtraneousItems";
 const QString Settings::SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS = "ShowHiddenFilesAndFolders";
-
+const QString Settings::SETTINGS_LOG_DEBUG_MESSAGE = "LogDebugMessage";
+const QString Settings::SETTINGS_BANDWITH_LIMIT = "BandwidthLimit";
 
 // [Reseller]
 const QString Settings::SETTINGS_GROUP_RESELLER = "Reseller";
@@ -298,6 +298,7 @@ void Settings::reloadSettings()
 	windowSize = userSettings->value( SETTINGS_WINDOW_SIZE ).toSize();
 	windowPosition = userSettings->value( SETTINGS_WINDOW_POSITION, QPoint( 200, 200 ) ).toPoint();
 	logDebugMessage = userSettings->value( SETTINGS_LOG_DEBUG_MESSAGE ).toBool();
+	bandwidthLimit = userSettings->value( SETTINGS_BANDWITH_LIMIT ).toInt();
 
 	// [AppData]
 	appData->beginGroup( SETTINGS_GROUP_APPDATA );
@@ -968,4 +969,18 @@ void Settings::saveLogDebugMessages(bool logDebugMessage)
 bool Settings::getLogDebugMessages() const
 {
     return logDebugMessage;
+}
+
+void Settings::saveBandwidthLimit(int bandwidthLimit)
+{
+	if (this->bandwidthLimit != bandwidthLimit)
+	{
+		this->bandwidthLimit = bandwidthLimit;
+		userSettings->setValue(SETTINGS_BANDWITH_LIMIT, bandwidthLimit);
+	}
+}
+
+int Settings::getBandwidthLimit() const
+{
+    return bandwidthLimit;
 }

@@ -54,6 +54,7 @@ BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
 	Settings* settings = Settings::getInstance();
 	this->setDeleteFlag = settings->getDeleteExtraneousItems();
 	this->compressedUpload = settings->isCompressedRsyncTraffic();
+	this->bandwidthLimit = settings->getBandwidthLimit();
 
 	// TODO adjust the given values for subtask steps and durations
 	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
@@ -124,7 +125,7 @@ void BackupThread::run()
 
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_FILE_UPLOAD);
 		emit infoSignal( tr( "Uploading files and directories" ) );
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, &warnings, false );
+		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, bandwidthLimit, &warnings, false );
 
 		checkAbortState();
 		if ((subPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD)) != 0) subPt->setTerminated(true);
@@ -147,7 +148,7 @@ void BackupThread::run()
 			updateBackupContentFile( currentBackupContentFile, processedItems );
 
 			QString warning;
-			rsync->upload( currentBackupContentFile, metaDataDir, true, 0 );
+			rsync->upload( currentBackupContentFile, metaDataDir, true, 0, 0 );
 
 			checkAbortState();
 			if ((subPt = this->pt.getSubtask(TASKNAME_UPLOAD_METADATA)) != 0) subPt->setTerminated(true);
@@ -157,7 +158,7 @@ void BackupThread::run()
 			this->pt.debugIsCorrectCurrentTask(TASKNAME_METAINFO);
 			QString currentBackupTimeFile = createCurrentBackupTimeFile();
 
-			rsync->upload( currentBackupTimeFile, metaDataDir, true, 0 );
+			rsync->upload( currentBackupTimeFile, metaDataDir, true, 0, 0 );
 			FileSystemUtils::removeFile( currentBackupTimeFile );
 			checkAbortState();
 
@@ -181,7 +182,7 @@ void BackupThread::run()
 
 			try
 			{
-				rsync->upload( currentMetadataFileName, metaDataDir, true, &warning );
+				rsync->upload( currentMetadataFileName, metaDataDir, true, bandwidthLimit, &warning );
 			}
 			catch ( const ProcessException& e )
 			{
@@ -349,11 +350,11 @@ void BackupThread::prepareServerDirectories()
 	vars.append(QPair<QString,QString>(tr("current task"), infoText));
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
 
-	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, false );
+	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, 0, false );
 	checkAbortState();
 	backupPrefixDir.mkdir( settings->getMetaFolderName() );
 	backupPrefixDir.mkdir( settings->getBackupFolderName() );
-	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, false );
+	rsync->upload( QStringList( backupPrefixFolder ), source, destination, QStringList(), QStringList(), false, false, 0, 0, false );
 	checkAbortState();
 	mySubPt->addFixpointNow(2);
 	emit progressSignal(mySubPt->getName(), mySubPt->getRootTask()->getFinishedRatio(), mySubPt->getRootTask()->getEstimatedTimeLeft(), vars);
@@ -378,7 +379,7 @@ quint64 BackupThread::estimateBackupSize( const QString& src, const QString& des
 
 	QObject::connect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
-	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, NULL, NULL );
+	quint64 uploadSize = rsync->calculateUploadTransfer( includeRules, src, destination, false, false, bandwidthLimit, NULL, NULL );
 	QObject::disconnect( rsync.get(), SIGNAL( volumeCalculationInfoSignal( const QString&, long, long ) ),
 					  this, SLOT( rsyncDryrunProgressHandler( const QString&, long, long ) ) );
 

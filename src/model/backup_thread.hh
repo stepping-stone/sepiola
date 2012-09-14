@@ -107,6 +107,7 @@ private:
 	QStringList excludePatternList;
 	bool setDeleteFlag;
 	bool compressedUpload;
+    int bandwidthLimit;
 	QDateTime backupStartDateTime;
 	ConstUtils::StatusEnum backupCurrentStatus;
 	ProgressTask pt;
