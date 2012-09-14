@@ -462,7 +462,8 @@ CH-3012 Bern</translation>
     <message>
         <location filename="../gui/main_window.ui" line="47"/>
         <source>background-color: white</source>
-        <translation>Hintergrundfarbe: weiss</translation>
+        <translatorcomment>do not translate</translatorcomment>
+        <translation>background-color: white</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="105"/>
@@ -1024,17 +1025,20 @@ Warning: The permissions of some files could not be backed up. See above for det
     <message>
         <location filename="../model/backup_task.cc" line="62"/>
         <source>&lt;font color=&quot;green&quot;&gt;Successful&lt;/font&gt;</source>
-        <translation>&lt;font color=&quot;grün&quot;&gt;Erfolgreich&lt;/font&gt;</translation>
+        <translatorcomment>do not translate the color name!</translatorcomment>
+        <translation>&lt;font color=&quot;green&quot;&gt;Erfolgreich&lt;/font&gt;</translation>
     </message>
     <message>
         <location filename="../model/backup_task.cc" line="63"/>
         <source>&lt;font color=&quot;orange&quot;&gt;Warnings&lt;/font&gt;</source>
+        <translatorcomment>do not translate the color name!</translatorcomment>
         <translation>&lt;font color=&quot;orange&quot;&gt;Warnungen&lt;/font&gt;</translation>
     </message>
     <message>
         <location filename="../model/backup_task.cc" line="64"/>
         <source>&lt;font color=&quot;red&quot;&gt;Failed&lt;/font&gt;</source>
-        <translation>&lt;font color=&quot;rot&quot;&gt;Fehlgeschlagen&lt;/font&gt;</translation>
+        <translatorcomment>do not translate the color name!</translatorcomment>
+        <translation>&lt;font color=&quot;red&quot;&gt;Fehlgeschlagen&lt;/font&gt;</translation>
     </message>
     <message>
         <location filename="../model/backup_task.cc" line="65"/>
