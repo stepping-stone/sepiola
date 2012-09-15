@@ -44,6 +44,7 @@
 #include "gui/main_window.hh"
 #include "model/main_model.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "test/test_manager.hh"
 #include "utils/log_file_utils.hh"
 
@@ -79,20 +80,17 @@ void messageHandler(QtMsgType type, const char *msg)
 {
 	if (Settings::getInstance()->isLogDebugMessageEnabled() )
 	{
-		QString message;
-		message.append(msg);
-		message.append(Settings::getInstance()->getEOLCharacter() );
 		switch (type)
 		{
 		case QtDebugMsg:
 		case QtWarningMsg:
-			fprintf( stdout, "%s", (const char*) message.toLocal8Bit());
-			fflush( stdout);
+			fprintf(stdout, "%s%s", msg, Platform::EOL_CHARACTER);
+			fflush(stdout);
 			break;
 		case QtCriticalMsg:
 		case QtFatalMsg:
-			fprintf( stderr, "%s", (const char*) message.toLocal8Bit());
-			fflush( stderr);
+			fprintf(stderr, "%s%s", msg, Platform::EOL_CHARACTER);
+			fflush(stderr);
 			break;
 		}
 	}
