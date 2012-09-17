@@ -253,102 +253,102 @@ CH-3012 Bern</translation>
 <context>
     <name>BackupThread</name>
     <message>
-        <location filename="../model/backup_thread.cc" line="106"/>
+        <location filename="../model/backup_thread.cc" line="109"/>
         <source>Creating/validating server directories</source>
         <translation>Server Verzeichnisse werden erstellt und überprüft</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="124"/>
+        <location filename="../model/backup_thread.cc" line="127"/>
         <source>Uploading files and directories</source>
         <translation>Lade Dateien und Verzeichnisse hoch</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="138"/>
+        <location filename="../model/backup_thread.cc" line="141"/>
         <source>Getting backup content meta data</source>
         <translation>Metadaten des Backupinhalts werden ermittelt</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="143"/>
+        <location filename="../model/backup_thread.cc" line="146"/>
         <source>Uploading backup content meta data</source>
         <translation>Metadaten des Backupinhalts werden übertragen</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="154"/>
+        <location filename="../model/backup_thread.cc" line="157"/>
         <source>Uploading backup info data</source>
         <translation>Backup Infodaten werden übertragen</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="165"/>
+        <location filename="../model/backup_thread.cc" line="168"/>
         <source>Getting permission meta data</source>
         <translation>Dateiberechtigungen werden ermittelt</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="178"/>
+        <location filename="../model/backup_thread.cc" line="181"/>
         <source>Uploading permission meta data</source>
         <translation>Lade Berechtigungs Metadaten hoch</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="191"/>
+        <location filename="../model/backup_thread.cc" line="194"/>
         <source>Warning: Could not backup file permissions due to following problem:</source>
         <translation>Warnung: Konnte keine Backup Dateiberechtigungen erstellen aufgrund folgenden Problem:</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="207"/>
+        <location filename="../model/backup_thread.cc" line="210"/>
         <source>Backup succeeded.</source>
         <translation>Backup erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="214"/>
+        <location filename="../model/backup_thread.cc" line="217"/>
         <source>Backup succeeded with warnings.</source>
         <translation>Backup erfolgreich (mit Warnungen).</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="233"/>
+        <location filename="../model/backup_thread.cc" line="236"/>
         <source>Backup failed.</source>
         <translation>Backup fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="446"/>
+        <location filename="../model/backup_thread.cc" line="449"/>
         <source>Can not create a backup info file</source>
         <translation>Backup Infodatei konnte nicht erstellt werden</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="227"/>
+        <location filename="../model/backup_thread.cc" line="230"/>
         <source>Backup aborted.</source>
         <translation>Backup abgebrochen.</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="257"/>
+        <location filename="../model/backup_thread.cc" line="260"/>
         <source>Backup has been aborted</source>
         <translation>Backup wurde abgebrochen</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="298"/>
-        <location filename="../model/backup_thread.cc" line="313"/>
-        <location filename="../model/backup_thread.cc" line="347"/>
-        <location filename="../model/backup_thread.cc" line="374"/>
+        <location filename="../model/backup_thread.cc" line="301"/>
+        <location filename="../model/backup_thread.cc" line="316"/>
+        <location filename="../model/backup_thread.cc" line="350"/>
+        <location filename="../model/backup_thread.cc" line="377"/>
         <source>current task</source>
         <translation>Aktueller Prozess</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="299"/>
-        <location filename="../model/backup_thread.cc" line="314"/>
+        <location filename="../model/backup_thread.cc" line="302"/>
+        <location filename="../model/backup_thread.cc" line="317"/>
         <source>current file</source>
         <translation>Aktuelle Datei</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="300"/>
+        <location filename="../model/backup_thread.cc" line="303"/>
         <source>files processed</source>
         <translation>Dateien abgearbeitet</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="301"/>
-        <location filename="../model/backup_thread.cc" line="316"/>
+        <location filename="../model/backup_thread.cc" line="304"/>
+        <location filename="../model/backup_thread.cc" line="319"/>
         <source>estimated remaining time</source>
         <translation>Geschätzte Restdauer</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="315"/>
+        <location filename="../model/backup_thread.cc" line="318"/>
         <source>traffic / transferred</source>
         <translation>Datenverkehr / übertragen</translation>
     </message>
@@ -382,72 +382,72 @@ CH-3012 Bern</translation>
 <context>
     <name>MainModel</name>
     <message>
-        <location filename="../model/main_model.cc" line="114"/>
+        <location filename="../model/main_model.cc" line="116"/>
         <source>Key has not been generated.</source>
         <translation>Schlüssel konnte nicht generiert werden.</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="129"/>
+        <location filename="../model/main_model.cc" line="131"/>
         <source>Trying to login</source>
         <translation>Anmeldeversuch</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="132"/>
+        <location filename="../model/main_model.cc" line="134"/>
         <source>Can not login to the server. Please review your settings.</source>
         <translation>Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Einstellungen.</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="136"/>
+        <location filename="../model/main_model.cc" line="138"/>
         <source>Login succeeded.</source>
         <translation>Anmeldung erfolgreich.</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="94"/>
+        <location filename="../model/main_model.cc" line="96"/>
         <source>Establishing connection ...</source>
         <translation>Verbindung wird hergestellt ...</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="124"/>
+        <location filename="../model/main_model.cc" line="126"/>
         <source>Login failed.</source>
         <translation>Anmeldung fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="143"/>
+        <location filename="../model/main_model.cc" line="145"/>
         <source>Login with key was successful</source>
         <translation>Anmeldung mit Schlüssel war erfolgreich</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="146"/>
+        <location filename="../model/main_model.cc" line="148"/>
         <source>Connection established.</source>
         <translation>Verbindung hergestellt.</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="95"/>
+        <location filename="../model/main_model.cc" line="97"/>
         <source>Validating server&apos;s fingerprint ...</source>
         <translation>Fingerabdruck des Servers wird überprüft ...</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="103"/>
+        <location filename="../model/main_model.cc" line="105"/>
         <source>Server&apos;s fingerprint is correct.</source>
         <translation>Fingerabdruck des Servers ist korrekt.</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="207"/>
+        <location filename="../model/main_model.cc" line="209"/>
         <source>Verify connection</source>
         <translation>Verbindung wird überprüft</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="215"/>
+        <location filename="../model/main_model.cc" line="217"/>
         <source>Task has not been scheduled, because the connection could not be established</source>
         <translation>Zeitgesteuertes Backup konnte nicht erstellt werden, da die Verbindung nicht hergestellt werden konnte</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="98"/>
+        <location filename="../model/main_model.cc" line="100"/>
         <source>Server fingerprint validation failed</source>
         <translation>Fingerabdruck des Servers konnte nicht validiert werden</translation>
     </message>
     <message>
-        <location filename="../model/main_model.cc" line="348"/>
+        <location filename="../model/main_model.cc" line="350"/>
         <source>Some restore info files could not be opened</source>
         <translation>Einige Wiederhergestellten Info Dokumente konnten nicht geöffnet werden</translation>
     </message>
@@ -816,28 +816,28 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Der Prozess %1 ist wurde nicht gestartet. Entweder ist das aufgerufene Programm nicht vorhanden, oder Sie haben nicht genügend Rechte um es auszuführen.</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="146"/>
+        <location filename="../settings/settings.cc" line="140"/>
         <source>English</source>
         <translation>Englisch</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="147"/>
+        <location filename="../settings/settings.cc" line="141"/>
         <source>German</source>
         <translation>Deutsch</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="352"/>
+        <location filename="../main.cc" line="350"/>
         <source>Application started</source>
         <translation>Applikation wurde gestartet</translation>
     </message>
     <message>
-        <location filename="../main.cc" line="354"/>
+        <location filename="../main.cc" line="352"/>
         <source>Application closed</source>
         <translation>Applikation wurde beendet</translation>
     </message>
     <message>
-        <location filename="../tools/at.cc" line="83"/>
         <location filename="../tools/schtasks.cc" line="149"/>
+        <location filename="../tools/at.cc" line="83"/>
         <source>Scheduled task has been created</source>
         <translation>Zeitgesteuertes Backup wurde eingerichtet</translation>
     </message>
@@ -912,7 +912,7 @@ Warning: The permissions of some files could not be backed up. See above for det
 </translation>
     </message>
     <message>
-        <location filename="../main.cc" line="344"/>
+        <location filename="../main.cc" line="342"/>
         <source>Update started</source>
         <translation>Aktualisierung gestartet</translation>
     </message>
@@ -1046,7 +1046,7 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Nicht definiert</translation>
     </message>
     <message>
-        <location filename="../model/backup_thread.cc" line="330"/>
+        <location filename="../model/backup_thread.cc" line="333"/>
         <source>creating server directories</source>
         <translation>Erstellen von Serververzeichnissen</translation>
     </message>
@@ -1106,13 +1106,13 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>%1 Minuten nach dem Hochfahren der Computers</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="262"/>
+        <location filename="../settings/settings.cc" line="256"/>
         <source>reseller address (missing)</source>
         <translation>Wiederverkäufer Adresse (fehlend)</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="522"/>
-        <location filename="../tools/rsync.cc" line="599"/>
+        <location filename="../tools/rsync.cc" line="531"/>
+        <location filename="../tools/rsync.cc" line="608"/>
         <source>rsync exited with with exitCode %1 (%2 %3).</source>
         <translation>rsync beendern mit dem exitCode %1 (%2 %3).</translation>
     </message>
@@ -1130,7 +1130,7 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Gesamtgrösse: %1 GB, Frei: %2 GB</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="1034"/>
+        <location filename="../tools/rsync.cc" line="1043"/>
         <source>rsync exited with exitCode %1 (%2 %3).</source>
         <translation>rsync beendern mit dem exitCode %1 (%2 %3).</translation>
     </message>
@@ -1252,37 +1252,37 @@ Warning: The permissions of some files could not be backed up. See above for det
 <context>
     <name>RestoreThread</name>
     <message>
-        <location filename="../model/restore_thread.cc" line="75"/>
+        <location filename="../model/restore_thread.cc" line="76"/>
         <source>Downloading files and/or directories ...</source>
         <translation>Lade Daten und/oder Verzeichnisse herunter ...</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="86"/>
+        <location filename="../model/restore_thread.cc" line="87"/>
         <source>Applying Metadata</source>
         <translation>Metadaten werden übernommen</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="90"/>
+        <location filename="../model/restore_thread.cc" line="91"/>
         <source>Restore done.</source>
         <translation>Wiederherstellung der Daten abgeschlossen.</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="94"/>
+        <location filename="../model/restore_thread.cc" line="95"/>
         <source>Restore failed.</source>
         <translation>Wiederherstellung fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="138"/>
+        <location filename="../model/restore_thread.cc" line="139"/>
         <source>Restore has been aborted</source>
         <translation>Wiederherstellung wurde abgebrochen</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="100"/>
+        <location filename="../model/restore_thread.cc" line="101"/>
         <source>Restore aborted.</source>
         <translation>Wiederherstellen abgebrochen.</translation>
     </message>
     <message>
-        <location filename="../model/restore_thread.cc" line="121"/>
+        <location filename="../model/restore_thread.cc" line="122"/>
         <source>WARNING: Setting of metadata failed. File %1 has not been found on the server. Possibly you are restoring data from a backup of another platform/os.</source>
         <translation>WARNUNG: Die Einstellung der Metadaten ist fehlgeschlagen. Die Datei %1 ist nicht auf dem Server gefunden worden. Eventuell ist die Wiederherstellung der Daten auseinem Backup oder einer anderen Plattform/OS.</translation>
     </message>
@@ -1290,57 +1290,57 @@ Warning: The permissions of some files could not be backed up. See above for det
 <context>
     <name>Rsync</name>
     <message>
-        <location filename="../tools/rsync.cc" line="506"/>
-        <location filename="../tools/rsync.cc" line="579"/>
-        <location filename="../tools/rsync.cc" line="580"/>
+        <location filename="../tools/rsync.cc" line="515"/>
+        <location filename="../tools/rsync.cc" line="588"/>
+        <location filename="../tools/rsync.cc" line="589"/>
         <source>%1 files and/or directories downloaded</source>
         <translation>%1 Dateien und/oder Verzeichnisse heruntergeladen</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="515"/>
-        <location filename="../tools/rsync.cc" line="591"/>
+        <location filename="../tools/rsync.cc" line="524"/>
+        <location filename="../tools/rsync.cc" line="600"/>
         <source>Error occurred while downloading: </source>
         <translation>Während dem Herunterladen ist ein Fehler aufgetreten:</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="199"/>
-        <location filename="../tools/rsync.cc" line="339"/>
+        <location filename="../tools/rsync.cc" line="204"/>
+        <location filename="../tools/rsync.cc" line="348"/>
         <source>%1 files and/or directories processed</source>
         <translation>%1 Dateien und/oder Verzeichnisse bearbeitet</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="170"/>
-        <location filename="../tools/rsync.cc" line="320"/>
+        <location filename="../tools/rsync.cc" line="175"/>
+        <location filename="../tools/rsync.cc" line="329"/>
         <source>Uploading %1</source>
         <translation>Lade %1 hoch</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="177"/>
-        <location filename="../tools/rsync.cc" line="327"/>
+        <location filename="../tools/rsync.cc" line="182"/>
+        <location filename="../tools/rsync.cc" line="336"/>
         <source>Deleting %1</source>
         <translation>Lösche %1</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="499"/>
-        <location filename="../tools/rsync.cc" line="572"/>
+        <location filename="../tools/rsync.cc" line="508"/>
+        <location filename="../tools/rsync.cc" line="581"/>
         <source>Downloading %1</source>
         <translation>Lade %1 herunter</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="1023"/>
+        <location filename="../tools/rsync.cc" line="1032"/>
         <source>Warning: At least one file could not be backuped up. See above for details.</source>
         <translation>Warnung: Mindestens eine Datei konnte nicht gesichert werden. Siehe oben für weitere Details.</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="1028"/>
+        <location filename="../tools/rsync.cc" line="1037"/>
         <source>Warning: Some files have been renamed, moved or deleted during backup before they could be uploaded to the server.
 Usually this concerns temporary files and this warning can be ignored. See above for details.</source>
         <translation>Warnung: Einige Dateien wurden währen des backups umbenannt, verschoben oder gelöscht bevor sie auf den Server hochgeladen werden konnten.
 In der Regel betrifft dies temporäre Dateien und diese Warnung kann ignoriert werden. Siehe oben für weitere Details.</translation>
     </message>
     <message>
-        <location filename="../tools/rsync.cc" line="174"/>
-        <location filename="../tools/rsync.cc" line="324"/>
+        <location filename="../tools/rsync.cc" line="179"/>
+        <location filename="../tools/rsync.cc" line="333"/>
         <source>Skipping %1</source>
         <translation>Überspringe %1</translation>
     </message>
@@ -1348,18 +1348,18 @@ In der Regel betrifft dies temporäre Dateien und diese Warnung kann ignoriert w
 <context>
     <name>SettingsForm</name>
     <message>
-        <location filename="../gui/settings_form.cc" line="101"/>
+        <location filename="../gui/settings_form.cc" line="103"/>
         <source>Settings saved</source>
         <translation>Einstellungen gespeichert</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="112"/>
-        <location filename="../gui/settings_form.cc" line="130"/>
+        <location filename="../gui/settings_form.cc" line="114"/>
+        <location filename="../gui/settings_form.cc" line="132"/>
         <source>Unsaved settings</source>
         <translation>Nicht gespeicherte Einstellungen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="112"/>
+        <location filename="../gui/settings_form.cc" line="114"/>
         <source>Your settings have been modified.
 Do you want to restore the original settings?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1381,7 +1381,7 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>S&amp;peichern</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="101"/>
+        <location filename="../gui/settings_form.cc" line="103"/>
         <source>Settings have been saved.</source>
         <translation>Einstellungen wurden gespeichert.</translation>
     </message>
@@ -1396,7 +1396,7 @@ Wollen Sie Ihre original Einstellungen wiederherstellen?</translation>
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
-        <location filename="../gui/settings_form.cc" line="130"/>
+        <location filename="../gui/settings_form.cc" line="132"/>
         <source>Your settings have been modified.
 Do you want to save the settings before leaving this view?</source>
         <translation>Ihre Einstellungen wurden geändert.
@@ -1458,7 +1458,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="323"/>
-        <location filename="../settings/settings.cc" line="731"/>
+        <location filename="../settings/settings.cc" line="726"/>
         <source>English</source>
         <translatorcomment>Hier wird die Sprache in der jeweiligen Sprache eingetragen.</translatorcomment>
         <translation>Deutsch</translation>
@@ -1489,6 +1489,16 @@ p, li { white-space: pre-wrap; }
         <location filename="../gui/settings_form.ui" line="467"/>
         <source>Verbose logging</source>
         <translation>Ausführliche Protokollierung</translation>
+    </message>
+    <message>
+        <location filename="../gui/settings_form.ui" line="483"/>
+        <source>Limit upload bandwidth to</source>
+        <translation>Begrenze Bandbreite beim Hochladen auf</translation>
+    </message>
+    <message>
+        <location filename="../gui/settings_form.ui" line="500"/>
+        <source>Kilobytes/Second</source>
+        <translation>Kilobyte/Sekunde</translation>
     </message>
 </context>
 <context>
