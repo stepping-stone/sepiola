@@ -7,7 +7,7 @@ before_install:
 before_script:
   - mkdir build
   - wget http://www.cmake.org/files/v2.8/cmake-2.8.11.1-Linux-i386.tar.gz
-  - tar xf cmake-2.8.11.1-Linux-i386.tar.gz
+  - tar -C build -xf cmake-2.8.11.1-Linux-i386.tar.gz
 script:
   - cd build
   - ./cmake-2.8.11.1-Linux-i386/bin/cmake ..
