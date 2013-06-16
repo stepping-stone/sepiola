@@ -19,6 +19,8 @@
 See INSTALL for compilation and installation instructions.
 See COPYING for license information.
 
+Travis Continuos Integration Build Results: https://api.travis-ci.org/stepping-stone/sepiola.png
+
 Sepiola requires a set of open source tools to work, some patched some unpatched.
 The actual requirements depend on the platform and are described in the INSTALL
 file. The patches of the tools can be found in the patches subdirectory and the
