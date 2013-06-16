@@ -4,8 +4,11 @@ compiler:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libqt4-dev
-script:
+before_script:
   - mkdir build
+  - wget http://www.cmake.org/files/v2.8/cmake-2.8.11.1-Linux-i386.tar.gz
+  - tar xf cmake-2.8.11.1-Linux-i386.tar.gz
+script:
   - cd build
-  - cmake ..
+  - ./cmake-2.8.11.1-Linux-i386/bin/cmake ..
   - make
