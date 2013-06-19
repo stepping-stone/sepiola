@@ -38,10 +38,25 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     #    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wshadow")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal -Wno-long-long")
-
-	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG -ggdb")# -Werror")
-    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" )
+ELSE(CMAKE_COMPILER_IS_GNUCXX)
+    # on Clang we have one flag to rule them all: -Weverything (includes all
+    # warnings, including the ones enabled with -pedantic)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Weverything")
+    # disable warnings about variables being shadowed, see above (this is just Qt-style)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow")
+    # disable warnings about padding member attributes since there is nothing
+    # we can do about it at the moment
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-padded")
+    # disable warnings about C++98 incompatibility since we require C++11
+    # from now on anyway
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+# The following works on GNU C++ and LLVM only, but those are the only ones we
+# currently support anyway (C++ native, MinGW C++ for win32 and LLVM on OSX)
+SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG -ggdb")# -Werror")
+SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" )
+
 SET(CMAKE_CXX_FLAGS_DEPLOY ${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO})
 
 IF(Q_WS_WIN)
