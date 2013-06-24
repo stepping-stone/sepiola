@@ -28,8 +28,6 @@
 #include "tools/abstract_informing_process.hh"
 #include "utils/string_utils.hh"
 
-using std::auto_ptr;
-
 /**
  * The RestoreThread class runs the restore process in its own thread
  * @author Bruno Santschi, santschi@puzzle.ch
@@ -78,7 +76,7 @@ private:
 	void applyMetadata( const QString& backup_prefix, const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination );
 	void pushStateEvent(ConstUtils::StatusEnum eventState);
 
-	auto_ptr< AbstractRsync > rsync;
+    std::shared_ptr<AbstractRsync> rsync;
 	bool isAborted;
 	bool isCustomRestore;
 	QString backup_prefix;

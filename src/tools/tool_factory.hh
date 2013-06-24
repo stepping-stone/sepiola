@@ -19,14 +19,10 @@
 #ifndef TOOL_FACTORY_HH
 #define TOOL_FACTORY_HH
 
-#include <memory>
-
 class AbstractMetadata;
 class AbstractRsync;
 class AbstractSsh;
 class AbstractScheduler;
-
-using std::auto_ptr;
 
 /**
  * The ToolFactory class provides methods for constructing real implementation object
@@ -51,25 +47,25 @@ public:
 	 * Returns an AbstractAcl implementation
 	 * @return an acl implementation
 	 */
-	static auto_ptr< AbstractMetadata > getMetadataImpl();
+	static AbstractMetadata * getMetadataImpl();
 
 	/**
 	 * Returns an AbstractRsync implementation
 	 * @return an rsync implementation
 	 */
-	static auto_ptr< AbstractRsync > getRsyncImpl();
+	static AbstractRsync * getRsyncImpl();
 
 	/**
 	 * Returns an AbstractSsh implementation
 	 * @return a ssh implementation
 	 */
-	static auto_ptr< AbstractSsh > getSshImpl();
+	static AbstractSsh * getSshImpl();
 
 	/**
 	 * Returns an AbstractScheduler implementation
 	 * @return a scheduler implementation
 	 */
-	static auto_ptr< AbstractScheduler > getSchedulerImpl();
+	static AbstractScheduler * getSchedulerImpl();
 };
 
 #endif

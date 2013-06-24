@@ -24,6 +24,8 @@
 #include "tools/abstract_metadata.hh"
 #include "utils/file_system_utils.hh"
 
+#include <memory>
+
 RestoreThread::RestoreThread( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination )
 {
 	this->isCustomRestore = true;
@@ -51,7 +53,7 @@ RestoreThread::~RestoreThread()
 void RestoreThread::init()
 {
 	isAborted = false;
-	rsync = ToolFactory::getRsyncImpl();
+	rsync.reset(ToolFactory::getRsyncImpl());
 	QObject::connect( rsync.get(), SIGNAL( infoSignal( const QString& ) ),
 					  this, SIGNAL( infoSignal( const QString& ) ) );
 	QObject::connect( rsync.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -110,7 +112,7 @@ void RestoreThread::applyMetadata( const QString& backup_prefix, const QString& 
 {
 	if ( downloadedItems.size() > 0 )
 	{
-		auto_ptr< AbstractMetadata > metadata = ToolFactory::getMetadataImpl();
+        std::shared_ptr<AbstractMetadata> metadata(ToolFactory::getMetadataImpl());
 		QObject::connect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
 						  this, SIGNAL( infoSignal( const QString& ) ) );
 		QObject::connect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),

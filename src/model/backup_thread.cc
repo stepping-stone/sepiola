@@ -166,7 +166,7 @@ void BackupThread::run()
 			FileSystemUtils::removeFile( settings->getApplicationDataDir() + settings->getMetadataFileName() );
 			FileSystemUtils::removeFile( settings->getApplicationDataDir() + settings->getTempMetadataFileName() );
 			emit infoSignal( tr( "Getting permission meta data" ) );
-			auto_ptr< AbstractMetadata > metadata = ToolFactory::getMetadataImpl();
+            std::shared_ptr<AbstractMetadata> metadata(ToolFactory::getMetadataImpl());
 			QObject::connect( metadata.get(), SIGNAL( infoSignal( const QString& ) ),
 							  this, SIGNAL( infoSignal( const QString& ) ) );
 			QObject::connect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),

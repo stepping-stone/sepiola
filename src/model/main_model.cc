@@ -17,6 +17,7 @@
 */
 
 #include <QDebug>
+#include <memory>
 
 #include "cli/cli_manager.hh"
 #include "exception/login_exception.hh"
@@ -54,7 +55,7 @@ MainModel::~MainModel()
 void MainModel::keepSettings()
 {
 	Settings* settings = Settings::getInstance();
-	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
+    std::shared_ptr<AbstractScheduler> scheduler(ToolFactory::getSchedulerImpl());
 	QObject::connect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
 						this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
 	QObject::connect( scheduler.get(), SIGNAL( infoSignal( const QString& ) ),
@@ -75,7 +76,7 @@ void MainModel::keepSettings()
 
 void MainModel::deleteSettings()
 {
-	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
+    std::shared_ptr<AbstractScheduler> scheduler(ToolFactory::getSchedulerImpl());
 	scheduler->deleteExistingTask( Settings::getInstance()->getThisApplicationFullPathExecutable(), CliManager::SCHEDULE_ARGUMENT );
 	Settings::getInstance()->deleteSettings();
 }
@@ -87,7 +88,7 @@ bool MainModel::initConnection()
 	try
 	{
 		Settings* settings = Settings::getInstance();
-		auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
+        std::shared_ptr<AbstractSsh> ssh(ToolFactory::getSshImpl());
 		QObject::connect( ssh.get(), SIGNAL( infoSignal( const QString& ) ),
 						  this, SIGNAL( infoSignal( const QString& ) ) );
 		QObject::connect( ssh.get(), SIGNAL( errorSignal( const QString& ) ),
@@ -200,7 +201,7 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 
 bool MainModel::isSchedulingOnStartSupported()
 {
-	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
+    std::shared_ptr<AbstractScheduler> scheduler(ToolFactory::getSchedulerImpl());
 	return scheduler->isSchedulingOnStartSupported();
 }
 
@@ -220,7 +221,7 @@ void MainModel::schedule( const BackupSelectionHash& includeRules, const Schedul
 	Settings* settings = Settings::getInstance();
 	settings->saveBackupSelectionRules( includeRules );
 
-	auto_ptr< AbstractScheduler > scheduler = ToolFactory::getSchedulerImpl();
+    std::shared_ptr<AbstractScheduler> scheduler(ToolFactory::getSchedulerImpl());
 
 	QObject::connect( scheduler.get(), SIGNAL( askForPassword( const QString&, bool, int*, const QString& ) ),
 					  this, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ) );
@@ -267,7 +268,7 @@ QStringList MainModel::getPrefixes()
 	}
 	try
 	{
-		auto_ptr< AbstractRsync > rsync = ToolFactory::getRsyncImpl();
+        std::shared_ptr<AbstractRsync> rsync(ToolFactory::getRsyncImpl());
 		prefixes = rsync->getPrefixes();
 	}
 	catch ( const ProcessException& e )
@@ -287,7 +288,7 @@ QList<int> MainModel::getServerQuota()
 	}
 	//try
 	//{
-		auto_ptr< AbstractSsh > ssh = ToolFactory::getSshImpl();
+        std::shared_ptr<AbstractSsh> ssh(ToolFactory::getSshImpl());
 		quota = ssh->getServerQuotaValues();
 	//}
 	//catch ( const ProcessException& e )
@@ -306,7 +307,7 @@ QList<RestoreName> MainModel::getRestoreNames( const QString & backup_prefix )
 	try
 	{
 		Settings* settings = Settings::getInstance();
-		auto_ptr< AbstractRsync > rsync = ToolFactory::getRsyncImpl();
+        std::shared_ptr<AbstractRsync> rsync(ToolFactory::getRsyncImpl());
 		QStringList restoreInfoFiles = rsync->downloadAllRestoreInfoFiles( settings->getApplicationDataDir(), backup_prefix );
 		foreach( QString restoreInfoFile, restoreInfoFiles )
 		{
@@ -369,7 +370,7 @@ QStringList MainModel::getRestoreContent( const QString & backup_prefix, const Q
 	try
 	{
 		Settings* settings = Settings::getInstance();
-		auto_ptr< AbstractRsync > rsync = ToolFactory::getRsyncImpl();
+        std::shared_ptr<AbstractRsync> rsync(ToolFactory::getRsyncImpl());
 		QFileInfo backupContentFileName = rsync->downloadBackupContentFile( backup_prefix, backupName, settings->getApplicationDataDir() );
 
 		QFile backupContentFile( backupContentFileName.absoluteFilePath() );

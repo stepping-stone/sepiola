@@ -52,38 +52,38 @@ ToolFactory::~ToolFactory()
 {
 }
 
-auto_ptr< AbstractMetadata > ToolFactory::getMetadataImpl()
+AbstractMetadata * ToolFactory::getMetadataImpl()
 {
 #ifdef Q_OS_MAC
-	return auto_ptr< AbstractMetadata >( new UnixPermissions );
+	return new UnixPermissions;
 #elif defined Q_OS_WIN32
-	return auto_ptr< AbstractMetadata >( new SetAcl(Settings::getInstance()->getSetAclName()) );
+	return new SetAcl(Settings::getInstance()->getSetAclName());
 #else
-	return auto_ptr< AbstractMetadata >( new PosixAcl(Settings::getInstance()->getGetfaclName(), Settings::getInstance()->getSetfaclName()) );
+	return new PosixAcl(Settings::getInstance()->getGetfaclName(), Settings::getInstance()->getSetfaclName());
 #endif
 
 }
 
-auto_ptr< AbstractRsync > ToolFactory::getRsyncImpl()
+AbstractRsync * ToolFactory::getRsyncImpl()
 {
-	return auto_ptr< AbstractRsync >( new Rsync );
+	return new Rsync;
 }
 
-auto_ptr< AbstractSsh > ToolFactory::getSshImpl()
+AbstractSsh * ToolFactory::getSshImpl()
 {
-	return auto_ptr< AbstractSsh >( new Plink );
+	return new Plink;
 }
 
-auto_ptr< AbstractScheduler > ToolFactory::getSchedulerImpl()
+AbstractScheduler * ToolFactory::getSchedulerImpl()
 {
 #ifdef Q_OS_WIN32
     if ( Schtasks::isSchtasksSupported() )
     {
-        return auto_ptr< AbstractScheduler >( new Schtasks );
+        return new Schtasks;
     }
-    return auto_ptr< AbstractScheduler >( new At );
+    return new At;
 #else
-	return auto_ptr< AbstractScheduler >( new Crontab );
+	return new Crontab;
 #endif
 }
 

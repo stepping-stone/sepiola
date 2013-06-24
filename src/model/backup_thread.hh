@@ -33,8 +33,6 @@
 #include "utils/progress_task.hh"
 #include "utils/string_utils.hh"
 
-using std::auto_ptr;
-
 /**
  * The BackupThread class runs the backup process in its own thread
  * @author Bruno Santschi, santschi@puzzle.ch
@@ -99,7 +97,7 @@ private:
 	ConstUtils::StatusEnum getLastBackupState();
 
 
-	auto_ptr< AbstractRsync > rsync;
+    std::shared_ptr<AbstractRsync> rsync;
 	bool isAborted;
 	QStringList items;
 	BackupSelectionHash includeRules;
