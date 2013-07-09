@@ -35,7 +35,7 @@ original sources as follows:
 * putty: ftp://ftp.chiark.greenend.org.uk/users/sgtatham/
 * openssh: http://www.openssh.com/portable.html
 * getfacl/setfacl: ftp://oss.sgi.com/projects/xfs/cmd_tars/
-* SetACL: hhttp://sourceforge.net/projects/setacl/
+* SetACL: http://sourceforge.net/projects/setacl/
 
 
 # License & Copyright
