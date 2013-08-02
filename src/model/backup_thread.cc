@@ -20,6 +20,8 @@
 #include <QPair>
 #include <QSet>
 #include <QDateTime>
+#include <QXmlStreamWriter>
+#include <QTime>
 
 #include "exception/process_exception.hh"
 #include "exception/abort_exception.hh"
@@ -42,7 +44,7 @@ const QString BackupThread::TASKNAME_FILE_UPLOAD = "file upload";
 const QString BackupThread::TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT = "downloading current backup content file";
 const QString BackupThread::TASKNAME_UPLOAD_METADATA = "uploading metadata";
 const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
-
+const int BackupThread::MIN_BACKUP_ID = 100000;
 
 BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
 	rsync(ToolFactory::getRsyncImpl()),
@@ -55,6 +57,10 @@ BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
 	this->setDeleteFlag = settings->getDeleteExtraneousItems();
 	this->compressedUpload = settings->isCompressedRsyncTraffic();
 	this->bandwidthLimit = settings->getBandwidthLimit();
+
+    /* initialize random seed and generate the backup id */
+    qsrand(QTime::currentTime().msec());
+    this->backupID = (double)qrand() + MIN_BACKUP_ID;
 
 	// TODO adjust the given values for subtask steps and durations
 	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
@@ -110,6 +116,10 @@ void BackupThread::run()
 
 		prepareServerDirectories();
 		checkAbortState();
+
+        // Write the backupStarted.xml to the server for the backup surveillance
+        uploadBackupStartedXML( this->backupID );
+        BackupThread::uploadSchedulerXML( settings->getScheduleRule() );
 
 		QString source = "/";
 		QString destination = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getBackupFolderName() + "/", "'");
@@ -233,6 +243,8 @@ void BackupThread::run()
 	}
 	if ( failed )
 	{
+        // Write the backupStarted.xml to the server for the backup surveillance
+        uploadBackupEndedXML(this->backupID, 0);
 		emit infoSignal( tr( "Backup failed." ) );
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
@@ -240,8 +252,12 @@ void BackupThread::run()
 	}
 	else if (!warnings.isEmpty())
 	{
+        // Write the backupStarted.xml to the server for the backup surveillance
+        uploadBackupEndedXML(this->backupID, 1);
 		this->setLastBackupState(ConstUtils::STATUS_WARNING);
 	} else {
+        // Write the backupStarted.xml to the server for the backup surveillance
+        uploadBackupEndedXML(this->backupID, 1);
 		this->setLastBackupState(ConstUtils::STATUS_OK);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_OK )";
 	}
@@ -463,4 +479,221 @@ void BackupThread::abortBackupProcess()
 	emit abort_rsync();
 	emit updateOverviewFormLastBackupsInfo();
 	emit finalStatusSignal( this->getLastBackupState() );
+}
+
+void BackupThread::uploadBackupStartedXML(double id)
+{
+    qDebug() << "BackupThread::uploadBackupStartedXML()";
+    
+    Settings* settings = Settings::getInstance();
+    QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName(), "'");
+
+    //QString backupStartedFile = settings->getBackupStartedXMLFileName();
+    QString backupStartedFile = "/tmp/backupStarted.xml";
+	QFile file( backupStartedFile );
+	if ( !file.open( QIODevice::WriteOnly ) )
+	{
+		emit showCriticalMessageBox( tr( "Can not create a backup info file" ) );
+		return;
+	}
+    
+    // Get the current time
+    QDateTime time = QDateTime::currentDateTimeUtc();
+    time.setTimeSpec(Qt::UTC);
+    
+    QDateTime localTime = time.toLocalTime();
+    localTime.setTimeSpec(Qt::OffsetFromUTC);
+    
+    QXmlStreamWriter stream(&file);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+    stream.writeStartElement("backup_started");
+    stream.writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+    stream.writeAttribute("xsi:schemaLocation","http://xml.stepping-stone.ch/schema/backup_started backup_started.xsd");
+    stream.writeTextElement("startdate", localTime.toString("yyyy-MM-ddTHH:mm:ss").append( getTimezoneOffset(time, localTime) ) );
+    stream.writeTextElement("id", QString::number(id, 'f', 0) );
+    stream.writeEndElement();
+    stream.writeEndDocument();
+    
+    file.close();
+    
+    // Upload the file to the server
+    rsync->upload( backupStartedFile, metaDataDir, true, 0, 0 );
+    FileSystemUtils::removeFile( backupStartedFile );
+    checkAbortState();
+}
+
+
+void BackupThread::uploadBackupEndedXML(double id, int success)
+{
+    qDebug() << "BackupThread::uploadBackupEndedXML()";
+    
+    Settings* settings = Settings::getInstance();
+    QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName(), "'");
+
+    //QString backupEndedFile = settings->getBackupStartedXMLFileName();
+    QString backupEndedFile = "/tmp/backupEnded.xml";
+	QFile file( backupEndedFile );
+	if ( !file.open( QIODevice::WriteOnly ) )
+	{
+		emit showCriticalMessageBox( tr( "Can not create a backup info file" ) );
+		return;
+	}
+    
+    // Get the current time
+    QDateTime time = QDateTime::currentDateTimeUtc();
+    time.setTimeSpec(Qt::UTC);
+    
+    QDateTime localTime = time.toLocalTime();
+    localTime.setTimeSpec(Qt::OffsetFromUTC);
+    
+    QXmlStreamWriter stream(&file);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+    stream.writeStartElement("backup_ended");
+    stream.writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+    stream.writeAttribute("xsi:schemaLocation","http://xml.stepping-stone.ch/schema/backup_ended backup_ended.xsd");
+    stream.writeTextElement("enddate", localTime.toString("yyyy-MM-ddTHH:mm:ss").append( getTimezoneOffset(time, localTime) ) );
+    stream.writeTextElement("id", QString::number(id, 'f', 0) );
+    stream.writeTextElement("success", QString("%1").arg(success));
+    stream.writeEndElement();
+    stream.writeEndDocument();
+    
+    file.close();
+    
+    // Upload the file to the server
+    rsync->upload( backupEndedFile, metaDataDir, true, 0, 0 );
+    FileSystemUtils::removeFile( backupEndedFile );
+    checkAbortState();
+}
+
+
+void BackupThread::uploadSchedulerXML( ScheduledTask schedule )
+{
+    qDebug() << "BackupThread::uploadSchedulerXML()";
+    
+    Settings* settings = Settings::getInstance();
+    QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName(), "'");    
+    
+    // Get the current time
+    QDateTime time = QDateTime::currentDateTimeUtc();
+    time.setTimeSpec(Qt::UTC);
+    
+    QDateTime localTime = time.toLocalTime();
+    localTime.setTimeSpec(Qt::OffsetFromUTC);
+    
+    //QString backupEndedFile = settings->getBackupStartedXMLFileName();
+    QString schedulerFile = "/tmp/scheduler.xml";
+    QFile file( schedulerFile );
+    if ( !file.open( QIODevice::WriteOnly ) )
+    {
+        emit showCriticalMessageBox( tr( "Can not create a backup info file" ) );
+        return;
+    }
+    
+    QXmlStreamWriter stream(&file);
+    stream.setAutoFormatting(true);
+    stream.writeStartDocument();
+    stream.writeStartElement("online_backup_schedule");
+    stream.writeAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+    stream.writeAttribute("xsi:schemaLocation","http://xml.stepping-stone.ch/schema/online_backup_schedule online_backup_schedule.xsd");
+   
+    // Check which type of task it is and act appropriate
+    switch( schedule.getType() )
+    {
+        case ScheduleRule::NEVER:
+            stream.writeStartElement("no_schedule");
+            stream.writeEndElement();
+            break;
+        case ScheduleRule::AFTER_BOOT:
+            stream.writeStartElement("backup_after_startup");
+            stream.writeTextElement("minutes_after_startup",QString("%1").arg( schedule.getMinutesAfterStartup() ) );
+            stream.writeEndElement();
+            break;
+        case ScheduleRule::AT_WEEKDAYS_AND_TIME:
+            stream.writeStartElement("custom_online_backup");
+            stream.writeStartElement("minutes");
+            stream.writeTextElement("minute_selected",QString("%1").arg( schedule.getTimeToRun().minute() ) );
+            stream.writeEndElement();
+            stream.writeStartElement("hours");
+            stream.writeTextElement("hour_selected",QString("%1").arg( schedule.getTimeToRun().hour() ) );
+            stream.writeEndElement();
+            stream.writeStartElement("days_of_month");
+            stream.writeTextElement("every_day_of_month","*");
+            stream.writeEndElement();
+            stream.writeStartElement("months");
+            stream.writeTextElement("everymonth","*");
+            stream.writeEndElement();
+            stream.writeStartElement("days_of_week");
+            
+            // Check which days the user selected
+            if ( schedule.getWeekdays().contains(ScheduleRule::MONDAY) &&
+                 schedule.getWeekdays().contains(ScheduleRule::TUESDAY) &&
+                 schedule.getWeekdays().contains(ScheduleRule::WEDNESDAY) &&
+                 schedule.getWeekdays().contains(ScheduleRule::THURSDAY) &&
+                 schedule.getWeekdays().contains(ScheduleRule::FRIDAY) &&
+                 schedule.getWeekdays().contains(ScheduleRule::SATURDAY) &&
+                 schedule.getWeekdays().contains(ScheduleRule::SUNDAY) )
+            {
+                stream.writeTextElement("every_day_of_week","*");
+            } else
+            {
+                if ( schedule.getWeekdays().contains(ScheduleRule::MONDAY) )
+                    stream.writeTextElement( "week_day", QString("%1").arg( ScheduleRule::MONDAY + 1) );
+                
+                if ( schedule.getWeekdays().contains(ScheduleRule::TUESDAY) )
+                    stream.writeTextElement( "week_day", QString("%1").arg( ScheduleRule::TUESDAY + 1) );
+                
+                if ( schedule.getWeekdays().contains(ScheduleRule::WEDNESDAY) )
+                    stream.writeTextElement( "week_day", QString("%1").arg( ScheduleRule::WEDNESDAY + 1) );
+                
+                if ( schedule.getWeekdays().contains(ScheduleRule::THURSDAY) )
+                    stream.writeTextElement( "week_day", QString("%1").arg( ScheduleRule::THURSDAY + 1) );
+                
+                if ( schedule.getWeekdays().contains(ScheduleRule::FRIDAY) )
+                    stream.writeTextElement( "week_day", QString("%1").arg( ScheduleRule::FRIDAY + 1) );
+                
+                if ( schedule.getWeekdays().contains(ScheduleRule::SATURDAY) )
+                    stream.writeTextElement( "week_day", QString("%1").arg( ScheduleRule::SATURDAY + 1) );
+                
+                if ( schedule.getWeekdays().contains(ScheduleRule::SUNDAY) )
+                    stream.writeTextElement( "week_day", QString("%1").arg( ScheduleRule::SUNDAY + 1) );
+            }
+            
+            stream.writeEndElement();
+            stream.writeTextElement("timezone",getTimezoneOffset(time,localTime));
+            stream.writeEndElement();
+            stream.writeEndElement();
+            break;
+    }
+    
+    stream.writeEndElement();
+    stream.writeEndDocument();
+
+    file.close();
+    
+    // Upload the file to the server
+    rsync->upload( schedulerFile, metaDataDir, true, 0, 0 );
+    FileSystemUtils::removeFile( schedulerFile );
+    checkAbortState();
+    
+}
+
+QString BackupThread::getTimezoneOffset( QDateTime utc, QDateTime localTime )
+{
+    uint offset = localTime.toTime_t() - utc.toTime_t();
+    
+    double timezone = (double)offset / 3600.0;
+    
+    double integerPart = 0.0;
+    
+    double fractionPart = modf(timezone,&integerPart);
+    
+    QChar fill = '0';
+    
+    if ( timezone > 0 )
+        return "+" + QString("%1:%2").arg((int)integerPart,2,10,fill).arg((int)fractionPart * 6,2,10,fill);
+    else
+        return "-" + QString("%1:%2").arg(qAbs<int>((int)integerPart),2,10,fill).arg((int)fractionPart * 6,2,10,fill);
+
 }

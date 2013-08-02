@@ -32,6 +32,7 @@
 #include "model/backup_task.hh"
 #include "utils/progress_task.hh"
 #include "utils/string_utils.hh"
+#include "model/scheduled_task.hh"
 
 /**
  * The BackupThread class runs the backup process in its own thread
@@ -57,6 +58,7 @@ public:
 	virtual ~BackupThread();
 
 	void startInCurrentThread();
+    void uploadSchedulerXML(ScheduledTask schedule);
 signals:
 	void showCriticalMessageBox( const QString& message );
 	void finishProgressDialog();
@@ -73,6 +75,8 @@ public slots:
 	void rsyncUploadProgressHandler(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten);
 	void updateInformationToDisplay(StringPairList vars = StringPairList());
 	void abortBackupProcess();
+    void prepareServerDirectories();
+
 
 protected:
 
@@ -88,13 +92,16 @@ private:
 	static const QString TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT;
 	static const QString TASKNAME_UPLOAD_METADATA;
 	static const QString TASKNAME_METAINFO;
+    static const int MIN_BACKUP_ID;
 	void checkAbortState();
-	void prepareServerDirectories();
 	quint64 estimateBackupSize( const QString& src, const QString& destination );
 	void updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList );
 	QString createCurrentBackupTimeFile();
 	void setLastBackupState(ConstUtils::StatusEnum status);
 	ConstUtils::StatusEnum getLastBackupState();
+    void uploadBackupStartedXML(double id);
+    void uploadBackupEndedXML(double id, int success);
+    QString getTimezoneOffset( QDateTime utc, QDateTime localtime );
 
 
     std::shared_ptr<AbstractRsync> rsync;
@@ -105,11 +112,12 @@ private:
 	QStringList excludePatternList;
 	bool setDeleteFlag;
 	bool compressedUpload;
-    int bandwidthLimit;
+	int bandwidthLimit;
 	QDateTime backupStartDateTime;
 	ConstUtils::StatusEnum backupCurrentStatus;
 	ProgressTask pt;
-	int currentTaskNr;
+    int currentTaskNr;
+    double backupID;
 };
 
 #endif

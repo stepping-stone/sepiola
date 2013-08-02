@@ -210,6 +210,18 @@ void MainModel::schedule( const BackupSelectionHash& includeRules, const Schedul
 	showProgressDialogSlot( tr( "Verify connection" ) );
 	if ( initConnection() )
 	{
+        try
+        {
+            // Update the schedule information to the server
+            BackupThread backupThread( includeRules );
+            backupThread.prepareServerDirectories();
+            backupThread.uploadSchedulerXML( scheduleRule );
+        }
+        catch ( const ProcessException& e )
+        {
+            emit showCriticalMessageBox( e.what() );
+        }
+
 		closeProgressDialogSlot();
 	}
 	else
