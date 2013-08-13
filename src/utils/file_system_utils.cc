@@ -80,11 +80,11 @@ void FileSystemUtils::convertFile(const QString& fileName, const QString& fromEn
 
 	QTextStream inputStream(&file);
 	if (!fromEncoding.isEmpty())
-		inputStream.setCodec(fromEncoding.toAscii());
+		inputStream.setCodec(fromEncoding.toLatin1());
 
 	QTextStream outputStream(&tmpFile);
 	if (!toEncoding.isEmpty())
-		outputStream.setCodec(toEncoding.toAscii());
+		outputStream.setCodec(toEncoding.toLatin1());
 
 	while (!inputStream.atEnd())
 	{
@@ -163,7 +163,7 @@ void FileSystemUtils::writeLinesToFile(const QString& fileName, const QStringLis
 	QTextStream out( &file);
 	if (!encoding.isEmpty())
 	{
-		out.setCodec(encoding.toAscii());
+		out.setCodec(encoding.toLatin1());
 		//out.setGenerateByteOrderMark(true);
 	}
 	foreach( QString line, lines )
@@ -185,7 +185,7 @@ QStringList FileSystemUtils::readLinesFromFile(const QString& fileName, const QS
 	QTextStream in(&file);
 	if (!encoding.isEmpty())
 	{
-		in.setCodec(encoding.toAscii());
+		in.setCodec(encoding.toLatin1());
 	}
 	while ( !in.atEnd() )
 	{

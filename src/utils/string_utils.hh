@@ -77,7 +77,7 @@ namespace
 
 inline void StringUtils::testChar2StdString() {
 	QString testStr = QString("abcd");
-	char* myText = testStr.toAscii().data();
+	char* myText = testStr.toLatin1().data();
 	std::string myString1(myText);
 	cout << myString1;
 	std::string myString2 = myText;
@@ -185,7 +185,7 @@ inline QString StringUtils::buf2QString(const char* buf) {
 }
 
 inline QString StringUtils::buf2QString(QString buf) {
-	return buf2QString(buf.toAscii().data());
+	return buf2QString(buf.toLatin1().data());
 }
 
 inline float StringUtils::trafficStr2BytesPerSecond(QString trafficStr) {

@@ -195,7 +195,7 @@ bool Process::blockingReadLine(QByteArray* byteArray, int msec, char lineEndChar
 		}
 		else
 		{
-			*byteArray = readBuffer.left(pos).toAscii();
+			*byteArray = readBuffer.left(pos).toLatin1();
 			readBuffer = readBuffer.mid(pos+1);
 			return result;
 		}
