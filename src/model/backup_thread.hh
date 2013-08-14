@@ -77,7 +77,6 @@ public slots:
 	void abortBackupProcess();
     void prepareServerDirectories();
 
-
 protected:
 
 	/**
@@ -92,15 +91,15 @@ private:
 	static const QString TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT;
 	static const QString TASKNAME_UPLOAD_METADATA;
 	static const QString TASKNAME_METAINFO;
-    static const int MIN_BACKUP_ID;
+    static const long MIN_BACKUP_ID;
 	void checkAbortState();
 	quint64 estimateBackupSize( const QString& src, const QString& destination );
 	void updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList );
 	QString createCurrentBackupTimeFile();
 	void setLastBackupState(ConstUtils::StatusEnum status);
 	ConstUtils::StatusEnum getLastBackupState();
-    void uploadBackupStartedXML(double id);
-    void uploadBackupEndedXML(double id, int success);
+    void uploadBackupStartedXML(long id);
+    void uploadBackupEndedXML(long id, int success);
     QString getTimezoneOffset( QDateTime utc, QDateTime localtime );
 
 
@@ -117,7 +116,7 @@ private:
 	ConstUtils::StatusEnum backupCurrentStatus;
 	ProgressTask pt;
     int currentTaskNr;
-    double backupID;
+    long backupID;
 };
 
 #endif
