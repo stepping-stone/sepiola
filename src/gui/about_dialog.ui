@@ -1,155 +1,184 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>AboutDialog</class>
- <widget class="QDialog" name="AboutDialog" >
-  <property name="windowModality" >
+ <widget class="QDialog" name="AboutDialog">
+  <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
-  <property name="geometry" >
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>313</width>
-    <height>432</height>
+    <width>334</width>
+    <height>331</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>About</string>
   </property>
-  <property name="autoFillBackground" >
+  <property name="autoFillBackground">
    <bool>true</bool>
   </property>
-  <property name="modal" >
+  <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" >
-   <item row="0" column="0" >
-    <widget class="QLabel" name="labelVersion" >
-     <property name="text" >
+  <layout class="QGridLayout">
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="labelVersion">
+     <property name="text">
       <string>Version</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox1" >
-     <property name="title" >
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox1">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
       <string>Reseller</string>
      </property>
-     <property name="checked" >
+     <property name="checked">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="labelReseller" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelReseller">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>[ResellerAddress]</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="imgReseller" >
-        <property name="pixmap" >
-         <pixmap resource="resources/logo_reseller.qrc" >:/main/logo_reseller.png</pixmap>
+      <item row="0" column="1">
+       <widget class="QLabel" name="imgReseller">
+        <property name="pixmap">
+         <pixmap resource="resources/screen.qrc">:/main/icon.png</pixmap>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox2" >
-     <property name="title" >
+   <item row="3" column="1">
+    <widget class="QPushButton" name="btnOk">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>&amp;OK</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff/>
+      </iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>170</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
       <string>Copyright by</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="labelSteppingStone" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+     <layout class="QGridLayout">
+      <item row="0" column="1">
+       <widget class="QLabel" name="labelSteppingStone">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>stepping stone GmbH&#xd;
-Neufeldstrasse 9&#xd;
+        <property name="text">
+         <string>stepping stone GmbH
+Neufeldstrasse 9
 CH-3012 Bern</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="imgSteppingStone" >
-        <property name="text" >
-         <string/>
-        </property>
-        <property name="pixmap" >
-         <pixmap resource="resources/screen.qrc" >:/main/logo_stepping_stone.png</pixmap>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox3" >
-     <property name="title" >
+   <item row="2" column="1">
+    <widget class="QGroupBox" name="groupBox3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>140</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
       <string>Developed by</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="labelPuzzleITC" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelPuzzleITC">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>Puzzle ITC GmbH&#xd;
-Eigerplatz 4&#xd;
+        <property name="text">
+         <string>Puzzle ITC GmbH
+Eigerplatz 4
 CH-3007 Bern</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="imgPuzzleITC" >
-        <property name="text" >
-         <string/>
-        </property>
-        <property name="pixmap" >
-         <pixmap resource="resources/screen.qrc" >:/main/logo_puzzle.png</pixmap>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="4" column="0" >
+   <item row="3" column="0">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>161</width>
        <height>20</height>
@@ -157,23 +186,11 @@ CH-3007 Bern</string>
      </property>
     </spacer>
    </item>
-   <item row="4" column="1" >
-    <widget class="QPushButton" name="btnOk" >
-     <property name="text" >
-      <string>&amp;OK</string>
-     </property>
-     <property name="icon" >
-      <iconset>
-       <normaloff/>
-      </iconset>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <resources>
-  <include location="resources/screen.qrc" />
-  <include location="resources/logo_reseller.qrc" />
+  <include location="resources/screen.qrc"/>
+  <include location="resources/logo_reseller.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -182,11 +199,11 @@ CH-3007 Bern</string>
    <receiver>AboutDialog</receiver>
    <slot>close()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>330</x>
      <y>137</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>190</x>
      <y>81</y>
     </hint>

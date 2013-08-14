@@ -17,6 +17,7 @@
 */
 
 #include <QLabel>
+#include <qpixmap.h>
 
 #include "gui/about_dialog.hh"
 #include "settings/settings.hh"
@@ -32,12 +33,12 @@ AboutDialog::AboutDialog()
 	this->labelVersion->setText( tr( "%1 Version %2" ).arg( settings->getApplicationName(), Settings::VERSION ) );
 
 	// rescale images if needed
-	if ( this->imgSteppingStone->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgSteppingStone->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
+/*	if ( this->imgSteppingStone->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgSteppingStone->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
 		this->imgSteppingStone->setPixmap(this->imgSteppingStone->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 	}
 	if ( this->imgPuzzleITC->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgPuzzleITC->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
 		this->imgPuzzleITC->setPixmap(this->imgPuzzleITC->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-	}
+	}*/
 	
 	if (settings->isReseller())
 	{
@@ -50,7 +51,8 @@ AboutDialog::AboutDialog()
 	}
 	else
 	{
-		this->groupBox1->setHidden(true);
+		this->labelReseller->setText( settings->getApplicationName() );
+        this->groupBox1->setTitle("Application");
 	}
 }
 
