@@ -31,14 +31,14 @@ AboutDialog::AboutDialog()
 	Settings* settings = Settings::getInstance();
 	this->labelVersion->setText( tr( "%1\nVersion %2" ).arg( settings->getApplicationName(), Settings::VERSION ) );
 
-	if (settings->isReseller())
-	{
-        this->labelSupport->setText( settings->getResellerAddress() );
-		// rescale image if needed
-		if ( this->imgReseller->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgReseller->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
-			this->imgReseller->setPixmap(this->imgReseller->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-		}
-	}
+#ifdef IS_RESELLER
+    this->labelSupport->setText( settings->getResellerAddress() );
+    // rescale image if needed
+    if ( this->imgReseller->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgReseller->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
+        this->imgReseller->setPixmap(this->imgReseller->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+#endif
+
 }
 
 AboutDialog::~AboutDialog()

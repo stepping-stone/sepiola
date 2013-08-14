@@ -177,11 +177,6 @@ class Settings : public QObject
 		bool useOpenSshInsteadOfPlinkForRsync();
 
 		/**
-		 * Indicates whether a reseller was given in by the build system or not
-		 */
-		bool isReseller();
-
-		/**
 		 * returns the provided reseller address from config_reseller
 		 */
 		QString getResellerAddress();
@@ -349,8 +344,6 @@ class Settings : public QObject
 
 
 		// Settings given at build-time or by platform
-		static const bool IS_RESELLER;
-
 		static Settings* instance;
 
 		QSettings* applicationSettings; // read only settings
