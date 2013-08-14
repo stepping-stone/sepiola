@@ -29,28 +29,15 @@ AboutDialog::AboutDialog()
 	setupUi( this );
 	this->setBackgroundRole( QPalette::Base );
 	Settings* settings = Settings::getInstance();
-	this->labelVersion->setText( tr( "%1 Version %2" ).arg( settings->getApplicationName(), Settings::VERSION ) );
+	this->labelVersion->setText( tr( "%1\nVersion %2" ).arg( settings->getApplicationName(), Settings::VERSION ) );
 
-	// rescale images if needed
-	if ( this->imgSteppingStone->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgSteppingStone->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
-		this->imgSteppingStone->setPixmap(this->imgSteppingStone->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-	}
-	if ( this->imgPuzzleITC->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgPuzzleITC->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
-		this->imgPuzzleITC->setPixmap(this->imgPuzzleITC->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-	}
-	
 	if (settings->isReseller())
 	{
-		this->groupBox1->setHidden(false);
-		this->labelReseller->setText(settings->getResellerAddress());
+        this->labelSupport->setText( settings->getResellerAddress() );
 		// rescale image if needed
 		if ( this->imgReseller->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgReseller->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
 			this->imgReseller->setPixmap(this->imgReseller->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 		}
-	}
-	else
-	{
-		this->groupBox1->setHidden(true);
 	}
 }
 
