@@ -38,6 +38,7 @@
 #include "utils/unicode_text_stream.hh"
 #include "utils/datetime_utils.hh"
 #include "utils/progress_task.hh"
+#include "settings/platform.hh"
 
 const QString BackupThread::TASKNAME_PREPARE_DIRECTORIES = "preparing server directories";
 const QString BackupThread::TASKNAME_ESTIMATE_BACKUP_SIZE = "estimating backup size";
@@ -513,6 +514,11 @@ void BackupThread::uploadBackupStartedXML(double id)
     stream.writeAttribute("xsi:schemaLocation","http://xml.stepping-stone.ch/schema/backup_started backup_started.xsd");
     stream.writeTextElement("startdate", localTime.toString("yyyy-MM-ddTHH:mm:ss").append( getTimezoneOffset(time, localTime) ) );
     stream.writeTextElement("id", QString::number(id, 'f', 0) );
+    stream.writeStartElement("client");
+    stream.writeTextElement("identifier", settings->getApplicationName() );
+    stream.writeTextElement("version", Settings::VERSION );
+    stream.writeTextElement("operatingsystem", Platform::OS_IDENTIFIER );
+    stream.writeEndElement();
     stream.writeEndElement();
     stream.writeEndDocument();
     
@@ -557,6 +563,11 @@ void BackupThread::uploadBackupEndedXML(double id, int success)
     stream.writeTextElement("enddate", localTime.toString("yyyy-MM-ddTHH:mm:ss").append( getTimezoneOffset(time, localTime) ) );
     stream.writeTextElement("id", QString::number(id, 'f', 0) );
     stream.writeTextElement("success", QString("%1").arg(success));
+    stream.writeStartElement("client");
+    stream.writeTextElement("identifier", settings->getApplicationName() );
+    stream.writeTextElement("version", Settings::VERSION );
+    stream.writeTextElement("operatingsystem", Platform::OS_IDENTIFIER );
+    stream.writeEndElement();
     stream.writeEndElement();
     stream.writeEndDocument();
     
@@ -664,9 +675,14 @@ void BackupThread::uploadSchedulerXML( ScheduledTask schedule )
             stream.writeEndElement();
             stream.writeTextElement("timezone",getTimezoneOffset(time,localTime));
             stream.writeEndElement();
-            stream.writeEndElement();
             break;
     }
+    
+    stream.writeStartElement("client");
+    stream.writeTextElement("identifier", settings->getApplicationName() );
+    stream.writeTextElement("version", Settings::VERSION );  
+    stream.writeTextElement("operatingsystem", Platform::OS_IDENTIFIER);
+    stream.writeEndElement();
     
     stream.writeEndElement();
     stream.writeEndDocument();
@@ -699,31 +715,3 @@ QString BackupThread::getTimezoneOffset( QDateTime utc, QDateTime localTime )
         return "-" + QString("%1:%2").arg(qAbs<int>((int)integerPart),2,10,fill).arg((int)fractionPart * 6,2,10,fill);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
