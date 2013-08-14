@@ -21,7 +21,6 @@
 #include <QSet>
 #include <QDateTime>
 #include <QXmlStreamWriter>
-#include <qglobal.h>
 #include <QTime>
 #include <QTemporaryFile>
 
