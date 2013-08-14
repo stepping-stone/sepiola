@@ -100,7 +100,6 @@ private:
 	ConstUtils::StatusEnum getLastBackupState();
     void uploadBackupStartedXML(long id);
     void uploadBackupEndedXML(long id, int success);
-    QString getTimezoneOffset( QDateTime utc, QDateTime localtime );
 
 
     std::shared_ptr<AbstractRsync> rsync;

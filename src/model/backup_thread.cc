@@ -48,6 +48,23 @@ const QString BackupThread::TASKNAME_UPLOAD_METADATA = "uploading metadata";
 const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
 const long BackupThread::MIN_BACKUP_ID = 100000;
 
+namespace {
+    QString getTimezoneOffset( const QDateTime & utc, const QDateTime & localTime )
+    {
+        const uint offset = localTime.toTime_t() - utc.toTime_t();
+        const double timezone = static_cast<double>(offset) / 3600.0;
+        double integerPart = 0.0;
+        const double fractionPart = modf(timezone, &integerPart);
+        const QChar fill('0');
+
+        return QString("%1%2:%3")
+            .arg(timezone > 0 ? '+' : '-')
+            .arg(qAbs<int>(integerPart), 2, 10, fill)
+            .arg(static_cast<int>(fractionPart * 60), 2, 10, fill);
+
+    }
+}
+
 BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
 	rsync(ToolFactory::getRsyncImpl()),
     isAborted(false),
@@ -689,23 +706,4 @@ void BackupThread::uploadSchedulerXML( ScheduledTask schedule )
     rsync->upload( file.fileName(), destination, true, 0, 0 );
     checkAbortState();
     
-}
-
-QString BackupThread::getTimezoneOffset( QDateTime utc, QDateTime localTime )
-{
-    uint offset = localTime.toTime_t() - utc.toTime_t();
-    
-    double timezone = (double)offset / 3600.0;
-    
-    double integerPart = 0.0;
-    
-    double fractionPart = modf(timezone,&integerPart);
-    
-    QChar fill = '0';
-    
-    if ( timezone > 0 )
-        return "+" + QString("%1:%2").arg((int)integerPart,2,10,fill).arg((int)fractionPart * 6,2,10,fill);
-    else
-        return "-" + QString("%1:%2").arg(qAbs<int>((int)integerPart),2,10,fill).arg((int)fractionPart * 6,2,10,fill);
-
 }
