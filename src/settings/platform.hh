@@ -31,5 +31,15 @@ namespace Platform {
     static const char EXECUTABLE_SUFFIX[] = "";
 #endif
 
+#if defined Q_OS_WIN32
+    static const QString OS_IDENTIFIER = "Windows";
+#elif defined Q_OS_MAC
+    static const QString OS_IDENTIFIER = "MacOSX";
+#elif defined Q_OS_LINUX
+    static const QString OS_IDENTIFIER = "Linux";
+#else
+#error "Operating system not supported"
+#endif
+
 }
 #endif // PLATFORM_HH
