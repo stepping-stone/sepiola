@@ -229,11 +229,11 @@ void createConsole()
 int main(int argc, char *argv[])
 {
 	setHomeDir();
-        
+
 	if (CliManager::isNoopApplication(argc, argv) )
 	{
 		return 0;
-	}
+    }
 
 	if (CliManager::isHelpApplication(argc, argv) )
 	{
@@ -346,10 +346,10 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		mainWindow.show();
+        mainWindow.show();
         LogFileUtils::getInstance()->writeLog(QObject::tr("Application started") );
-		result = app.exec();
-		LogFileUtils::getInstance()->writeLog(QObject::tr("Application closed") );
+        result = app.exec();
+        LogFileUtils::getInstance()->writeLog(QObject::tr("Application closed") );
 	}
 	LogFileUtils::getInstance()->close();
 	QObject::disconnect( &mainWindow, SIGNAL( writeLog( const QString& ) ), LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ));

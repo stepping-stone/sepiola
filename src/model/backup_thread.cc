@@ -694,14 +694,13 @@ void BackupThread::uploadSchedulerXML( ScheduledTask schedule )
 
 QString BackupThread::getTimezoneOffset( QDateTime utc, QDateTime localTime )
 {
-    int offset = localTime.toTime_t() - utc.toTime_t();
+    uint offset = localTime.toTime_t() - utc.toTime_t();
     
-    double timezone = offset / 3600;
+    double timezone = (double)offset / 3600.0;
     
-    double integerPart;
-    double fractionPart;
+    double integerPart = 0.0;
     
-    fractionPart = modf(timezone,&integerPart);
+    double fractionPart = modf(timezone,&integerPart);
     
     QChar fill = '0';
     
