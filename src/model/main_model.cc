@@ -216,6 +216,7 @@ void MainModel::schedule( const BackupSelectionHash& includeRules, const Schedul
             BackupThread* backupThread = new BackupThread( includeRules );
             backupThread->prepareServerDirectories();
             backupThread->uploadSchedulerXML( scheduleRule );
+            delete backupThread;
             
         } catch ( const ProcessException& e )
         {
