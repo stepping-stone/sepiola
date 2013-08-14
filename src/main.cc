@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
 	if (CliManager::isNoopApplication(argc, argv) )
 	{
 		return 0;
-	}
+    }
 
 	if (CliManager::isHelpApplication(argc, argv) )
 	{
@@ -333,7 +333,7 @@ int main(int argc, char *argv[])
 	app.installTranslator(&appTranslator);
 	app.installTranslator(&qtTranslator);
 
-	MainWindow mainWindow( &model);
+	MainWindow mainWindow( &model);    
 	QObject::connect( &mainWindow, SIGNAL( writeLog( const QString& ) ), LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ));
 
 	int result = 0;
@@ -346,10 +346,10 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		mainWindow.show();
-		LogFileUtils::getInstance()->writeLog(QObject::tr("Application started") );
-		result = app.exec();
-		LogFileUtils::getInstance()->writeLog(QObject::tr("Application closed") );
+        mainWindow.show();
+        LogFileUtils::getInstance()->writeLog(QObject::tr("Application started") );
+        result = app.exec();
+        LogFileUtils::getInstance()->writeLog(QObject::tr("Application closed") );
 	}
 	LogFileUtils::getInstance()->close();
 	QObject::disconnect( &mainWindow, SIGNAL( writeLog( const QString& ) ), LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ));
