@@ -22,6 +22,7 @@
 #include <QDateTime>
 #include <QXmlStreamWriter>
 #include <QTime>
+#include <QTemporaryFile>
 
 #include "exception/process_exception.hh"
 #include "exception/abort_exception.hh"
@@ -45,7 +46,7 @@ const QString BackupThread::TASKNAME_FILE_UPLOAD = "file upload";
 const QString BackupThread::TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT = "downloading current backup content file";
 const QString BackupThread::TASKNAME_UPLOAD_METADATA = "uploading metadata";
 const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
-const int BackupThread::MIN_BACKUP_ID = 100000;
+const long BackupThread::MIN_BACKUP_ID = 100000;
 
 BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
 	rsync(ToolFactory::getRsyncImpl()),
@@ -61,8 +62,8 @@ BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
 
     /* initialize random seed and generate the backup id */
     qsrand(QTime::currentTime().msec());
-    this->backupID = (double)qrand() + MIN_BACKUP_ID;
-
+    this->backupID = static_cast<long>(qrand()) + MIN_BACKUP_ID;
+    
 	// TODO adjust the given values for subtask steps and durations
 	this->pt = ProgressTask("Backup", DateTimeUtils::getDateTimeFromSecs(60), 50);
 	pt.appendTask(TASKNAME_PREPARE_DIRECTORIES, DateTimeUtils::getDateTimeFromSecs(2 /* time for directory-preparation */), 3.0);
@@ -482,19 +483,17 @@ void BackupThread::abortBackupProcess()
 	emit finalStatusSignal( this->getLastBackupState() );
 }
 
-void BackupThread::uploadBackupStartedXML(double id)
+void BackupThread::uploadBackupStartedXML(long id)
 {
     qDebug() << "BackupThread::uploadBackupStartedXML()";
     
     Settings* settings = Settings::getInstance();
     QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName(), "'");
 
-    //QString backupStartedFile = settings->getBackupStartedXMLFileName();
-    QString backupStartedFile = "/tmp/backupStarted.xml";
-	QFile file( backupStartedFile );
-	if ( !file.open( QIODevice::WriteOnly ) )
+    QTemporaryFile file;
+	if ( !file.open() )
 	{
-		emit showCriticalMessageBox( tr( "Can not create a backup info file" ) );
+		emit showCriticalMessageBox( tr( "Can not create a temporary backupStarted.xml file" ) );
 		return;
 	}
     
@@ -524,25 +523,23 @@ void BackupThread::uploadBackupStartedXML(double id)
     file.close();
     
     // Upload the file to the server
-    rsync->upload( backupStartedFile, metaDataDir, true, 0, 0 );
-    FileSystemUtils::removeFile( backupStartedFile );
+    QString destination = metaDataDir + "/backupStarted.xml";
+    rsync->upload( file.fileName(), destination, true, 0, 0 );
     checkAbortState();
 }
 
 
-void BackupThread::uploadBackupEndedXML(double id, int success)
+void BackupThread::uploadBackupEndedXML(long id, int success)
 {
     qDebug() << "BackupThread::uploadBackupEndedXML()";
     
     Settings* settings = Settings::getInstance();
     QString metaDataDir = settings->getServerUserName() + "@" + settings->getServerName() + ":" + StringUtils::quoteText(settings->getBackupRootFolder() + settings->getBackupPrefix() + "/" + settings->getMetaFolderName(), "'");
 
-    //QString backupEndedFile = settings->getBackupStartedXMLFileName();
-    QString backupEndedFile = "/tmp/backupEnded.xml";
-	QFile file( backupEndedFile );
-	if ( !file.open( QIODevice::WriteOnly ) )
+	QTemporaryFile file;
+	if ( !file.open() )
 	{
-		emit showCriticalMessageBox( tr( "Can not create a backup info file" ) );
+		emit showCriticalMessageBox( tr( "Can not create a temporary backupEndedted.xml file" ) );
 		return;
 	}
     
@@ -573,8 +570,8 @@ void BackupThread::uploadBackupEndedXML(double id, int success)
     file.close();
     
     // Upload the file to the server
-    rsync->upload( backupEndedFile, metaDataDir, true, 0, 0 );
-    FileSystemUtils::removeFile( backupEndedFile );
+    QString destination = metaDataDir + "/backupEnded.xml";
+    rsync->upload( file.fileName(), destination, true, 0, 0 );
     checkAbortState();
 }
 
@@ -594,11 +591,10 @@ void BackupThread::uploadSchedulerXML( ScheduledTask schedule )
     localTime.setTimeSpec(Qt::OffsetFromUTC);
     
     //QString backupEndedFile = settings->getBackupStartedXMLFileName();
-    QString schedulerFile = "/tmp/scheduler.xml";
-    QFile file( schedulerFile );
-    if ( !file.open( QIODevice::WriteOnly ) )
+    QTemporaryFile file;
+    if ( !file.open() )
     {
-        emit showCriticalMessageBox( tr( "Can not create a backup info file" ) );
+        emit showCriticalMessageBox( tr( "Can not create a temporary schedule.xml file" ) );
         return;
     }
     
@@ -689,8 +685,8 @@ void BackupThread::uploadSchedulerXML( ScheduledTask schedule )
     file.close();
     
     // Upload the file to the server
-    rsync->upload( schedulerFile, metaDataDir, true, 0, 0 );
-    FileSystemUtils::removeFile( schedulerFile );
+    QString destination = metaDataDir + "/scheduler.xml";
+    rsync->upload( file.fileName(), destination, true, 0, 0 );
     checkAbortState();
     
 }
