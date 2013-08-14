@@ -17,7 +17,6 @@
 */
 
 #include <QLabel>
-#include <qpixmap.h>
 
 #include "gui/about_dialog.hh"
 #include "settings/settings.hh"
@@ -51,8 +50,10 @@ AboutDialog::AboutDialog()
 	}
 	else
 	{
-		this->labelReseller->setText( settings->getApplicationName() );
+        this->labelVersion->setHidden( true );
+        this->labelReseller->setText( settings->getApplicationName()+ "\nVersion: " + Settings::VERSION );
         this->groupBox1->setTitle("Application");
+        
 	}
 }
 

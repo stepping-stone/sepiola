@@ -44,6 +44,12 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="title">
       <string>Reseller</string>
      </property>
@@ -59,6 +65,12 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>[ResellerAddress]</string>
         </property>
@@ -69,8 +81,17 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="imgReseller">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="pixmap">
          <pixmap resource="resources/screen.qrc">:/main/icon.png</pixmap>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -98,7 +119,7 @@
    <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox2">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -106,11 +127,14 @@
      <property name="maximumSize">
       <size>
        <width>170</width>
-       <height>16777215</height>
+       <height>87</height>
       </size>
      </property>
      <property name="title">
       <string>Copyright by</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <layout class="QGridLayout">
       <item row="0" column="1">
@@ -127,7 +151,7 @@ Neufeldstrasse 9
 CH-3012 Bern</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
         </property>
        </widget>
       </item>
@@ -150,6 +174,9 @@ CH-3012 Bern</string>
      </property>
      <property name="title">
       <string>Developed by</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
      <layout class="QGridLayout">
       <item row="0" column="0">
