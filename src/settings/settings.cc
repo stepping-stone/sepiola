@@ -41,9 +41,6 @@ const bool Settings::SHOW_PROGRESS = false;
 const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );
 const QString Settings::VERSION = QString::number( VERSION_MAJOR ) + "." + QString::number( VERSION_MINOR ) + "." + QString::number( VERSION_PATCH );
 
-// [Application]
-const QString Settings::SETTINGS_GROUP_APPLICATION = "Application";
-
 // [Client]
 const QString Settings::SETTINGS_GROUP_CLIENT = "Client";
 const QString Settings::SETTINGS_APPLICATION_FULL_NAME = "ApplicationName";
@@ -260,7 +257,7 @@ void Settings::reloadSettings()
 	quotaModificationUrlUidParam = resellerSettings->value( SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM, quotaModificationUrlUidParam ).toString();
 	resellerSettings->endGroup();
 
-	applicationName = resellerSettings->value( SETTINGS_GROUP_APPLICATION + "/" + SETTINGS_APPLICATION_FULL_NAME, applicationName ).toString();
+	applicationName = resellerSettings->value( SETTINGS_GROUP_CLIENT + "/" + SETTINGS_APPLICATION_FULL_NAME, applicationName ).toString();
 
 	serverName = userSettings->value( SETTINGS_HOST, serverName ).toString();
 	serverUserName = userSettings->value( SETTINGS_USERNAME ).toString();
