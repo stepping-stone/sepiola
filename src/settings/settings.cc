@@ -34,8 +34,6 @@
 #include "utils/datatypes.hh"
 #include "model/scheduled_task.hh"
 
-#include "config.h"
-
 const bool Settings::SHOW_PROGRESS = false;
 
 const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );

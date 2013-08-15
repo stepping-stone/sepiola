@@ -29,6 +29,8 @@
 #include <QSize>
 #include <QPoint>
 
+#include "config.h"
+
 #include "model/backup_task.hh"
 #include "model/scheduled_task.hh"
 
