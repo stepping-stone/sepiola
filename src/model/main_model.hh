@@ -31,6 +31,8 @@
 // Forward declarations
 class LocalDirModel;
 class RemoteDirModel;
+class SpaceUsageModel;
+
 /**
  * The MainModel class the main model according to the MVC pattern
  * @author Reto Aebersold, aebersold@puzzle.ch
@@ -98,6 +100,12 @@ public:
 	RemoteDirModel* getCurrentRemoteDirModel();
 	RemoteDirModel* loadRemoteDirModel( const QString& backup_prefix, const QString& backupName );
 	void clearRemoteDirModel();
+
+    /**
+     * Get a pointer to the space usage model.
+     * Not const due to Qt signal/slot system.
+     */
+    const SpaceUsageModel* getSpaceUsageModel();
 
 	/**
 	 * Initializes the connection to the server
@@ -271,6 +279,7 @@ public slots:
 private:
 	LocalDirModel* localDirModel;
 	RemoteDirModel* remoteDirModel;
+    SpaceUsageModel* spaceUsageModel;
 	bool isLoginAborted;
 	QStringList getRestoreContent( const QString& backup_prefix, const QString& backupName );
 };

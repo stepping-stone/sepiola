@@ -27,6 +27,7 @@
 
 // Forward declarations
 class MainModel;
+class SpaceUsageModel;
 
 /**
  * The OutputDialog class provides a dialog supporting text output
@@ -81,6 +82,7 @@ signals:
 
 private:
 	MainModel* model;
+    SpaceUsageModel* spaceUsageModel;
 	bool initialized;
 
 	QRgb COLOR_BLACK;

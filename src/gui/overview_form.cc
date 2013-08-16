@@ -32,8 +32,11 @@
 #include "model/backup_task.hh"
 #include "model/main_model.hh"
 #include "model/scheduled_task.hh"
+#include "model/space_usage_model.hh"
 
-OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( parent )
+OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) :
+    QWidget( parent ),
+    spaceUsageModel(new SpaceUsageModel(this))
 {
 	COLOR_BLACK = qRgba( 0, 0, 0, 255 );
 	COLOR_WHITE = qRgba( 255, 255, 255, 255 );
@@ -46,6 +49,7 @@ OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	initialized = false;
 
 	this->model = model;
+    this->stackedBarView->setModel(spaceUsageModel);
 
 	// adjust content of change-quota-label
 	Settings* settings = Settings::getInstance();
@@ -72,6 +76,7 @@ OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( paren
 
 OverviewForm::~OverviewForm()
 {
+    delete spaceUsageModel;
 }
 
 void OverviewForm::on_btnBackupNow_clicked()
@@ -155,7 +160,7 @@ void OverviewForm::refreshSpaceStatistic()
 		quota = quotaValues.at(0);
 		backup = quotaValues.at(1);
 		snapshot = quotaValues.at(2);
-		this->labelSpaceAvailable->setPixmap( this->getSpaceVisualization( quota, backup, snapshot ) );
+        spaceUsageModel->setSpaceUsage(backup, snapshot, (quota - backup - snapshot), quota);
 
 		QList<float> sizes; sizes << backup << snapshot << ( quota - backup - snapshot ) << quota;
 
@@ -179,7 +184,7 @@ void OverviewForm::refreshSpaceStatistic()
 			}
 		}
 	} else {
-		this->labelSpaceAvailable->setPixmap( this->getSpaceVisualization( -1, 0, 0, 10 ) );
+        spaceUsageModel->setSpaceUsage(0, 0, 0, 0);
 
 		// set field-text of all space-fields
 		for ( int i = 0; i < sizeNames.size(); i++ )

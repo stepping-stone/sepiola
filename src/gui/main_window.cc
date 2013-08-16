@@ -32,6 +32,7 @@
 #include "gui/logfile_form.hh"
 #include "gui/traffic_progress_dialog.hh"
 #include "model/main_model.hh"
+#include "model/space_usage_model.hh"
 
 MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 {
@@ -73,7 +74,6 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 	QObject::connect( model, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 	QObject::connect( this->overviewForm, SIGNAL( startBackupNow() ), this->backupForm, SLOT( runBackupNow() ) );
-
 
 	stackedLayout = new QStackedLayout( frameMain );
 	stackedLayout->addWidget( overviewForm );

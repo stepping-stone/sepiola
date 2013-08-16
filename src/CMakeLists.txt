@@ -188,6 +188,7 @@ QT4_WRAP_CPP(
 	model/backup_thread.hh
 	model/main_model.hh
 	model/restore_thread.hh
+	model/space_usage_model.hh
 )
 
 QT4_WRAP_CPP(
@@ -205,6 +206,7 @@ QT4_WRAP_CPP(
 	gui/pattern_dialog.hh
 	gui/output_dialog.hh 
 	gui/traffic_progress_dialog.hh
+	gui/stacked_bar_view.hh
 )
 
 QT4_WRAP_UI(
@@ -250,6 +252,7 @@ SET(BASE_SOURCE_FILES
 	model/local_dir_model.cc
 	model/scheduled_task.cc
 	model/backup_task.cc
+	model/space_usage_model.cc
 	${sepiola_base_MOC}
 )
 
@@ -268,6 +271,7 @@ SET(UI_SOURCE_FILES
 	gui/restore_form.cc 
 	gui/settings_form.cc
 	gui/text_input_dialog.cc
+	gui/stacked_bar_view.cc
 	test/test_manager.cc
 	${sepiola_UI}
 	${sepiola_ui_MOC}

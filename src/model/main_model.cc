@@ -31,6 +31,7 @@
 #include "model/remote_dir_model.hh"
 #include "model/local_dir_model.hh"
 #include "model/restore_thread.hh"
+#include "model/space_usage_model.hh"
 #include "tools/abstract_rsync.hh"
 #include "tools/abstract_metadata.hh"
 #include "tools/abstract_ssh.hh"
@@ -45,7 +46,10 @@
 const QString MainModel::BACKUP_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 const QString MainModel::BACKUP_TIME_TODAY = "TODAY";
 
-MainModel::MainModel() : localDirModel(0), remoteDirModel(0)
+MainModel::MainModel() :
+    localDirModel(nullptr),
+    remoteDirModel(nullptr),
+    spaceUsageModel(new SpaceUsageModel(this))
 {
 }
 
@@ -53,6 +57,7 @@ MainModel::~MainModel()
 {
 	delete localDirModel;
 	delete remoteDirModel;
+    delete spaceUsageModel;
 }
 
 void MainModel::keepSettings()
@@ -291,6 +296,11 @@ QStringList MainModel::getPrefixes()
 		emit showCriticalMessageBox( e.what() );
 	}
 	return prefixes;
+}
+
+const SpaceUsageModel* MainModel::getSpaceUsageModel()
+{
+    return spaceUsageModel;
 }
 
 QList<int> MainModel::getServerQuota()
