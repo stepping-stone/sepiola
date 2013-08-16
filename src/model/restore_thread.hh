@@ -23,10 +23,11 @@
 #include <QThread>
 #include <QStringList>
 
-#include "exception/abort_exception.hh"
-#include "tools/abstract_rsync.hh"
-#include "tools/abstract_informing_process.hh"
-#include "utils/string_utils.hh"
+#include "utils/const_utils.hh"
+#include "utils/datatypes.hh"
+
+// Forward declarations
+class AbstractRsync;
 
 /**
  * The RestoreThread class runs the restore process in its own thread

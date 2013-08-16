@@ -22,6 +22,7 @@
 #include <QLocale>
 #include <QDebug>
 #include <QFileInfo>
+#include <QMessageBox>
 
 #include <unistd.h>
 #include <signal.h>

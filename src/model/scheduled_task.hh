@@ -19,14 +19,11 @@
 #ifndef SCHEDULEDTASK_H_
 #define SCHEDULEDTASK_H_
 
-#include <QList>
-#include <QStringList>
-#include <QDebug>
+#include <QVector>
+#include <QSet>
+#include <QTime>
+#include <QDataStream>
 #include <QMetaType>
-#include <QVariant>
-
-#include "tools/abstract_rsync.hh"
-#include "exception/abort_exception.hh"
 
 namespace ScheduleRule {
 enum ScheduleType

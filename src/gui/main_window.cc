@@ -17,11 +17,21 @@
 */
 
 #include <QDebug>
+#include <QMessageBox>
+#include <QStackedLayout>
 
+#include "settings/settings.hh"
 #include "gui/about_dialog.hh"
 #include "gui/logfile_form.hh"
 #include "gui/main_window.hh"
 #include "gui/password_dialog.hh"
+#include "gui/overview_form.hh"
+#include "gui/backup_form.hh"
+#include "gui/restore_form.hh"
+#include "gui/settings_form.hh"
+#include "gui/logfile_form.hh"
+#include "gui/traffic_progress_dialog.hh"
+#include "model/main_model.hh"
 
 MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 {

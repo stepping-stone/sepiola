@@ -20,22 +20,19 @@
 #define MAIN_WINDOW_HH
 
 #include <QMainWindow>
-#include <QDialog>
-#include <QStackedLayout>
 #include <QCloseEvent>
-#include <QMessageBox>
-#include <QProgressDialog>
-#include <QSplashScreen>
 
 #include "ui_main_window.h"
 
-#include "gui/overview_form.hh"
-#include "gui/backup_form.hh"
-#include "gui/restore_form.hh"
-#include "gui/settings_form.hh"
-#include "gui/logfile_form.hh"
-#include "gui/traffic_progress_dialog.hh"
-#include "model/main_model.hh"
+class MainModel;
+class OverviewForm;
+class BackupForm;
+class SettingsForm;
+class RestoreForm;
+class LogfileForm;
+class TrafficProgressDialog;
+class QStackedLayout;
+class QSplashScreen;
 
 /**
  * The MainWindow class is the main user interface.

@@ -20,8 +20,7 @@
 #define SETTINGS_FORM_HH
 
 #include <QWidget>
-#include <QMessageBox>
-#include <QSettings>
+#include <QString>
 
 #include "ui_settings_form.h"
 

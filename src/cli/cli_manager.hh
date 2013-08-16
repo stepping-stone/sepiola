@@ -20,6 +20,7 @@
 #define CLI_MANAGER_HH
 
 #include <QObject>
+#include <QString>
 
 /**
  * The CliManager class is used to start the application without a graphical user interface.

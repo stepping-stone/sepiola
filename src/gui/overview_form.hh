@@ -21,12 +21,12 @@
 
 #include <QWidget>
 #include <QPixmap>
+#include <QRgb>
 
 #include "ui_overview_form.h"
 
-#include "model/main_model.hh"
-#include "model/scheduled_task.hh"
-
+// Forward declarations
+class MainModel;
 
 /**
  * The OutputDialog class provides a dialog supporting text output

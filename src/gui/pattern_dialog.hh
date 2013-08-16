@@ -20,6 +20,8 @@
 #define PATTERN_DIALOG_HH
 
 #include <QDialog>
+#include <QString>
+#include <QStringList>
 
 #include "ui_pattern_dialog.h"
 

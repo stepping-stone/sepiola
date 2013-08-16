@@ -17,7 +17,6 @@
 */
 
 #include "gui/logfile_form.hh"
-#include "settings/settings.hh"
 
 LogfileForm::LogfileForm( QWidget* parent, MainModel* /*model*/) : QWidget ( parent )
 {

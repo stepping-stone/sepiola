@@ -17,10 +17,9 @@
 */
 
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 
-#include <QString>
-#include <QStringList>
+//#include <QStringList>
 #include <QDebug>
 #include <QWaitCondition>
 #include <QMutex>

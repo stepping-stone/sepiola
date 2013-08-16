@@ -20,6 +20,7 @@
 #define TEXT_INPUT_DIALOG_HH
 
 #include <QDialog>
+#include <QString>
 
 #include "ui_text_input_dialog.h"
 

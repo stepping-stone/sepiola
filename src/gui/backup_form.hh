@@ -21,8 +21,14 @@
 
 #include "ui_backup_form.h"
 
-#include "model/main_model.hh"
-#include "model/local_dir_model.hh"
+#include <QWidget>
+#include <QString>
+#include <QStringList>
+#include <QTime>
+
+// Forward declarations
+class MainModel;
+class LocalDirModel;
 
 /**
  * The BackupForm class is the backup user interface.

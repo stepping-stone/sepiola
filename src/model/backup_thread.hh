@@ -25,14 +25,11 @@
 #include <QPair>
 #include <QStringList>
 #include <QThread>
-#include <QDebug>
 
 #include "tools/abstract_rsync.hh"
-#include "exception/abort_exception.hh"
-#include "model/backup_task.hh"
 #include "utils/progress_task.hh"
-#include "utils/string_utils.hh"
 #include "model/scheduled_task.hh"
+#include "utils/const_utils.hh"
 
 /**
  * The BackupThread class runs the backup process in its own thread

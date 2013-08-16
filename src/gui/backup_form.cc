@@ -20,10 +20,12 @@
 #include <QMessageBox>
 #include <QShortcut>
 
+#include "settings/settings.hh"
 #include "gui/backup_form.hh"
 #include "gui/pattern_dialog.hh"
 #include "model/scheduled_task.hh"
-
+#include "model/main_model.hh"
+#include "model/local_dir_model.hh"
 #include "utils/log_file_utils.hh"
 
 // default const values

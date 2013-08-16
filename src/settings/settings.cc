@@ -24,7 +24,7 @@
 #include <QCoreApplication>
 #include <QLocale>
 #include <cstdio>
-#include <QtCore/QTranslator>
+#include <QTranslator>
 
 #include "settings/platform.hh"
 #include "settings/settings.hh"

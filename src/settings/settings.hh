@@ -21,7 +21,6 @@
 
 #include <QObject>
 #include <QFileInfo>
-#include <QSettings>
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -33,7 +32,10 @@
 
 #include "model/backup_task.hh"
 #include "model/scheduled_task.hh"
+#include "utils/datatypes.hh"
 
+// Forward declarations
+class QSettings;
 
 /**
  * The Settings class is used to store and read all settings for this application

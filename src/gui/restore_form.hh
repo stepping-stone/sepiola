@@ -20,11 +20,13 @@
 #define RESTORE_FORM_HH
 
 #include <QWidget>
+#include <QString>
 
 #include "ui_restore_form.h"
 
-#include "model/main_model.hh"
 
+class MainModel;
+class RemoteDirModel;
 
 /**
  * The RestoreForm class is the restore user interface.

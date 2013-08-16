@@ -19,12 +19,10 @@
 #ifndef BACKUPTASK_H_
 #define BACKUPTASK_H_
 
-#include <QList>
-#include <QStringList>
-#include <QDebug>
+#include <QDateTime>
+#include <QString>
+#include <QMap>
 
-#include "tools/abstract_rsync.hh"
-#include "exception/abort_exception.hh"
 #include "utils/const_utils.hh"
 
 

@@ -19,9 +19,11 @@
 #ifndef LOGFILE_FORM_HH
 #define LOGFILE_FORM_HH
 
+#include <QStringList>
+
 #include "ui_logfile_form.h"
 
-#include "model/main_model.hh"
+class MainModel;
 
 /**
  * The LogfileDialog class provides a dialog showing the log file

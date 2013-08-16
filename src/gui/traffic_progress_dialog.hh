@@ -20,11 +20,17 @@
 #define TRAFFIC_PROGRESS_DIALOG_HH
 
 #include <QDialog>
-#include <QTime>
+#include <QDateTime>
+#include <QPair>
+#include <QString>
+#include <QList>
 
 #include "ui_traffic_progress_dialog.h"
 #include "utils/string_utils.hh"
-#include "model/backup_task.hh"
+#include "utils/const_utils.hh"
+
+// Forward declarations
+class QLabel;
 
 /**
  * The OutputDialog class provides a dialog supporting text output

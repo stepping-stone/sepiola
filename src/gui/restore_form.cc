@@ -20,7 +20,10 @@
 #include <QDebug>
 
 #include "gui/restore_form.hh"
+#include "settings/settings.hh"
 #include "model/dir_tree_item.hh"
+#include "model/main_model.hh"
+#include "model/remote_dir_model.hh"
 
 RestoreForm::~RestoreForm()
 {

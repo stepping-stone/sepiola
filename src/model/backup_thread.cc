@@ -28,6 +28,7 @@
 #include "exception/abort_exception.hh"
 #include "model/backup_thread.hh"
 #include "model/main_model.hh"
+#include "model/backup_task.hh"
 #include "settings/settings.hh"
 #include "tools/tool_factory.hh"
 #include "tools/abstract_metadata.hh"

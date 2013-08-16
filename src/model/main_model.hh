@@ -19,20 +19,18 @@
 #ifndef MAIN_MODEL_HH
 #define MAIN_MODEL_HH
 
-#include <QDebug>
 #include <QObject>
-#include <QSettings>
 #include <QDirModel>
 #include <QStandardItemModel>
 #include <QList>
 
-#include "model/remote_dir_model.hh"
-#include "model/local_dir_model.hh"
 #include "model/restore_name.hh"
-#include "settings/settings.hh"
-#include "tools/abstract_rsync.hh"
+#include "model/scheduled_task.hh"
 #include "tools/abstract_informing_process.hh"
 
+// Forward declarations
+class LocalDirModel;
+class RemoteDirModel;
 /**
  * The MainModel class the main model according to the MVC pattern
  * @author Reto Aebersold, aebersold@puzzle.ch

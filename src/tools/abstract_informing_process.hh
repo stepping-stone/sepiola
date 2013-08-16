@@ -22,8 +22,6 @@
 #include <QObject>
 #include <QString>
 #include <QDateTime>
-#include <QList>
-#include <QPair>
 #include <QMetaType>
 
 #include "utils/string_utils.hh"

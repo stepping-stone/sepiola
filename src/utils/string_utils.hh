@@ -23,7 +23,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QDir>
-#include <math.h>
+#include <cmath>
 #include <algorithm>
 #include <iostream>
 #include <string>

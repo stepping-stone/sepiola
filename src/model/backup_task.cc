@@ -17,7 +17,6 @@
 */
 
 #include <QDebug>
-#include <QDateTime>
 
 #include "model/backup_task.hh"
 

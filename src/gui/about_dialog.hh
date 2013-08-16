@@ -21,6 +21,8 @@
 
 #include "ui_about_dialog.h"
 
+#include <QDialog>
+
 /**
  * The AboutDialog class provides a dialog showing information about the owner of the application
  * @author Bruno Santschi, santschi@puzzle.ch

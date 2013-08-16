@@ -19,8 +19,11 @@
 #include <QDebug>
 #include <memory>
 
+#include "settings/settings.hh"
 #include "cli/cli_manager.hh"
 #include "exception/login_exception.hh"
+#include "model/remote_dir_model.hh"
+#include "model/local_dir_model.hh"
 #include "model/backup_thread.hh"
 #include "model/backup_task.hh"
 #include "model/dir_tree_item.hh"

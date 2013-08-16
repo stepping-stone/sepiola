@@ -23,13 +23,15 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QImageReader>
-#include <math.h>
+#include <cmath>
 
 #include "gui/overview_form.hh"
 #include "settings/settings.hh"
 #include "utils/debug_timer.hh"
 #include "model/scheduled_task.hh"
 #include "model/backup_task.hh"
+#include "model/main_model.hh"
+#include "model/scheduled_task.hh"
 
 OverviewForm::OverviewForm( QWidget *parent, MainModel *model ) : QWidget( parent )
 {

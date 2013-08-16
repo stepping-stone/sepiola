@@ -20,6 +20,7 @@
 #define PASSWORD_DIALOG_HH
 
 #include <QDialog>
+#include <QString>
 
 #include "ui_password_dialog.h"
 

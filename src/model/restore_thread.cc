@@ -16,6 +16,7 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "exception/abort_exception.hh"
 #include "exception/process_exception.hh"
 #include "model/main_model.hh"
 #include "model/restore_thread.hh"

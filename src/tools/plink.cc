@@ -334,7 +334,6 @@ QList<int> Plink::getServerQuotaValues()
 	qDebug() << "Plink::getServerQuotaValues()";
 	Settings* settings = Settings::getInstance();
 
-	QList<int> sizes;
 
 	QStringList arguments;
 	arguments << "-i";
@@ -350,7 +349,7 @@ QList<int> Plink::getServerQuotaValues()
 	int quota, backup, snapshot;
 	QTextStream in(quotaText);
 	in >> quota >> backup >> snapshot;
-	sizes.clear();
+    QList<int> sizes;
 	sizes << quota << backup << snapshot;
 	qDebug() << "Quota values on server:" << sizes;
 	return sizes;

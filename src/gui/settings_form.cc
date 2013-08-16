@@ -17,7 +17,9 @@
 */
 
 #include <QDebug>
+#include <QMessageBox>
 
+#include "settings/settings.hh"
 #include "gui/settings_form.hh"
 #include "model/main_model.hh"
 
