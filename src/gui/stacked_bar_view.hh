@@ -11,6 +11,7 @@
 #define STACKED_BAR_VIEW_HH
 
 #include <QtGui/QAbstractItemView>
+#include <QtGui/QPixmap>
 
 class StackedBarView :
     public QAbstractItemView
@@ -25,6 +26,8 @@ public:
     void scrollTo(const QModelIndex & index, ScrollHint hint = EnsureVisible);
 
     QRect visualRect(const QModelIndex & index) const;
+
+    QPixmap legendIcon(const QModelIndex & index) const;
 
 protected:
     int	horizontalOffset() const;

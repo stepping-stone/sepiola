@@ -225,3 +225,19 @@ bool StackedBarView::edit(const QModelIndex&, EditTrigger, QEvent*)
     // disable editing for all
     return false;
 }
+
+QPixmap StackedBarView::legendIcon(const QModelIndex & index) const
+{
+    const QColor color = qvariant_cast<QColor>(index.data(Qt::DecorationRole));
+
+    QLinearGradient gradient(0, 0, 0, 16);
+    gradient.setColorAt(0.0, Qt::white);
+    gradient.setColorAt(0.5, color);
+    gradient.setColorAt(1.0, Qt::black);
+
+    QPixmap pixmap(16, 16);
+    QPainter painter(&pixmap);
+    painter.fillRect(0, 0, 16, 16, gradient);
+
+    return pixmap;
+}

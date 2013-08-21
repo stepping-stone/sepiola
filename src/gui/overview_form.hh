@@ -20,8 +20,6 @@
 #define OVERVIEW_FORM_HH
 
 #include <QWidget>
-#include <QPixmap>
-#include <QRgb>
 
 #include "ui_overview_form.h"
 
@@ -49,11 +47,6 @@ public:
 	 */
 	virtual ~OverviewForm();
 
-	/**
-	 * Returns whether the restore list has been initialized
-	 */
-	bool isInitialized();
-
 public slots:
 	/**
  	 * Refreshes the graphical quota-statistics
@@ -70,10 +63,6 @@ public slots:
 	 */
 	void refreshScheduleOverview();
 
-private:
-	QPixmap getSpaceVisualization(int quota, int used, int snapshot, int imgW=1000, int imgH=16);
-	QRgb linIP(QRgb v0, QRgb vMid, QRgb v1, float mid, float x);
-
 private slots:
 	void on_btnBackupNow_clicked();
 
@@ -83,14 +72,6 @@ signals:
 private:
 	MainModel* model;
     SpaceUsageModel* spaceUsageModel;
-	bool initialized;
-
-	QRgb COLOR_BLACK;
-	QRgb COLOR_WHITE;
-	QRgb COLOR_BACKUP;
-	QRgb COLOR_SNAPSHOT;
-	QRgb COLOR_FREE;
-	QRgb COLOR_UNKNOWN;
 };
 
 #endif
