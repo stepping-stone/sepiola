@@ -18,6 +18,8 @@ class SpaceUsageModel :
 {
     Q_OBJECT
 public:
+    enum Entries { BACKUP = 0, INCREMENTAL = 1, FREE = 2, QUOTA = 3 };
+
      /** Order of elements in the tuple: backup, incremental, free, quota
      */
     typedef std::tuple<double, double, double, double> SpaceUsageData;

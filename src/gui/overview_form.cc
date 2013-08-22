@@ -149,9 +149,9 @@ void OverviewForm::refreshSpaceStatistic()
 		snapshot = quotaValues.at(2);
         spaceUsageModel->setSpaceUsage(backup, snapshot, (quota - backup - snapshot), quota);
 
-        this->labelLegendBackup->setPixmap(this->stackedBarView->legendIcon(spaceUsageModel->index(0, 0)));
-        this->labelLegendSnapshot->setPixmap(this->stackedBarView->legendIcon(spaceUsageModel->index(1, 0)));
-        this->labelLegendFree->setPixmap(this->stackedBarView->legendIcon(spaceUsageModel->index(2, 0)));
+        this->labelLegendBackup->setPixmap(this->stackedBarView->legendIcon(spaceUsageModel->index(SpaceUsageModel::BACKUP, 0)));
+        this->labelLegendSnapshot->setPixmap(this->stackedBarView->legendIcon(spaceUsageModel->index(SpaceUsageModel::INCREMENTAL, 0)));
+        this->labelLegendFree->setPixmap(this->stackedBarView->legendIcon(spaceUsageModel->index(SpaceUsageModel::FREE, 0)));
 
 		QList<float> sizes; sizes << backup << snapshot << ( quota - backup - snapshot ) << quota;
 

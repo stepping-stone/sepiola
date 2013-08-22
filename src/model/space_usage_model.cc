@@ -36,19 +36,19 @@ QVariant SpaceUsageModel::data(const QModelIndex & index, int role) const
     {
         switch (index.row())
         {
-            case 0: return std::get<0>(_spaceUsage);
-            case 1: return std::get<1>(_spaceUsage);
-            case 2: return std::get<2>(_spaceUsage);
-            //case 3: return std::get<3>(_spaceUsage);
+            case Entries::BACKUP:      return std::get<Entries::BACKUP>(_spaceUsage);
+            case Entries::INCREMENTAL: return std::get<Entries::INCREMENTAL>(_spaceUsage);
+            case Entries::FREE:        return std::get<Entries::FREE>(_spaceUsage);
+            //case Entries::QUOTA: return std::get<Entries::QUOTA>(_spaceUsage);
         }
     } else if (role == Qt::DecorationRole)
     {
         switch (index.row())
         {
-            case 0: return QColor(255, 0, 0, 255);
-            case 1: return QColor(255, 175, 0, 255);
-            case 2: return QColor(0, 191, 0, 255);
-            //case 3: return QColor(0, 0, 0, 0);
+            case Entries::BACKUP:      return QColor(255, 0, 0, 255);
+            case Entries::INCREMENTAL: return QColor(255, 175, 0, 255);
+            case Entries::FREE:        return QColor(0, 191, 0, 255);
+            //case Entries::QUOTA: return QColor(0, 0, 0, 0);
         }
     }
 
@@ -65,10 +65,10 @@ bool SpaceUsageModel::setData(const QModelIndex & index, const QVariant & value,
 
     switch (index.row())
     {
-        case 0: std::get<0>(_spaceUsage) = value.toDouble(); break;
-        case 1: std::get<1>(_spaceUsage) = value.toDouble(); break;
-        case 2: std::get<2>(_spaceUsage) = value.toDouble(); break;
-        case 3: std::get<3>(_spaceUsage) = value.toDouble(); break;
+        case Entries::BACKUP:      std::get<Entries::BACKUP>(_spaceUsage) = value.toDouble(); break;
+        case Entries::INCREMENTAL: std::get<Entries::INCREMENTAL>(_spaceUsage) = value.toDouble(); break;
+        case Entries::FREE:        std::get<Entries::FREE>(_spaceUsage) = value.toDouble(); break;
+        case Entries::QUOTA:       std::get<Entries::QUOTA>(_spaceUsage) = value.toDouble(); break;
         default: return false;
     }
 
