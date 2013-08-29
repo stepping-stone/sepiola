@@ -215,9 +215,9 @@ bool Plink::generateKeys( const QString& password )
 	QString shellArguments;
 	arguments << "sh" << "-c";
 	shellArguments.append( "echo " + LOGIN_ECHO_MESSAGE + ";" );
-	shellArguments.append( "puttygen -q -t dsa -b 1024 -o " + privatePuttyKeyFileName + ";" );
-	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + publicKeyFileName + " -O public-openssh;" );
-	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + privateOpenSshKeyFileName + " -O private-openssh;" );
+	shellArguments.append( "puttygen -q -t dsa -b 1024 -o " + privatePuttyKeyFileName + " 2>&1;" );
+	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + publicKeyFileName + " -O public-openssh 2>&1;" );
+	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + privateOpenSshKeyFileName + " -O private-openssh 2>&1;" );
 	shellArguments.append( "cat " + publicKeyFileName + " >> " + authorizedKeyFileName + ";" );
 	shellArguments.append( "echo " + START_PRIVATE_KEY_ECHO_MESSAGE +";" );
 	shellArguments.append( "cat " + privatePuttyKeyFileName + ";" );
