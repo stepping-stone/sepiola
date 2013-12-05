@@ -103,7 +103,7 @@ bool Schtasks::schedule( const QString& execName, const QString& cliArgument, co
 	{
 		QStringList arguments = schtasksArguments;
 		arguments << "/ru" << username;
-		//arguments << "/rp" << password;
+		arguments << "/rp" << password;
 
 		deleteExistingTask( execName, cliArgument );
 		createProcess( SCHTASKS_NAME, arguments );
