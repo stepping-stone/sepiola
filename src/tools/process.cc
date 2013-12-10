@@ -62,8 +62,21 @@ void Process::createProcess(const QString& executableName, const QStringList& ar
 void Process::start()
 {
 	assert(qProcess);
-	qDebug() << "Started: " << executableName << arguments;
-	LogFileUtils::getInstance()->writeLog("Started: " + executableName + " " + arguments.join(" "));
+
+	// As we don't want to log the password, we need to filter it
+	QStringList log_arguments = arguments;
+
+	// Iterate over the arguments
+	const int arg_size = log_arguments.size();
+	for (int i = 0; i < arg_size ; ++i)
+	{
+	    // If it is the schtask password, filter it
+	    if ( ( log_arguments.at(i) == "/rp" ) && ( i + 1 < arg_size ) )
+	        log_arguments.replace(i + 1, "[filtered]");
+	}
+
+	qDebug() << "Started: " << executableName << log_arguments;
+	LogFileUtils::getInstance()->writeLog("Started: " + executableName + " " + log_arguments.join(" "));
 
 	qProcess->start(executableName, arguments);
 	if (qProcess->waitForStarted() )
@@ -72,7 +85,7 @@ void Process::start()
 		LogFileUtils::getInstance()->writeLog("         " + executableName + " started successfully.");
 		return;
 	}
-	qCritical() << "Failed: " << executableName << arguments;
+	qCritical() << "Failed: " << executableName << log_arguments;
 	throw ProcessException( QObject::tr( "The process %1 failed to start. Either the invoked program is missing, or you may have insufficient permissions to invoke the program." ).arg( executableName ) );
 }
 
