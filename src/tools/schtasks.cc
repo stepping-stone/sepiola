@@ -74,7 +74,7 @@ void Schtasks::scheduleTask( const QString& execName, const QString& cliArgument
 			{
 				dayString.append( "," );
 			}
-			dayString.append( locale.dayName( i + 1, QLocale::ShortFormat ) );
+			dayString.append( locale.standaloneDayName( i + 1, QLocale::ShortFormat ) );
 		}
 	}
 
