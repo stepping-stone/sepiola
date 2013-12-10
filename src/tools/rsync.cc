@@ -1038,6 +1038,15 @@ void Rsync::processWarningsAndErrors(QString* warnings)
 								   "Usually this concerns temporary files and this warning can be ignored. See above for details.");
 					return;
 			}
+		} else if ( exitCode == 23 )
+		{
+		    // If there were no warnings, check if it the exit code is 23, if
+		    // yes it means that the disk quota is exceeded and the rsync cannot
+		    // execute mkstemp
+		    *warnings += StringUtils::fromLocalEnc(readAllStandardError());
+		    *warnings += "\n";
+		    *warnings += tr("Warning: Server disk quota exceeded. No more backups possible");
+		    return;
 		}
 
 		throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(exitCode).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
