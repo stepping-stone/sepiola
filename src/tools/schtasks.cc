@@ -127,6 +127,7 @@ bool Schtasks::schedule( const QString& execName, const QString& cliArgument, co
 		{
 			lineData = QString::fromLocal8Bit( readAll() );
 		}
+
 		if ( lineData.contains( getTranslationForWARNING( locale ) ) )
 		{
 			schtasks_success = false;
@@ -144,13 +145,14 @@ bool Schtasks::schedule( const QString& execName, const QString& cliArgument, co
 			LogFileUtils::getInstance()->writeLog( error );
 		}
 	}
+
 	if ( schtasks_success )
 	{
 		emit infoSignal( QObject::tr( "Scheduled task has been created" ) );
 	}
 	else
 	{
-		emit infoSignal( QObject::tr( "Scheduled task could not be created" ) );
+		emit infoSignal( QObject::tr( "Scheduled task could not be created\nPlease make sure you have enough permission. Restart the application by right-clicking on the application icon, select \"Run as administrator\" and try again." ) );
 	}
 	return schtasks_success;
 }
