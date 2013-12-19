@@ -15,10 +15,8 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 IF(DEFINED RESELLER)
-    IF(NOT ${RESELLER} STREQUAL ${STEPPINGSTONE_RESELLER_NAME})
-		MESSAGE("Creating makefile for a reseller")
-        SET(IS_RESELLER TRUE FORCE)
-    ENDIF(NOT ${RESELLER} STREQUAL ${STEPPINGSTONE_RESELLER_NAME})
+    MESSAGE("Creating makefile for a reseller")
+    SET(IS_RESELLER TRUE FORCE)
 ENDIF(DEFINED RESELLER)
 
 SET(MACOSX_BUNDLE_ICON_FILE icon.icns)
