@@ -60,11 +60,11 @@ SET(CMAKE_CXX_FLAGS_DEPLOY ${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO})
 IF(Q_WS_WIN)
     include(CMakeDetermineRCCompiler)
 	# add windows icon
-	SET(ICON_RC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/icon/windows)
+	SET(ICON_RC_DIR ${PROJECT_SOURCE_DIR}/src/icon/windows)
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icon.o
 		COMMAND ${CMAKE_RC_COMPILER} -I${ICON_RC_DIR}
-		-i${CMAKE_CURRENT_SOURCE_DIR}/icon/windows/icon.rc
+		-i ${PROJECT_SOURCE_DIR}/src/icon/windows/icon.rc
 		-o ${CMAKE_CURRENT_BINARY_DIR}/icon.o
 	)
 	SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/icon.o)
