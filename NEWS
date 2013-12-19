@@ -1,5 +1,5 @@
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007, 2008  stepping stone GmbH
+#| Copyright (C) 2007, 2008, 2013  stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -14,8 +14,13 @@
 #| along with this program; if not, write to the Free Software
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+Version 2.2.0
 
+* Several bugs fixed for scheduling backup jobs on Microsoft Windows
+* Update to Qt 4.8 and building on Linux
+* Fixed installation of Qt-DLLs on Windows
+* Fixed crash when quota is exceeded
+* Improved error messages in several places
+* Updated translation
+* Several build system updates and fixes
 
-2008-09-20 Daniel Tschan <tschan+sepiola@puzzle.ch>
-
-    * First released on SourceForge.net
