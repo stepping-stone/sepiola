@@ -19,9 +19,18 @@ IF(DEFINED RESELLER)
     SET(IS_RESELLER TRUE FORCE)
 ENDIF(DEFINED RESELLER)
 
-SET(MACOSX_BUNDLE_ICON_FILE icon.icns)
-SET(WIN_BUNDLE_ICON_FILE    icon.ico)
-SET(LINUX_BUNDLE_ICON_FILE  icon.png)
+SET(MACOSX_ICON_FILE src/icon/mac/icon.icns
+    CACHE PATH "Application icon for OSX")
+SET(WINDOWS_RESSOURCE_FILE src/icon/windows/icon.rc
+    CACHE PATH "Application resource (including icon) for Windows")
+SET(LINUX_ICON_FILE src/icon/linux/icon.png
+    CACHE PATH "Application icon for Linux")
+SET(ABOUT_IMAGE_FILE src/gui/resources/about_image.png
+    CACHE PATH "About image")
+SET(WINDOW_ICON_FILE src/gui/resources/icon.png
+    CACHE PATH "Window icon")
+SET(RESELLER_CONFIG_FILE config/config_reseller
+    CACHE PATH "Configuration file for the reseller")
 
 IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 	ADD_DEFINITIONS(-DCMAKE_BUILD_TYPE_DEPLOY)
@@ -59,13 +68,12 @@ SET(CMAKE_CXX_FLAGS_DEPLOY ${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO})
 
 IF(Q_WS_WIN)
     include(CMakeDetermineRCCompiler)
-	# add windows icon
-	SET(ICON_RC_DIR ${PROJECT_SOURCE_DIR}/src/icon/windows)
+	# add windows icon/ressources
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icon.o
-		COMMAND ${CMAKE_RC_COMPILER} -I${ICON_RC_DIR}
-		-i ${PROJECT_SOURCE_DIR}/src/icon/windows/icon.rc
-		-o ${CMAKE_CURRENT_BINARY_DIR}/icon.o
+		COMMAND ${CMAKE_RC_COMPILER}
+        -i "${PROJECT_SOURCE_DIR}/${WINDOWS_RESSOURCE_FILE}"
+		-o "${CMAKE_CURRENT_BINARY_DIR}/icon.o"
 	)
 	SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/icon.o)
 ENDIF(Q_WS_WIN)
@@ -357,11 +365,6 @@ IF(Q_WS_WIN)
 ENDIF(Q_WS_WIN)
 
 
-IF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/config_reseller")
-	INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/config_reseller" DESTINATION ${APP_DIR})
-ENDIF(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/config_reseller")
-
-
 IF(Q_WS_WIN)
 	FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink-*)
 	FILE(GLOB RSYNC_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/rsync-*)
@@ -374,9 +377,13 @@ IF(Q_WS_WIN)
 	)
 
 	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
-	IF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
-		INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config_reseller DESTINATION ${APP_DIR})
-	ENDIF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
+    IF(DEFINED RESELLER)
+        INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR})
+	    ADD_CUSTOM_TARGET(copy_reseller ALL
+		    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR})
+	ENDIF(DEFINED RESELLER)
 	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
 	
 	INSTALL(PROGRAMS 
@@ -387,15 +394,27 @@ IF(Q_WS_WIN)
 		)
 ELSEIF(Q_WS_MAC)
 	ADD_CUSTOM_TARGET(copy ALL 
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config                             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/plink-*               ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/config/config
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/mac-universal/plink-*
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/ssh-*                 ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/mac-universal/ssh-*
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/mac-universal/rsync-*               ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/mac-universal/rsync-*
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${translation_binaries}                                         ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/src/icon/mac/${MACOSX_BUNDLE_ICON_FILE}   ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/Resources/${MACOSX_BUNDLE_ICON_FILE}
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${translation_binaries}
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/${MACOSX_ICON_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/Resources/icon.icns
 	)
 	
 
@@ -405,9 +424,14 @@ ELSEIF(Q_WS_MAC)
 	ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
-	IF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
-		INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config_reseller DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
-	ENDIF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
+    IF(DEFINED RESELLER)
+		INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+	    ADD_CUSTOM_TARGET(copy_reseller ALL
+		    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+    ENDIF(DEFINED RESELLER)
+
 	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
@@ -420,25 +444,43 @@ ELSE(Q_WS_WIN)
 		SET(LINUX_DIR linux-i386)
 	ENDIF(ARCH MATCHES "64$")
 	ADD_CUSTOM_TARGET(copy ALL 
-		COMMAND cp ${PROJECT_SOURCE_DIR}/config/config ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/plink-* ${CMAKE_CURRENT_BINARY_DIR}/plink
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/config/config
+            ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/plink-*
+            ${CMAKE_CURRENT_BINARY_DIR}/plink
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/plink
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/ssh-* ${CMAKE_CURRENT_BINARY_DIR}/ssh
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/ssh-*
+            ${CMAKE_CURRENT_BINARY_DIR}/ssh
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/ssh
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync-* ${CMAKE_CURRENT_BINARY_DIR}/rsync
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync-*
+            ${CMAKE_CURRENT_BINARY_DIR}/rsync
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/rsync
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/getfacl-* ${CMAKE_CURRENT_BINARY_DIR}/getfacl
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/getfacl-*
+            ${CMAKE_CURRENT_BINARY_DIR}/getfacl
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/getfacl
-		COMMAND cp ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/setfacl-* ${CMAKE_CURRENT_BINARY_DIR}/setfacl
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/setfacl-*
+            ${CMAKE_CURRENT_BINARY_DIR}/setfacl
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/setfacl
-		
-		COMMAND cp ${PROJECT_SOURCE_DIR}/src/icon/linux/${LINUX_BUNDLE_ICON_FILE} ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/${LINUX_ICON_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png
 	)
 
 	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
-	IF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
-		INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config_reseller DESTINATION ${APP_DIR})
-	ENDIF(EXISTS ${PROJECT_SOURCE_DIR}/config/config_reseller)
+    IF(DEFINED RESELLER)
+		INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR})
+	    ADD_CUSTOM_TARGET(copy_reseller ALL
+		    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE}
+            ${CMAKE_CURRENT_BINARY_DIR}
+            VERBATIM)
+    ENDIF(DEFINED RESELLER)
 	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/plink   DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ssh     DESTINATION ${APP_DIR})
