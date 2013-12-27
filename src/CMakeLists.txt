@@ -78,15 +78,10 @@ IF(Q_WS_WIN)
 	SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/icon.o)
 ENDIF(Q_WS_WIN)
 
-# add reseller logo: copy reseller logo and appropriate qrc-file into build-dir
-SET(RESELLER_LOGO_QRC_FULLFILENAME "${CMAKE_CURRENT_BINARY_DIR}/resources/logo_reseller.qrc")
-CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/src/gui/resources/logo_reseller.qrc" ${RESELLER_LOGO_QRC_FULLFILENAME} COPYONLY)
-ADD_CUSTOM_COMMAND(
-	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/resources/logo_reseller.png"
-	DEPENDS "${PROJECT_SOURCE_DIR}/src/gui/resources/logo_reseller.png"
-	COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/src/gui/resources/logo_reseller.png" "${CMAKE_CURRENT_BINARY_DIR}/resources/logo_reseller.png"
-)
-
+GENERATE_QT_RESOURCE_FROM_FILES(
+	"${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
+	"/main"
+    "${PROJECT_SOURCE_DIR}/${ABOUT_IMAGE_FILE}";"${PROJECT_SOURCE_DIR}/${WINDOW_ICON_FILE}")
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 INCLUDE_DIRECTORIES(
@@ -234,7 +229,7 @@ QT4_WRAP_UI(
 QT4_ADD_RESOURCES(
 	sepiola_RC
 	gui/resources/screen.qrc
-	${RESELLER_LOGO_QRC_FULLFILENAME}
+	"${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
 )
 
 SET(BASE_SOURCE_FILES
