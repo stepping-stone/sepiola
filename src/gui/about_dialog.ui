@@ -73,7 +73,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="imgReseller">
+       <widget class="QLabel" name="imageAbout">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -81,7 +81,7 @@
          </sizepolicy>
         </property>
         <property name="pixmap">
-         <pixmap resource="resources/screen.qrc">:/main/icon.png</pixmap>
+         <pixmap resource="resources/screen.qrc">:/main/about_image.png</pixmap>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -188,7 +188,6 @@ https://github.com/stepping-stone/sepiola/issues</string>
  </widget>
  <resources>
   <include location="resources/screen.qrc"/>
-  <include location="resources/logo_reseller.qrc"/>
  </resources>
  <connections>
   <connection>

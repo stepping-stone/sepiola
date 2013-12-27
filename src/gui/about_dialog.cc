@@ -34,8 +34,8 @@ AboutDialog::AboutDialog()
 #ifdef IS_RESELLER
     this->labelSupport->setText( settings->getResellerAddress() );
     // rescale image if needed
-    if ( this->imgReseller->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imgReseller->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
-        this->imgReseller->setPixmap(this->imgReseller->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    if ( this->imageAbout->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imageAbout->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
+        this->imageAbout->setPixmap(this->imageAbout->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
 #endif
 
