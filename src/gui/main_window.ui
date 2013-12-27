@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,214 +10,220 @@
     <height>600</height>
    </rect>
   </property>
-  <property name="minimumSize" >
+  <property name="minimumSize">
    <size>
     <width>800</width>
     <height>600</height>
    </size>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Sepiola Online Backup Client</string>
   </property>
-  <property name="windowIcon" >
-   <iconset resource="resources/screen.qrc" >:/main/icon.png</iconset>
+  <property name="windowIcon">
+   <iconset resource="resources/screen.qrc">
+    <normaloff>:/main/icon.png</normaloff>:/main/icon.png</iconset>
   </property>
-  <property name="iconSize" >
+  <property name="iconSize">
    <size>
     <width>32</width>
     <height>32</height>
    </size>
   </property>
-  <widget class="QWidget" name="centralwidget" >
-   <layout class="QHBoxLayout" >
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout">
     <item>
-     <widget class="QFrame" name="frameToolbar" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Expanding" hsizetype="Minimum" >
+     <widget class="QFrame" name="frameToolbar">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="minimumSize" >
+      <property name="minimumSize">
        <size>
         <width>155</width>
         <height>16</height>
        </size>
       </property>
-      <property name="styleSheet" >
+      <property name="styleSheet">
        <string>background-color: white</string>
       </property>
-      <property name="frameShape" >
+      <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
-      <property name="frameShadow" >
+      <property name="frameShadow">
        <enum>QFrame::Sunken</enum>
       </property>
-      <property name="lineWidth" >
+      <property name="lineWidth">
        <number>1</number>
       </property>
-      <layout class="QVBoxLayout" >
+      <layout class="QVBoxLayout">
        <item>
-        <widget class="QToolButton" name="btnOverview" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QToolButton" name="btnOverview">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize" >
+         <property name="minimumSize">
           <size>
            <width>110</width>
            <height>81</height>
           </size>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Overview</string>
          </property>
-         <property name="icon" >
-          <iconset resource="resources/screen.qrc" >:/main/home.png</iconset>
+         <property name="icon">
+          <iconset resource="resources/screen.qrc">
+           <normaloff>:/main/home.png</normaloff>:/main/home.png</iconset>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>48</width>
            <height>48</height>
           </size>
          </property>
-         <property name="toolButtonStyle" >
+         <property name="toolButtonStyle">
           <enum>Qt::ToolButtonTextUnderIcon</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="btnBackup" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QToolButton" name="btnBackup">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize" >
+         <property name="minimumSize">
           <size>
            <width>110</width>
            <height>81</height>
           </size>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Backup</string>
          </property>
-         <property name="icon" >
-          <iconset resource="resources/screen.qrc" >:/main/backup.png</iconset>
+         <property name="icon">
+          <iconset resource="resources/screen.qrc">
+           <normaloff>:/main/backup.png</normaloff>:/main/backup.png</iconset>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>48</width>
            <height>48</height>
           </size>
          </property>
-         <property name="toolButtonStyle" >
+         <property name="toolButtonStyle">
           <enum>Qt::ToolButtonTextUnderIcon</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="btnRestore" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QToolButton" name="btnRestore">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize" >
+         <property name="minimumSize">
           <size>
            <width>110</width>
            <height>81</height>
           </size>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Restore</string>
          </property>
-         <property name="icon" >
-          <iconset resource="resources/screen.qrc" >:/main/restore.png</iconset>
+         <property name="icon">
+          <iconset resource="resources/screen.qrc">
+           <normaloff>:/main/restore.png</normaloff>:/main/restore.png</iconset>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>48</width>
            <height>48</height>
           </size>
          </property>
-         <property name="toolButtonStyle" >
+         <property name="toolButtonStyle">
           <enum>Qt::ToolButtonTextUnderIcon</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="btnSettings" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QToolButton" name="btnSettings">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize" >
+         <property name="minimumSize">
           <size>
            <width>110</width>
            <height>81</height>
           </size>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Settings</string>
          </property>
-         <property name="icon" >
-          <iconset resource="resources/screen.qrc" >:/main/settings.png</iconset>
+         <property name="icon">
+          <iconset resource="resources/screen.qrc">
+           <normaloff>:/main/settings.png</normaloff>:/main/settings.png</iconset>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>48</width>
            <height>48</height>
           </size>
          </property>
-         <property name="toolButtonStyle" >
+         <property name="toolButtonStyle">
           <enum>Qt::ToolButtonTextUnderIcon</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="btnLogfile" >
-         <property name="sizePolicy" >
-          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+        <widget class="QToolButton" name="btnLogfile">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize" >
+         <property name="minimumSize">
           <size>
            <width>110</width>
            <height>81</height>
           </size>
          </property>
-         <property name="text" >
+         <property name="text">
           <string>&amp;Logfile</string>
          </property>
-         <property name="icon" >
-          <iconset resource="resources/screen.qrc" >:/main/logfile.png</iconset>
+         <property name="icon">
+          <iconset resource="resources/screen.qrc">
+           <normaloff>:/main/logfile.png</normaloff>:/main/logfile.png</iconset>
          </property>
-         <property name="iconSize" >
+         <property name="iconSize">
           <size>
            <width>48</width>
            <height>48</height>
           </size>
          </property>
-         <property name="toolButtonStyle" >
+         <property name="toolButtonStyle">
           <enum>Qt::ToolButtonTextUnderIcon</enum>
          </property>
         </widget>
        </item>
        <item>
         <spacer>
-         <property name="orientation" >
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>129</width>
            <height>141</height>
@@ -228,140 +235,149 @@
      </widget>
     </item>
     <item>
-     <widget class="QFrame" name="frameMain" >
-      <property name="sizePolicy" >
-       <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+     <widget class="QFrame" name="frameMain">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="frameShape" >
+      <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
-      <property name="frameShadow" >
+      <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <property name="lineWidth" >
+      <property name="lineWidth">
        <number>0</number>
       </property>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar" >
-   <property name="geometry" >
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>18</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
      <string>&amp;Help</string>
     </property>
-    <addaction name="actionAbout" />
+    <addaction name="actionAbout"/>
    </widget>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionExit" />
+    <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
      <string>&amp;Tools</string>
     </property>
-    <addaction name="actionOverview" />
-    <addaction name="actionBackup" />
-    <addaction name="actionRestore" />
-    <addaction name="actionSettings" />
-    <addaction name="actionLogfile" />
+    <addaction name="actionOverview"/>
+    <addaction name="actionBackup"/>
+    <addaction name="actionRestore"/>
+    <addaction name="actionSettings"/>
+    <addaction name="actionLogfile"/>
    </widget>
-   <addaction name="menuFile" />
-   <addaction name="menuTools" />
-   <addaction name="menuHelp" />
+   <addaction name="menuFile"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
-  <action name="actionExit" >
-   <property name="icon" >
-    <iconset resource="resources/screen.qrc" >:/main/exit.png</iconset>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionExit">
+   <property name="icon">
+    <iconset resource="resources/screen.qrc">
+     <normaloff>:/main/exit.png</normaloff>:/main/exit.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Exit</string>
    </property>
   </action>
-  <action name="actionOverview" >
-   <property name="icon" >
-    <iconset resource="resources/screen.qrc" >:/main/home.png</iconset>
+  <action name="actionOverview">
+   <property name="icon">
+    <iconset resource="resources/screen.qrc">
+     <normaloff>:/main/home.png</normaloff>:/main/home.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Overview</string>
    </property>
   </action>
-  <action name="actionBackup" >
-   <property name="icon" >
-    <iconset resource="resources/screen.qrc" >:/main/backup.png</iconset>
+  <action name="actionBackup">
+   <property name="icon">
+    <iconset resource="resources/screen.qrc">
+     <normaloff>:/main/backup.png</normaloff>:/main/backup.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Backup</string>
    </property>
   </action>
-  <action name="actionRestore" >
-   <property name="icon" >
-    <iconset resource="resources/screen.qrc" >:/main/restore.png</iconset>
+  <action name="actionRestore">
+   <property name="icon">
+    <iconset resource="resources/screen.qrc">
+     <normaloff>:/main/restore.png</normaloff>:/main/restore.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Restore</string>
    </property>
   </action>
-  <action name="actionSettings" >
-   <property name="icon" >
-    <iconset resource="resources/screen.qrc" >:/main/settings.png</iconset>
+  <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="resources/screen.qrc">
+     <normaloff>:/main/settings.png</normaloff>:/main/settings.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Settings</string>
    </property>
   </action>
-  <action name="actionAbout" >
-   <property name="icon" >
-    <iconset resource="resources/screen.qrc" >:/main/about.png</iconset>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="resources/screen.qrc">
+     <normaloff>:/main/about.png</normaloff>:/main/about.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;About</string>
    </property>
-   <property name="iconText" >
+   <property name="iconText">
     <string>About</string>
    </property>
-   <property name="toolTip" >
+   <property name="toolTip">
     <string>About</string>
    </property>
   </action>
-  <action name="actionHelpContents" >
-   <property name="icon" >
-    <iconset/>
+  <action name="actionHelpContents">
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Help Contents</string>
    </property>
   </action>
-  <action name="actionViewLogfile" >
-   <property name="text" >
+  <action name="actionViewLogfile">
+   <property name="text">
     <string>View Logfile</string>
    </property>
   </action>
-  <action name="actionLogfile" >
-   <property name="icon" >
-    <iconset resource="resources/screen.qrc" >:/main/logfile.png</iconset>
+  <action name="actionLogfile">
+   <property name="icon">
+    <iconset resource="resources/screen.qrc">
+     <normaloff>:/main/logfile.png</normaloff>:/main/logfile.png</iconset>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>&amp;Logfile</string>
    </property>
   </action>
  </widget>
  <resources>
-  <include location="resources/screen.qrc" />
+  <include location="resources/screen.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -370,11 +386,11 @@
    <receiver>MainWindow</receiver>
    <slot>close()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>-1</x>
      <y>-1</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>423</x>
      <y>357</y>
     </hint>
