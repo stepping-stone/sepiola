@@ -134,8 +134,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="labelSupport">
         <property name="text">
-         <string>Please report bugs at
-https://github.com/stepping-stone/sepiola/issues</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please report bugs at&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/stepping-stone/sepiola/issues&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://github.com/stepping-stone/sepiola/issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
