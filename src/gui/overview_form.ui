@@ -459,15 +459,41 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="labelDateLastBackup_0">
+         <widget class="QLabel" name="labelDayLastBackup_0">
           <property name="minimumSize">
            <size>
-            <width>70</width>
+            <width>85</width>
             <height>0</height>
            </size>
           </property>
           <property name="text">
-           <string>Freitag, 10.03.2011  12:34</string>
+           <string>Freitag</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_0">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>10.03.2011</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelTimeLastBackup_0">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>12:34</string>
           </property>
          </widget>
         </item>
@@ -527,15 +553,41 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="labelDateLastBackup_1">
+         <widget class="QLabel" name="labelDayLastBackup_1">
           <property name="minimumSize">
            <size>
-            <width>70</width>
+            <width>85</width>
             <height>0</height>
            </size>
           </property>
           <property name="text">
-           <string>Donnerstag, 10.03.2011  12:34</string>
+           <string>Donnerstag</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_1">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>09.03.2011</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelTimeLastBackup_1">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>12:34</string>
           </property>
          </widget>
         </item>
@@ -595,15 +647,41 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="labelDateLastBackup_2">
+         <widget class="QLabel" name="labelDayLastBackup_2">
           <property name="minimumSize">
            <size>
-            <width>70</width>
+            <width>85</width>
             <height>0</height>
            </size>
           </property>
           <property name="text">
-           <string>Freitag, 10.03.2011  12:34</string>
+           <string>Mittwoch</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_2">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>08.03.2011</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelTimeLastBackup_2">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>12:34</string>
           </property>
          </widget>
         </item>
@@ -663,15 +741,41 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="labelDateLastBackup_3">
+         <widget class="QLabel" name="labelDayLastBackup_3">
           <property name="minimumSize">
            <size>
-            <width>70</width>
+            <width>85</width>
             <height>0</height>
            </size>
           </property>
           <property name="text">
-           <string>Freitag, 10.03.2011  12:34</string>
+           <string>Dienstag</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_3">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>07.03.2011</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelTimeLastBackup_3">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>12:34</string>
           </property>
          </widget>
         </item>
@@ -731,15 +835,41 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="labelDateLastBackup_4">
+         <widget class="QLabel" name="labelDayLastBackup_4">
           <property name="minimumSize">
            <size>
-            <width>70</width>
+            <width>85</width>
             <height>0</height>
            </size>
           </property>
           <property name="text">
-           <string>Freitag, 10.03.2011  12:34</string>
+           <string>Montag</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateLastBackup_4">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>06.03.2011</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelTimeLastBackup_4">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>12:34</string>
           </property>
          </widget>
         </item>
@@ -813,9 +943,41 @@ Next Backup</string>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="labelDateNextBackup">
+         <widget class="QLabel" name="labelDayNextBackup">
+          <property name="minimumSize">
+           <size>
+            <width>85</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Freitag, 04.06.2012  23:05</string>
+           <string>Samstag</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelDateNextBackup">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>11.03.2011</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="labelTimeNextBackup">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>12.34</string>
           </property>
          </widget>
         </item>
