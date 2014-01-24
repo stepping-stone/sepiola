@@ -76,7 +76,7 @@ void OverviewForm::refreshLastBackupsOverview()
 	qDebug() << "OverviewForm::refreshLastBackupsOverview()";
 	Settings* settings = Settings::getInstance();
 	QStringList fieldnames_status;
-	fieldnames_status << "labelIconStatusLastBackup_%1" << "labelStatusLastBackup_%1" << "labelDateLastBackup_%1" << "labelWeekdayLastBackup_%1";
+	fieldnames_status << "labelIconStatusLastBackup_%1" << "labelStatusLastBackup_%1" << "labelDayLastBackup_%1" << "labelDateLastBackup_%1" << "labelTimeLastBackup_%1";
 	QImage img;
 
 	// fill map with a pixmap for each status
@@ -97,15 +97,22 @@ void OverviewForm::refreshLastBackupsOverview()
 		lab_icon->setHidden( isHidden );
 		QLabel* lab_status = this->findChild<QLabel *>( fieldnames_status[1].arg( i ) );
 		lab_status->setHidden( isHidden );
-		QLabel* lab_date = this->findChild<QLabel *>( fieldnames_status[2].arg( i ) );
+		QLabel* lab_day = this->findChild<QLabel *>( fieldnames_status[2].arg( i ) );
+		lab_day->setHidden( isHidden );
+		QLabel* lab_date = this->findChild<QLabel *>( fieldnames_status[3].arg( i ) );
 		lab_date->setHidden( isHidden );
+		QLabel* lab_time = this->findChild<QLabel *>( fieldnames_status[4].arg( i ) );
+		lab_time->setHidden( isHidden );
+
 		if ( !isHidden )
 		{
 			BackupTask lastBackup = lastBackups.at( i );
 			ConstUtils::StatusEnum status = lastBackup.getStatus();
 			lab_icon->setPixmap( status_pixmap.value( status ) );
 			lab_status->setText( lastBackup.getStatusText() );
-			lab_date->setText( lastBackup.getDateTime().toString("dddd,\tdd.MM.yyyy  hh:mm") );
+			lab_day->setText( lastBackup.getDateTime().toString("dddd") );
+			lab_date->setText( lastBackup.getDateTime().toString("dd.MM.yyyy") );
+			lab_time->setText( lastBackup.getDateTime().toString("hh:mm") );
 		}
 	}
 }
@@ -118,12 +125,43 @@ void OverviewForm::refreshScheduleOverview()
 	if ( myTask.getType() != ScheduleRule::NEVER )
 	{
 		this->labelNextBackup->setText( QObject::tr( "Scheduled" ) );
-		this->labelDateNextBackup->setText( myTask.toString() );
+
+		// Get the next execution string which will be of format:
+		// weekday,\tdd.MM.yyyy   hh:mm
+		QString next_task = myTask.toString();
+
+		// Prepare the regex to extract weekday, date and time from the task
+		// string
+		QString next_weekday;
+        QString next_date;
+        QString next_time;
+        QRegExp regex("(\\w*),\t(\\d{2}.\\d{2}.\\d{4})\\s*(\\d{2}:\\d{2})");
+
+        // Parse the next_task in order to extract weekday, date and time and
+        int pos = regex.indexIn( next_task );
+        if (pos > -1) {
+            next_weekday = regex.cap(1);
+            next_date = regex.cap(2);
+            next_time = regex.cap(3);
+        } else
+        {
+            next_date = "";
+            next_time = "";
+            next_weekday = "Not found";
+        }
+
+        // Set the corresponding label text
+		this->labelDateNextBackup->setText( next_date );
+		this->labelTimeNextBackup->setText( next_time );
+		this->labelDayNextBackup->setText( next_weekday );
+
 	}
 	else
 	{
 		this->labelNextBackup->setText( QObject::tr( "Not scheduled" ) );
 		this->labelDateNextBackup->setText( "" );
+		this->labelDayNextBackup->setText( "" );
+		this->labelTimeNextBackup->setText( "" );
 	}
 }
 
