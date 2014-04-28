@@ -21,6 +21,8 @@
 
 #include "tools/abstract_informing_process.hh"
 
+#define SNAPSHOT_SUCCESS 0
+
 /**
  * The AbstractSnapshot class provides methods for using a snapshot object
  * @author Pat Kläy, pat.klaey@stepping-stone.ch
