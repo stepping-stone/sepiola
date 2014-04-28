@@ -36,7 +36,7 @@ void DummySnapshot::initializeSnapshot()
     emit sendSnapshotInitialized( SNAPSHOT_SUCCESS );
 }
 
-void DummySnapshot::addFilesToSnapshot( BackupSelectionHash& includeRules)
+void DummySnapshot::addFilesToSnapshot(const BackupSelectionHash& includeRules)
 {
     // Again nothing to do here, just send the signal that the files were added
     emit sendFilesAddedToSnapshot( SNAPSHOT_SUCCESS );

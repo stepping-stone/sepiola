@@ -80,7 +80,7 @@ public slots:
      * @param The BackupSelectionHash which defines all files which are later
      * backed-up
      */
-    void addFilesToSnapshot( BackupSelectionHash& includeRules );
+    void addFilesToSnapshot( const BackupSelectionHash& includeRules );
 
     /**
      * Executes the snapshot
