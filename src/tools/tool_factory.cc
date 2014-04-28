@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2014 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -23,12 +23,14 @@
 #include "tools/abstract_rsync.hh"
 #include "tools/abstract_ssh.hh"
 #include "tools/abstract_scheduler.hh"
+#include "tools/abstract_snapshot.hh"
 
 #ifdef Q_OS_WIN32
 #include "tools/at.hh"
 #include "tools/schtasks.hh"
 #else
 #include "tools/crontab.hh"
+#include "tools/dummy_snapshot.hh"
 #endif
 
 #include "tools/plink.hh"
@@ -85,5 +87,10 @@ AbstractScheduler * ToolFactory::getSchedulerImpl()
 #else
 	return new Crontab;
 #endif
+}
+
+AbstractSnapshot * ToolFactory::getSnapshotImpl()
+{
+    return new DummySnapshot;
 }
 
