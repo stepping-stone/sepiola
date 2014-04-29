@@ -96,7 +96,7 @@ void FilesystemSnapshot::snapshotObjectCreated(int result)
 {
     if ( result == SNAPSHOT_SUCCESS )
     {
-        qDebug() << "Filesystem snapshot object successfully created, "
+        qDebug() << "Filesystem snapshot object successfully created,"
                   << "going to initialize filesystem snapshot";
         emit sendInitializeSnapshot();
     } else
@@ -109,8 +109,8 @@ void FilesystemSnapshot::snapshotInitialized(int result)
 {
     if ( result == SNAPSHOT_SUCCESS )
     {
-        qDebug() << "Filesystem snapshot successfully initialized, "
-                  << "going to add backup selection to the filesystem snapshot "
+        qDebug() << "Filesystem snapshot successfully initialized,"
+                  << "going to add backup selection to the filesystem snapshot"
                   << "set";
         emit sendAddFilesToSnapshot( this->includeRules );
     } else
@@ -124,7 +124,7 @@ void FilesystemSnapshot::filesAddedToSnapshot(int result)
     if ( result == SNAPSHOT_SUCCESS )
     {
         qDebug() << "Successfully added the backup selection to the filesystem"
-                  << " snapshot set, going to take the snapshot";
+                  << "snapshot set, going to take the snapshot";
         emit sendTakeSnapshot();
     } else
     {
@@ -136,9 +136,9 @@ void FilesystemSnapshot::snapshotTaken(int result)
 {
     if ( result == SNAPSHOT_SUCCESS )
     {
-        qDebug() << "Filesystem snapshot successfully taken, going to upload "
+        qDebug() << "Filesystem snapshot successfully taken, going to upload"
                   << "the files to the backup server";
-
+        emit infoSignal( tr("Filesystem snapshot successfully taken!") );
         emit sendSnapshotDone( result );
 
     } else

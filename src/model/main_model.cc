@@ -182,9 +182,14 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 	this->fsSnapshot = new FilesystemSnapshot( includeRules );
 
 	// Connect the FilesystemSnapshots sendSnapshotDone signal to the local
-	// uploadFiles slot
+	// uploadFiles slot so as soon as the snapshot is finished, the files can
+	// be uploaded
 	QObject::connect( this->fsSnapshot, SIGNAL( sendSnapshotDone(int) ),
 	                   this, SLOT( uploadFiles() ) );
+
+	// Connect the info and error signals to the info and error slot
+    QObject::connect( this->fsSnapshot, SIGNAL( infoSignal(const QString&) ),
+                       this, SLOT( infoSlot(const QString&) ) );
 
 	// Start the fs snapshot
 	this->fsSnapshot->doSnapshot();
