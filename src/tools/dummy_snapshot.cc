@@ -30,6 +30,13 @@ DummySnapshot::~DummySnapshot()
     // As the constructor is empty, the destructor can be empty too
 }
 
+void DummySnapshot::createSnapshotObject()
+{
+    // Nothing to do here, simply send the signal that the object has been
+    // created
+    emit sendSnapshotObjectCreated( SNAPSHOT_SUCCESS );
+}
+
 void DummySnapshot::initializeSnapshot()
 {
     // Simply send the snapshot initialized signal (do nothing at all)
