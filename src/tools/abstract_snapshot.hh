@@ -23,6 +23,9 @@
 
 #define SNAPSHOT_SUCCESS 0
 
+// Forward declarations
+class QString;
+
 /**
  * The AbstractSnapshot class provides methods for using a snapshot object
  * @author Pat Kläy, pat.klaey@stepping-stone.ch
@@ -37,6 +40,12 @@ public:
      * Destroys the AbstractScheduler
      */
     virtual ~AbstractSnapshot();
+
+    /**
+     * Return the location of the file inside the snapshot
+     * @param The file one is looking for
+     */
+    virtual QString getFileSnapshotPath(QString file);
 
 signals:
 

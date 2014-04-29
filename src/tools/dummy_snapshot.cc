@@ -18,6 +18,8 @@
 
 #include "dummy_snapshot.hh"
 
+#include <QString>
+
 DummySnapshot::DummySnapshot()
 {
     // Empty constructor
@@ -26,6 +28,13 @@ DummySnapshot::DummySnapshot()
 DummySnapshot::~DummySnapshot()
 {
     // As the constructor is empty, the destructor can be empty too
+}
+
+QString DummySnapshot::getFileSnapshotPath( QString file )
+{
+    // As nothing has been done in the dummy snapshot, the file path did not
+    // change, so simply return the file path
+    return file;
 }
 
 void DummySnapshot::createSnapshotObject()
