@@ -45,7 +45,7 @@ public:
      * Return the location of the file inside the snapshot
      * @param The file one is looking for
      */
-    virtual QString getFileSnapshotPath(QString file);
+    virtual QString getFileSnapshotPath(QString file) = 0;
 
 signals:
 
