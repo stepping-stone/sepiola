@@ -81,7 +81,7 @@ public slots:
      * @param The BackupSelectionHash which defines all files which are later
      * backed-up
      */
-    virtual void addFilesToSnapshot( const BackupSelectionHash& includeRules ) = 0;
+    virtual void addFilesToSnapshot( const BackupSelectionHash includeRules ) = 0;
 
     /**
      * Executes the snapshot
