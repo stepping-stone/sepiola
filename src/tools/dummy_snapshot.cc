@@ -20,9 +20,7 @@
 
 DummySnapshot::DummySnapshot()
 {
-    // Empty constructor, just send the signal that the object has been
-    // created
-    emit sendSnapshotObjectCreated( SNAPSHOT_SUCCESS );
+    // Empty constructor
 }
 
 DummySnapshot::~DummySnapshot()
