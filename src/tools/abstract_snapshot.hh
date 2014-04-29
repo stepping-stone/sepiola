@@ -29,6 +29,7 @@
  */
 class AbstractSnapshot : public AbstractInformingProcess
 {
+    Q_OBJECT
 
 public:
 
@@ -68,27 +69,29 @@ public slots:
     /**
      * Creates a new snapshot object
      */
-    void createSnapshotObject();
+    virtual void createSnapshotObject() = 0;
 
     /**
      * Initializes the snapshot object
      */
-    void initializeSnapshot();
+    virtual void initializeSnapshot() = 0;
 
     /**
      * Adds all the given files to the snapshot selection
      * @param The BackupSelectionHash which defines all files which are later
      * backed-up
      */
-    void addFilesToSnapshot( const BackupSelectionHash& includeRules );
+    virtual void addFilesToSnapshot( const BackupSelectionHash& includeRules ) = 0;
 
     /**
      * Executes the snapshot
      */
-    void takeSnapshot();
-
-
+    virtual void takeSnapshot() = 0;
 
 };
+
+inline AbstractSnapshot::~AbstractSnapshot()
+{
+}
 
 #endif /* ABSTRACT_SNAPSHOT_HH_ */
