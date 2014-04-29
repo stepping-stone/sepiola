@@ -183,6 +183,8 @@ QT4_WRAP_CPP(
 	tools/abstract_informing_process.hh
 	tools/abstract_rsync.hh
 	tools/abstract_scheduler.hh
+	tools/abstract_snapshot.hh
+	tools/dummy_snapshot.hh
 	tools/rsync.hh
 	settings/settings.hh
 	utils/log_file_utils.hh
@@ -237,6 +239,7 @@ SET(BASE_SOURCE_FILES
 	tools/plink.cc
 	tools/process.cc
 	tools/rsync.cc
+	tools/dummy_snapshot.cc
 	tools/tool_factory.cc
 	utils/string_utils.cc
 	utils/extended_file.cc
