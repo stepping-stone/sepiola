@@ -38,6 +38,10 @@ signals:
     void sendTakeSnapshot();
     void sendSnapshotDone( int result );
 
+    // Common signals
+    void infoSignal( const QString& text );
+    void errorSignal( const QString& text );
+
 private:
     AbstractSnapshot * snapshot;
     QThread * snapshotThread;
