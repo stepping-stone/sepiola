@@ -25,8 +25,10 @@
  * The dummy snapshot class provides an empty snapshot method
  * @author Pat Kläy, pat.klaey@stepping-stone.ch
  */
-class DummySnapshot: public AbstractSnapshot
+class DummySnapshot : public AbstractSnapshot
 {
+    Q_OBJECT
+
 public:
 
     /**
@@ -38,6 +40,31 @@ public:
      * Destroys the DummySnapshot
      */
     virtual ~DummySnapshot();
+
+public slots:
+
+    /**
+     * Creates a new snapshot object
+     */
+    void createSnapshotObject();
+
+    /**
+     * Initializes the snapshot object
+     */
+    void initializeSnapshot();
+
+    /**
+     * Adds all the given files to the snapshot selection
+     * @param The BackupSelectionHash which defines all files which are later
+     * backed-up
+     */
+    void addFilesToSnapshot( const BackupSelectionHash& includeRules );
+
+    /**
+     * Executes the snapshot
+     */
+    void takeSnapshot();
+
 };
 
 #endif /* DUMMY_SNAPSHOT_HH_ */
