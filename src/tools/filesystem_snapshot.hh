@@ -20,7 +20,7 @@ class FilesystemSnapshot : public QObject
     Q_OBJECT
 
 public:
-    FilesystemSnapshot( BackupSelectionHash& includes );
+    FilesystemSnapshot( const BackupSelectionHash& includes );
     virtual ~FilesystemSnapshot();
     void doSnapshot();
     QString getSnapshotPathForFile( QString filename );

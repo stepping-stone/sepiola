@@ -11,7 +11,7 @@
 #include "filesystem_snapshot.hh"
 #include "tools/tool_factory.hh"
 
-FilesystemSnapshot::FilesystemSnapshot( BackupSelectionHash& includes)
+FilesystemSnapshot::FilesystemSnapshot( const BackupSelectionHash& includes)
 {
     // Save the included files
     this->includeRules = includes;
