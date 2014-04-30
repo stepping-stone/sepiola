@@ -19,7 +19,10 @@
 #ifndef ABSTRACT_SNAPSHOT_HH_
 #define ABSTRACT_SNAPSHOT_HH_
 
+#include <QList>
+
 #include "tools/abstract_informing_process.hh"
+#include "tools/filesystem_snapshot_path_mapper.hh"
 
 #define SNAPSHOT_SUCCESS 0
 
@@ -41,11 +44,14 @@ public:
      */
     virtual ~AbstractSnapshot();
 
-    /**
-     * Return the location of the file inside the snapshot
-     * @param The file one is looking for
-     */
-    virtual QString getFileSnapshotPath(QString file) = 0;
+
+    virtual const QList<FilesystemSnapshotPathMapper>& getSnapshotPathMappers() = 0;
+
+    virtual void setSnapshotPathMappers(
+            const QList<FilesystemSnapshotPathMapper>& snapshotPathMappers) = 0;
+
+private:
+    QList<FilesystemSnapshotPathMapper> snapshotPathMappers;
 
 signals:
 
@@ -96,7 +102,6 @@ public slots:
      * Executes the snapshot
      */
     virtual void takeSnapshot() = 0;
-
 };
 
 inline AbstractSnapshot::~AbstractSnapshot()

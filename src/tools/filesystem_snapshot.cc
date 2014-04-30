@@ -85,13 +85,6 @@ void FilesystemSnapshot::doSnapshot()
     emit sendCreateSnapshotObject();
 }
 
-QString FilesystemSnapshot::getSnapshotPathForFile( QString file )
-{
-    // Call the snapshots getFileSnapshotPath method to obtain the correct
-    // location on the filesystem
-    return this->snapshot->getFileSnapshotPath( file );
-}
-
 void FilesystemSnapshot::snapshotObjectCreated(int result)
 {
     if ( result == SNAPSHOT_SUCCESS )
@@ -147,4 +140,7 @@ void FilesystemSnapshot::snapshotTaken(int result)
     }
 }
 
-
+const QList<FilesystemSnapshotPathMapper>& FilesystemSnapshot::getSnapshotPathMappers()
+{
+    return this->snapshot->getSnapshotPathMappers();
+}

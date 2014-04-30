@@ -23,7 +23,7 @@ public:
     FilesystemSnapshot( const BackupSelectionHash& includes );
     virtual ~FilesystemSnapshot();
     void doSnapshot();
-    QString getSnapshotPathForFile( QString filename );
+    const QList<FilesystemSnapshotPathMapper>& getSnapshotPathMappers();
 
 private slots:
     void snapshotObjectCreated( int result );
