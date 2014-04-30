@@ -29,6 +29,7 @@
 #define SNAPSHOT_SUCCESS 0
 #define SNAPSHOT_CANNOT_CREATE_SNASPHOT_OBJECT 1
 #define SNAPSHOT_CANNOT_INITIALIZE_BACKUP 2
+#define SNAPSHOT_CANNOT_CREATE_SNAPSHOT 3
 
 typedef QHash<QString,FilesystemSnapshotPathMapper> SnapshotMapper;
 

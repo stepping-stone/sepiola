@@ -1,0 +1,129 @@
+/*
+#| sepiola - Open Source Online Backup Client
+#| Copyright (C) 2007-2014 stepping stone GmbH
+#|
+#| This program is free software; you can redistribute it and/or
+#| modify it under the terms of the GNU General Public License
+#| Version 2 as published by the Free Software Foundation.
+#|
+#| This program is distributed in the hope that it will be useful,
+#| but WITHOUT ANY WARRANTY; without even the implied warranty of
+#| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#| GNU General Public License for more details.
+#|
+#| You should have received a copy of the GNU General Public License
+#| along with this program; if not, write to the Free Software
+#| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef SHADOW_COPY_HH_
+#define SHADOW_COPY_HH_
+
+#include "abstract_snapshot.hh"
+
+#pragma once
+
+#include <stdio.h>
+#include <tchar.h>
+#include <string>
+#include <iostream>
+#include "error.h"
+
+#include "stdafx.h"
+
+#include <shlwapi.h>
+#include <vss.h>
+#include <vswriter.h>
+#include <vsbackup.h>
+#include <unordered_map>
+
+#pragma comment (lib, "VssApi.lib")
+
+/* Functions in VSSAPI.DLL */
+typedef HRESULT(STDAPICALLTYPE * _CreateVssBackupComponentsInternal)(
+    OUT IVssBackupComponents** ppBackup);
+typedef void(APIENTRY * _VssFreeSnapshotPropertiesInternal)(IN VSS_SNAPSHOT_PROP* pProp);
+static _CreateVssBackupComponentsInternal CreateVssBackupComponentsInternal_I;
+static _VssFreeSnapshotPropertiesInternal VssFreeSnapshotPropertiesInternal_I;
+
+/* Define some vss snapshot errors code which are 100 < code < 200*/
+#define SNAPSHOT_CANNOT_SET_BACKUP_CONTEXT 101
+#define SNAPSHOT_WRITER_GATHERING_METADATA_FAILED 102
+#define SNAPSHOT_ASYNC_WAIT_FAILED 103
+#define SNAPSHOT_CANNOT_START_SNAPSHOT_SET 104
+#define SNAPSHOT_CANNOT_ADD_PARTITION_TO_SNAPSHOT_SET 105
+#define SNAPSHOT_CANNOT_SET_SNAPSHOT_STATE 106
+#define SNAPSHOT_CANNOT_PREPARE_FOR_BACKUP 107
+#define SNAPSHOT_CANNOT_GET_SNAPSHOT_PROPERTIES 108
+
+/**
+ * The dummy snapshot class provides an empty snapshot method
+ * @author Pat Kläy, pat.klaey@stepping-stone.ch
+ */
+class ShadowCopy : public AbstractSnapshot
+{
+    Q_OBJECT
+
+public:
+
+    /**
+     * Creates the ShadowCopy object
+     */
+    ShadowCopy();
+
+    /**
+     * Destroys the ShadowCopy object
+     */
+    virtual ~ShadowCopy();
+
+    /**
+     * Return the location of the file inside the snapshot
+     * @param The file one is looking for
+     */
+    QString getFileSnapshotPath(QString file);
+
+
+
+public slots:
+
+    /**
+     * Creates a new snapshot object
+     */
+    void createSnapshotObject();
+
+    /**
+     * Initializes the snapshot object
+     */
+    void initializeSnapshot();
+
+    /**
+     * Adds all the given files to the snapshot selection
+     * @param The BackupSelectionHash which defines all files which are later
+     * backed-up
+     */
+    void addFilesToSnapshot( const BackupSelectionHash includeRules );
+
+    /**
+     * Executes the snapshot
+     */
+    void takeSnapshot();
+
+private:
+    QString getDriveLetterByFile(const QString filename );
+    SnapshotMapper snapshotPathMappers;
+    static const _VSS_SNAPSHOT_CONTEXT SC_SNAPSHOT_CONTEXT = VSS_CTX_BACKUP;
+    static const VSS_BACKUP_TYPE SC_SNAPSHOT_TYPE = VSS_BT_COPY;
+    static const bool SC_SNAPSHOT_BOOTABLE_STATE = false;
+    static const bool SC_SNAPSHOT_SELECT_COMPONENTS = false;
+
+    HRESULT result;
+    HMODULE vssapiBase;
+    IVssBackupComponents *pBackup = NULL;
+    IVssAsync *pAsync = NULL;
+    IVssAsync* pPrepare = NULL;
+    IVssAsync* pDoShadowCopy = NULL;
+    unordered_map<WCHAR*, VSS_ID> snapshot_set_ids;
+    unordered_map<WCHAR*, VSS_SNAPSHOT_PROP> properties;
+};
+
+#endif /* SHADOW_COPY_HH_ */
