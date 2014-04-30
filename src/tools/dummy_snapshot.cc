@@ -30,13 +30,6 @@ DummySnapshot::~DummySnapshot()
     // As the constructor is empty, the destructor can be empty too
 }
 
-QString DummySnapshot::getFileSnapshotPath( QString file )
-{
-    // As nothing has been done in the dummy snapshot, the file path did not
-    // change, so simply return the file path
-    return file;
-}
-
 void DummySnapshot::createSnapshotObject()
 {
     // Nothing to do here, simply send the signal that the object has been
@@ -52,7 +45,17 @@ void DummySnapshot::initializeSnapshot()
 
 void DummySnapshot::addFilesToSnapshot(const BackupSelectionHash includeRules)
 {
-    // Again nothing to do here, just send the signal that the files were added
+    // Create a new FilesystemSnapshotPathMapper object and add the includeRules
+    QString partition = "/";
+    FilesystemSnapshotPathMapper mapper(partition,includeRules);
+
+    // As the partition is /, the snapshotpath will also be /
+    mapper.setSnapshotPath(partition);
+
+    // Add the newly created FilesystemSnapshotPathMapper to our mappers list
+    this->snapshotPathMappers.append(mapper);
+
+    // Send the signal that the files are added to the snapshot set
     emit sendFilesAddedToSnapshot( SNAPSHOT_SUCCESS );
 }
 
@@ -60,4 +63,16 @@ void DummySnapshot::takeSnapshot()
 {
     // Again, no action needed, just send the signal that the snapshot is taken
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
+}
+
+
+const QList<FilesystemSnapshotPathMapper>& DummySnapshot::getSnapshotPathMappers()
+{
+    return this->snapshotPathMappers;
+}
+
+void DummySnapshot::setSnapshotPathMappers(
+        const QList<FilesystemSnapshotPathMapper>& snapshotPathMappers)
+{
+    this->snapshotPathMappers = snapshotPathMappers;
 }
