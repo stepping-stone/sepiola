@@ -41,13 +41,13 @@ public:
      */
     virtual ~DummySnapshot();
 
-    const QList<FilesystemSnapshotPathMapper>& getSnapshotPathMappers();
+    const SnapshotMapper& getSnapshotPathMappers();
 
     void setSnapshotPathMappers(
-            const QList<FilesystemSnapshotPathMapper>& snapshotPathMappers);
+            const SnapshotMapper& snapshotPathMappers);
 
 private:
-    QList<FilesystemSnapshotPathMapper> snapshotPathMappers;
+    SnapshotMapper snapshotPathMappers;
 
 public slots:
 
