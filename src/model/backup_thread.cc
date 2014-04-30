@@ -49,6 +49,8 @@ const QString BackupThread::TASKNAME_UPLOAD_METADATA = "uploading metadata";
 const QString BackupThread::TASKNAME_METAINFO = "saving meta information";
 const long BackupThread::MIN_BACKUP_ID = 100000;
 
+typedef QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> UploadedFile;
+
 namespace {
     QString getTimezoneOffset( const QDateTime & utc, const QDateTime & localTime )
     {
@@ -158,14 +160,24 @@ void BackupThread::run()
 
 		// Backup all partitions on their own to be able to match the snapshot
 		// path to the original path on the backup server
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
+		QList<UploadedFile> processedItems;
+		QList<UploadedFile> relativeProcessedItems;
 		foreach ( FilesystemSnapshotPathMapper mapper, this->fsSnapshot->getSnapshotPathMappers() )
 		{
 		    QString tmp_source = mapper.getSnapshotPath();
 		    QString tmp_destination = destination + mapper.getPartition() + "/";
 		    BackupSelectionHash tmp_includes = mapper.getRelativeIncludes();
 
-		    processedItems.append( rsync->upload( tmp_includes, tmp_source, tmp_destination, setDeleteFlag, compressedUpload, bandwidthLimit, &warnings, false ) );
+		    QList<UploadedFile> relativeProcessedItems;
+		    relativeProcessedItems = rsync->upload( tmp_includes, tmp_source, tmp_destination, setDeleteFlag, compressedUpload, bandwidthLimit, &warnings, false );
+
+		    // Add to each processed file the partition again for the upcoming
+		    // tasks
+		    foreach( UploadedFile item, relativeProcessedItems )
+		    {
+		        UploadedFile file( mapper.getPartition() + item.first, item.second );
+		        processedItems.append( file );
+		    }
 
 		}
 
