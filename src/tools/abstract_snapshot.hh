@@ -20,14 +20,17 @@
 #define ABSTRACT_SNAPSHOT_HH_
 
 #include <QList>
+#include <QHash>
+#include <QString>
 
 #include "tools/abstract_informing_process.hh"
 #include "tools/filesystem_snapshot_path_mapper.hh"
 
 #define SNAPSHOT_SUCCESS 0
+#define SNAPSHOT_CANNOT_CREATE_SNASPHOT_OBJECT 1
+#define SNAPSHOT_CANNOT_INITIALIZE_BACKUP 2
 
-// Forward declarations
-class QString;
+typedef QHash<QString,FilesystemSnapshotPathMapper> SnapshotMapper;
 
 /**
  * The AbstractSnapshot class provides methods for using a snapshot object
@@ -45,13 +48,13 @@ public:
     virtual ~AbstractSnapshot();
 
 
-    virtual const QList<FilesystemSnapshotPathMapper>& getSnapshotPathMappers() = 0;
+    virtual const SnapshotMapper& getSnapshotPathMappers() = 0;
 
     virtual void setSnapshotPathMappers(
-            const QList<FilesystemSnapshotPathMapper>& snapshotPathMappers) = 0;
+            const SnapshotMapper& snapshotPathMappers) = 0;
 
 private:
-    QList<FilesystemSnapshotPathMapper> snapshotPathMappers;
+    SnapshotMapper snapshotPathMappers;
 
 signals:
 

@@ -53,7 +53,7 @@ void DummySnapshot::addFilesToSnapshot(const BackupSelectionHash includeRules)
     mapper.setSnapshotPath(partition);
 
     // Add the newly created FilesystemSnapshotPathMapper to our mappers list
-    this->snapshotPathMappers.append(mapper);
+    this->snapshotPathMappers.insert(partition,mapper);
 
     // Send the signal that the files are added to the snapshot set
     emit sendFilesAddedToSnapshot( SNAPSHOT_SUCCESS );
@@ -66,13 +66,13 @@ void DummySnapshot::takeSnapshot()
 }
 
 
-const QList<FilesystemSnapshotPathMapper>& DummySnapshot::getSnapshotPathMappers()
+const SnapshotMapper& DummySnapshot::getSnapshotPathMappers()
 {
     return this->snapshotPathMappers;
 }
 
 void DummySnapshot::setSnapshotPathMappers(
-        const QList<FilesystemSnapshotPathMapper>& snapshotPathMappers)
+        const SnapshotMapper& snapshotPathMappers)
 {
     this->snapshotPathMappers = snapshotPathMappers;
 }

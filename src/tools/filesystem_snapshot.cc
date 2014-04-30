@@ -140,7 +140,7 @@ void FilesystemSnapshot::snapshotTaken(int result)
     }
 }
 
-const QList<FilesystemSnapshotPathMapper>& FilesystemSnapshot::getSnapshotPathMappers()
+const SnapshotMapper& FilesystemSnapshot::getSnapshotPathMappers()
 {
     return this->snapshot->getSnapshotPathMappers();
 }
