@@ -175,11 +175,13 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 		return;
 	}
 
-	this->backupThread = new BackupThread( includeRules );
 	this->startInThisThread = startInCurrentThread;
 
 	// Create a new Filesystem Snapshot
 	this->fsSnapshot = new FilesystemSnapshot( includeRules );
+
+	// Create a new Backup Thread
+	this->backupThread = new BackupThread( includeRules, this->fsSnapshot );
 
 	// Connect the FilesystemSnapshots sendSnapshotDone signal to the local
 	// uploadFiles slot so as soon as the snapshot is finished, the files can
@@ -210,7 +212,7 @@ void MainModel::schedule( const BackupSelectionHash& includeRules, const Schedul
         try
         {
             // Update the schedule information to the server
-            BackupThread backupThread( includeRules );
+            BackupThread backupThread( includeRules, NULL );
             backupThread.prepareServerDirectories();
             backupThread.uploadSchedulerXML( scheduleRule );
         }

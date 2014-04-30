@@ -66,7 +66,7 @@ namespace {
     }
 }
 
-BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
+BackupThread::BackupThread( const BackupSelectionHash& incRules, FilesystemSnapshot* snapshot) :
 	rsync(ToolFactory::getRsyncImpl()),
     isAborted(false),
     includeRules(incRules),
@@ -77,6 +77,7 @@ BackupThread::BackupThread( const BackupSelectionHash& incRules ) :
 	this->setDeleteFlag = settings->getDeleteExtraneousItems();
 	this->compressedUpload = settings->isCompressedRsyncTraffic();
 	this->bandwidthLimit = settings->getBandwidthLimit();
+	this->fsSnapshot = snapshot;
 
     /* initialize random seed and generate the backup id */
     qsrand(QTime::currentTime().msec());
@@ -152,10 +153,23 @@ void BackupThread::run()
 		}
 		if ((subPt = this->pt.getSubtask(TASKNAME_ESTIMATE_BACKUP_SIZE)) != 0) subPt->setTerminated(true);
 
-
 		this->pt.debugIsCorrectCurrentTask(TASKNAME_FILE_UPLOAD);
 		emit infoSignal( tr( "Uploading files and directories" ) );
-		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, bandwidthLimit, &warnings, false );
+
+		// Backup all partitions on their own to be able to match the snapshot
+		// path to the original path on the backup server
+		QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
+		foreach ( FilesystemSnapshotPathMapper mapper, this->fsSnapshot->getSnapshotPathMappers() )
+		{
+		    QString tmp_source = mapper.getSnapshotPath();
+		    QString tmp_destination = destination + mapper.getPartition() + "/";
+		    BackupSelectionHash tmp_includes = mapper.getRelativeIncludes();
+
+		    processedItems.append( rsync->upload( tmp_includes, tmp_source, tmp_destination, setDeleteFlag, compressedUpload, bandwidthLimit, &warnings, false ) );
+
+		}
+
+		//QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, bandwidthLimit, &warnings, false );
 
 		checkAbortState();
 		if ((subPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD)) != 0) subPt->setTerminated(true);

@@ -30,6 +30,7 @@
 #include "utils/progress_task.hh"
 #include "model/scheduled_task.hh"
 #include "utils/const_utils.hh"
+#include "tools/filesystem_snapshot.hh"
 
 /**
  * The BackupThread class runs the backup process in its own thread
@@ -47,7 +48,7 @@ public:
 	 * @param excludePatternList Pattern list for exclude files
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
-	BackupThread( const BackupSelectionHash& includeRules );
+	BackupThread( const BackupSelectionHash& includeRules, FilesystemSnapshot* snapshot );
 
 	/**
 	 * Destroys the BackupThread
@@ -113,6 +114,7 @@ private:
 	ProgressTask pt;
     int currentTaskNr;
     long backupID;
+    FilesystemSnapshot* fsSnapshot;
 };
 
 #endif
