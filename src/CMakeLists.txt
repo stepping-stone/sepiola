@@ -242,6 +242,7 @@ SET(BASE_SOURCE_FILES
 	tools/rsync.cc
 	tools/dummy_snapshot.cc
 	tools/filesystem_snapshot.cc
+	tools/filesystem_snapshot_path_mapper.cc
 	tools/tool_factory.cc
 	utils/string_utils.cc
 	utils/extended_file.cc
