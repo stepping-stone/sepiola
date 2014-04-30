@@ -28,6 +28,7 @@
 #ifdef Q_OS_WIN32
 #include "tools/at.hh"
 #include "tools/schtasks.hh"
+#include "tools/shadow_copy.hh"
 #else
 #include "tools/crontab.hh"
 #include "tools/dummy_snapshot.hh"
@@ -91,6 +92,10 @@ AbstractScheduler * ToolFactory::getSchedulerImpl()
 
 AbstractSnapshot * ToolFactory::getSnapshotImpl()
 {
+#ifdef Q_OS_WIN32
+    return new ShadowCopy;
+#else
     return new DummySnapshot;
+#endif
 }
 
