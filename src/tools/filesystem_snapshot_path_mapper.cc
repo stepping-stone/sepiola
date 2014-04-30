@@ -48,3 +48,8 @@ void FilesystemSnapshotPathMapper::setSnapshotPath(const QString& snapshotPath)
 {
     this->snapshotPath = snapshotPath;
 }
+
+void FilesystemSnapshotPathMapper::addFileToRelativeIncludes(QString filename, bool backup)
+{
+    this->relativeIncludes.insert( filename, backup );
+}

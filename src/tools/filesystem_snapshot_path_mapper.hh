@@ -78,6 +78,13 @@ public:
      */
     void setSnapshotPath(const QString& snapshotPath);
 
+    /**
+     * Add a single file to the relativeInclude list of this mapper object
+     * @param The relative filename (relative concerning the partition)
+     * @param Whether to backup this file or not
+     */
+    void addFileToRelativeIncludes( QString filename, bool backup );
+
 private:
     QString partition;
     QString snapshotPath;
