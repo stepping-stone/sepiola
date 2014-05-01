@@ -28,9 +28,6 @@
 #include <string>
 #include <iostream>
 #include "error.h"
-
-#include "stdafx.h"
-
 #include <shlwapi.h>
 #include <vss.h>
 #include <vswriter.h>
