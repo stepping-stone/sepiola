@@ -105,6 +105,7 @@ public slots:
 
 private:
     QString getDriveLetterByFile(const QString filename );
+    QString wCharArrayToQString( WCHAR* string);
     SnapshotMapper snapshotPathMappers;
     static const _VSS_SNAPSHOT_CONTEXT SC_SNAPSHOT_CONTEXT = VSS_CTX_BACKUP;
     static const VSS_BACKUP_TYPE SC_SNAPSHOT_TYPE = VSS_BT_COPY;
