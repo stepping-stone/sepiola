@@ -76,12 +76,10 @@ public:
      */
     virtual ~ShadowCopy();
 
-    /**
-     * Return the location of the file inside the snapshot
-     * @param The file one is looking for
-     */
-    QString getFileSnapshotPath(QString file);
+    const SnapshotMapper& getSnapshotPathMappers();
 
+    void setSnapshotPathMappers(
+            const SnapshotMapper& snapshotPathMappers);
 
 
 public slots:

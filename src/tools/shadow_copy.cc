@@ -314,3 +314,14 @@ QString ShadowCopy::getDriveLetterByFile( const QString filename )
     return letter;
 
 }
+
+const SnapshotMapper& DummySnapshot::getSnapshotPathMappers()
+{
+    return this->snapshotPathMappers;
+}
+
+void DummySnapshot::setSnapshotPathMappers(
+        const SnapshotMapper& snapshotPathMappers)
+{
+    this->snapshotPathMappers = snapshotPathMappers;
+}
