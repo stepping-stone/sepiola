@@ -287,7 +287,10 @@ void ShadowCopy::takeSnapshot()
         // Store the snapshot properties according to the partition name in the
         // FilesystemSnapshotPathMapper object
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
-        this->snapshotPathMappers.value(wCharArrayToQString(tmp.first)).setSnapshotPath( snapshotPath );
+        QString partition = wCharArrayToQString(tmp.first);
+        FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
+        mapper.setSnapshotPath( snapshotPath );
+        this->snapshotPathMappers.insert( partition, mapper);
     }
 
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
