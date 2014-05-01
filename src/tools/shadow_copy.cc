@@ -55,7 +55,7 @@ void ShadowCopy::createSnapshotObject()
     CoInitialize(NULL);
 
     // Load the vssapi library
-    this->vssapiBase = LoadLibrary(L"vssapi.dll");
+    this->vssapiBase = LoadLibrary("vssapi.dll");
 
     // Get the
     CreateVssBackupComponentsInternal_I = (_CreateVssBackupComponentsInternal)GetProcAddress(this->vssapiBase, "CreateVssBackupComponentsInternal");
