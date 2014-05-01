@@ -168,7 +168,9 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
         {
             // If it exists simply add the file to the list of files of the
             // FilesystemSnapshotPathMapper object
-            this->snapshotPathMappers.value(driveLetter).addFileToRelativeIncludes( relativeFileName, true);
+            FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( driveLetter );
+            mapper.addFileToRelativeIncludes( relativeFileName, true);
+            this->snapshotPathMappers.insert (driveLetter, mapper );
         } else
         {
             // Insert the partition name with a corresponding
@@ -197,7 +199,7 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
         // Check if the operation succeeded
         if (this->result != S_OK)
         {
-            QString error = QString("Adding %s to snapshot set failed with error: 0x%08lx\n").arg(partition).arg(this->result);
+            QString error = QString("Adding %s to snapshot set failed with error: 0x%08lx\n").arg(partition_name).arg(this->result);
             emit sendFilesAddedToSnapshot( SNAPSHOT_CANNOT_ADD_PARTITION_TO_SNAPSHOT_SET );
             return;
         }
@@ -284,8 +286,8 @@ void ShadowCopy::takeSnapshot()
 
         // Store the snapshot properties according to the partition name in the
         // FilesystemSnapshotPathMapper object
-        QString snapshotPath = QString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
-        this->snapshotPathMappers.value(tmp.first).setSnapshotPath( snapshotPath );
+        QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
+        this->snapshotPathMappers.value(wCharArrayToQString(tmp.first)).setSnapshotPath( snapshotPath );
     }
 
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
@@ -315,13 +317,18 @@ QString ShadowCopy::getDriveLetterByFile( const QString filename )
 
 }
 
-const SnapshotMapper& DummySnapshot::getSnapshotPathMappers()
+const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()
 {
     return this->snapshotPathMappers;
 }
 
-void DummySnapshot::setSnapshotPathMappers(
+void ShadowCopy::setSnapshotPathMappers(
         const SnapshotMapper& snapshotPathMappers)
 {
     this->snapshotPathMappers = snapshotPathMappers;
+}
+
+QString ShadowCopy::wCharArrayToQString( WCHAR* string)
+{
+    return QString::fromWCharArray( string, sizeof(string) );
 }
