@@ -36,6 +36,11 @@ public:
     FilesystemSnapshotPathMapper(const QString& _partition, const BackupSelectionHash& includeRules);
 
     /**
+     * Constructs an empty FilesystemSnapshotPathMapper
+     */
+    FilesystemSnapshotPathMapper();
+
+    /**
      * Destroys the FilesystemSnapshotPathMapper
      */
     virtual ~FilesystemSnapshotPathMapper();

@@ -15,6 +15,10 @@ FilesystemSnapshotPathMapper::FilesystemSnapshotPathMapper(const QString& _parti
     this->relativeIncludes = includeRules;
 }
 
+FilesystemSnapshotPathMapper::FilesystemSnapshotPathMapper()
+{
+}
+
 FilesystemSnapshotPathMapper::~FilesystemSnapshotPathMapper()
 {
 }
