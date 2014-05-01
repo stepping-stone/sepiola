@@ -30,7 +30,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -w")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized -Winit-self")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wstrict-null-sentinel")
@@ -41,7 +41,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
 ELSE(CMAKE_COMPILER_IS_GNUCXX)
     # on Clang we have one flag to rule them all: -Weverything (includes all
     # warnings, including the ones enabled with -pedantic)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Weverything")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Weverything -w")
     # disable warnings about variables being shadowed, see above (this is just Qt-style)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-shadow")
     # disable warnings about padding member attributes since there is nothing
@@ -86,6 +86,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 INCLUDE_DIRECTORIES(
 	.
 	${CMAKE_CURRENT_BINARY_DIR}
+	/home/sst-admin/bin/inc/win2003/
 )
 
 INCLUDE_DIRECTORIES(SYSTEM
@@ -93,6 +94,7 @@ INCLUDE_DIRECTORIES(SYSTEM
 	${QT_QTCORE_INCLUDE_DIR} 
 	${QT_QTGUI_INCLUDE_DIR}
 	${QT_QTNETWORK_INCLUDE_DIR} 
+        /home/sst-admin/bin/inc/win2003/
 )
 
 FIND_PROGRAM(QT_LUPDATE 
@@ -184,6 +186,7 @@ QT4_WRAP_CPP(
 	tools/abstract_scheduler.hh
 	tools/abstract_snapshot.hh
 	tools/dummy_snapshot.hh
+        tools/shadow_copy.hh
 	tools/filesystem_snapshot.hh
 	tools/rsync.hh
 	settings/settings.hh
@@ -291,6 +294,7 @@ IF(Q_WS_WIN)
         tools/at.cc
         tools/schtasks.cc
         tools/set_acl.cc
+        tools/shadow_copy.cc
     )
 ELSEIF(Q_WS_MAC)
     LIST(APPEND BASE_SOURCE_FILES
@@ -345,7 +349,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} "-framework AppKit" iconv System)
 	ELSE(Q_WS_WIN)
 		SET(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
+		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -static-libstdc++ -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ${QT_NETWORK_LIB_DEPENDENCIES} ${QT_CORE_LIB_DEPENDENCIES} ${QT_PLUGINS_DIR}/imageformats/libqsvg.a ${QT_QTSVG_LIBRARY} ${QT_QTXML_LIBRARY})
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} SM ICE Xi Xext X11 rt m fontconfig)
 	ENDIF(Q_WS_WIN)
