@@ -32,7 +32,9 @@
 #include <vss.h>
 #include <vswriter.h>
 #include <vsbackup.h>
-#include <unordered_map>
+#include <QString>
+#include <QHash>
+
 
 #pragma comment (lib, "VssApi.lib")
 
@@ -118,8 +120,7 @@ private:
     IVssAsync *pAsync = NULL;
     IVssAsync* pPrepare = NULL;
     IVssAsync* pDoShadowCopy = NULL;
-    unordered_map<WCHAR*, VSS_ID> snapshot_set_ids;
-    unordered_map<WCHAR*, VSS_SNAPSHOT_PROP> properties;
+    QHash<QString, VSS_ID> snapshot_set_ids;
 };
 
 #endif /* SHADOW_COPY_HH_ */
