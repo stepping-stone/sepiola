@@ -73,6 +73,16 @@ public slots:
      */
     void takeSnapshot();
 
+    /**
+     * Cleans up the snapshot
+     */
+    void cleanupSnapshot();
+
+    /**
+     * Checks if there is something to clean up
+     */
+    virtual void checkCleanup();
+
 };
 
 #endif /* DUMMY_SNAPSHOT_HH_ */
