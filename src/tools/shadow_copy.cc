@@ -21,6 +21,9 @@
 #include <QString>
 #include <QDebug>
 #include <QRegExp>
+#include <QDir>
+#include <QProcess>
+#include <QStringList>
 
 /**
  * The dummy snapshot class provides an empty snapshot method
@@ -155,12 +158,16 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
     // Go through all files and add the corresponding partition name to the hash
     foreach( QString file, includeRules.keys() )
     {
+        qDebug() << "Adding file" << file << "to the snapshot mapper";
+
         // Get the driveletter of the current file
         QString driveLetter = getDriveLetterByFile( file );
 
         // Get the relative filename
         QString relativeFileName = file;
-        relativeFileName.replace( driveLetter, QString(""));
+        relativeFileName.replace( driveLetter + ":/", QString(""));
+
+        qDebug() << "Relative file name now is:" << relativeFileName;
 
         // Check if the corresponding entry in the SnapshotMapper already
         // exists
@@ -179,22 +186,29 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
             FilesystemSnapshotPathMapper mapper(driveLetter, empty);
             mapper.addFileToRelativeIncludes( relativeFileName, true);
             this->snapshotPathMappers.insert( driveLetter, mapper );
+            qDebug() << "Added a new snapshotmapper for partition" << driveLetter << "which is:" << this->snapshotPathMappers.value( driveLetter).getRelativeIncludes();
         }
     }
+
+    //qDebug() << "SnapshotPathMappers now are:" << this->snapshotPathMappers;
 
     // Create temporary VSS_ID
     VSS_ID tmp_snapshot_set_id;
 
     // Go through all partitions from the SnapshotMapper and add them to the
     // Snapshot set
-    foreach ( QString partition_name , this->snapshotPathMappers.keys() )
+    foreach ( QString partition , this->snapshotPathMappers.keys() )
     {
+        QString partition_name = partition;
+	partition_name.append(":\\");
+	qDebug() << "Adding partition" << partition_name << "to snapshot set";
+
         // Convert the partition name to a wchar array
-        WCHAR partition[4] = {0};
-        partition_name.toWCharArray(partition);
+        WCHAR win_partition[4] = {0};
+        partition_name.toWCharArray(win_partition);
 
         // Add the partition to the snapshot set
-        this->result = this->pBackup->AddToSnapshotSet(partition, GUID_NULL, &tmp_snapshot_set_id);
+        this->result = this->pBackup->AddToSnapshotSet(win_partition, GUID_NULL, &tmp_snapshot_set_id);
 
         // Check if the operation succeeded
         if (this->result != S_OK)
@@ -205,7 +219,8 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
         }
 
         // Add the partition name and the snapshot set id the the hash map
-        this->snapshot_set_ids[partition] = tmp_snapshot_set_id;
+        qDebug() << "Adding partition" << partition << "to the snapshot_set_ids";
+        this->snapshot_set_ids.insert(partition, tmp_snapshot_set_id);
     }
 
     emit sendFilesAddedToSnapshot( SNAPSHOT_SUCCESS );
@@ -269,12 +284,12 @@ void ShadowCopy::takeSnapshot()
     }
 
     // Go through all snapshots and get the according properties
-    for (auto &tmp : this->snapshot_set_ids)
+    foreach ( QString partition, this->snapshot_set_ids.keys() )
     {
         VSS_SNAPSHOT_PROP tmp_snapshot_prop;
 
         // Get the and set them to the snapshot properties field
-        this->result = this->pBackup->GetSnapshotProperties(tmp.second, &tmp_snapshot_prop);
+        this->result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( partition) , &tmp_snapshot_prop);
 
         // Check if the operation succeeded
         if (this->result != S_OK)
@@ -287,9 +302,21 @@ void ShadowCopy::takeSnapshot()
         // Store the snapshot properties according to the partition name in the
         // FilesystemSnapshotPathMapper object
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
-        QString partition = wCharArrayToQString(tmp.first);
+	
+        QString linkname = "C:\\mount_shadow_copy_";
+	linkname.append(partition);
+        snapshotPath.append("\\");
+
+
+        QString args = linkname;
+	args.append(" ").append(snapshotPath);
+	const char* char_args = args.toUtf8().constData();
+ 
+
+	ShellExecute(0, "runas", "C:\\Users\\SepiolaDEV\\Desktop\\link.bat", char_args , 0, SW_HIDE);
+
         FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
-        mapper.setSnapshotPath( snapshotPath );
+        mapper.setSnapshotPath( linkname );
         this->snapshotPathMappers.insert( partition, mapper);
     }
 
@@ -301,7 +328,7 @@ QString ShadowCopy::getDriveLetterByFile( const QString filename )
 {
     // The filename will be something like <LETTER>:\path\to\file so get the
     // <LETTER>:
-    QRegExp regex("^\w:\\");
+    QRegExp regex("^\\w:\\/");
 
     // Get the first occurrence of the regex in the filename
     int pos = regex.indexIn( filename );
@@ -309,10 +336,11 @@ QString ShadowCopy::getDriveLetterByFile( const QString filename )
     QString letter;
     if ( pos > -1 )
     {
-        letter = regex.cap(0);
+        letter = regex.cap(0).left(1);
     } else
     {
         // TODO: What if no drive letter was found?
+	qDebug() << filename << "does not math ^\\w:\\/";
     }
 
     // Return the drive letter
@@ -333,5 +361,5 @@ void ShadowCopy::setSnapshotPathMappers(
 
 QString ShadowCopy::wCharArrayToQString( WCHAR* string)
 {
-    return QString::fromWCharArray( string, sizeof(string) );
+    return QString::fromWCharArray( string, wcslen(string) );
 }
