@@ -83,6 +83,18 @@ signals:
      */
     void sendSnapshotTaken(int result);
 
+    /**
+     * Send the signal that the snapshot has been cleaned up
+     * @param Result of the cleanup
+     */
+    void sendSnapshotCleandUp(int result);
+
+    /**
+     * Send the signal whether or not the snapshot needs some cleanup
+     * @param Whether the snapshot needs some cleanup or not
+     */
+    void sendSnapshotNeedsCleanup(bool cleanup);
+
 public slots:
 
     /**
@@ -106,6 +118,16 @@ public slots:
      * Executes the snapshot
      */
     virtual void takeSnapshot() = 0;
+
+    /**
+     * Cleans up the snapshot
+     */
+    virtual void cleanupSnapshot() = 0;
+
+    /**
+     * Checks if there is something to clean up
+     */
+    virtual void checkCleanup() = 0;
 };
 
 inline AbstractSnapshot::~AbstractSnapshot()

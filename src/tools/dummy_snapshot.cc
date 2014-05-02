@@ -65,6 +65,18 @@ void DummySnapshot::takeSnapshot()
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
 }
 
+void DummySnapshot::cleanupSnapshot()
+{
+    // Nothing to do as nothing was done while taking the snapshot, just send
+    // the signal to continue
+    emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
+}
+
+void DummySnapshot::checkCleanup()
+{
+    // As no cleanup needed at any point, send back that no cleanup is needed
+    emit sendSnapshotNeedsCleanup(false);
+}
 
 const SnapshotMapper& DummySnapshot::getSnapshotPathMappers()
 {
