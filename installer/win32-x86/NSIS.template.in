@@ -460,7 +460,7 @@ Section "Installer Section" InstSection
   File "@CPACK_INSTALL_PREFIX@/bin/zlib1.dll"
   File "@CPACK_INSTALL_PREFIX@/bin/libpng*.dll"
   File "@CPACK_INSTALL_PREFIX@/bin/libstdc++-6.dll"
-  File "@CPACK_INSTALL_PREFIX@/bin/libgcc_s_sjlj-1.dll"
+  File "@CPACK_INSTALL_PREFIX@/bin/libgcc_s_*.dll"
 
   ;Use the entire tree produced by the INSTALL target.  Keep the
   ;list of directories here in sync with the RMDir commands below.
