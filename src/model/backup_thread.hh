@@ -66,6 +66,7 @@ signals:
 	void updateOverviewFormLastBackupsInfo();
 	void infoSignal( const QString& text );
 	void errorSignal( const QString& text );
+	void backupFinished();
 
 	void progressSignal( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos = StringPairList());
 	void finalStatusSignal( ConstUtils::StatusEnum status );

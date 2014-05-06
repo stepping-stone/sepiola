@@ -577,9 +577,12 @@ void MainModel::uploadFiles( int result )
         emit finalStatusSignal( ConstUtils::STATUS_ERROR );
         emit finishProgressDialog();
         emit updateOverviewFormLastBackupsInfo();
+        emit backupFinished();
         return;
     }
 
+    QObject::connect( backupThread, SIGNAL( backupFinished() ),
+                      this, SIGNAL( backupFinished() ) );
     QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
                       this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
     QObject::connect( backupThread, SIGNAL( infoSignal( const QString& ) ),

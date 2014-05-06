@@ -315,6 +315,7 @@ void BackupThread::run()
 	emit finalStatusSignal( this->getLastBackupState() );
 	emit finishProgressDialog();
 	emit updateOverviewFormLastBackupsInfo();
+	emit backupFinished();
 }
 
 void BackupThread::checkAbortState()
