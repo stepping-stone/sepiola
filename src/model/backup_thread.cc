@@ -307,6 +307,10 @@ void BackupThread::run()
 		this->setLastBackupState(ConstUtils::STATUS_OK);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_OK )";
 	}
+
+	// Cleanup the filesystem snapshot
+	this->fsSnapshot->cleanup();
+
 	emit infoSignal( "==================================================" );
 	emit finalStatusSignal( this->getLastBackupState() );
 	emit finishProgressDialog();
