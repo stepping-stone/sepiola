@@ -21,9 +21,11 @@ class FilesystemSnapshot : public QObject
 
 public:
     FilesystemSnapshot( const BackupSelectionHash& includes );
+    FilesystemSnapshot( );
     virtual ~FilesystemSnapshot();
     void doSnapshot();
     const SnapshotMapper& getSnapshotPathMappers();
+    void setIncludeRules( const BackupSelectionHash& includes );
     void cleanup();
 
 private slots:

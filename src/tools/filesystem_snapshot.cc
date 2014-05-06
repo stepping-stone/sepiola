@@ -23,6 +23,50 @@ FilesystemSnapshot::FilesystemSnapshot( const BackupSelectionHash& includes)
     // Get the snapshot implementation
     this->snapshot = ToolFactory::getSnapshotImpl();
 
+    // Immediately check if the snapshot needs some cleanup
+    this->snapshot->checkCleanup();
+
+    // Move the snapshot object to the newly created thread
+    this->snapshot->moveToThread( this->snapshotThread );
+
+    // Register the BackupSelectionHash type
+    qRegisterMetaType<BackupSelectionHash>("BackupSelectionHash");
+
+    // Connect signals and slots
+    QObject::connect( this, SIGNAL( sendCreateSnapshotObject() ),
+                      this->snapshot, SLOT( createSnapshotObject() ) );
+    QObject::connect( this, SIGNAL( sendInitializeSnapshot() ),
+                      this->snapshot, SLOT( initializeSnapshot() ) );
+    QObject::connect( this, SIGNAL( sendAddFilesToSnapshot( const BackupSelectionHash ) ),
+                      this->snapshot, SLOT( addFilesToSnapshot( const BackupSelectionHash ) ) );
+    QObject::connect( this, SIGNAL( sendTakeSnapshot() ),
+                      this->snapshot, SLOT( takeSnapshot() ) );
+    QObject::connect( this, SIGNAL( sendCleanupSnapshot() ),
+                      this->snapshot, SLOT( cleanupSnapshot() ) );
+    QObject::connect( this->snapshot, SIGNAL( sendSnapshotObjectCreated(int) ),
+                      this, SLOT( snapshotObjectCreated(int) ) );
+    QObject::connect( this->snapshot, SIGNAL( sendSnapshotInitialized(int) ),
+                      this, SLOT( snapshotInitialized(int) ) );
+    QObject::connect( this->snapshot, SIGNAL( sendFilesAddedToSnapshot(int) ),
+                      this, SLOT( filesAddedToSnapshot(int) ) );
+    QObject::connect( this->snapshot, SIGNAL( sendSnapshotTaken(int) ),
+                      this, SLOT( snapshotTaken(int) ) );
+
+    // And start the snapshot thread
+    this->snapshotThread->start();
+}
+
+FilesystemSnapshot::FilesystemSnapshot( )
+{
+    // Create a new snapshot thread
+    this->snapshotThread = new QThread;
+
+    // Get the snapshot implementation
+    this->snapshot = ToolFactory::getSnapshotImpl();
+
+    // Immediately check if the snapshot needs some cleanup
+    this->snapshot->checkCleanup();
+
     // Move the snapshot object to the newly created thread
     this->snapshot->moveToThread( this->snapshotThread );
 
@@ -81,6 +125,11 @@ FilesystemSnapshot::~FilesystemSnapshot()
 
     // Delete the snapshot object
     delete this->snapshot;
+}
+
+void FilesystemSnapshot::setIncludeRules( const BackupSelectionHash& includes )
+{
+    this->includeRules = includes;
 }
 
 void FilesystemSnapshot::doSnapshot()
