@@ -74,8 +74,7 @@ void DummySnapshot::cleanupSnapshot()
 
 void DummySnapshot::checkCleanup()
 {
-    // As no cleanup needed at any point, send back that no cleanup is needed
-    emit sendSnapshotNeedsCleanup(false);
+    // Nothing to do here, no cleanup needed
 }
 
 const SnapshotMapper& DummySnapshot::getSnapshotPathMappers()
