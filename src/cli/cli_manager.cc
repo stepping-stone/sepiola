@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QWaitCondition>
 #include <QMutex>
+#include <QEventLoop>
 
 #ifdef Q_OS_UNIX
 #include <termios.h>
@@ -139,7 +140,10 @@ void CliManager::runSchedule()
 	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
 							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 
+	QEventLoop loop;
+	loop.connect( &mainModel, SIGNAL( backupFinished() ), SLOT( quit() ));
 	mainModel.backup( backupRules, true );
+	loop.exec();
 
 	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
 								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );

@@ -225,6 +225,7 @@ signals:
 	void showCriticalMessageBox( const QString& message );
 	void updateStatusBarMessage ( const QString& message );
 	void updateOverviewFormLastBackupsInfo();
+	void backupFinished();
 
 	void showProgressDialog( const QString& dialogTitle );
 	void finishProgressDialog();
