@@ -24,6 +24,7 @@ public:
     virtual ~FilesystemSnapshot();
     void doSnapshot();
     const SnapshotMapper& getSnapshotPathMappers();
+    void cleanup();
 
 private slots:
     void snapshotObjectCreated( int result );
@@ -37,6 +38,7 @@ signals:
     void sendAddFilesToSnapshot( const BackupSelectionHash includeRules );
     void sendTakeSnapshot();
     void sendSnapshotDone( int result );
+    void sendCleanupSnapshot();
 
     // Common signals
     void infoSignal( const QString& text );
