@@ -46,6 +46,11 @@ public:
     void setSnapshotPathMappers(
             const SnapshotMapper& snapshotPathMappers);
 
+    /**
+     * Checks if there is something to clean up
+     */
+    virtual void checkCleanup();
+
 private:
     SnapshotMapper snapshotPathMappers;
 
@@ -77,11 +82,6 @@ public slots:
      * Cleans up the snapshot
      */
     void cleanupSnapshot();
-
-    /**
-     * Checks if there is something to clean up
-     */
-    virtual void checkCleanup();
 
 };
 
