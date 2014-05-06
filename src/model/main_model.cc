@@ -569,9 +569,13 @@ void MainModel::uploadFiles( int result )
     // up and stop the backup here
     if ( result != SNAPSHOT_SUCCESS )
     {
-        this->fsSnapshot; // TODO cleanup
+        this->fsSnapshot->cleanup();
         delete this->fsSnapshot;
         this->backupThread->setLastBackupState( ConstUtils::STATUS_ERROR );
+        emit infoSignal( "==================================================" );
+        emit finalStatusSignal( ConstUtils::STATUS_ERROR );
+        emit finishProgressDialog();
+        emit updateOverviewFormLastBackupsInfo();
         return;
     }
 
