@@ -304,20 +304,24 @@ void ShadowCopy::takeSnapshot()
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
 	
         QString linkname = "C:\\mount_shadow_copy_";
-	linkname.append(partition);
+        linkname.append(partition);
         snapshotPath.append("\\");
 
 
         QString args = linkname;
-	args.append(" ").append(snapshotPath);
-	const char* char_args = args.toUtf8().constData();
+        args.append(" ").append(snapshotPath);
+        const char* char_args = args.toUtf8().constData();
  
-
-	ShellExecute(0, "runas", "C:\\Users\\SepiolaDEV\\Desktop\\link.bat", char_args , 0, SW_HIDE);
+        // Find installation path
+	    ShellExecute(0, "runas", "<Installation-Path>\\mountshadows.bat", char_args , 0, SW_HIDE);
 
         FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
         mapper.setSnapshotPath( linkname );
         this->snapshotPathMappers.insert( partition, mapper);
+
+        // As the mounting takes some time, delay the execution of the next
+        // loop itereation
+        QThread::sleep(1);
     }
 
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
@@ -340,12 +344,49 @@ QString ShadowCopy::getDriveLetterByFile( const QString filename )
     } else
     {
         // TODO: What if no drive letter was found?
-	qDebug() << filename << "does not math ^\\w:\\/";
+        qDebug() << filename << "does not math ^\\w:\\/";
     }
 
     // Return the drive letter
     return letter;
 
+}
+
+void ShadowCopy::cleanupSnapshot()
+{
+    // Go through all snapshot and delete the shadow copy itself and the symlink
+    // to it
+    foreach ( QString partition, this->snapshot_set_ids.keys() )
+    {
+        // Get the symlink name for the given partition
+        QString linkname = this->snapshotPathMappers.value( partition ).getSnapshotPath();
+
+        // Simply remove the symlink
+        QDir::remove( linkname );
+    }
+
+    // Finally remove the shadow copy itself
+
+    // Get the snapshot properties for the given partition
+    VSS_SNAPSHOT_PROP tmp_snapshot_prop;
+
+    // Get the and set them to the snapshot properties field
+    this->result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.keys().first() , &tmp_snapshot_prop);
+
+    // Check if the operation succeeded
+    if (this->result == S_OK)
+    {
+        // Get the ID from the shadow copy
+        VSS_ID shadowCopyID = tmp_snapshot_prop.m_SnapshotSetId;
+
+        // And delete it (as the copies are non-persistent, we do not care about
+        // errors in the deletion process)
+        this->pBackup->DeleteSnapshots( shadowCopyID, VSS_OBJECT_SNAPSHOT_SET,
+                                         true, nullptr, nullptr);
+    }
+
+    // Send that the cleanup is done
+    emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
 }
 
 const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()

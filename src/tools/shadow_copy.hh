@@ -105,6 +105,11 @@ public slots:
      */
     void takeSnapshot();
 
+    /**
+     * Cleans up the snapshot
+     */
+    virtual void cleanupSnapshot();
+
 private:
     QString getDriveLetterByFile(const QString filename );
     QString wCharArrayToQString( WCHAR* string);
