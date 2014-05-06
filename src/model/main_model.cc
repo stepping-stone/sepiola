@@ -50,7 +50,8 @@ const QString MainModel::BACKUP_TIME_TODAY = "TODAY";
 MainModel::MainModel() :
     localDirModel(nullptr),
     remoteDirModel(nullptr),
-    spaceUsageModel(new SpaceUsageModel(this))
+    spaceUsageModel(new SpaceUsageModel(this)),
+    fsSnapshot( new FilesystemSnapshot() )
 {
 }
 
@@ -177,8 +178,8 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 
 	this->startInThisThread = startInCurrentThread;
 
-	// Create a new Filesystem Snapshot
-	this->fsSnapshot = new FilesystemSnapshot( includeRules );
+	// Set the include rules for the filesystem snapshot object
+	this->fsSnapshot->setIncludeRules( includeRules );
 
 	// Create a new Backup Thread
 	this->backupThread = new BackupThread( includeRules, this->fsSnapshot );
