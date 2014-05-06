@@ -303,10 +303,10 @@ void ShadowCopy::takeSnapshot()
         // FilesystemSnapshotPathMapper object
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
 	
-        QString linkname = "C:\\mount_shadow_copy_";
+        QString linkname = MOUNT_DIRECTORY;
+        linkname.append( MOUNT_PREFIX );
         linkname.append(partition);
         snapshotPath.append("\\");
-
 
         QString args = linkname;
         args.append(" ").append(snapshotPath);
@@ -387,6 +387,21 @@ void ShadowCopy::cleanupSnapshot()
 
     // Send that the cleanup is done
     emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
+}
+
+void ShadowCopy::checkCleanup()
+{
+    // Check in the MOUNT_DIRECTORY if there are any links with MOUNT_PREFIX
+    QStringList nameFilter(MOUNT_PREFIX + "*");
+    QDir directory(MOUNT_DIRECTORY);
+    QStringList oldShadowCopyMounts = directory.entryList(nameFilter);
+
+    // If yes, remove them
+    foreach( QString oldMount, oldShadowCopyMounts )
+    {
+        QDir::remove( oldMount );
+    }
+
 }
 
 const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()
