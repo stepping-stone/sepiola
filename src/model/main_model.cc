@@ -187,7 +187,7 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 	// uploadFiles slot so as soon as the snapshot is finished, the files can
 	// be uploaded
 	QObject::connect( this->fsSnapshot, SIGNAL( sendSnapshotDone(int) ),
-	                   this, SLOT( uploadFiles() ) );
+	                   this, SLOT( uploadFiles( int ) ) );
 
 	// Connect the info and error signals to the info and error slot
     QObject::connect( this->fsSnapshot, SIGNAL( infoSignal(const QString&) ),
@@ -563,8 +563,18 @@ void MainModel::exit()
 	Settings::getInstance()->deletePrivateKeyFiles();
 }
 
-void MainModel::uploadFiles()
+void MainModel::uploadFiles( int result )
 {
+    // If the creation of the filesystem snapshot was not successful, clean it
+    // up and stop the backup here
+    if ( result != SNAPSHOT_SUCCESS )
+    {
+        this->fsSnapshot; // TODO cleanup
+        delete this->fsSnapshot;
+        this->backupThread->setLastBackupState( ConstUtils::STATUS_ERROR );
+        return;
+    }
+
     QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
                       this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
     QObject::connect( backupThread, SIGNAL( infoSignal( const QString& ) ),
@@ -583,7 +593,7 @@ void MainModel::uploadFiles()
                       this, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
     QObject::connect( this, SIGNAL( abortProcess() ),
                         backupThread, SLOT( abortBackupProcess() ) );
-    qDebug() << "MainModel::backup: startInCurrentThread=" << this->startInThisThread;
+    qDebug() << "MainModel::uploadFiles: startInCurrentThread=" << this->startInThisThread;
     if ( this->startInThisThread )
     {
         // signals are not connected with QCoreApplication and multiple threads

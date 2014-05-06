@@ -280,8 +280,9 @@ public slots:
 
 	/**
 	 * Aborts the current process
+	 * @param The result of the filesystem snapshot creation
 	 */
-	void uploadFiles();
+	void uploadFiles( int result );
 
 private:
 	LocalDirModel* localDirModel;

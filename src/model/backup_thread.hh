@@ -57,6 +57,8 @@ public:
 
 	void startInCurrentThread();
     void uploadSchedulerXML(ScheduledTask schedule);
+    void setLastBackupState(ConstUtils::StatusEnum status);
+
 signals:
 	void showCriticalMessageBox( const QString& message );
 	void finishProgressDialog();
@@ -94,7 +96,6 @@ private:
 	quint64 estimateBackupSize( const QString& src, const QString& destination );
 	void updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList );
 	QString createCurrentBackupTimeFile();
-	void setLastBackupState(ConstUtils::StatusEnum status);
 	ConstUtils::StatusEnum getLastBackupState();
     void uploadBackupStartedXML(long id);
     void uploadBackupEndedXML(long id, int success);

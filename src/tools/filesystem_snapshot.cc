@@ -94,7 +94,9 @@ void FilesystemSnapshot::snapshotObjectCreated(int result)
         emit sendInitializeSnapshot();
     } else
     {
-        // TODO, delete the snapshot object and proceed or abort the backup process
+        qDebug() << "Cannot create filesystem snapshot object";
+        emit infoSignal("Cannot create filesystem snapshot, stopping backup here");
+        emit sendSnapshotDone( result );
     }
 }
 
@@ -108,7 +110,9 @@ void FilesystemSnapshot::snapshotInitialized(int result)
         emit sendAddFilesToSnapshot( this->includeRules );
     } else
     {
-        // TODO, delete the snapshot object and proceed or abort the backup process
+        qDebug() << "Cannot initialize filesytem snapshot";
+        emit infoSignal("Cannot create filesystem snapshot, stopping backup here");
+        emit sendSnapshotDone( result );
     }
 }
 
@@ -121,7 +125,9 @@ void FilesystemSnapshot::filesAddedToSnapshot(int result)
         emit sendTakeSnapshot();
     } else
     {
-        // TODO, delete the snapshot object and proceed or abort the backup process
+        qDebug() << "Adding files to snapshot set failed";
+        emit infoSignal("Cannot create filesystem snapshot, stopping backup here");
+        emit sendSnapshotDone( result );
     }
 }
 
@@ -131,12 +137,14 @@ void FilesystemSnapshot::snapshotTaken(int result)
     {
         qDebug() << "Filesystem snapshot successfully taken, going to upload"
                   << "the files to the backup server";
-        emit infoSignal( tr("Filesystem snapshot successfully taken!") );
+        emit infoSignal( tr("Filesystem snapshot successfully taken") );
         emit sendSnapshotDone( result );
 
     } else
     {
-        // TODO, delete the snapshot object and proceed or abort the backup process
+        qDebug() << "Filesystem snapshot not successfully created";
+        emit infoSignal("Cannot create filesystem snapshot, stopping backup here");
+        emit sendSnapshotDone( result );
     }
 }
 
