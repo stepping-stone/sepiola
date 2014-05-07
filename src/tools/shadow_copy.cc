@@ -27,7 +27,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 
-const QString ShadowCopy::MOUNT_DIRECTORY = "C:\\"; // TODO change this to something more appropriate like tmp folder or the sepiola app data dir
+const QString ShadowCopy::MOUNT_DIRECTORY = Settings::getInstance()->getApplicationDataDir();
 const QString ShadowCopy::MOUNT_PREFIX = "mount_shadow_copy_";
 
 /**
