@@ -333,14 +333,15 @@ void ShadowCopy::takeSnapshot()
 
         if (CreateSymbolicLink_func == NULL)
         {
-            qDebug() << "CreateSymbolicLinkW not available";
-            emit sendSnapshotTaken( 4 );
+            qDebug() << "WinAPI function CreateSymbolicLinkW not available";
+            emit sendSnapshotTaken( SNAPSHOR_CANNOT_MOUNT_SNAPSHOT );
+            return;
         } else
         {
             if ((*CreateSymbolicLink_func)(link, target, flags) == 0)
             {
-                qDebug() <<  "CreateSymbolicLink failed" << GetLastError();
-                emit sendSnapshotTaken( SNAPSHOT_ASYNC_WAIT_FAILED );
+                qDebug() <<  "WinAPI call CreateSymbolicLink failed" << GetLastError();
+                emit sendSnapshotTaken( SNAPSHOR_CANNOT_MOUNT_SNAPSHOT );
                 return;
             }
         }
@@ -354,7 +355,6 @@ void ShadowCopy::takeSnapshot()
         QWaitCondition waitCondition;
         QMutex mutex;
         waitCondition.wait(&mutex, 500);
-
     }
 
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
