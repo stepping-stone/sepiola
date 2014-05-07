@@ -30,7 +30,6 @@
 const QString ShadowCopy::MOUNT_DIRECTORY = "C:\\"; // TODO change this to something more appropriate like tmp folder or the sepiola app data dir
 const QString ShadowCopy::MOUNT_PREFIX = "mount_shadow_copy_";
 
-
 /**
  * The dummy snapshot class provides an empty snapshot method
  * @author Pat Kläy, pat.klaey@stepping-stone.ch
@@ -335,7 +334,7 @@ void ShadowCopy::takeSnapshot()
         if (CreateSymbolicLink_func == NULL)
         {
             qDebug() << "CreateSymbolicLinkW not available";
-            emit sendSnapshotTaken( );
+            emit sendSnapshotTaken( 4 );
         } else
         {
             if ((*CreateSymbolicLink_func)(link, target, flags) == 0)

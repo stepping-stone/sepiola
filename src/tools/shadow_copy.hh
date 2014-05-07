@@ -45,6 +45,11 @@ typedef void(APIENTRY * _VssFreeSnapshotPropertiesInternal)(IN VSS_SNAPSHOT_PROP
 static _CreateVssBackupComponentsInternal CreateVssBackupComponentsInternal_I;
 static _VssFreeSnapshotPropertiesInternal VssFreeSnapshotPropertiesInternal_I;
 
+/* Funktions in kernel32.dll */
+typedef BOOL (WINAPI* CreateSymbolicLinkProc) (LPCSTR, LPCSTR, DWORD);
+typedef BOOL (WINAPI* RemoveDirectoryProc) (LPCSTR);
+
+
 /* Define some vss snapshot errors code which are 100 < code < 200*/
 #define SNAPSHOT_CANNOT_SET_BACKUP_CONTEXT 101
 #define SNAPSHOT_WRITER_GATHERING_METADATA_FAILED 102
