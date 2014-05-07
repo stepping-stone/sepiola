@@ -389,6 +389,15 @@ void ShadowCopy::cleanupSnapshot()
 {
     // Go through all snapshot and delete the shadow copy itself and the symlink
     // to it
+
+    if ( this->snapshot_set_ids.isEmpty() )
+    {
+        // If this hash is empty, nothing has been done yet. So 
+        // just send the signal that cleanup was successfull 
+        emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
+        return;
+    } 
+
     foreach ( QString partition, this->snapshot_set_ids.keys() )
     {
         // Get the symlink name for the given partition
