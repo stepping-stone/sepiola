@@ -425,15 +425,24 @@ void ShadowCopy::cleanupSnapshot()
 
 void ShadowCopy::checkCleanup()
 {
+    qDebug() << "Checking for filesystem snapshot cleanup";
+
     // Check in the MOUNT_DIRECTORY if there are any links with MOUNT_PREFIX
     QStringList nameFilter(MOUNT_PREFIX + "*");
     QDir directory(MOUNT_DIRECTORY);
     QStringList oldShadowCopyMounts = directory.entryList(nameFilter);
 
+    qDebug() << "Found the following leftovers of old FS Snapshots: " << oldShadowCopyMounts;
+
     // If yes, remove them
     foreach( QString oldMount, oldShadowCopyMounts )
     {
-        removeWindowsSymlink( oldMount );
+	QString linkname = oldMount;
+	linkname.prepend( MOUNT_DIRECTORY );
+
+        qDebug() << "Removing:" << linkname;
+
+        removeWindowsSymlink( linkname );
     }
 
 }
