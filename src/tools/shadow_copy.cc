@@ -393,21 +393,9 @@ void ShadowCopy::cleanupSnapshot()
     {
         // Get the symlink name for the given partition
         QString linkname = this->snapshotPathMappers.value( partition ).getSnapshotPath();
-        linkname.prepend("\\\\?\\");
-
-        HMODULE lib;
-        RemoveDirectoryProc RemoveDirectory_func;
-
-        lib = LoadLibrary("kernel32");
-        RemoveDirectory_func =
-            (RemoveDirectoryProc)GetProcAddress(lib,"RemoveDirectoryW");
-
-        LPCSTR link = (LPCSTR) linkname.utf16();
-
-        (*RemoveDirectory_func)(link);
 
         // Simply remove the symlink
-        //QDir::remove( linkname );
+        removeWindowsSymlink( linkname );
     }
 
     // Finally remove the shadow copy itself
@@ -445,22 +433,26 @@ void ShadowCopy::checkCleanup()
     // If yes, remove them
     foreach( QString oldMount, oldShadowCopyMounts )
     {
-        // Take the linkname and prepend the necessary Windows UNC path
-        QString linkname = oldMount;
-        linkname.prepend("\\\\?\\");
-
-        HMODULE lib;
-        RemoveDirectoryProc RemoveDirectory_func;
-
-        lib = LoadLibrary("kernel32");
-        RemoveDirectory_func =
-            (RemoveDirectoryProc)GetProcAddress(lib,"RemoveDirectoryW");
-
-        LPCSTR link = (LPCSTR) linkname.utf16();
-
-        (*RemoveDirectory_func)(link);
+        removeWindowsSymlink( oldMount );
     }
 
+}
+
+bool ShadowCopy::removeWindowsSymlink( QString linkname)
+{
+    // Take the linkname and prepend the necessary Windows UNC path
+    linkname.prepend("\\\\?\\");
+
+    HMODULE lib;
+    RemoveDirectoryProc RemoveDirectory_func;
+
+    lib = LoadLibrary("kernel32");
+    RemoveDirectory_func =
+        (RemoveDirectoryProc)GetProcAddress(lib,"RemoveDirectoryW");
+
+    LPCSTR link = (LPCSTR) linkname.utf16();
+
+    return (*RemoveDirectory_func)(link);
 }
 
 const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()
