@@ -317,9 +317,34 @@ void ShadowCopy::takeSnapshot()
         QString args = linkname;
         args.append(" ").append(snapshotPath);
         const char* char_args = args.toUtf8().constData();
- 
-        // Find installation path
-	    ShellExecute(0, "runas", "<Installation-Path>\\mountshadows.bat", char_args , 0, SW_HIDE);
+
+        HMODULE lib;
+        CreateSymbolicLinkProc CreateSymbolicLink_func;
+        DWORD flags = 1;
+
+        lib = LoadLibrary("kernel32");
+        CreateSymbolicLink_func =
+            (CreateSymbolicLinkProc)GetProcAddress(lib,"CreateSymbolicLinkW");
+
+        QString fullLinkname = linkname;
+        fullLinkname.prepend("\\\\?\\");
+
+        LPCSTR link = (LPCSTR) fullLinkname.utf16();
+        LPCSTR target = (LPCSTR) snapshotPath.utf16();
+
+        if (CreateSymbolicLink_func == NULL)
+        {
+            qDebug() << "CreateSymbolicLinkW not available";
+            emit sendSnapshotTaken( );
+        } else
+        {
+            if ((*CreateSymbolicLink_func)(link, target, flags) == 0)
+            {
+                qDebug() <<  "CreateSymbolicLink failed" << GetLastError();
+                emit sendSnapshotTaken( SNAPSHOT_ASYNC_WAIT_FAILED );
+                return;
+            }
+        }
 
         FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
         mapper.setSnapshotPath( linkname );
@@ -369,6 +394,18 @@ void ShadowCopy::cleanupSnapshot()
     {
         // Get the symlink name for the given partition
         QString linkname = this->snapshotPathMappers.value( partition ).getSnapshotPath();
+        linkname.prepend("\\\\?\\");
+
+        HMODULE lib;
+        RemoveDirectoryProc RemoveDirectory_func;
+
+        lib = LoadLibrary("kernel32");
+        RemoveDirectory_func =
+            (RemoveDirectoryProc)GetProcAddress(lib,"RemoveDirectoryW");
+
+        LPCSTR link = (LPCSTR) linkname.utf16();
+
+        (*RemoveDirectory_func)(link);
 
         // Simply remove the symlink
         //QDir::remove( linkname );
@@ -409,7 +446,20 @@ void ShadowCopy::checkCleanup()
     // If yes, remove them
     foreach( QString oldMount, oldShadowCopyMounts )
     {
-        //QDir::remove( oldMount );
+        // Take the linkname and prepend the necessary Windows UNC path
+        QString linkname = oldMount;
+        linkname.prepend("\\\\?\\");
+
+        HMODULE lib;
+        RemoveDirectoryProc RemoveDirectory_func;
+
+        lib = LoadLibrary("kernel32");
+        RemoveDirectory_func =
+            (RemoveDirectoryProc)GetProcAddress(lib,"RemoveDirectoryW");
+
+        LPCSTR link = (LPCSTR) linkname.utf16();
+
+        (*RemoveDirectory_func)(link);
     }
 
 }
