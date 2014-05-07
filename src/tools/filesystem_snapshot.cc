@@ -144,7 +144,7 @@ void FilesystemSnapshot::cleanup()
     // Emit the cleanup signal for the specific snapshot implementation and
     // wait for the signal that the snapshot has been cleaned up
     QEventLoop loop;
-    loop.connect( this->snapshot, SIGNAL( sendSnapshotCleandUp() ), SLOT( quit() ) );
+    loop.connect( this->snapshot, SIGNAL( sendSnapshotCleandUp( int ) ), SLOT( quit() ) );
     emit sendCleanupSnapshot();
 
     // Wait for the cleanup process to finish

@@ -24,6 +24,12 @@
 #include <QDir>
 #include <QProcess>
 #include <QStringList>
+#include <QWaitCondition>
+#include <QMutex>
+
+const QString ShadowCopy::MOUNT_DIRECTORY = "C:\\"; // TODO change this to something more appropriate like tmp folder or the sepiola app data dir
+const QString ShadowCopy::MOUNT_PREFIX = "mount_shadow_copy_";
+
 
 /**
  * The dummy snapshot class provides an empty snapshot method
@@ -321,7 +327,10 @@ void ShadowCopy::takeSnapshot()
 
         // As the mounting takes some time, delay the execution of the next
         // loop itereation
-        QThread::sleep(1);
+        QWaitCondition waitCondition;
+        QMutex mutex;
+        waitCondition.wait(&mutex, 500);
+
     }
 
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
@@ -362,7 +371,7 @@ void ShadowCopy::cleanupSnapshot()
         QString linkname = this->snapshotPathMappers.value( partition ).getSnapshotPath();
 
         // Simply remove the symlink
-        QDir::remove( linkname );
+        //QDir::remove( linkname );
     }
 
     // Finally remove the shadow copy itself
@@ -371,7 +380,8 @@ void ShadowCopy::cleanupSnapshot()
     VSS_SNAPSHOT_PROP tmp_snapshot_prop;
 
     // Get the and set them to the snapshot properties field
-    this->result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.keys().first() , &tmp_snapshot_prop);
+    QString part = this->snapshot_set_ids.keys().first();
+    this->result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( part ), &tmp_snapshot_prop);
 
     // Check if the operation succeeded
     if (this->result == S_OK)
@@ -399,7 +409,7 @@ void ShadowCopy::checkCleanup()
     // If yes, remove them
     foreach( QString oldMount, oldShadowCopyMounts )
     {
-        QDir::remove( oldMount );
+        //QDir::remove( oldMount );
     }
 
 }

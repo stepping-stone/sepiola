@@ -122,8 +122,8 @@ private:
     static const VSS_BACKUP_TYPE SC_SNAPSHOT_TYPE = VSS_BT_COPY;
     static const bool SC_SNAPSHOT_BOOTABLE_STATE = false;
     static const bool SC_SNAPSHOT_SELECT_COMPONENTS = false;
-    static const QString MOUNT_DIRECTORY = "C:\\"; // TODO change this to something more appropriate like tmp folder or the sepiola app data dir
-    static const QString MOUNT_PREFIX = "mount_shadow_copy_";
+    static const QString MOUNT_DIRECTORY;
+    static const QString MOUNT_PREFIX;
 
     HRESULT result;
     HMODULE vssapiBase;
