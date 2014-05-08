@@ -30,6 +30,7 @@
 #include "utils/progress_task.hh"
 #include "model/scheduled_task.hh"
 #include "utils/const_utils.hh"
+#include "tools/filesystem_snapshot.hh"
 
 /**
  * The BackupThread class runs the backup process in its own thread
@@ -47,7 +48,7 @@ public:
 	 * @param excludePatternList Pattern list for exclude files
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
-	BackupThread( const BackupSelectionHash& includeRules );
+	BackupThread( const BackupSelectionHash& includeRules, FilesystemSnapshot* snapshot );
 
 	/**
 	 * Destroys the BackupThread
@@ -56,6 +57,8 @@ public:
 
 	void startInCurrentThread();
     void uploadSchedulerXML(ScheduledTask schedule);
+    void setLastBackupState(ConstUtils::StatusEnum status);
+
 signals:
 	void showCriticalMessageBox( const QString& message );
 	void finishProgressDialog();
@@ -63,6 +66,7 @@ signals:
 	void updateOverviewFormLastBackupsInfo();
 	void infoSignal( const QString& text );
 	void errorSignal( const QString& text );
+	void backupFinished();
 
 	void progressSignal( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos = StringPairList());
 	void finalStatusSignal( ConstUtils::StatusEnum status );
@@ -93,7 +97,6 @@ private:
 	quint64 estimateBackupSize( const QString& src, const QString& destination );
 	void updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList );
 	QString createCurrentBackupTimeFile();
-	void setLastBackupState(ConstUtils::StatusEnum status);
 	ConstUtils::StatusEnum getLastBackupState();
     void uploadBackupStartedXML(long id);
     void uploadBackupEndedXML(long id, int success);
@@ -113,6 +116,7 @@ private:
 	ProgressTask pt;
     int currentTaskNr;
     long backupID;
+    FilesystemSnapshot* fsSnapshot;
 };
 
 #endif

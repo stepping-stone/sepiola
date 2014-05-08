@@ -84,16 +84,23 @@ GENERATE_QT_RESOURCE_FROM_FILES(
     "${PROJECT_SOURCE_DIR}/${ABOUT_IMAGE_FILE}";"${PROJECT_SOURCE_DIR}/${WINDOW_ICON_FILE}")
 
 ADD_DEFINITIONS(${QT_DEFINITIONS})
+
+IF(Q_WS_WIN)
+    SET(OS_HEADER_DIRECTORIES /usr/local/inc/win2003/)
+ENDIF(Q_WS_WIN)
+
 INCLUDE_DIRECTORIES(
 	.
 	${CMAKE_CURRENT_BINARY_DIR}
+	${OS_HEADER_DIRECTORIES}
 )
 
 INCLUDE_DIRECTORIES(SYSTEM
 	${QT_INCLUDE_DIR}
 	${QT_QTCORE_INCLUDE_DIR} 
 	${QT_QTGUI_INCLUDE_DIR}
-	${QT_QTNETWORK_INCLUDE_DIR} 
+	${QT_QTNETWORK_INCLUDE_DIR}
+	${OS_HEADER_DIRECTORIES}
 )
 
 FIND_PROGRAM(QT_LUPDATE 
@@ -183,6 +190,9 @@ QT4_WRAP_CPP(
 	tools/abstract_informing_process.hh
 	tools/abstract_rsync.hh
 	tools/abstract_scheduler.hh
+	tools/abstract_snapshot.hh
+	tools/dummy_snapshot.hh
+	tools/filesystem_snapshot.hh
 	tools/rsync.hh
 	settings/settings.hh
 	utils/log_file_utils.hh
@@ -237,6 +247,9 @@ SET(BASE_SOURCE_FILES
 	tools/plink.cc
 	tools/process.cc
 	tools/rsync.cc
+	tools/dummy_snapshot.cc
+	tools/filesystem_snapshot.cc
+	tools/filesystem_snapshot_path_mapper.cc
 	tools/tool_factory.cc
 	utils/string_utils.cc
 	utils/extended_file.cc
@@ -282,10 +295,16 @@ SET(UI_SOURCE_FILES
 # Use Q_WS_WIN from Qt-module instead of WIN32 from cmake
 # to make it work when cross-compiling using MinGW
 IF(Q_WS_WIN)
+    QT4_WRAP_CPP(
+        sepiola_win_MOC
+        tools/shadow_copy.hh
+    )
     LIST(APPEND BASE_SOURCE_FILES
         tools/at.cc
         tools/schtasks.cc
         tools/set_acl.cc
+        tools/shadow_copy.cc
+        ${sepiola_win_MOC}
     )
 ELSEIF(Q_WS_MAC)
     LIST(APPEND BASE_SOURCE_FILES
@@ -340,7 +359,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} "-framework AppKit" iconv System)
 	ELSE(Q_WS_WIN)
 		SET(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
+		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -static-libstdc++ -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ${QT_NETWORK_LIB_DEPENDENCIES} ${QT_CORE_LIB_DEPENDENCIES} ${QT_PLUGINS_DIR}/imageformats/libqsvg.a ${QT_QTSVG_LIBRARY} ${QT_QTXML_LIBRARY})
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} SM ICE Xi Xext X11 rt m fontconfig)
 	ENDIF(Q_WS_WIN)

@@ -42,6 +42,7 @@
 #include "utils/file_system_utils.hh"
 #include "utils/log_file_utils.hh"
 #include "utils/unicode_text_stream.hh"
+#include "tools/filesystem_snapshot.hh"
 
 const QString MainModel::BACKUP_TIME_FORMAT = "yyyy-MM-dd HH:mm";
 const QString MainModel::BACKUP_TIME_TODAY = "TODAY";
@@ -49,7 +50,8 @@ const QString MainModel::BACKUP_TIME_TODAY = "TODAY";
 MainModel::MainModel() :
     localDirModel(nullptr),
     remoteDirModel(nullptr),
-    spaceUsageModel(new SpaceUsageModel(this))
+    spaceUsageModel(new SpaceUsageModel(this)),
+    fsSnapshot( new FilesystemSnapshot() )
 {
 }
 
@@ -173,38 +175,28 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 		closeProgressDialogSlot();
 		return;
 	}
-	BackupThread* backupThread = new BackupThread( includeRules );
 
-	QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
-					  this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
-	QObject::connect( backupThread, SIGNAL( infoSignal( const QString& ) ),
-					  this, SIGNAL( infoSignal( const QString& ) ) );
-	QObject::connect( backupThread, SIGNAL( errorSignal( const QString& ) ),
-					  this, SIGNAL( errorSignal( const QString& ) ) );
-	qRegisterMetaType<StringPairList>("StringPairList");
-	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
-	QObject::connect( backupThread, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
-					  this, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ) );
-	QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
-					  this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
-	QObject::connect( backupThread, SIGNAL( finishProgressDialog() ),
-						this, SIGNAL( finishProgressDialog() ) );
-	QObject::connect( backupThread, SIGNAL( updateOverviewFormLastBackupsInfo() ),
-					  this, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
-	QObject::connect( this, SIGNAL( abortProcess() ),
-						backupThread, SLOT( abortBackupProcess() ) );
-	qDebug() << "MainModel::backup: startInCurrentThread=" << startInCurrentThread;
-	if ( startInCurrentThread )
-	{
-		// signals are not connected with QCoreApplication and multiple threads
-		// but in CLI mode we do not need an own thread
-		backupThread->startInCurrentThread();
-	}
-	else
-	{
-		backupThread->start();
-		//TODO: disconnect signal/slot connections
-	}
+	this->startInThisThread = startInCurrentThread;
+
+	// Set the include rules for the filesystem snapshot object
+	this->fsSnapshot->setIncludeRules( includeRules );
+
+	// Create a new Backup Thread
+	this->backupThread = new BackupThread( includeRules, this->fsSnapshot );
+
+	// Connect the FilesystemSnapshots sendSnapshotDone signal to the local
+	// uploadFiles slot so as soon as the snapshot is finished, the files can
+	// be uploaded
+	QObject::connect( this->fsSnapshot, SIGNAL( sendSnapshotDone(int) ),
+	                   this, SLOT( uploadFiles( int ) ) );
+
+	// Connect the info and error signals to the info and error slot
+    QObject::connect( this->fsSnapshot, SIGNAL( infoSignal(const QString&) ),
+                       this, SLOT( infoSlot(const QString&) ) );
+
+	// Start the fs snapshot
+	this->fsSnapshot->doSnapshot();
+
 }
 
 bool MainModel::isSchedulingOnStartSupported()
@@ -221,7 +213,7 @@ void MainModel::schedule( const BackupSelectionHash& includeRules, const Schedul
         try
         {
             // Update the schedule information to the server
-            BackupThread backupThread( includeRules );
+            BackupThread backupThread( includeRules, NULL );
             backupThread.prepareServerDirectories();
             backupThread.uploadSchedulerXML( scheduleRule );
         }
@@ -570,4 +562,55 @@ QStringList MainModel::getNewLogfileLines()
 void MainModel::exit()
 {
 	Settings::getInstance()->deletePrivateKeyFiles();
+}
+
+void MainModel::uploadFiles( int result )
+{
+    // If the creation of the filesystem snapshot was not successful, clean it
+    // up and stop the backup here
+    if ( result != SNAPSHOT_SUCCESS )
+    {
+        this->fsSnapshot->cleanup();
+        delete this->fsSnapshot;
+        this->backupThread->setLastBackupState( ConstUtils::STATUS_ERROR );
+        emit infoSignal( "==================================================" );
+        emit finalStatusSignal( ConstUtils::STATUS_ERROR );
+        emit finishProgressDialog();
+        emit updateOverviewFormLastBackupsInfo();
+        emit backupFinished();
+        return;
+    }
+
+    QObject::connect( backupThread, SIGNAL( backupFinished() ),
+                      this, SIGNAL( backupFinished() ) );
+    QObject::connect( backupThread, SIGNAL( showCriticalMessageBox( const QString& ) ),
+                      this, SIGNAL( showCriticalMessageBox( const QString& ) ) );
+    QObject::connect( backupThread, SIGNAL( infoSignal( const QString& ) ),
+                      this, SIGNAL( infoSignal( const QString& ) ) );
+    QObject::connect( backupThread, SIGNAL( errorSignal( const QString& ) ),
+                      this, SIGNAL( errorSignal( const QString& ) ) );
+    qRegisterMetaType<StringPairList>("StringPairList");
+    qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
+    QObject::connect( backupThread, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ),
+                      this, SIGNAL( progressSignal( const QString&, float, const QDateTime&, StringPairList ) ) );
+    QObject::connect( backupThread, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ),
+                      this, SIGNAL( finalStatusSignal( ConstUtils::StatusEnum ) ) );
+    QObject::connect( backupThread, SIGNAL( finishProgressDialog() ),
+                        this, SIGNAL( finishProgressDialog() ) );
+    QObject::connect( backupThread, SIGNAL( updateOverviewFormLastBackupsInfo() ),
+                      this, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
+    QObject::connect( this, SIGNAL( abortProcess() ),
+                        backupThread, SLOT( abortBackupProcess() ) );
+    qDebug() << "MainModel::uploadFiles: startInCurrentThread=" << this->startInThisThread;
+    if ( this->startInThisThread )
+    {
+        // signals are not connected with QCoreApplication and multiple threads
+        // but in CLI mode we do not need an own thread
+        backupThread->startInCurrentThread();
+    }
+    else
+    {
+        backupThread->start();
+        //TODO: disconnect signal/slot connections
+    }
 }

@@ -23,6 +23,7 @@ class AbstractMetadata;
 class AbstractRsync;
 class AbstractSsh;
 class AbstractScheduler;
+class AbstractSnapshot;
 
 /**
  * The ToolFactory class provides methods for constructing real implementation object
@@ -66,6 +67,13 @@ public:
 	 * @return a scheduler implementation
 	 */
 	static AbstractScheduler * getSchedulerImpl();
+
+    /**
+     * Returns an AbstractSnapshot implementation
+     * @return a snapshot implementation
+     */
+    static AbstractSnapshot * getSnapshotImpl();
+
 };
 
 #endif

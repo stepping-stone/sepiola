@@ -32,6 +32,8 @@
 class LocalDirModel;
 class RemoteDirModel;
 class SpaceUsageModel;
+class FilesystemSnapshot;
+class BackupThread;
 
 /**
  * The MainModel class the main model according to the MVC pattern
@@ -223,6 +225,7 @@ signals:
 	void showCriticalMessageBox( const QString& message );
 	void updateStatusBarMessage ( const QString& message );
 	void updateOverviewFormLastBackupsInfo();
+	void backupFinished();
 
 	void showProgressDialog( const QString& dialogTitle );
 	void finishProgressDialog();
@@ -274,7 +277,13 @@ public slots:
 	/**
 	 * Aborts the current process
 	 */
-	 bool abortProcessSlot();
+	bool abortProcessSlot();
+
+	/**
+	 * Aborts the current process
+	 * @param The result of the filesystem snapshot creation
+	 */
+	void uploadFiles( int result );
 
 private:
 	LocalDirModel* localDirModel;
@@ -282,6 +291,9 @@ private:
     SpaceUsageModel* spaceUsageModel;
 	bool isLoginAborted;
 	QStringList getRestoreContent( const QString& backup_prefix, const QString& backupName );
+	FilesystemSnapshot* fsSnapshot;
+	BackupThread* backupThread;
+	bool startInThisThread;
 };
 
 inline void MainModel::abortLogin()
