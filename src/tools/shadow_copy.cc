@@ -324,14 +324,18 @@ void ShadowCopy::takeSnapshot()
         QString fullLinkname = linkname;
         fullLinkname.prepend("\\\\?\\");
 
-        // Check if the link already (what would be wrong) exists, if yes,
-        // remove it
-        QDir* linkDir = new QDir( linkname );
-        if ( linkDir->exists() )
-            removeWindowsSymlink( fullLinkname );
-
         LPCSTR link = (LPCSTR) fullLinkname.utf16();
         LPCSTR target = (LPCSTR) snapshotPath.utf16();
+
+        // Check if the link already (what would be wrong) exists, if yes,
+        // remove it
+        PathFileExistsProc PathFileExists_func;
+        PathFileExists_func =
+                    (PathFileExistsProc)GetProcAddress(lib,"PathFileExistsW");
+
+
+//        if ( (*PathFileExists_func)(link) == 1 )
+//            removeWindowsSymlink( linkname ); TODO check why not this does not work
 
         if (CreateSymbolicLink_func == NULL)
         {

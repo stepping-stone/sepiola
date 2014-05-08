@@ -48,6 +48,7 @@ static _VssFreeSnapshotPropertiesInternal VssFreeSnapshotPropertiesInternal_I;
 /* Funktions in kernel32.dll */
 typedef BOOL (WINAPI* CreateSymbolicLinkProc) (LPCSTR, LPCSTR, DWORD);
 typedef BOOL (WINAPI* RemoveDirectoryProc) (LPCSTR);
+typedef BOOL (WINAPI* PathFileExistsProc) (LPCSTR);
 
 
 /* Define some vss snapshot errors code which are 100 < code < 200*/
