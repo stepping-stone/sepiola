@@ -17,6 +17,7 @@
 */
 
 #include "shadow_copy.hh"
+#include "settings/settings.hh"
 
 #include <QString>
 #include <QDebug>
@@ -27,7 +28,6 @@
 #include <QWaitCondition>
 #include <QMutex>
 
-const QString ShadowCopy::MOUNT_DIRECTORY = Settings::getInstance()->getApplicationDataDir();
 const QString ShadowCopy::MOUNT_PREFIX = "mount_shadow_copy_";
 
 /**
@@ -308,7 +308,7 @@ void ShadowCopy::takeSnapshot()
         // FilesystemSnapshotPathMapper object
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
 	
-        QString linkname = MOUNT_DIRECTORY;
+        QString linkname = getMountDirectory();
         linkname.append( MOUNT_PREFIX );
         linkname.append(partition);
         snapshotPath.append("\\");
@@ -438,7 +438,7 @@ void ShadowCopy::checkCleanup()
 
     // Check in the MOUNT_DIRECTORY if there are any links with MOUNT_PREFIX
     QStringList nameFilter(MOUNT_PREFIX + "*");
-    QDir directory(MOUNT_DIRECTORY);
+    QDir directory( getMountDirectory() );
     QStringList oldShadowCopyMounts = directory.entryList(nameFilter);
 
     qDebug() << "Found the following leftovers of old FS Snapshots: " << oldShadowCopyMounts;
@@ -447,7 +447,7 @@ void ShadowCopy::checkCleanup()
     foreach( QString oldMount, oldShadowCopyMounts )
     {
 	QString linkname = oldMount;
-	linkname.prepend( MOUNT_DIRECTORY );
+	linkname.prepend( getMountDirectory() );
 
         qDebug() << "Removing:" << linkname;
 
@@ -487,4 +487,9 @@ void ShadowCopy::setSnapshotPathMappers(
 QString ShadowCopy::wCharArrayToQString( WCHAR* string)
 {
     return QString::fromWCharArray( string, wcslen(string) );
+}
+
+QString ShadowCopy::getMountDirectory()
+{
+    return Settings::getInstance()->getApplicationDataDir();
 }
