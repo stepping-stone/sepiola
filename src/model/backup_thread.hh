@@ -50,7 +50,7 @@ public:
 	 * @param excludePatternList Pattern list for exclude files
 	 * @param setDeleteFlag indicates whether extraneous files should be deleted
 	 */
-	BackupThread( const BackupSelectionHash& includeRules, FilesystemSnapshot* snapshot );
+	BackupThread( const BackupSelectionHash& includeRules, FilesystemSnapshot* snapshot = NULL );
 
 	/**
 	 * Destroys the BackupThread

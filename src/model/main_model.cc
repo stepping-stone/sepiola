@@ -213,7 +213,7 @@ void MainModel::schedule( const BackupSelectionHash& includeRules, const Schedul
         try
         {
             // Update the schedule information to the server
-            BackupThread backupThread( includeRules, NULL );
+            BackupThread backupThread( includeRules );
             backupThread.prepareServerDirectories();
             backupThread.uploadSchedulerXML( scheduleRule );
         }
