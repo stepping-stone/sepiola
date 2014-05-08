@@ -491,5 +491,13 @@ QString ShadowCopy::wCharArrayToQString( WCHAR* string)
 
 QString ShadowCopy::getMountDirectory()
 {
-    return Settings::getInstance()->getApplicationDataDir();
+    // Get the application data directory from the settings class
+    QString applicationDataDir = Settings::getInstance()->getApplicationDataDir();
+
+    // As this string contains normal slashes, we need to replace them by
+    // windows style backslashes
+    applicationDataDir.replace("/","\\");
+
+    // Now we can return the applicationDataDir
+    return applicationDataDir;
 }
