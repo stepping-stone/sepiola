@@ -102,6 +102,7 @@ bool Schtasks::schedule( const QString& execName, const QString& cliArgument, co
 	if ( password_ok )
 	{
 		QStringList arguments = schtasksArguments;
+		arguments << "/rl" << "HIGHEST";
 		arguments << "/ru" << username;
 		arguments << "/rp" << password;
 
