@@ -25,6 +25,11 @@
 class QThread;
 class QString;
 
+/**
+ * The filesystem snapshot class is a wrapper which serves the client with
+ * operating system specific snapshot implementation
+ * @author Pat Kläy, pat.klaey@stepping-stone.ch
+ */
 class FilesystemSnapshot : public QObject
 {
 

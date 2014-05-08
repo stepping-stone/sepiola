@@ -23,6 +23,7 @@
 #include "filesystem_snapshot.hh"
 #include "tools/tool_factory.hh"
 
+
 FilesystemSnapshot::FilesystemSnapshot( const BackupSelectionHash& includes)
 {
     // Save the included files
