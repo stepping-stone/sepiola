@@ -30,7 +30,9 @@
 #include "utils/progress_task.hh"
 #include "model/scheduled_task.hh"
 #include "utils/const_utils.hh"
-#include "tools/filesystem_snapshot.hh"
+
+// forward declarations
+class FilesystemSnapshot;
 
 /**
  * The BackupThread class runs the backup process in its own thread

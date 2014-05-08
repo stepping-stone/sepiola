@@ -33,6 +33,7 @@
 #include "tools/tool_factory.hh"
 #include "tools/abstract_metadata.hh"
 #include "tools/abstract_rsync.hh"
+#include "tools/filesystem_snapshot.hh"
 #include "tools/rsync.hh"
 #include "utils/file_system_utils.hh"
 #include "utils/log_file_utils.hh"
