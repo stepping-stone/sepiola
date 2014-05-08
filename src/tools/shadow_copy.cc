@@ -313,10 +313,6 @@ void ShadowCopy::takeSnapshot()
         linkname.append(partition);
         snapshotPath.append("\\");
 
-        QString args = linkname;
-        args.append(" ").append(snapshotPath);
-        const char* char_args = args.toUtf8().constData();
-
         HMODULE lib;
         CreateSymbolicLinkProc CreateSymbolicLink_func;
         DWORD flags = 1;
@@ -327,6 +323,12 @@ void ShadowCopy::takeSnapshot()
 
         QString fullLinkname = linkname;
         fullLinkname.prepend("\\\\?\\");
+
+        // Check if the link already (what would be wrong) exists, if yes,
+        // remove it
+        QDir* linkDir = new QDir( linkname );
+        if ( linkDir->exists() )
+            removeWindowsSymlink( fullLinkname );
 
         LPCSTR link = (LPCSTR) fullLinkname.utf16();
         LPCSTR target = (LPCSTR) snapshotPath.utf16();
