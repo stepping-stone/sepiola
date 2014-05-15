@@ -148,6 +148,7 @@ void FilesystemSnapshot::doSnapshot()
 {
     // Simply start the whole snapshot process by sending the
     // createSnapshotObject signal to the snapshot thread
+    emit infoSignal("Taking filesystem snapshot, this might take some time ...");
     emit sendCreateSnapshotObject();
 }
 
@@ -189,7 +190,7 @@ void FilesystemSnapshot::snapshotInitialized(int result)
     } else
     {
         qDebug() << "Cannot initialize filesytem snapshot";
-        emit infoSignal("Cannot create filesystem snapshot, stopping backup here");
+        emit infoSignal("Cannot create filesystem snapshot (initialization failed), stopping backup here");
         emit sendSnapshotDone( result );
     }
 }
@@ -204,7 +205,7 @@ void FilesystemSnapshot::filesAddedToSnapshot(int result)
     } else
     {
         qDebug() << "Adding files to snapshot set failed";
-        emit infoSignal("Cannot create filesystem snapshot, stopping backup here");
+        emit infoSignal("Cannot create filesystem snapshot (adding partition to snapshot failed), stopping backup here");
         emit sendSnapshotDone( result );
     }
 }
