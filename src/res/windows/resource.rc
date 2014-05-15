@@ -1,0 +1,11 @@
+#include "resource.h"
+ 
+//Allow to switch manifest between x86 and x64
+#if defined(_M_X64) || defined(__amd64__)
+    CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "manifest.xml"
+#else
+    CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "manifest.xml"
+#endif
+
+// Add the icon
+IDI_ICON1	ICON	DISCARDABLE	"icon.ico"

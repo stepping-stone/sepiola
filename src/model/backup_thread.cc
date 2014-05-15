@@ -41,6 +41,7 @@
 #include "utils/datetime_utils.hh"
 #include "utils/progress_task.hh"
 #include "settings/platform.hh"
+#include "tools/filesystem_snapshot.hh"
 
 const QString BackupThread::TASKNAME_PREPARE_DIRECTORIES = "preparing server directories";
 const QString BackupThread::TASKNAME_ESTIMATE_BACKUP_SIZE = "estimating backup size";
@@ -74,13 +75,13 @@ BackupThread::BackupThread( const BackupSelectionHash& incRules, FilesystemSnaps
     isAborted(false),
     includeRules(incRules),
     backupStartDateTime(QDateTime()), // null-Time
-    backupCurrentStatus(ConstUtils::STATUS_UNDEFINED)
+    backupCurrentStatus(ConstUtils::STATUS_UNDEFINED),
+    fsSnapshot(snapshot)
 {
 	Settings* settings = Settings::getInstance();
 	this->setDeleteFlag = settings->getDeleteExtraneousItems();
 	this->compressedUpload = settings->isCompressedRsyncTraffic();
 	this->bandwidthLimit = settings->getBandwidthLimit();
-	this->fsSnapshot = snapshot;
 
     /* initialize random seed and generate the backup id */
     qsrand(QTime::currentTime().msec());

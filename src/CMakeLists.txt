@@ -19,11 +19,11 @@ IF(DEFINED RESELLER)
     SET(IS_RESELLER TRUE FORCE)
 ENDIF(DEFINED RESELLER)
 
-SET(MACOSX_ICON_FILE src/icon/mac/icon.icns
+SET(MACOSX_ICON_FILE src/res/mac/icon.icns
     CACHE PATH "Application icon for OSX")
-SET(WINDOWS_RESSOURCE_FILE src/icon/windows/icon.rc
-    CACHE PATH "Application resource (including icon) for Windows")
-SET(LINUX_ICON_FILE src/icon/linux/icon.png
+SET(WINDOWS_RESSOURCE_FILE src/res/windows/resource.rc
+    CACHE PATH "Windows ressource file")
+SET(LINUX_ICON_FILE src/res/linux/icon.png
     CACHE PATH "Application icon for Linux")
 SET(ABOUT_IMAGE_FILE src/gui/resources/about_image.png
     CACHE PATH "About image")
@@ -69,13 +69,11 @@ SET(CMAKE_CXX_FLAGS_DEPLOY ${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO})
 IF(Q_WS_WIN)
     include(CMakeDetermineRCCompiler)
 	# add windows icon/ressources
-	ADD_CUSTOM_COMMAND(
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/icon.o
-		COMMAND ${CMAKE_RC_COMPILER}
-        -i "${PROJECT_SOURCE_DIR}/${WINDOWS_RESSOURCE_FILE}"
-		-o "${CMAKE_CURRENT_BINARY_DIR}/icon.o"
+        ADD_CUSTOM_COMMAND(
+		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
+		COMMAND ${CMAKE_RC_COMPILER} ${PROJECT_SOURCE_DIR}/${WINDOWS_RESSOURCE_FILE} -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o
 	)
-	SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/icon.o)
+	SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
 ENDIF(Q_WS_WIN)
 
 GENERATE_QT_RESOURCE_FROM_FILES(
