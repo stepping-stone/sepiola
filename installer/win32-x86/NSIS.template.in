@@ -32,6 +32,9 @@
   ;Set compression
   SetCompressor @CPACK_NSIS_COMPRESSOR@
 
+  ; Requesting admin rights
+  RequestExecutionLevel admin
+
 ;--------------------------------
 ; determine admin versus local install
 ; Is install for "AllUsers" or "JustMe"?
