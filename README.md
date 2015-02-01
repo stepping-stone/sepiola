@@ -37,9 +37,12 @@ original sources as follows:
 * getfacl/setfacl: ftp://oss.sgi.com/projects/xfs/cmd_tars/
 * SetACL: http://sourceforge.net/projects/setacl/
 
+# Development
+
+The development follows the [git flow](http://nvie.com/posts/a-successful-git-branching-model/) model.
 
 # License & Copyright
 
-Copyright 2013 (c) stepping stone GmbH, Switzerland.
+Copyright 2015 (c) stepping stone GmbH, Switzerland.
 
 Released under the GPL-2 license.
