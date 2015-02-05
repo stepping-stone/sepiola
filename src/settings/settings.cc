@@ -37,7 +37,7 @@
 const bool Settings::SHOW_PROGRESS = false;
 
 const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );
-const QString Settings::VERSION = QString::number( VERSION_MAJOR ) + "." + QString::number( VERSION_MINOR ) + "." + QString::number( VERSION_PATCH );
+const QString Settings::VERSION = QString( SSBACKUP_VERSION );
 
 // [Client]
 const QString Settings::SETTINGS_GROUP_CLIENT = "Client";
