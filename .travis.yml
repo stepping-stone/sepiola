@@ -9,7 +9,6 @@ addons:
       name: "stepping-stone/sepiola"
       description: "Build submitted via Travis CI"
     notification_email: info@stepping-stone.ch
-    build_command_prepend: "mkdir coverity; cd coverity; cmake .."
     build_command: "make"
     branch_pattern: coverity_scan
 language: cpp
@@ -22,6 +21,6 @@ before_install:
 before_script:
   - mkdir build
   - cd build
-script:
   - cmake ..
-  - make
+script:
+  - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make ; fi
