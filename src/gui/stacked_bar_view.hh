@@ -53,7 +53,7 @@ protected slots:
 private:
     void _updateColorValues();
 
-    int _margin, _totalSize, _stackbarHeight;
+    int _margin, _stackbarHeight;
     double _totalValue;
     size_t _validItems;
 };
