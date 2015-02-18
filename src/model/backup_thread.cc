@@ -362,8 +362,7 @@ ConstUtils::StatusEnum BackupThread::getLastBackupState()
 void BackupThread::rsyncDryrunProgressHandler(const QString& filename, long files_total, long files_done) {
 	ProgressTask* mySubPt = this->pt.getSubtask(TASKNAME_ESTIMATE_BACKUP_SIZE); // this->pt.getCurrentTask();
 	StringPairList vars = StringPairList();
-	QString currentTaskName = mySubPt!=0 ? mySubPt->getName() : "";
-	if (currentTaskName==TASKNAME_ESTIMATE_BACKUP_SIZE)
+	if ( (mySubPt != 0) && (mySubPt->getName() == TASKNAME_ESTIMATE_BACKUP_SIZE) )
 	{
 		double ratio_done = (double)files_done / (files_total!=0 ? files_total: 1);
 		mySubPt->addFixpointNow(ratio_done);
