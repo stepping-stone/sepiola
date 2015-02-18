@@ -354,7 +354,6 @@ class Settings : public QObject
 		QSettings* resellerSettings; // read only reseller settings
 		QSettings* userSettings; // writable settings
 		QSettings* appData; // writable settings
-		bool settingsChanged;
 		QString applicationBinDir;
 		QString applicationDataDir;
 		QDateTime installDate;
@@ -409,7 +408,6 @@ class Settings : public QObject
 		QString privateOpenSshKey;
 		bool deleteExtraneousItems;
 		bool showHiddenFilesAndFolders;
-		bool compressedRsyncTraffic; // read only at the moment
         int bandwidthLimit;
 		QSize windowSize;
 		QPoint windowPosition;

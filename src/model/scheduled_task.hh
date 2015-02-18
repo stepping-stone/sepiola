@@ -57,8 +57,6 @@ class ScheduledTask
 		QString toString() const;
 		bool equals(const ScheduledTask& scheduledTask) const;
 		
-		static QMap<ScheduleRule::Weekdays, QString> weekdayNames;
-
 	private:
 		ScheduleRule::ScheduleType type;
 		QSet<ScheduleRule::Weekdays> weekdays;

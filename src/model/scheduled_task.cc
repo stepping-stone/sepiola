@@ -22,21 +22,11 @@
 
 #include "model/scheduled_task.hh"
 
-QMap<ScheduleRule::Weekdays, QString> ScheduledTask::weekdayNames;
-
 /**
  * Constructor for "Never"-Scheduler
  */
 ScheduledTask::ScheduledTask()
 {
-//ScheduledTask::hallo = 1;
-	this->weekdayNames.insert(ScheduleRule::MONDAY, QObject::tr("Monday"));
-	this->weekdayNames.insert(ScheduleRule::TUESDAY, QObject::tr("Tuesday"));
-	this->weekdayNames.insert(ScheduleRule::WEDNESDAY, QObject::tr("Wednesday"));
-	this->weekdayNames.insert(ScheduleRule::THURSDAY, QObject::tr("Thursday"));
-	this->weekdayNames.insert(ScheduleRule::FRIDAY, QObject::tr("Friday"));
-	this->weekdayNames.insert(ScheduleRule::SATURDAY, QObject::tr("Saturday"));
-	this->weekdayNames.insert(ScheduleRule::SUNDAY, QObject::tr("Sunday"));
 	this->setType(ScheduleRule::NEVER);
 	this->clearWeekdays();
 	this->setTimeToRun(QTime());
@@ -167,7 +157,6 @@ QString ScheduledTask::toString() const
 				//QString wdStr = "";
 				for (int i = 0; i < wdList.size(); i++)
 				{
-					//wdStr = wdStr + this->weekdayNames.value(wdList.at(i)).left(3) + tok;
 					QDateTime nextBkup = QDateTime::currentDateTime();
 					nextBkup.setTime(this->timeToRun);
 					int daysDiff = (wdList.at(i)+1-wd_now+7) % 7; // ScheduleRule::Weekdays starts at Monday=0 -> +1

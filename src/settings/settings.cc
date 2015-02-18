@@ -321,8 +321,6 @@ void Settings::reloadSettings()
 	appData->beginGroup( SETTINGS_GROUP_GUI );
 	nOfLastBackups = appData->value( SETTINGS_N_OF_SHOWN_LAST_BACKUPS, DEFAULT_NUM_OF_LAST_BACKUPS ).toInt();
 	appData->endGroup();
-
-	this->settingsChanged = false;
 }
 
 QDateTime Settings::getInstallDate()

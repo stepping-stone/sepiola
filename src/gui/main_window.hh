@@ -32,7 +32,6 @@ class RestoreForm;
 class LogfileForm;
 class TrafficProgressDialog;
 class QStackedLayout;
-class QSplashScreen;
 
 /**
  * The MainWindow class is the main user interface.
@@ -70,7 +69,6 @@ private:
 	RestoreForm* restoreForm;
 	SettingsForm* settingsForm;
 	LogfileForm* logfileForm;
-	QSplashScreen* splashScreen;
 	TrafficProgressDialog* progressDialog;
 
 	void writeSettings();
