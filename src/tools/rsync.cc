@@ -43,10 +43,10 @@ Rsync::Rsync() :
     progress_bytesRead(0),
     progress_bytesWritten(0),
     progress_trafficB_s(0),
+    last_calculatedLiteralData(0),
     files_total(-1),
     cur_n_files_done(0),
-    lastUpdateTime(QDateTime::currentDateTime()),
-    last_calculatedLiteralData(0)
+    lastUpdateTime(QDateTime::currentDateTime())
 {
 }
 
