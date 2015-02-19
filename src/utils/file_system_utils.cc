@@ -70,11 +70,13 @@ void FileSystemUtils::convertFile(const QString& fileName, const QString& fromEn
 	qDebug() << "FileSystemUtils::convertFile" << " " << fileName << " " << fromEncoding << " " << toEncoding;
 
 	QFile file(fileName);
-	file.open(QIODevice::ReadOnly);
+	if (!file.open(QIODevice::ReadOnly))
+	    throw RuntimeException( QObject::tr( "Could not open file %1" ).arg(fileName) );
 	qDebug() << "File to convert: " << fileName << " size: " << file.size();
 	QTemporaryFile tmpFile(fileName);
-	tmpFile.open();
 	tmpFile.setAutoRemove(false);
+	if (!tmpFile.open())
+	    throw RuntimeException( QObject::tr( "Could not open temporary file %1" ).arg(tmpFile.fileName()) );
 
 	qDebug() << "tmpFile: " << tmpFile.fileName();
 
