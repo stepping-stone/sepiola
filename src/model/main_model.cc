@@ -51,7 +51,10 @@ MainModel::MainModel() :
     localDirModel(nullptr),
     remoteDirModel(nullptr),
     spaceUsageModel(new SpaceUsageModel(this)),
-    fsSnapshot( new FilesystemSnapshot() )
+    isLoginAborted(false),
+    fsSnapshot( new FilesystemSnapshot() ),
+    backupThread(nullptr),
+    startInThisThread(true)
 {
 }
 

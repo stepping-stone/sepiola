@@ -28,17 +28,20 @@ const double ProgressTask::DURATION_CALCULATION_TIME_RANGE = 40.0; // only the a
 const double ProgressTask::MEAN_OVER_LAST_N_SECONDS = 20.0;
 
 
-ProgressTask::ProgressTask() : isFinished(false), parent(0)
+ProgressTask::ProgressTask() :
+	isFinished(false), fp_changed(false), parent(0), nSteps(0)
 {
 }
-ProgressTask::ProgressTask(const QString& name, const QDateTime& estDuration, const double nSteps) : isFinished(false), fp_changed(true), parent(0)
+ProgressTask::ProgressTask(const QString& name, const QDateTime& estDuration, const double nSteps) :
+	isFinished(false), fp_changed(true), parent(0)
 {
 	setName(name);
 	setEstimatedDuration(estDuration);
 	setNumberOfSteps(nSteps);
 }
 
-ProgressTask::ProgressTask(ProgressTask* parent, QString name, const QDateTime& estDuration, const double nSteps) : isFinished(false), fp_changed(true), parent(parent)
+ProgressTask::ProgressTask(ProgressTask* parent, QString name, const QDateTime& estDuration, const double nSteps) :
+	isFinished(false), fp_changed(true), parent(parent)
 {
 	setName(name);
 	setEstimatedDuration(estDuration);

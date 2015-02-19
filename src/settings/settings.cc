@@ -124,6 +124,13 @@ Settings::Settings() :
     userSettings(0),
     appData(0),
     logDebugMessage(false),
+    ignoreReinstall(false),
+    maxLogLines(10000),
+    rsyncTimeout(43200),
+    deleteExtraneousItems(true),
+    showHiddenFilesAndFolders(false),
+    bandwidthLimit(0),
+    nOfLastBackups(0),
     effectiveUserId(0)
 {
 	//TODO: load language name translations after setting the current langauge
