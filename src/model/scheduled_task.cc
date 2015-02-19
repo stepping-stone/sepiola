@@ -16,7 +16,6 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QDebug>
 #include <QtAlgorithms>
 #include <QTime>
 
@@ -25,34 +24,31 @@
 /**
  * Constructor for "Never"-Scheduler
  */
-ScheduledTask::ScheduledTask()
+ScheduledTask::ScheduledTask() :
+	type(ScheduleRule::NEVER),
+	timeToRun(QTime()),
+	minutesAfterStartup(0)
 {
-	this->setType(ScheduleRule::NEVER);
-	this->clearWeekdays();
-	this->setTimeToRun(QTime());
-	this->setMinutesAfterStartup(0);
 }
 
 /**
  * Constructor for Weekdays-Scheduler
  */
-ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> weekdays, QTime timeToRun)
+ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time) :
+	type(ScheduleRule::AT_WEEKDAYS_AND_TIME),
+	weekdays(w),
+	timeToRun(time),
+	minutesAfterStartup(0)
 {
-	ScheduledTask();
-	this->setType(ScheduleRule::AT_WEEKDAYS_AND_TIME);
-	this->setWeekdays(weekdays);
-	this->setTimeToRun(timeToRun);
-	this->setMinutesAfterStartup(0);
 }
 
 /**
  * Constructor for AfterBoot-Scheduler
  */
-ScheduledTask::ScheduledTask(int minutesAfterStartup)
+ScheduledTask::ScheduledTask(int minutes) :
+	type(ScheduleRule::AFTER_BOOT),
+	minutesAfterStartup(minutes)
 {
-	ScheduledTask();
-	this->setType(ScheduleRule::AFTER_BOOT);
-	this->setMinutesAfterStartup(minutesAfterStartup);
 }
 
 /**

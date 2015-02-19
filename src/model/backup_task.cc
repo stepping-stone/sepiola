@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2011 stepping stone GmbH
+#| Copyright (C) 2007-2015 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -16,17 +16,14 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QDebug>
-
 #include "model/backup_task.hh"
 
 QMap<ConstUtils::StatusEnum, QString> BackupTask::map_statusText;
 
-
-BackupTask::BackupTask()
+BackupTask::BackupTask() :
+	backupTime(QDateTime()),
+	status(ConstUtils::STATUS_UNDEFINED)
 {
-	this->setDateTime( QDateTime() );
-	this->setStatus( ConstUtils::STATUS_UNDEFINED );
 }
 
 BackupTask::BackupTask( const BackupTask& newBackupTask )
@@ -35,11 +32,10 @@ BackupTask::BackupTask( const BackupTask& newBackupTask )
 	status = newBackupTask.status;
 }
 
-BackupTask::BackupTask( const QDateTime& backupTime, ConstUtils::StatusEnum status )
+BackupTask::BackupTask( const QDateTime& bT, ConstUtils::StatusEnum s ) :
+	backupTime(bT),
+	status(s)
 {
-	BackupTask();
-	this->setStatus( status );
-	this->setDateTime( backupTime );
 }
 
 BackupTask::~BackupTask() {}

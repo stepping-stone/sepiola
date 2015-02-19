@@ -32,7 +32,7 @@ class BackupTask
 	public:
 		BackupTask();
 		BackupTask( const BackupTask& newBackupTask );
-		BackupTask( const QDateTime& backupTime, ConstUtils::StatusEnum status );
+		BackupTask( const QDateTime& bT, ConstUtils::StatusEnum s);
 		~BackupTask();
 
 		static QString getStatusText( ConstUtils::StatusEnum status );
