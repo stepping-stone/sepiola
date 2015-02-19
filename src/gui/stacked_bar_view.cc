@@ -24,7 +24,8 @@ StackedBarView::StackedBarView(QWidget* p) :
     QAbstractItemView(p),
     _margin(0),
     _stackbarHeight(16),
-    _totalValue(0.0)
+    _totalValue(0.0),
+    _validItems(0)
 {
 }
 

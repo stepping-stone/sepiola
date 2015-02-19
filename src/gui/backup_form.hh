@@ -77,7 +77,6 @@ private:
 	static const int default_schedule_minutesAfterStartup;
 	MainModel* model;
 	LocalDirModel* localDirModel;
-	bool detailsVisible;
 };
 
 #endif

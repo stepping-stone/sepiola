@@ -75,7 +75,6 @@ private:
 
 	static LogFileUtils* instance;
 	QFile* logFile;
-	int maxLines;
 	QTextStream output;
 	QStringList newLines;
 	QMutex mutex;

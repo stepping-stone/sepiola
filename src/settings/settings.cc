@@ -37,7 +37,7 @@
 const bool Settings::SHOW_PROGRESS = false;
 
 const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );
-const QString Settings::VERSION = QString::number( VERSION_MAJOR ) + "." + QString::number( VERSION_MINOR ) + "." + QString::number( VERSION_PATCH );
+const QString Settings::VERSION = QString( SSBACKUP_VERSION );
 
 // [Client]
 const QString Settings::SETTINGS_GROUP_CLIENT = "Client";
@@ -124,6 +124,13 @@ Settings::Settings() :
     userSettings(0),
     appData(0),
     logDebugMessage(false),
+    ignoreReinstall(false),
+    maxLogLines(10000),
+    rsyncTimeout(43200),
+    deleteExtraneousItems(true),
+    showHiddenFilesAndFolders(false),
+    bandwidthLimit(0),
+    nOfLastBackups(0),
     effectiveUserId(0)
 {
 	//TODO: load language name translations after setting the current langauge
@@ -321,8 +328,6 @@ void Settings::reloadSettings()
 	appData->beginGroup( SETTINGS_GROUP_GUI );
 	nOfLastBackups = appData->value( SETTINGS_N_OF_SHOWN_LAST_BACKUPS, DEFAULT_NUM_OF_LAST_BACKUPS ).toInt();
 	appData->endGroup();
-
-	this->settingsChanged = false;
 }
 
 QDateTime Settings::getInstallDate()

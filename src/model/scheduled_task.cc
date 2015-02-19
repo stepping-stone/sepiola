@@ -16,53 +16,39 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QDebug>
 #include <QtAlgorithms>
 #include <QTime>
 
 #include "model/scheduled_task.hh"
 
-QMap<ScheduleRule::Weekdays, QString> ScheduledTask::weekdayNames;
-
 /**
  * Constructor for "Never"-Scheduler
  */
-ScheduledTask::ScheduledTask()
+ScheduledTask::ScheduledTask() :
+	type(ScheduleRule::NEVER),
+	timeToRun(QTime()),
+	minutesAfterStartup(0)
 {
-//ScheduledTask::hallo = 1;
-	this->weekdayNames.insert(ScheduleRule::MONDAY, QObject::tr("Monday"));
-	this->weekdayNames.insert(ScheduleRule::TUESDAY, QObject::tr("Tuesday"));
-	this->weekdayNames.insert(ScheduleRule::WEDNESDAY, QObject::tr("Wednesday"));
-	this->weekdayNames.insert(ScheduleRule::THURSDAY, QObject::tr("Thursday"));
-	this->weekdayNames.insert(ScheduleRule::FRIDAY, QObject::tr("Friday"));
-	this->weekdayNames.insert(ScheduleRule::SATURDAY, QObject::tr("Saturday"));
-	this->weekdayNames.insert(ScheduleRule::SUNDAY, QObject::tr("Sunday"));
-	this->setType(ScheduleRule::NEVER);
-	this->clearWeekdays();
-	this->setTimeToRun(QTime());
-	this->setMinutesAfterStartup(0);
 }
 
 /**
  * Constructor for Weekdays-Scheduler
  */
-ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> weekdays, QTime timeToRun)
+ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time) :
+	type(ScheduleRule::AT_WEEKDAYS_AND_TIME),
+	weekdays(w),
+	timeToRun(time),
+	minutesAfterStartup(0)
 {
-	ScheduledTask();
-	this->setType(ScheduleRule::AT_WEEKDAYS_AND_TIME);
-	this->setWeekdays(weekdays);
-	this->setTimeToRun(timeToRun);
-	this->setMinutesAfterStartup(0);
 }
 
 /**
  * Constructor for AfterBoot-Scheduler
  */
-ScheduledTask::ScheduledTask(int minutesAfterStartup)
+ScheduledTask::ScheduledTask(int minutes) :
+	type(ScheduleRule::AFTER_BOOT),
+	minutesAfterStartup(minutes)
 {
-	ScheduledTask();
-	this->setType(ScheduleRule::AFTER_BOOT);
-	this->setMinutesAfterStartup(minutesAfterStartup);
 }
 
 /**
@@ -167,7 +153,6 @@ QString ScheduledTask::toString() const
 				//QString wdStr = "";
 				for (int i = 0; i < wdList.size(); i++)
 				{
-					//wdStr = wdStr + this->weekdayNames.value(wdList.at(i)).left(3) + tok;
 					QDateTime nextBkup = QDateTime::currentDateTime();
 					nextBkup.setTime(this->timeToRun);
 					int daysDiff = (wdList.at(i)+1-wd_now+7) % 7; // ScheduleRule::Weekdays starts at Monday=0 -> +1
