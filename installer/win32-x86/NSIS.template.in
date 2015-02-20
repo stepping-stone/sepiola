@@ -455,7 +455,7 @@ SectionEnd
 
 Section "Installer Section" InstSection
 
-  ;Libraries from the MinGW installation
+  ;Libraries from the MinGW installation, make sure to explicitly delete them in the uninstall section
   SetOutPath "$INSTDIR\bin"
   File "@CPACK_INSTALL_PREFIX@/bin/QtCore@CPACK_NSIS_QT_SUFFIX@4.dll"
   File "@CPACK_INSTALL_PREFIX@/bin/QtGui@CPACK_NSIS_QT_SUFFIX@4.dll"
@@ -590,6 +590,14 @@ Section "Uninstall"
   ;Keep the list of directories here in sync with the File commands above.
 @CPACK_NSIS_DELETE_FILES@
 @CPACK_NSIS_DELETE_DIRECTORIES@
+
+  Delete "$INSTDIR\bin\QtCore@CPACK_NSIS_QT_SUFFIX@4.dll"
+  Delete "$INSTDIR\bin\QtGui@CPACK_NSIS_QT_SUFFIX@4.dll"
+  Delete "$INSTDIR\bin\QtNetwork@CPACK_NSIS_QT_SUFFIX@4.dll"
+  Delete "$INSTDIR\bin\zlib1.dll"
+  Delete "$INSTDIR\bin\libpng*.dll"
+  Delete "$INSTDIR\bin\libstdc++-6.dll"
+  Delete "$INSTDIR\bin\libgcc_s_*.dll"
 
   ;Remove the temporary application folder
   RMDir /r "$TEMP\@CPACK_PACKAGE_NAME@"
