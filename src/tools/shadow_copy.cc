@@ -47,10 +47,6 @@ typedef BOOL (WINAPI* PathFileExistsProc) (LPCSTR);
 
 const QString ShadowCopy::MOUNT_PREFIX = "mount_shadow_copy_";
 
-/**
- * The dummy snapshot class provides an empty snapshot method
- * @author Pat Kläy, pat.klaey@stepping-stone.ch
- */
 ShadowCopy::ShadowCopy()
 {
     // Constructor
