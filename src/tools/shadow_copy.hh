@@ -115,7 +115,6 @@ private:
     static const bool SC_SNAPSHOT_SELECT_COMPONENTS = false;
     static const QString MOUNT_PREFIX;
 
-    HRESULT result;
     HMODULE vssapiBase;
     IVssBackupComponents *pBackup = NULL;
     IVssAsync *pAsync = NULL;

@@ -82,12 +82,12 @@ void ShadowCopy::createSnapshotObject()
     CreateVssBackupComponentsInternal_I = (_CreateVssBackupComponentsInternal)GetProcAddress(this->vssapiBase, "CreateVssBackupComponentsInternal");
 
     // Create the shadow copy backup component (VSSBackupComponent)
-    this->result = CreateVssBackupComponentsInternal_I(&(this->pBackup));
+    HRESULT result = CreateVssBackupComponentsInternal_I(&(this->pBackup));
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Cannot create VSSBackupComponent, operation failed with error: 0x%08lx").arg(this->result);
+        QString error = QString("Cannot create VSSBackupComponent, operation failed with error: 0x%08lx").arg(result);
         qCritical() << error;
         emit sendSnapshotObjectCreated( SNAPSHOT_CANNOT_CREATE_SNASPHOT_OBJECT );
         return;
@@ -107,36 +107,36 @@ void ShadowCopy::initializeSnapshot()
         return;
     }
 
-    this->result = this->pBackup->InitializeForBackup();
+    HRESULT result = this->pBackup->InitializeForBackup();
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Initialize for backup failed with error: = 0x%08lx").arg(this->result);
+        QString error = QString("Initialize for backup failed with error: = 0x%08lx").arg(result);
         qCritical() << error;
         emit sendSnapshotInitialized( SNAPSHOT_CANNOT_INITIALIZE_BACKUP );
         return;
     }
 
     // Set the context, we want an non-persistant backup which involves writers
-    this->result = this->pBackup->SetContext(this->SC_SNAPSHOT_CONTEXT);
+    HRESULT result = this->pBackup->SetContext(this->SC_SNAPSHOT_CONTEXT);
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Setting backup context to %i failed with error: 0x%08lx").arg(this->SC_SNAPSHOT_CONTEXT).arg(this->result);
+        QString error = QString("Setting backup context to %i failed with error: 0x%08lx").arg(this->SC_SNAPSHOT_CONTEXT).arg(result);
         qCritical() << error;
         emit sendSnapshotInitialized( SNAPSHOT_CANNOT_SET_BACKUP_CONTEXT );
         return;
     }
 
     // Tell the writers to gather metadata
-    this->result = this->pBackup->GatherWriterMetadata(&(this->pAsync));
+    HRESULT result = this->pBackup->GatherWriterMetadata(&(this->pAsync));
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Writers gathering metadata failed with error: 0x%08lx").arg(this->result);
+        QString error = QString("Writers gathering metadata failed with error: 0x%08lx").arg(result);
         qCritical() << error;
         emit sendSnapshotInitialized( SNAPSHOT_WRITER_GATHERING_METADATA_FAILED );
         return;
@@ -146,9 +146,9 @@ void ShadowCopy::initializeSnapshot()
     this->pAsync->Wait();
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Waiting for writers collecting metadata failed with error: 0x%08lx").arg(this->result);
+        QString error = QString("Waiting for writers collecting metadata failed with error: 0x%08lx").arg(result);
         qCritical() << error;
         emit sendSnapshotInitialized( SNAPSHOT_ASYNC_WAIT_FAILED );
         return;
@@ -157,12 +157,12 @@ void ShadowCopy::initializeSnapshot()
     VSS_ID tmp_snapshot_set_id;
 
     // Start the snapshot set
-    this->result = this->pBackup->StartSnapshotSet(&tmp_snapshot_set_id);
+    HRESULT result = this->pBackup->StartSnapshotSet(&tmp_snapshot_set_id);
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Starting snapshot set failed with error: 0x%08lx").arg(this->result);
+        QString error = QString("Starting snapshot set failed with error: 0x%08lx").arg(result);
         qCritical() << error;
         emit sendSnapshotInitialized( SNAPSHOT_CANNOT_START_SNAPSHOT_SET );
         return;
@@ -226,12 +226,12 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
         partition_name.toWCharArray(win_partition);
 
         // Add the partition to the snapshot set
-        this->result = this->pBackup->AddToSnapshotSet(win_partition, GUID_NULL, &tmp_snapshot_set_id);
+        HRESULT result = this->pBackup->AddToSnapshotSet(win_partition, GUID_NULL, &tmp_snapshot_set_id);
 
         // Check if the operation succeeded
-        if (this->result != S_OK)
+        if (result != S_OK)
         {
-            QString error = QString("Adding %s to snapshot set failed with error: 0x%08lx\n").arg(partition_name).arg(this->result);
+            QString error = QString("Adding %s to snapshot set failed with error: 0x%08lx\n").arg(partition_name).arg(result);
             emit sendFilesAddedToSnapshot( SNAPSHOT_CANNOT_ADD_PARTITION_TO_SNAPSHOT_SET );
             return;
         }
@@ -247,56 +247,56 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
 void ShadowCopy::takeSnapshot()
 {
     // Set the backup state
-    this->result = this->pBackup->SetBackupState(this->SC_SNAPSHOT_SELECT_COMPONENTS, this->SC_SNAPSHOT_BOOTABLE_STATE, this->SC_SNAPSHOT_TYPE);
+    HRESULT result = this->pBackup->SetBackupState(this->SC_SNAPSHOT_SELECT_COMPONENTS, this->SC_SNAPSHOT_BOOTABLE_STATE, this->SC_SNAPSHOT_TYPE);
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Setting backup state failed with error: 0x%08lx\n").arg(this->result);
+        QString error = QString("Setting backup state failed with error: 0x%08lx\n").arg(result);
         emit sendSnapshotTaken( SNAPSHOT_CANNOT_SET_SNAPSHOT_STATE );
         return;
     }
 
     // Tell everyone to prepare for the backup
-    this->result = this->pBackup->PrepareForBackup(&(this->pPrepare));
+    HRESULT result = this->pBackup->PrepareForBackup(&(this->pPrepare));
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Preparing for backup failed with error: 0x%08lx\n").arg(this->result);
+        QString error = QString("Preparing for backup failed with error: 0x%08lx\n").arg(result);
         emit sendSnapshotTaken( SNAPSHOT_CANNOT_PREPARE_FOR_BACKUP );
         return;
     }
 
     // Wait for everyone to be ready
-    this->result = this->pPrepare->Wait();
+    HRESULT result = this->pPrepare->Wait();
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Waiting for preparing for backup failed with error: 0x%08lx\n").arg(this->result);
+        QString error = QString("Waiting for preparing for backup failed with error: 0x%08lx\n").arg(result);
         emit sendSnapshotTaken( SNAPSHOT_ASYNC_WAIT_FAILED );
         return;
     }
 
     // And create the shadow copy
-    this->result = this->pBackup->DoSnapshotSet(&(this->pDoShadowCopy));
+    HRESULT result = this->pBackup->DoSnapshotSet(&(this->pDoShadowCopy));
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Creating shadow copy snapshot failed with error: 0x%08lx\n").arg(this->result);
+        QString error = QString("Creating shadow copy snapshot failed with error: 0x%08lx\n").arg(result);
         emit sendSnapshotTaken( SNAPSHOT_CANNOT_CREATE_SNAPSHOT );
         return;
     }
 
     // Wait until the shadow copy is created
-    this->result = this->pDoShadowCopy->Wait();
+    HRESULT result = this->pDoShadowCopy->Wait();
 
     // Check if the operation succeeded
-    if (this->result != S_OK)
+    if (result != S_OK)
     {
-        QString error = QString("Waiting for shadow copy to finish failed with error: 0x%08lx\n").arg(this->result);
+        QString error = QString("Waiting for shadow copy to finish failed with error: 0x%08lx\n").arg(result);
         emit sendSnapshotTaken( SNAPSHOT_ASYNC_WAIT_FAILED );
         return;
     }
@@ -307,12 +307,12 @@ void ShadowCopy::takeSnapshot()
         VSS_SNAPSHOT_PROP tmp_snapshot_prop;
 
         // Get the and set them to the snapshot properties field
-        this->result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( partition) , &tmp_snapshot_prop);
+        HRESULT result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( partition) , &tmp_snapshot_prop);
 
         // Check if the operation succeeded
-        if (this->result != S_OK)
+        if (result != S_OK)
         {
-            QString error = QString("Getting snapshot properties failed with error: 0x%08lx\n").arg(this->result);
+            QString error = QString("Getting snapshot properties failed with error: 0x%08lx\n").arg(result);
             emit sendSnapshotTaken( SNAPSHOT_CANNOT_GET_SNAPSHOT_PROPERTIES );
             return;
         }
@@ -433,10 +433,10 @@ void ShadowCopy::cleanupSnapshot()
 
     // Get the and set them to the snapshot properties field
     QString part = this->snapshot_set_ids.keys().first();
-    this->result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( part ), &tmp_snapshot_prop);
+    HRESULT result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( part ), &tmp_snapshot_prop);
 
     // Check if the operation succeeded
-    if (this->result == S_OK)
+    if (result == S_OK)
     {
         // Get the ID from the shadow copy
         VSS_ID shadowCopyID = tmp_snapshot_prop.m_SnapshotSetId;
