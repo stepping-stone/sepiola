@@ -28,6 +28,23 @@
 #include <QWaitCondition>
 #include <QMutex>
 
+#ifndef __GNUC__
+// only valid for Visual C++ linker (either with Visual C++ or clang frontend)
+#pragma comment (lib, "VssApi.lib")
+#endif
+
+/* Functions in VSSAPI.DLL */
+typedef HRESULT(STDAPICALLTYPE * _CreateVssBackupComponentsInternal)(
+    OUT IVssBackupComponents** ppBackup);
+typedef void(APIENTRY * _VssFreeSnapshotPropertiesInternal)(IN VSS_SNAPSHOT_PROP* pProp);
+static _CreateVssBackupComponentsInternal CreateVssBackupComponentsInternal_I;
+static _VssFreeSnapshotPropertiesInternal VssFreeSnapshotPropertiesInternal_I;
+
+/* Funktions in kernel32.dll */
+typedef BOOL (WINAPI* CreateSymbolicLinkProc) (LPCSTR, LPCSTR, DWORD);
+typedef BOOL (WINAPI* RemoveDirectoryProc) (LPCSTR);
+typedef BOOL (WINAPI* PathFileExistsProc) (LPCSTR);
+
 const QString ShadowCopy::MOUNT_PREFIX = "mount_shadow_copy_";
 
 /**
