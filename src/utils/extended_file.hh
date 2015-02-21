@@ -169,7 +169,7 @@ inline bool ExtendedFile::setOwnerAndGroupId(uint ownerId, uint groupId)
 	return chown(encodeName( fileName() ), ownerId, groupId) == 0;
 }
 #else
-inline bool ExtendedFile::setOwnerAndGroupId(uint ownerId, uint groupId)
+inline bool ExtendedFile::setOwnerAndGroupId(uint, uint)
 {
 	return true;
 }
