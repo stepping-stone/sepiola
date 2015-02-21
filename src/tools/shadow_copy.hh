@@ -21,8 +21,6 @@
 
 #include "abstract_snapshot.hh"
 
-#pragma once
-
 #include <stdio.h>
 #include <tchar.h>
 #include <string>
