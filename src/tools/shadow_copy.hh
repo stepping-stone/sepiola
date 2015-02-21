@@ -35,8 +35,10 @@
 #include <QString>
 #include <QHash>
 
-
+#ifndef __GNUC__
+// only valid for Visual C++ linker (either with Visual C++ or clang frontend)
 #pragma comment (lib, "VssApi.lib")
+#endif
 
 /* Functions in VSSAPI.DLL */
 typedef HRESULT(STDAPICALLTYPE * _CreateVssBackupComponentsInternal)(
