@@ -119,7 +119,7 @@ void ShadowCopy::initializeSnapshot()
     }
 
     // Set the context, we want an non-persistant backup which involves writers
-    HRESULT result = this->pBackup->SetContext(this->SC_SNAPSHOT_CONTEXT);
+    result = this->pBackup->SetContext(this->SC_SNAPSHOT_CONTEXT);
 
     // Check if the operation succeeded
     if (result != S_OK)
@@ -131,7 +131,7 @@ void ShadowCopy::initializeSnapshot()
     }
 
     // Tell the writers to gather metadata
-    HRESULT result = this->pBackup->GatherWriterMetadata(&(this->pAsync));
+    result = this->pBackup->GatherWriterMetadata(&(this->pAsync));
 
     // Check if the operation succeeded
     if (result != S_OK)
@@ -157,7 +157,7 @@ void ShadowCopy::initializeSnapshot()
     VSS_ID tmp_snapshot_set_id;
 
     // Start the snapshot set
-    HRESULT result = this->pBackup->StartSnapshotSet(&tmp_snapshot_set_id);
+    result = this->pBackup->StartSnapshotSet(&tmp_snapshot_set_id);
 
     // Check if the operation succeeded
     if (result != S_OK)
@@ -258,7 +258,7 @@ void ShadowCopy::takeSnapshot()
     }
 
     // Tell everyone to prepare for the backup
-    HRESULT result = this->pBackup->PrepareForBackup(&(this->pPrepare));
+    result = this->pBackup->PrepareForBackup(&(this->pPrepare));
 
     // Check if the operation succeeded
     if (result != S_OK)
@@ -269,7 +269,7 @@ void ShadowCopy::takeSnapshot()
     }
 
     // Wait for everyone to be ready
-    HRESULT result = this->pPrepare->Wait();
+    result = this->pPrepare->Wait();
 
     // Check if the operation succeeded
     if (result != S_OK)
@@ -280,7 +280,7 @@ void ShadowCopy::takeSnapshot()
     }
 
     // And create the shadow copy
-    HRESULT result = this->pBackup->DoSnapshotSet(&(this->pDoShadowCopy));
+    result = this->pBackup->DoSnapshotSet(&(this->pDoShadowCopy));
 
     // Check if the operation succeeded
     if (result != S_OK)
@@ -291,7 +291,7 @@ void ShadowCopy::takeSnapshot()
     }
 
     // Wait until the shadow copy is created
-    HRESULT result = this->pDoShadowCopy->Wait();
+    result = this->pDoShadowCopy->Wait();
 
     // Check if the operation succeeded
     if (result != S_OK)
@@ -307,7 +307,7 @@ void ShadowCopy::takeSnapshot()
         VSS_SNAPSHOT_PROP tmp_snapshot_prop;
 
         // Get the and set them to the snapshot properties field
-        HRESULT result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( partition) , &tmp_snapshot_prop);
+        result = this->pBackup->GetSnapshotProperties(this->snapshot_set_ids.value( partition) , &tmp_snapshot_prop);
 
         // Check if the operation succeeded
         if (result != S_OK)
