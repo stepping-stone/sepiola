@@ -20,7 +20,7 @@
 
   !include "MUI.nsh"
   ;Default installation folder
-  InstallDir "$PROGRAMFILES\@CPACK_PACKAGE_INSTALL_DIRECTORY@"  
+  InstallDir "$@CPACK_PROGRAMFILES_NAME@\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
 
 ;--------------------------------
 ;General
@@ -72,7 +72,7 @@ Function .onInit
 
   done:
   StrCmp $SV_ALLUSERS "AllUsers" 0 +2
-    StrCpy $INSTDIR "$PROGRAMFILES\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
+    StrCpy $INSTDIR "$@CPACK_PROGRAMFILES_NAME@\@CPACK_PACKAGE_INSTALL_DIRECTORY@"
 
   StrCmp "@CPACK_NSIS_MODIFY_PATH@" "ON" 0 noOptionsPage
     !insertmacro MUI_INSTALLOPTIONS_EXTRACT "NSIS.InstallOptions.ini"
