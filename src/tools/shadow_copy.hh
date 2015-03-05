@@ -21,8 +21,6 @@
 
 #include "abstract_snapshot.hh"
 
-#pragma once
-
 #include <stdio.h>
 #include <tchar.h>
 #include <string>
@@ -34,21 +32,6 @@
 #include <vsbackup.h>
 #include <QString>
 #include <QHash>
-
-
-#pragma comment (lib, "VssApi.lib")
-
-/* Functions in VSSAPI.DLL */
-typedef HRESULT(STDAPICALLTYPE * _CreateVssBackupComponentsInternal)(
-    OUT IVssBackupComponents** ppBackup);
-typedef void(APIENTRY * _VssFreeSnapshotPropertiesInternal)(IN VSS_SNAPSHOT_PROP* pProp);
-static _CreateVssBackupComponentsInternal CreateVssBackupComponentsInternal_I;
-static _VssFreeSnapshotPropertiesInternal VssFreeSnapshotPropertiesInternal_I;
-
-/* Funktions in kernel32.dll */
-typedef BOOL (WINAPI* CreateSymbolicLinkProc) (LPCSTR, LPCSTR, DWORD);
-typedef BOOL (WINAPI* RemoveDirectoryProc) (LPCSTR);
-typedef BOOL (WINAPI* PathFileExistsProc) (LPCSTR);
 
 
 /* Define some vss snapshot errors code which are 100 < code < 200*/
@@ -132,7 +115,6 @@ private:
     static const bool SC_SNAPSHOT_SELECT_COMPONENTS = false;
     static const QString MOUNT_PREFIX;
 
-    HRESULT result;
     HMODULE vssapiBase;
     IVssBackupComponents *pBackup = NULL;
     IVssAsync *pAsync = NULL;

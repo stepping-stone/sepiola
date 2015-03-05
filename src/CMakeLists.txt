@@ -37,6 +37,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
+    # The GCC on Travis CI does not support -std=c++11 yet
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized -Winit-self")

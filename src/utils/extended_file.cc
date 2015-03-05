@@ -136,22 +136,22 @@ FileInfo ExtendedFile::fileInfo() const
 	return FileInfo();
 }
 
-uint ExtendedFile::ownerToId( const QString& owner )
+uint ExtendedFile::ownerToId( const QString& )
 {
 	return uint(-1);
 }
 
-uint ExtendedFile::groupToId( const QString& group )
+uint ExtendedFile::groupToId( const QString& )
 {
 	return uint(-1);
 }
 
-QString ExtendedFile::idToOwner( uint uid )
+QString ExtendedFile::idToOwner( uint )
 {
 	return QString();
 }
 
-QString ExtendedFile::idToGroup( uint gid )
+QString ExtendedFile::idToGroup( uint )
 {
 	return QString();
 }
