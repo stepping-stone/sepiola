@@ -23,14 +23,9 @@
 
 #include "model/local_dir_model.hh"
 
-LocalDirModel::LocalDirModel(const QStringList & nameFilters, QDir::Filters filters, QDir::SortFlags sort, QObject * parent) : QDirModel(nameFilters, filters, sort, parent)
-{
-	selectionRules.clear();
-}
-
 Qt::ItemFlags LocalDirModel::flags(const QModelIndex& index) const
 {
-	Qt::ItemFlags f = QDirModel::flags(index);
+	Qt::ItemFlags f = QFileSystemModel::flags(index);
 	if (index.column() == 0) // make the first column checkable
 		f |= Qt::ItemIsUserCheckable;
 	return f;
@@ -67,7 +62,7 @@ QVariant LocalDirModel::data(const QModelIndex& index, int role) const
         // the item is checked only if we have stored its path
 		return (existRulesOnChildren ? 0 : 1)*((closestParentRule.second ? Qt::Checked : Qt::Unchecked)-1) + 1;
 	}
-	return QDirModel::data(index, role);
+	return QFileSystemModel::data(index, role);
 }
 /**
  * remove all rules on children
@@ -106,11 +101,5 @@ bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int
 		// qDebug() << "Current selection rules" << selectionRules.keys();
 		return true;
 	}
-	return QDirModel::setData(index, value, role);
+	return QFileSystemModel::setData(index, value, role);
 }
-
-
-LocalDirModel::~LocalDirModel()
-{
-}
-

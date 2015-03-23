@@ -54,7 +54,6 @@ private:
 	QString patternListToString( QStringList patternList );
 
 private slots:
-	void on_btnRefresh_clicked();
 	void runBackupNow();
 	void save();
 	void reset();
@@ -62,8 +61,10 @@ private slots:
 	void on_radioButtonNoSchedule_clicked();
 	void on_radioButtonMinutesAfterBooting_clicked();
 	void on_radioButtonDaily_clicked();
-	void refreshLocalDirModel();
 	void schedule();
+
+public slots:
+	void showHiddenFilesAndFolders(bool show);
 
 signals:
 	void updateOverviewFormScheduleInfo();

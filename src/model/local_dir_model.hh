@@ -19,7 +19,7 @@
 #ifndef LOCAL_DIR_MODEL_HH
 #define LOCAL_DIR_MODEL_HH
 
-#include <QDirModel>
+#include <QFileSystemModel>
 #include <QDir>
 #include <QStringList>
 #include <QSet>
@@ -32,12 +32,9 @@
  * @source http://www.qtcentre.org/forum/f-qt-programming-2/t-qdirmodelqtreeview-and-checkable-items-6957.html
  */
 
-class LocalDirModel : public QDirModel
+class LocalDirModel : public QFileSystemModel
 {
 public:	
-	LocalDirModel(const QStringList & nameFilters, QDir::Filters filters, QDir::SortFlags sort, QObject * parent = 0);
-	~LocalDirModel();
-	
 	Qt::ItemFlags flags(const QModelIndex& index) const;
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);

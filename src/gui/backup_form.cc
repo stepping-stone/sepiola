@@ -42,7 +42,6 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 
 	this->reload();
 
-	new QShortcut( Qt::Key_F5, this, SLOT( refreshLocalDirModel() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ),
 					  parent, SIGNAL ( updateOverviewFormScheduleInfo() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ),
@@ -250,18 +249,12 @@ QStringList BackupForm::getSelectedFilesAndDirs()
 	return items;
 }
 
-void BackupForm::refreshLocalDirModel()
+void BackupForm::showHiddenFilesAndFolders(bool show)
 {
-	if (Settings::getInstance()->getShowHiddenFilesAndFolders()) {
-		this->localDirModel->setFilter(this->localDirModel->filter() | QDir::Hidden);
-	} else {
-		this->localDirModel->setFilter(this->localDirModel->filter() & (~QDir::Hidden));
-	}
-	this->localDirModel->refresh();
-}
+	qDebug() << "BackupForm::showHiddenFilesAndFolders()";
 
-void BackupForm::on_btnRefresh_clicked()
-{
-	qDebug() << "BackupForm::on_btnRefresh_clicked()";
-	refreshLocalDirModel();
+	if (show)
+		this->localDirModel->setFilter(this->localDirModel->filter() | QDir::Hidden);
+	else
+		this->localDirModel->setFilter(this->localDirModel->filter() & (~QDir::Hidden));
 }
