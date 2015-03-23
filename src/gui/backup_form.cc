@@ -118,7 +118,8 @@ void BackupForm::save()
 	{
 		QMessageBox::information( this, tr( "Empty backup list" ), tr( "No items have been selected for scheduling" ) );
 		return;
-	}	this->schedule();
+	}
+	this->schedule();
 	// Settings::getInstance()->saveBackupSelectionRules( this->model->getLocalDirModel()->getSelectionRules() ); // this is not necessary, because it is called in method schedule()
 }
 
@@ -126,16 +127,9 @@ void BackupForm::reset()
 {
 	qDebug() << "BackupForm::reset()";
 	int answer = QMessageBox::warning( this, tr( "Reset" ), tr( "Are you sure you want to reset all form values?" ), QMessageBox::Yes | QMessageBox::Cancel );
-	switch ( answer )
-	{
-		case QMessageBox::Yes:
-			this->reload();
-			this->refreshLocalDirModel();
-			break;
-		default:
-			// do nothing
-			break;
-	}
+
+	if (answer == QMessageBox::Yes)
+		this->reload();
 }
 
 void BackupForm::schedule()
