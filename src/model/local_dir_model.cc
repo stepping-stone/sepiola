@@ -39,14 +39,20 @@ QVariant LocalDirModel::data(const QModelIndex& index, int role) const
 {
 	if (index.isValid() && index.column() == 0 && role == Qt::CheckStateRole)
 	{
-		QFileInfo f_info = fileInfo(index);
+		QFileInfo f_info  = fileInfo(index);
 		bool curPathIsDir = f_info.isDir();
-		QString curPath = f_info.absoluteFilePath() + ((curPathIsDir &&  !f_info.absoluteFilePath().endsWith("/"))?"/":"");
+		QString curPath   = f_info.absoluteFilePath();
+
+		if (curPathIsDir &&  !curPath.endsWith("/"))
+			curPath += "/";
+
 		bool existRulesOnChildren = false;
 		QPair<QString,bool> closestParentRule;
+
 		QHashIterator<QString,bool> itr(selectionRules);
 		while (itr.hasNext()) {
 			itr.next();
+
 			QString rulePath = itr.key();
 			if (rulePath != curPath && curPathIsDir && rulePath.startsWith(curPath)) {
 				// rules on children
@@ -59,9 +65,16 @@ QVariant LocalDirModel::data(const QModelIndex& index, int role) const
 				}
 			}
 		}
-        // the item is checked only if we have stored its path
-		return (existRulesOnChildren ? 0 : 1)*((closestParentRule.second ? Qt::Checked : Qt::Unchecked)-1) + 1;
+
+		if (existRulesOnChildren)
+			return Qt::PartiallyChecked;
+
+		if (closestParentRule.second)
+			return Qt::Checked;
+
+		return Qt::Unchecked;
 	}
+
 	return QFileSystemModel::data(index, role);
 }
 /**
@@ -76,11 +89,17 @@ bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int
 		Qt::CheckState curVal = (Qt::CheckState)(data(index,role).toInt());
 		QFileInfo f_info = fileInfo(index);
 		bool curPathIsDir = f_info.isDir();
-		QString curPath = f_info.absoluteFilePath() + ((curPathIsDir &&  !f_info.absoluteFilePath().endsWith("/"))?"/":"");
+		QString curPath = f_info.absoluteFilePath();
+
+		if (curPathIsDir &&  !curPath.endsWith("/"))
+			curPath += "/";
+
 		QPair<QString,bool> closestParentRule("",false);
+
 		QMutableHashIterator<QString,bool> itr(selectionRules);
 		while (itr.hasNext()) {
 			itr.next();
+
 			QString rulePath = itr.key();
 			bool rulePathIsDir = rulePath.endsWith("/");
 			if (rulePath == curPath || (curPathIsDir && rulePath.startsWith(curPath))) {
@@ -94,12 +113,14 @@ bool LocalDirModel::setData(const QModelIndex& index, const QVariant& value, int
 				}
 			}
 		}
-		if ((curVal == Qt::Checked)==closestParentRule.second) {
+
+		if ((curVal == Qt::Checked) == closestParentRule.second) {
 			selectionRules.insert(curPath, !closestParentRule.second);
 		}
 		emit layoutChanged(); // in fact dataChanged() would be better, but it's too expensive to calculate all the changed items
-		// qDebug() << "Current selection rules" << selectionRules.keys();
+
 		return true;
 	}
+
 	return QFileSystemModel::setData(index, value, role);
 }
