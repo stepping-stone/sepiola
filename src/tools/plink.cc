@@ -72,6 +72,7 @@ bool Plink::loginWithKey()
 	}
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << "-i" << privatePuttyKeyFileName;
 	/* $$$ TODO [dt] check if this is correct */ // arguments << "-o" << "IdentitiesOnly=yes"; // doesn't work lonely so
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
@@ -108,6 +109,7 @@ bool Plink::assertCorrectFingerprint(const QString& userName, const QString& ser
 {
     qDebug() << "Plink::assertCorrectFingerprint(userName=" << userName << ", serverName=" << serverName << ", savedKey=" << savedKey << ")";
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << userName + "@" + serverName;
 	arguments << "sh -c \":\"";
 
@@ -191,6 +193,7 @@ void Plink::uploadToMetaFolder( const QFileInfo& file, bool append )
 	QString dest = settings->getServerUserName() + "@" + settings->getServerName();
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << "-i";
 	arguments << settings->createPrivatePuttyKeyFile();
 	arguments << dest;
@@ -224,6 +227,7 @@ bool Plink::generateKeys( const QString& password )
 	QString authorizedKeyFileName = settings->getAuthorizedKeyFolderName() + settings->getAuthorizedKeyFileName();
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	QString shellArguments;
 	arguments << "sh" << "-c";
@@ -362,6 +366,7 @@ QList<int> Plink::getServerQuotaValues()
 
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << "-i";
 	arguments << settings->createPrivatePuttyKeyFile();
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
