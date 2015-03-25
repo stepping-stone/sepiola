@@ -796,7 +796,11 @@ QStringList Rsync::getRsyncSshArguments()
 	}
 	else
 	{
-		arguments << StringUtils::quoteText(settings->getPlinkName(), "'") + " -i " + StringUtils::quoteText(settings->createPrivatePuttyKeyFile(), "'");
+		QString argument;
+		argument.append( StringUtils::quoteText(settings->getPlinkName(), "'") );
+		argument.append(" -noagent");
+		argument.append(" -i " + StringUtils::quoteText(settings->createPrivatePuttyKeyFile(), "'"));
+		arguments << argument;
 	}
 	return arguments;
 }
