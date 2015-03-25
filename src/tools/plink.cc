@@ -252,30 +252,36 @@ bool Plink::generateKeys( const QString& password )
 	createProcess( settings->getPlinkName(), arguments );
 	start();
 
-	QString line;
-
 	while (true)
 	{
 		// the server terminates the connection immediately in case of an invalid username (but not only then)
 		if (!waitForReadyRead())
 			throw LoginException(qApp->translate("Plink", "Error occurred during login, perhaps invalid username"));
 
-		line = readAll();
+		QString line = readAll();
 
 		if (line.contains("password:", Qt::CaseInsensitive))
+		{
+			qDebug() << "Password line: " << line;
 			break;
+		}
 
 		qDebug() << "ignoring message from plink:" << line;
 	}
 
-	qDebug() << "Password line: " << line;
 	write( password.toLocal8Bit() );
 	write( settings->getEOLCharacter() );
 
 	if (!waitForReadyRead())
 		throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
 
-	line = readAll();
+	if (readAllStandardError().contains("Access denied"))
+	{
+		qWarning() << "Access denied. Username or password not valid";
+		throw LoginException( qApp->translate( "Plink", "Username or password not valid" ) );
+	}
+
+	QString line = readAll();
 	line.replace( "\n", "" );
 	line.replace( "\r", "" );
 	qDebug() << "loggedInMessage1: " << line;
