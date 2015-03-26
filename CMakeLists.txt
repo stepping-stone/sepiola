@@ -59,7 +59,7 @@ if (GIT_DESC)
 else ()
     SET(CPACK_PACKAGE_VERSION_MAJOR 2)
     SET(CPACK_PACKAGE_VERSION_MINOR 3)
-    SET(CPACK_PACKAGE_VERSION_PATCH 4)
+    SET(CPACK_PACKAGE_VERSION_PATCH 5)
 endif ()
 
 # set automatically by CMake, but we need it early
