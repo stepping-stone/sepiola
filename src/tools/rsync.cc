@@ -788,11 +788,19 @@ QStringList Rsync::getRsyncSshArguments()
 		QString argument;
 		argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
 		argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
+		// overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
+		argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
+		// ignore any running SSH agents since they may offer additional keys first, causing authentication failures
+		argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
 		arguments << argument;
 	}
 	else
 	{
-		arguments << StringUtils::quoteText(settings->getPlinkName(), "'") + " -i " + StringUtils::quoteText(settings->createPrivatePuttyKeyFile(), "'");
+		QString argument;
+		argument.append( StringUtils::quoteText(settings->getPlinkName(), "'") );
+		argument.append(" -noagent");
+		argument.append(" -i " + StringUtils::quoteText(settings->createPrivatePuttyKeyFile(), "'"));
+		arguments << argument;
 	}
 	return arguments;
 }

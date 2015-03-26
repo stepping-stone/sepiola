@@ -223,15 +223,15 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="displayFormat">
-           <string>hh:mm</string>
-          </property>
           <property name="time">
            <time>
             <hour>12</hour>
             <minute>0</minute>
             <second>0</second>
            </time>
+          </property>
+          <property name="displayFormat">
+           <string>hh:mm</string>
           </property>
          </widget>
         </item>
@@ -271,29 +271,6 @@
          </property>
          <property name="text">
           <string>Files and folders</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>10</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnRefresh">
-         <property name="text">
-          <string>&amp;Refresh</string>
          </property>
         </widget>
        </item>

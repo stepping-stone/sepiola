@@ -74,6 +74,7 @@ MainWindow::MainWindow( MainModel *model ) : QMainWindow()
 	QObject::connect( model, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), overviewForm, SLOT ( refreshLastBackupsOverview() ) );
 	QObject::connect( this->overviewForm, SIGNAL( startBackupNow() ), this->backupForm, SLOT( runBackupNow() ) );
+	QObject::connect( this->settingsForm, SIGNAL( showHiddenFilesAndFolders(bool) ), this->backupForm, SLOT( showHiddenFilesAndFolders(bool) ) );
 
 	stackedLayout = new QStackedLayout( frameMain );
 	stackedLayout->addWidget( overviewForm );

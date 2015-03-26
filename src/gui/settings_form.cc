@@ -104,6 +104,7 @@ void SettingsForm::save()
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
 		emit updateOverviewFormLastBackupsInfo();
+		emit showHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
 		formChanged = false;
 	}
 }

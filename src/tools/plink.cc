@@ -72,6 +72,7 @@ bool Plink::loginWithKey()
 	}
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << "-i" << privatePuttyKeyFileName;
 	/* $$$ TODO [dt] check if this is correct */ // arguments << "-o" << "IdentitiesOnly=yes"; // doesn't work lonely so
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
@@ -108,65 +109,79 @@ bool Plink::assertCorrectFingerprint(const QString& userName, const QString& ser
 {
     qDebug() << "Plink::assertCorrectFingerprint(userName=" << userName << ", serverName=" << serverName << ", savedKey=" << savedKey << ")";
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << userName + "@" + serverName;
-//    arguments << serverName;
 	arguments << "sh -c \":\"";
 
 	createProcess( this->plinkName, arguments );
 	setProcessChannelMode( QProcess::MergedChannels );
 	start();
 
-	if ( waitForReadyRead() )
+	if (!waitForReadyRead())
 	{
-		// if the key has already been cached, the first line is either
-		//  "username@host password:" or
-		//  "Using keyboard-interactive authentication."
-		QString line = readLine();
-		if ( line.contains( '@' ) || line.startsWith( "Using" ) || line.startsWith( "login" ) ) //password prompt
+		if (!waitForFinished())
 		{
-			// key has already been cached
-			qDebug() << "Key has already been cached";
+			qDebug() << "Timeout occurred while waiting for plink output";
 			terminate();
-			return true;
-		}
-		if ( line.startsWith( "Unable to open connection" ) )
-		{
-			emit errorSignal( QObject::tr( "Unable to open connection" ) );
 			return false;
 		}
-        if ( line.startsWith("FATAL ERROR") )
-        {
-            qDebug() << "Key has already been cached but connection failed (probably wrong username)";
-            terminate();
-            return true;
-        }
-		while ( !line.startsWith( "ssh-rsa") )
-		{
-			blockingReadLine( &line );
-		}
-		QStringList splittedLine = line.split( " " );
-		if ( splittedLine.size() != 3 )
-		{
-			qCritical() << "Fingerprint output format not recognized";
-			return false;
-		}
-		QString serverKey = splittedLine.at( 2 );
-		serverKey = serverKey.left( serverKey.lastIndexOf( ":" ) + 3 );
-		if ( serverKey.compare( savedKey ) == 0 )
-		{
-			qDebug() << "Correct server key";
-			write( "y" );
-			write( Platform::EOL_CHARACTER );
-			waitForReadyRead();
-			terminate();
+		// for some reason, putty has the key already in its cache
+		if ( (exitStatus() == QProcess::NormalExit) && (exitCode() == 0) )
 			return true;
-		}
-		qWarning() << "Wrong server key: " << serverKey << " instead of " << savedKey;
-		write( "n" );
-		write( Platform::EOL_CHARACTER );
+
+		qDebug() << "Unknown error occurred while waiting for plink output";
+		return false;
+	}
+
+	// if the key has already been cached, the first line is either
+	//  "username@host password:" or
+	//  "Using keyboard-interactive authentication."
+	QString line = readLine();
+	if ( line.contains( '@' ) || line.startsWith( "Using" ) || line.startsWith( "login" ) ) //password prompt
+	{
+		// key has already been cached
+		qDebug() << "Key has already been cached";
+		terminate();
+		return true;
+	}
+	if ( line.startsWith( "Unable to open connection" ) )
+	{
+		emit errorSignal( QObject::tr( "Unable to open connection" ) );
 		terminate();
 		return false;
 	}
+	if ( line.startsWith("FATAL ERROR") )
+	{
+		qDebug() << "Key has already been cached but connection failed (probably wrong username)";
+		terminate();
+		return true;
+	}
+	while ( !line.startsWith( "ssh-rsa") )
+	{
+		blockingReadLine( &line );
+	}
+	QStringList splittedLine = line.split( " " );
+	if ( splittedLine.size() != 3 )
+	{
+		qCritical() << "Fingerprint output format not recognized";
+		terminate();
+		return false;
+	}
+	QString serverKey = splittedLine.at( 2 );
+	serverKey = serverKey.left( serverKey.lastIndexOf( ":" ) + 3 );
+	if ( serverKey.compare( savedKey ) == 0 )
+	{
+		qDebug() << "Correct server key";
+		write( "y" );
+		write( Platform::EOL_CHARACTER );
+		waitForReadyRead();
+		terminate();
+		return true;
+	}
+	qWarning() << "Wrong server key: " << serverKey << " instead of " << savedKey;
+	write( "n" );
+	write( Platform::EOL_CHARACTER );
+	terminate();
 	return false;
 }
 
@@ -178,6 +193,7 @@ void Plink::uploadToMetaFolder( const QFileInfo& file, bool append )
 	QString dest = settings->getServerUserName() + "@" + settings->getServerName();
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << "-i";
 	arguments << settings->createPrivatePuttyKeyFile();
 	arguments << dest;
@@ -211,6 +227,7 @@ bool Plink::generateKeys( const QString& password )
 	QString authorizedKeyFileName = settings->getAuthorizedKeyFolderName() + settings->getAuthorizedKeyFileName();
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();
 	QString shellArguments;
 	arguments << "sh" << "-c";
@@ -235,25 +252,44 @@ bool Plink::generateKeys( const QString& password )
 	createProcess( settings->getPlinkName(), arguments );
 	start();
 
-	QString line;
-	while ( !line.contains( "password:", Qt::CaseInsensitive ) )
+	while (true)
 	{
-		waitForReadyRead();
-		line = readAll();
+		// the server terminates the connection immediately in case of an invalid username (but not only then)
+		if (!waitForReadyRead())
+			throw LoginException(qApp->translate("Plink", "Error occurred during login, perhaps invalid username"));
+
+		QString line = readAll();
+
+		if (line.contains("password:", Qt::CaseInsensitive))
+		{
+			qDebug() << "Password line: " << line;
+			break;
+		}
+
+		qDebug() << "ignoring message from plink:" << line;
 	}
 
-	qDebug() << "Password line: " << line;
 	write( password.toLocal8Bit() );
 	write( settings->getEOLCharacter() );
 
-	waitForReadyRead();
-	line = readAll();
+	if (!waitForReadyRead())
+		throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
+
+	if (readAllStandardError().contains("Access denied"))
+	{
+		qWarning() << "Access denied. Username or password not valid";
+		throw LoginException( qApp->translate( "Plink", "Username or password not valid" ) );
+	}
+
+	QString line = readAll();
 	line.replace( "\n", "" );
 	line.replace( "\r", "" );
 	qDebug() << "loggedInMessage1: " << line;
 	if ( line == "" )
 	{
-		waitForReadyRead();
+		if (!waitForReadyRead())
+			throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
+
 		line = readAll();
 		line.replace( "\n", "" );
 		line.replace( "\r", "" );
@@ -336,6 +372,7 @@ QList<int> Plink::getServerQuotaValues()
 
 
 	QStringList arguments;
+	arguments << "-noagent";
 	arguments << "-i";
 	arguments << settings->createPrivatePuttyKeyFile();
 	arguments << settings->getServerUserName() + "@" + settings->getServerName();

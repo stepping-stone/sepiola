@@ -42,7 +42,6 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 
 	this->reload();
 
-	new QShortcut( Qt::Key_F5, this, SLOT( refreshLocalDirModel() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ),
 					  parent, SIGNAL ( updateOverviewFormScheduleInfo() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ),
@@ -118,7 +117,8 @@ void BackupForm::save()
 	{
 		QMessageBox::information( this, tr( "Empty backup list" ), tr( "No items have been selected for scheduling" ) );
 		return;
-	}	this->schedule();
+	}
+	this->schedule();
 	// Settings::getInstance()->saveBackupSelectionRules( this->model->getLocalDirModel()->getSelectionRules() ); // this is not necessary, because it is called in method schedule()
 }
 
@@ -126,16 +126,9 @@ void BackupForm::reset()
 {
 	qDebug() << "BackupForm::reset()";
 	int answer = QMessageBox::warning( this, tr( "Reset" ), tr( "Are you sure you want to reset all form values?" ), QMessageBox::Yes | QMessageBox::Cancel );
-	switch ( answer )
-	{
-		case QMessageBox::Yes:
-			this->reload();
-			this->refreshLocalDirModel();
-			break;
-		default:
-			// do nothing
-			break;
-	}
+
+	if (answer == QMessageBox::Yes)
+		this->reload();
 }
 
 void BackupForm::schedule()
@@ -256,18 +249,12 @@ QStringList BackupForm::getSelectedFilesAndDirs()
 	return items;
 }
 
-void BackupForm::refreshLocalDirModel()
+void BackupForm::showHiddenFilesAndFolders(bool show)
 {
-	if (Settings::getInstance()->getShowHiddenFilesAndFolders()) {
-		this->localDirModel->setFilter(this->localDirModel->filter() | QDir::Hidden);
-	} else {
-		this->localDirModel->setFilter(this->localDirModel->filter() & (~QDir::Hidden));
-	}
-	this->localDirModel->refresh();
-}
+	qDebug() << "BackupForm::showHiddenFilesAndFolders()";
 
-void BackupForm::on_btnRefresh_clicked()
-{
-	qDebug() << "BackupForm::on_btnRefresh_clicked()";
-	refreshLocalDirModel();
+	if (show)
+		this->localDirModel->setFilter(this->localDirModel->filter() | QDir::Hidden);
+	else
+		this->localDirModel->setFilter(this->localDirModel->filter() & (~QDir::Hidden));
 }

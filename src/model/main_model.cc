@@ -485,17 +485,14 @@ LocalDirModel* MainModel::getLocalDirModel()
 {
 	if (!localDirModel)
 	{
-		if (Settings::getInstance()->getShowHiddenFilesAndFolders()) {
-			localDirModel = new LocalDirModel( QStringList(),
-					QDir::Dirs | QDir::Files | QDir::Drives | QDir::Hidden | QDir::NoDotAndDotDot,
-					QDir::Name | QDir::IgnoreCase | QDir::DirsFirst
-			);
-		} else {
-			localDirModel = new LocalDirModel( QStringList(),
-					QDir::Dirs | QDir::Files | QDir::Drives | QDir::NoDotAndDotDot,
-					QDir::Name | QDir::IgnoreCase | QDir::DirsFirst
-			);
-		}
+		localDirModel = new LocalDirModel;
+		QDir::Filters filter = QDir::Dirs | QDir::Files | QDir::Drives | QDir::NoDotAndDotDot;
+
+		if (Settings::getInstance()->getShowHiddenFilesAndFolders())
+			filter |= QDir::Hidden;
+
+		localDirModel->setFilter(filter);
+		localDirModel->setRootPath("");
 	}
 	return localDirModel;
 }

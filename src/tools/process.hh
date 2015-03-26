@@ -115,6 +115,7 @@ protected:
 	void setProcessChannelMode ( QProcess::ProcessChannelMode mode );
 	QByteArray readAll();
 	int exitCode() const;
+	QProcess::ExitStatus exitStatus() const;
 	QByteArray readLine( qint64 maxSize = 0 );
 	void setStandardInputFile( const QString & fileName );
 	bool waitForReadyRead( int msecs );
@@ -188,6 +189,12 @@ inline int Process::exitCode() const
 {
 	assert(qProcess);
 	return qProcess->exitCode();
+}
+
+inline QProcess::ExitStatus Process::exitStatus() const
+{
+	assert(qProcess);
+	return qProcess->exitStatus();
 }
 
 inline QByteArray Process::readLine( qint64 maxSize )

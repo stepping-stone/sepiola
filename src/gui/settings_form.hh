@@ -57,6 +57,7 @@ private:
 
 signals:
 	void updateOverviewFormLastBackupsInfo();
+	void showHiddenFilesAndFolders(bool);
 
 private slots:
 	void save();
