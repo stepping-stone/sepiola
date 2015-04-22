@@ -1021,45 +1021,61 @@ void Rsync::abort()
 
 void Rsync::processWarningsAndErrors(QString* warnings)
 {
+	QString standardErrors = StringUtils::fromLocalEnc(readAllStandardError());
+
 	if (this->isAlive()) {
-		QString standardErrors = readAllStandardError();
-		if ( standardErrors != "" )
+		if (!standardErrors.isEmpty())
 		{
 			qWarning() << "Error occurred while uploading: " + standardErrors;
 			throw ProcessException(standardErrors);
 		}
-	} else {
-		int exitCode = this->exitCode();
-		if (exitCode == 0) return;
-		if (warnings)
-		{
-			switch (exitCode)
-			{
-				case 23:  // Partial transfer due to error
-					*warnings += StringUtils::fromLocalEnc(readAllStandardError());
-					*warnings += "\n";
-					*warnings += tr("Warning: At least one file could not be backuped up. See above for details.");
-					return;
-				case 24:  // Partial transfer due to vanished source files
-					*warnings += StringUtils::fromLocalEnc(readAllStandardError());
-					*warnings += "\n";
-					*warnings += tr("Warning: Some files have been renamed, moved or deleted during backup before they could be uploaded to the server.\n"
-								   "Usually this concerns temporary files and this warning can be ignored. See above for details.");
-					return;
-			}
-		} else if ( exitCode == 23 )
-		{
-		    // If there were no warnings, check if it the exit code is 23, if
-		    // yes it means that the disk quota is exceeded and the rsync cannot
-		    // execute mkstemp
-		    *warnings += StringUtils::fromLocalEnc(readAllStandardError());
-		    *warnings += "\n";
-		    *warnings += tr("Warning: Server disk quota exceeded. No more backups possible");
-		    return;
-		}
 
-		throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(exitCode).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
+		// the process is still running and no errors so far
+		return;
 	}
+
+	int exitCode = this->exitCode();
+
+	// the process exited cleanly
+	if (exitCode == 0)
+		return;
+
+	// if the warnings pointer is NULL, always throw since we have no other way to report
+	if (warnings == nullptr)
+		throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).")
+				.arg(exitCode)
+				.arg(standardErrors)
+				.arg(readAllStandardOutput().data()) );
+
+	if (warnings->isEmpty())
+	{
+		// if we have already accumulated errors, interpret the error
+		switch (exitCode)
+		{
+			case 23:  // Partial transfer due to error
+				*warnings += standardErrors;
+				*warnings += "\n";
+				*warnings += tr("Warning: At least one file could not be backuped up. See above for details.");
+				return;
+			case 24:  // Partial transfer due to vanished source files
+				*warnings += standardErrors;
+				*warnings += "\n";
+				*warnings += tr("Warning: Some files have been renamed, moved or deleted during backup before they could be uploaded to the server.\n"
+							   "Usually this concerns temporary files and this warning can be ignored. See above for details.");
+				return;
+		}
+	} else if (exitCode == 23)
+	{
+		// If there were no warnings, check if it the exit code is 23, if
+		// yes it means that the disk quota is exceeded and the rsync cannot
+		// execute mkstemp
+		*warnings += standardErrors;
+		*warnings += "\n";
+		*warnings += tr("Warning: Server disk quota exceeded. No more backups possible");
+		return;
+	}
+
+	throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(exitCode).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
 }
 
 void Rsync::testGetItem()
