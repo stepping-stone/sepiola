@@ -261,7 +261,7 @@ void BackupThread::run()
 								 this, SIGNAL( infoSignal( const QString& ) ) );
 			QObject::disconnect( metadata.get(), SIGNAL( errorSignal( const QString& ) ),
 								 this, SIGNAL( errorSignal( const QString& ) ) );
-			if( !failed && !isAborted)
+			if (!isAborted)
 			{
 				if (warnings.isEmpty())
 				{
