@@ -281,33 +281,40 @@ void BackupThread::run()
 	{
 		failed = true;
 		emit errorSignal( e.what() );
+		emit infoSignal( tr( "Backup failed." ) );
 	}
 	catch ( const AbortException& e )
 	{
-		qDebug() << "Backup aborted.";
-		emit infoSignal( tr( "Backup aborted." ) );
-		qDebug() << e.what();
 		emit errorSignal( e.what() );
+		emit infoSignal( tr( "Backup aborted." ) );
 	}
 	if ( failed )
 	{
-        // Write the backupStarted.xml to the server for the backup surveillance
-        uploadBackupEndedXML(this->backupID, 0);
-		emit infoSignal( tr( "Backup failed." ) );
 		this->setLastBackupState(ConstUtils::STATUS_ERROR);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
-
 	}
 	else if (!warnings.isEmpty())
 	{
-        // Write the backupStarted.xml to the server for the backup surveillance
-        uploadBackupEndedXML(this->backupID, 1);
 		this->setLastBackupState(ConstUtils::STATUS_WARNING);
-	} else {
-        // Write the backupStarted.xml to the server for the backup surveillance
-        uploadBackupEndedXML(this->backupID, 1);
+		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_WARNING )";
+	}
+	else
+	{
 		this->setLastBackupState(ConstUtils::STATUS_OK);
 		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_OK )";
+	}
+
+	try {
+		// Write the backupEnded.xml to the server for the backup surveillance
+		uploadBackupEndedXML(this->backupID, !failed);
+	}
+	catch ( const ProcessException& e )
+	{
+		emit errorSignal( e.what() );
+		emit infoSignal( tr( "Backup failed." ) );
+		// set final backup state to failed in case the upload failed
+		this->setLastBackupState(ConstUtils::STATUS_ERROR);
+		qDebug() << "BackupThread::run()" << "finalStatusSignal( ConstUtils::STATUS_ERROR )";
 	}
 
 	// Cleanup the filesystem snapshot
