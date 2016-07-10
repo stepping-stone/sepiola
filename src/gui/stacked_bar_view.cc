@@ -29,7 +29,7 @@ StackedBarView::StackedBarView(QWidget* p) :
 {
 }
 
-QModelIndex	StackedBarView::indexAt(const QPoint& point) const
+QModelIndex StackedBarView::indexAt(const QPoint& point) const
 {
     if (_validItems == 0)
         return QModelIndex();
@@ -69,12 +69,12 @@ QRect StackedBarView::visualRect(const QModelIndex&) const
     return QRect();
 }
 
-int	StackedBarView::horizontalOffset() const
+int StackedBarView::horizontalOffset() const
 {
     return horizontalScrollBar()->value();
 }
 
-int	StackedBarView::verticalOffset() const
+int StackedBarView::verticalOffset() const
 {
     return verticalScrollBar()->value();
 }
@@ -86,7 +86,7 @@ bool StackedBarView::isIndexHidden(const QModelIndex& index) const
     return (value <= 0.0 || color.isNull());
 }
 
-QModelIndex	StackedBarView::moveCursor(CursorAction, Qt::KeyboardModifiers)
+QModelIndex StackedBarView::moveCursor(CursorAction, Qt::KeyboardModifiers)
 {
     return QModelIndex();
 }
@@ -95,7 +95,7 @@ void StackedBarView::setSelection(const QRect &, QItemSelectionModel::SelectionF
 {
 }
 
-QRegion	StackedBarView::visualRegionForSelection(const QItemSelection &) const
+QRegion StackedBarView::visualRegionForSelection(const QItemSelection &) const
 {
     return QRegion();
 }
