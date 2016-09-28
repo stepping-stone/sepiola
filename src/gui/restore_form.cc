@@ -21,6 +21,7 @@
 
 #include "gui/restore_form.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "model/dir_tree_item.hh"
 #include "model/main_model.hh"
 #include "model/remote_dir_model.hh"
@@ -244,7 +245,7 @@ void RestoreForm::on_btnBrowseAndRestore_clicked()
 
 void RestoreForm::on_btnRestore_clicked()
 {
-	startRestore(this->radioButtonFull->isChecked(), "/");
+    startRestore(this->radioButtonFull->isChecked(), Platform::ROOT_PREFIX); 
 }
 
 void RestoreForm::startRestore(bool isFullRestore, QString destination)
