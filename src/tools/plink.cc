@@ -270,7 +270,7 @@ bool Plink::generateKeys( const QString& password )
 	}
 
 	write( password.toLocal8Bit() );
-	write( settings->getEOLCharacter() );
+    write( Platform::EOL_CHARACTER );
 
 	if (!waitForReadyRead())
 		throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
