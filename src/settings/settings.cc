@@ -913,15 +913,6 @@ QPoint Settings::getWindowPosition()
 	return windowPosition;
 }
 
-bool Settings::useOpenSshInsteadOfPlinkForRsync()
-{
-//#if defined Q_OS_MAC || defined Q_OS_UNIX
-    return true;
-//#else
-//    return false;
-//#endif
-}
-
 QString Settings::getResellerAddress()
 {
 	return resellerAddress;
