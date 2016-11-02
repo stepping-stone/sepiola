@@ -32,9 +32,12 @@ void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QStr
     // Read the SshHostKey fingerprint form the registry.
     QString rsaPrefix("0x23,0x");
     QSettings puttySshHostKey("HKEY_CURRENT_USER\\Software\\SimonTatham\\PUTTY\\SshHostKeys", QSettings::NativeFormat);
-    QString hostKeyValue = puttySshHostKey.value("rsa2@22:kvm-0003.stepping-stone.ch").toString();
+    QString hostKeyValue = puttySshHostKey.value("rsa2@22:kvm-0003.stepping-stone.ch", "keyNotFound").toString();
+    if (hostKeyValue.compare("keyNotFound") == 0) {
+      qWarning() << "Can not find the given putty key in the Windows registry";
+      return;
+    }
     hostKeyValue.remove(0 , rsaPrefix.length());
-
     QString sshKey = convertPuttyKey(hostKeyValue, host);
     addOpenSshKey( sshKey, host, sshKnownHostsFileName);
 #else
