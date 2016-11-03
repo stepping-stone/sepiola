@@ -318,8 +318,12 @@ void ShadowCopy::takeSnapshot()
         }
 
         // Store the snapshot properties according to the partition name in the
-        // FilesystemSnapshotPathMapper object
-        QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
+        // FilesystemSnapshotPathMapper object.
+        // Example for the snapshotPath: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy7
+        QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);          
+
+        QStringRef harddiskVolumeShadowCopy = snapshotPath.midRef(22);
+        QString snapshotPathForCygwin = "/proc/sys/device/" + harddiskVolumeShadowCopy.toString() + "/";
 	
         QString linkname = getMountDirectory();
         linkname.append( MOUNT_PREFIX );
@@ -338,7 +342,7 @@ void ShadowCopy::takeSnapshot()
         fullLinkname.prepend("\\\\?\\");
 
         LPCSTR link = (LPCSTR) fullLinkname.utf16();
-        LPCSTR target = (LPCSTR) snapshotPath.utf16();
+        LPCSTR target = (LPCSTR) snapshotPathForCygwin.utf16();
 
         // Check if the link already (what would be wrong) exists, if yes,
         // remove it
