@@ -110,18 +110,15 @@ bool assertCliDependencies()
         return false;
     }
 
-	if (settings->useOpenSshInsteadOfPlinkForRsync())
-	{
-        // return if the user chose to use the ssh client instead
-        // of plink and the client could not befound
-		QFileInfo sshFile(settings->getSshName() );
-		if (!sshFile.exists())
-        {
-            qDebug() << "OpenSSH instead of plink selected, but ssh could not be found";
-            return false;
-        }
-	}
-    
+    // return if the user chose to use the ssh client instead
+    // of plink and the client could not befound
+    QFileInfo sshFile(settings->getSshName() );
+    if (!sshFile.exists())
+    {
+        qDebug() << "OpenSSH instead of plink selected, but ssh could not be found";
+        return false;
+    }
+
 #ifdef Q_OS_WIN32
 	QFileInfo setaclFile(settings->getSetAclName() );
 	return setaclFile.exists();

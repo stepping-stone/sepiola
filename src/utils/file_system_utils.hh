@@ -64,6 +64,17 @@ public:
 	 */
 	static void convertToServerPath( QString* path );
 
+    /**
+     * Converts the given path so that cygwin supports it.
+     * If the application's operating system is a Unix (Linux and Mac)
+     * no conversation will be made.
+     * If the application is running on a Microsoft Windows, the following
+     * conversion happens: the drive will be changed to a folder. For instance,
+     * if the given path is C/folder/file, the path will be changed to /cygdrive/c/folder/file
+     * @param path the path to convert
+     */
+    static void convertToCygwinPath(QString* path);
+
 	/**
 	 * Converts the given path so that the underlaying operating system supports it.
 	 * If the application's operating system is a Unix (Linux and Mac)
