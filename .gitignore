@@ -3,3 +3,5 @@ build
 *.swp
 .*project
 .settings
+build.mingw32
+build.mingw64
