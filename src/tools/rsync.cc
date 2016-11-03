@@ -65,7 +65,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QString include_dirs_filename = settings->getApplicationDataDir() + "includes";
 
 	QString source(src);
-	FileSystemUtils::convertToServerPath( &source );
+#ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &source );
+#endif
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -242,7 +244,10 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	Settings* settings = Settings::getInstance();
 
 	QString source(src);
-	FileSystemUtils::convertToServerPath( &source );
+
+#ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &source );
+#endif
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -826,7 +831,11 @@ QString Rsync::getValidDestinationPath( const QString& destination )
 	{
 		validDestination = validDestination.left( validDestination.size() -1 );
 	}
-	FileSystemUtils::convertToServerPath( &validDestination );
+#ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &validDestination );
+#else
+    FileSystemUtils::convertToServerPath( &validDestination );
+#endif
 	return validDestination;
 	// return convertFilenameForRsyncArgument(validDestination);
 }
@@ -943,12 +952,14 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 }
 
 QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
-	FileSystemUtils::convertToServerPath( &filename );
 #ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &filename );
     return( filename.toUtf8() );
 #elif defined Q_OS_MAC
+    FileSystemUtils::convertToServerPath( &filename );
     return(filename.normalized( QString::NormalizationForm_D ).toUtf8());
 #else
+    FileSystemUtils::convertToServerPath( &filename );
     return( filename.toLocal8Bit() );
 #endif
 }
