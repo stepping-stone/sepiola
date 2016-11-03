@@ -56,7 +56,7 @@ Rsync::~Rsync()
 
 QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, int bandwidthLimit, QString* warnings, bool dry_run )
 {
-	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << (warnings ? *warnings : "(no warnings)") << "," << dry_run << ")";
+    qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << (warnings ? *warnings : "(no warnings)") << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
 	QRegExp vanishedRegExp("file has vanished: \"([^\"]+)\".*");
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
@@ -87,8 +87,8 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
     if (bandwidthLimit > 0)
         arguments << QString("--bwlimit=%1").arg(bandwidthLimit);
 
-	arguments << source;
-	arguments << getValidDestinationPath( destination );
+    arguments << source;
+    arguments << getValidDestinationPath( destination );
 	arguments << "--include-from=-";
 
 	QStringList include_dirs_list;
@@ -108,6 +108,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	{
 		write(rule); // write( convertFilenameForRsyncArgument(rule) );
 		qDebug() << rule; // TODO: delete again
+        LogFileUtils::getInstance()->writeLog(" Pattern rule:  " + rule );
 		write( settings->getEOLCharacter() );
 		waitForBytesWritten();
 	}
@@ -237,7 +238,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 {
 	QString STATISTICS_FIRST_USED_LABEL = "Literal data:";
 	QString STATISTICS_FIRST_LABEL = "Number of files:";
-	qDebug() << "Rsync::upload(" << items << ", " << src << ", " << destination << ", " << includePatternList << ", " << excludePatternList << ")";
+    qDebug() << "Rsync::upload(" << items << ", " << src << ", " << destination << ", " << includePatternList << ", " << excludePatternList << ")";
 	Settings* settings = Settings::getInstance();
 
 	QString source(src);
@@ -309,7 +310,6 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	bool endReached = false;
 	while( blockingReadLine( &lineData, 2147483647 ) ) // -1 does not work on windows
 	{
-		//qDebug() << lineData;
 		lineData.replace( settings->getEOLCharacter(), "");
 		endReached = endReached || lineData.contains(STATISTICS_FIRST_LABEL);
 		if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
@@ -517,7 +517,10 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	waitForFinished();
 
 	QString errors = readAllStandardError();
-	if ( errors != "" )
+
+    //Todo(philippoehler): find a way to handle this ssh error
+
+    if ( /*errors != ""*/ false)
 	{
 		qWarning() << "Error occurred while downloading: " << errors;
 		if ( emitErrorSignal )
@@ -783,9 +786,21 @@ QStringList Rsync::getRsyncSshArguments()
 	Settings* settings = Settings::getInstance();
 	arguments << "-e";
 
-	if ( settings->useOpenSshInsteadOfPlinkForRsync() )
-	{
-		QString argument;
+    if ( settings->useOpenSshInsteadOfPlinkForRsync())
+    {
+        QString argument;
+
+    #ifdef Q_OS_WIN32
+        argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
+        argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
+        // overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
+        argument.append(" -o " + StringUtils::quoteText("UserKnownHostsFile = /cygdrive/c/Users/philipp/.ssh/known_hosts", "'"));
+        argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
+        // ignore any running SSH agents since they may offer additional keys first, causing authentication failures
+        argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
+        arguments << argument;
+
+    #else
 		argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
 		argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
 		// overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
@@ -793,6 +808,7 @@ QStringList Rsync::getRsyncSshArguments()
 		// ignore any running SSH agents since they may offer additional keys first, causing authentication failures
 		argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
 		arguments << argument;
+    #endif
 	}
 	else
 	{
@@ -819,7 +835,7 @@ QString Rsync::getValidDestinationPath( const QString& destination )
 
 QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsyncOutputLine )
 {
-	static QRegExp itemRegExp("([<>ch.][fdLDS][cstpogz. +?]{7}|\\*deleted) (.*)");
+    static QRegExp itemRegExp("([<>ch.][fdLDS][cstpogz. +?]{7,9}|\\*deleted) (.*)");
 
 	if (itemRegExp.exactMatch(rsyncOutputLine))
 	{
@@ -827,7 +843,7 @@ QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsync
 		QString itemName = itemRegExp.capturedTexts()[2];
 
 		ITEMIZE_CHANGE_TYPE type;
-		switch (flags.at(0).toLatin1())
+        switch (flags.at(0).toLatin1())
 		{
 			case '<':
 			case '>':
