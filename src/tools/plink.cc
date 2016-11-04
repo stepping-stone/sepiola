@@ -58,18 +58,15 @@ bool Plink::loginWithKey()
 	QString privatePuttyKeyFileName = settings->createPrivatePuttyKeyFile();
 	QString privateOpenSshKeyFileName = settings->createPrivateOpenSshKeyFile();
 
-	if ( privatePuttyKeyFileName == "" || (settings->useOpenSshInsteadOfPlinkForRsync() && privateOpenSshKeyFileName == "" ) )
+    if ( privatePuttyKeyFileName == "" || privateOpenSshKeyFileName == "" )
 	{
 		return false; // force generation of keys
 	}
 
-	if ( settings->useOpenSshInsteadOfPlinkForRsync() )
-	{
-		HostFileUtils::addPuttyKeyToOpenSshKeyFile(
-                settings->getServerName(),
-                QDir::home().absolutePath() + "/.putty/sshhostkeys",
-                QDir::home().absolutePath() + "/.ssh/known_hosts" );
-	}
+    HostFileUtils::addPuttyKeyToOpenSshKeyFile(
+            settings->getServerName(),
+            QDir::home().absolutePath() + "/.putty/sshhostkeys",
+            QDir::home().absolutePath() + "/.ssh/known_hosts" );
 
 	QStringList arguments;
 	arguments << "-noagent";
@@ -270,7 +267,7 @@ bool Plink::generateKeys( const QString& password )
 	}
 
 	write( password.toLocal8Bit() );
-	write( settings->getEOLCharacter() );
+    write( Platform::EOL_CHARACTER );
 
 	if (!waitForReadyRead())
 		throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));

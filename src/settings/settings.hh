@@ -174,13 +174,6 @@ class Settings : public QObject
 		int getRsyncTimeout();
 
 		/**
-		 * Indicates whether to use the openssh client instead of plink for rsync
-		 * This is a workaround for rsync-plink deadlock problem
-		 * (see bug 854 https://old-bugzilla.puzzle.ch/show_bug.cgi?id=854 for a detail description)
-		 */
-		bool useOpenSshInsteadOfPlinkForRsync();
-
-		/**
 		 * returns the provided reseller address from config_reseller
 		 */
 		QString getResellerAddress();

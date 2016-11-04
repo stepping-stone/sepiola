@@ -564,7 +564,7 @@ void Settings::saveBackupPrefix( const QString& backupPrefix )
 const char* Settings::getEOLCharacter()
 {
 #ifdef Q_OS_WIN32
-    return "\r\n";
+    return "\n";
 #else
 	return "\n";
 #endif
@@ -911,15 +911,6 @@ QSize Settings::getWindowSize()
 QPoint Settings::getWindowPosition()
 {
 	return windowPosition;
-}
-
-bool Settings::useOpenSshInsteadOfPlinkForRsync()
-{
-#if defined Q_OS_MAC || defined Q_OS_UNIX
-    return true;
-#else
-    return false;
-#endif
 }
 
 QString Settings::getResellerAddress()
