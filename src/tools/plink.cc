@@ -66,7 +66,8 @@ bool Plink::loginWithKey()
     HostFileUtils::addPuttyKeyToOpenSshKeyFile(
             settings->getServerName(),
             QDir::home().absolutePath() + "/.putty/sshhostkeys",
-            QDir::home().absolutePath() + "/.ssh/known_hosts" );
+            settings->getApplicationDataDir() + "/.ssh/known_hosts" );
+
 
 	QStringList arguments;
 	arguments << "-noagent";
