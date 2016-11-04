@@ -99,6 +99,10 @@ FunctionEnd
 !verbose 3
 !include "WinMessages.NSH"
 !verbose 4
+
+!verbose 3
+!include "x64.NSH"
+!verbose 4
 ;====================================================
 ; get_NT_environment 
 ;     Returns: the selected environment
@@ -441,6 +445,23 @@ FunctionEnd
 
 ;--------------------------------
 ;Installer Sections
+
+Section "Copy dependencies for Cygwin tools"
+${If} ${RunningX64}
+     SetOutPath "$INSTDIR\bin"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/"
+     SetOutPath "$PROFILE\.sepiola" 
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/.ssh"
+    Goto endCygwin
+${Else}
+     SetOutPath "$INSTDIR\bin"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/"
+     SetOutPath "$PROFILE\.sepiola" 
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/.ssh"
+    Goto endCygwin
+${EndIf}  
+    endCygwin:
+SectionEnd
 
 Section "Add to path"
   Push $INSTDIR\bin
