@@ -23,6 +23,9 @@
 
 namespace Platform {
 
+
+static const char SYSTEM_INDEPENDENT_EOL_CHARACTER[] = "\n";
+
 #ifdef Q_OS_WIN32
     static const char EOL_CHARACTER[] = "\r\n";
     static const char EXECUTABLE_SUFFIX[] = ".exe";

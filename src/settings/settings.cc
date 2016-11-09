@@ -561,15 +561,6 @@ void Settings::saveBackupPrefix( const QString& backupPrefix )
 	}
 }
 
-const char* Settings::getEOLCharacter()
-{
-#ifdef Q_OS_WIN32
-    return "\n";
-#else
-	return "\n";
-#endif
-}
-
 void Settings::saveWindowSize( QSize size )
 {
 	if ( this->windowSize != size )

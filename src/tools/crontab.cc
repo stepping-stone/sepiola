@@ -22,6 +22,7 @@
 
 #include "tools/crontab.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "test/test_manager.hh"
 #include "cli/cli_manager.hh"
 
@@ -128,7 +129,7 @@ bool Crontab::writeCrontabEntries_Helper( QStringList& crontabEntries, QString& 
 	foreach( QString crontabEntry, crontabEntries )
 	{
 		out << crontabEntry;
-		out << settings->getEOLCharacter();
+        out << Platform::EOL_CHARACTER;
 	}
 	out.flush();
 

@@ -75,12 +75,6 @@ class Settings : public QObject
 		void reloadSettings();
 
 		/**
-		 * Gets the end of line character for the current operating system
-		 * @return an end of line character
-		 */
-		const char* getEOLCharacter();
-
-		/**
 		 * Gets a list of available application languages
 		 * @return list of languages
 		 */

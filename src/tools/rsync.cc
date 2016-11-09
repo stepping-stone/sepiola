@@ -33,6 +33,7 @@
 
 #include "model/restore_name.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "tools/rsync.hh"
 #include "test/test_manager.hh"
 #include "utils/file_system_utils.hh"
@@ -97,7 +98,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
 	QList<QByteArray> convertedIncludeDirs;
 	foreach ( QString include_dir, include_dirs_list ) { /* qDebug() << "$$$" << include_dir; */ convertedIncludeDirs.append(convertFilenameForRsyncArgument(include_dir)); }
-	if (StringUtils::writeQByteArrayListToFile(convertedIncludeDirs, include_dirs_filename, settings->getEOLCharacter())) {
+    if (StringUtils::writeQByteArrayListToFile(convertedIncludeDirs, include_dirs_filename, Platform::EOL_CHARACTER )) {
 		arguments << "--files-from=" + convertFilenameForRsyncArgument(include_dirs_filename);
 		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
 	} else {
@@ -111,7 +112,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		write(rule); // write( convertFilenameForRsyncArgument(rule) );
 		qDebug() << rule; // TODO: delete again
         LogFileUtils::getInstance()->writeLog(" Pattern rule:  " + rule );
-		write( settings->getEOLCharacter() );
+        write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
 		waitForBytesWritten();
 	}
 	closeWriteChannel();
@@ -129,7 +130,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	{
 		// qDebug() << "first in while" << readAllStandardError(); // $$$ delete again
 		qDebug() << lineData;
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		if (lineData.size() > 0) {
 			endReached = (endReached || (lineData.contains(STATISTICS_FIRST_LABEL)));
 			if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
@@ -303,7 +304,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 #else
         write( item.toLocal8Bit() );
 #endif
-		write( settings->getEOLCharacter() );
+        write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
 		waitForBytesWritten();
 	}
 
@@ -315,7 +316,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	bool endReached = false;
 	while( blockingReadLine( &lineData, 2147483647 ) ) // -1 does not work on windows
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		endReached = endReached || lineData.contains(STATISTICS_FIRST_LABEL);
 		if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
 			endReached = true; // hopefully not necessary
@@ -490,7 +491,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 #else
             write( item.toLocal8Bit() );
 #endif
-			write( settings->getEOLCharacter() );
+            write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
 			waitForBytesWritten();
 		}
 		closeWriteChannel();
@@ -505,7 +506,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647 ) ) // -1 does not work on windows
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
 		if (item != "") {
 			removeSymlinkString( &item );
@@ -559,7 +560,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	if ( includeRules.size() > 0 )
 	{
 		QString includesFilename = settings->getApplicationDataDir() + "restore_includes";
-		if (StringUtils::writeQByteArrayListToFile( calculateRsyncRulesFromIncludeRules(includeRules), includesFilename, QByteArray(settings->getEOLCharacter()) )) {
+        if (StringUtils::writeQByteArrayListToFile( calculateRsyncRulesFromIncludeRules(includeRules), includesFilename, QByteArray(Platform::EOL_CHARACTER) )) {
 			arguments << "--include-from=" + convertFilenameForRsyncArgument(includesFilename);
 		}
 		createProcess( settings->getRsyncName() , arguments );
@@ -577,7 +578,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647, rsyncEolChar ) ) // -1 does not work on windows
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		// qDebug() << lineData;
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
 		if (item != "") {
@@ -663,7 +664,7 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination, cons
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647 ) )
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
 		if ( !item.contains( "=>" ) && item.contains( settings->getMetaFolderName() + "/" + settings->getBackupTimeFileName() ) )
 		{
@@ -722,7 +723,7 @@ QStringList Rsync::getPrefixes()
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647 ) )
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		qDebug() << "Rsync::getPrefixes():" << lineData;
 
 		QString column;
