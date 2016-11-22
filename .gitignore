@@ -1,5 +1,7 @@
 build
+build.*
 .vimrc
 *.swp
 .*project
 .settings
+CMakeLists.txt.user

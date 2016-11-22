@@ -23,12 +23,17 @@
 
 namespace Platform {
 
+
+static const char SYSTEM_INDEPENDENT_EOL_CHARACTER[] = "\n";
+
 #ifdef Q_OS_WIN32
     static const char EOL_CHARACTER[] = "\r\n";
     static const char EXECUTABLE_SUFFIX[] = ".exe";
+    static const char ROOT_PREFIX[] = "/cygdrive";
 #else
     static const char EOL_CHARACTER[] = "\n";
     static const char EXECUTABLE_SUFFIX[] = "";
+    static const char ROOT_PREFIX[] = "/";
 #endif
 
 #if defined Q_OS_WIN32

@@ -75,12 +75,6 @@ class Settings : public QObject
 		void reloadSettings();
 
 		/**
-		 * Gets the end of line character for the current operating system
-		 * @return an end of line character
-		 */
-		const char* getEOLCharacter();
-
-		/**
 		 * Gets a list of available application languages
 		 * @return list of languages
 		 */
@@ -172,13 +166,6 @@ class Settings : public QObject
 		 * @return number of seconds to timeout
 		 */
 		int getRsyncTimeout();
-
-		/**
-		 * Indicates whether to use the openssh client instead of plink for rsync
-		 * This is a workaround for rsync-plink deadlock problem
-		 * (see bug 854 https://old-bugzilla.puzzle.ch/show_bug.cgi?id=854 for a detail description)
-		 */
-		bool useOpenSshInsteadOfPlinkForRsync();
 
 		/**
 		 * returns the provided reseller address from config_reseller

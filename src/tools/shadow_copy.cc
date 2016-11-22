@@ -28,6 +28,8 @@
 #include <QWaitCondition>
 #include <QMutex>
 
+#include "utils/log_file_utils.hh"
+
 #ifndef __GNUC__
 // only valid for Visual C++ linker (either with Visual C++ or clang frontend)
 #pragma comment (lib, "VssApi.lib")
@@ -320,6 +322,11 @@ void ShadowCopy::takeSnapshot()
         // Store the snapshot properties according to the partition name in the
         // FilesystemSnapshotPathMapper object
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
+
+        // Remove the frist 22 characters: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy7   ->   HarddiskVolumeShadowCopy7
+        QStringRef harddiskVolumeShadowCopy = snapshotPath.midRef(22);
+        QString snapshotPathForCygwin = "/proc/sys/device/" + harddiskVolumeShadowCopy.toString() + "/";
+        LogFileUtils::getInstance()->writeLog("snapshotPathForCygwin: " + snapshotPathForCygwin);
 	
         QString linkname = getMountDirectory();
         linkname.append( MOUNT_PREFIX );
@@ -338,7 +345,7 @@ void ShadowCopy::takeSnapshot()
         fullLinkname.prepend("\\\\?\\");
 
         LPCSTR link = (LPCSTR) fullLinkname.utf16();
-        LPCSTR target = (LPCSTR) snapshotPath.utf16();
+        LPCSTR target = (LPCSTR) snapshotPathForCygwin.utf16();
 
         // Check if the link already (what would be wrong) exists, if yes,
         // remove it

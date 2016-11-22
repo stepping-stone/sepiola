@@ -22,6 +22,7 @@
 
 #include "gui/output_dialog.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "utils/debug_timer.hh"
 
 OutputDialog::OutputDialog( const QString& title )
@@ -54,7 +55,7 @@ void OutputDialog::appendInfo( const QString& info )
 	else
 	{
 		// add a new line
-		this->outputCache.append( Settings::getInstance()->getEOLCharacter() );
+        this->outputCache.append( Platform::EOL_CHARACTER );
 	}
 }
 
