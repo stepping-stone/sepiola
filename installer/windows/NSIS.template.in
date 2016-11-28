@@ -612,13 +612,8 @@ Section "Uninstall"
 @CPACK_NSIS_DELETE_FILES@
 @CPACK_NSIS_DELETE_DIRECTORIES@
 
-  Delete "$INSTDIR\bin\QtCore@CPACK_NSIS_QT_SUFFIX@4.dll"
-  Delete "$INSTDIR\bin\QtGui@CPACK_NSIS_QT_SUFFIX@4.dll"
-  Delete "$INSTDIR\bin\QtNetwork@CPACK_NSIS_QT_SUFFIX@4.dll"
-  Delete "$INSTDIR\bin\zlib1.dll"
-  Delete "$INSTDIR\bin\libpng*.dll"
-  Delete "$INSTDIR\bin\libstdc++-6.dll"
-  Delete "$INSTDIR\bin\libgcc_s_*.dll"
+  ;Remove the application bin foler even if it is not empty. 
+  RMDir /r "$INSTDIR\bin"
 
   ;Remove the temporary application folder
   RMDir /r "$TEMP\@CPACK_PACKAGE_NAME@"
