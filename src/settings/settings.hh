@@ -179,7 +179,8 @@ class Settings : public QObject
 		QString getMetaFolderName();
 		QString getBackupRootFolder();
 		QString getRestoreRootFolder();
-		QString getMetadataFileName();
+        QString getMetadataFileName();
+        QString getSshConfigFileName();
 		QString getTempMetadataFileName();
 		QString getBackupContentFileName();
 		QString getBackupTimeFileName();
@@ -200,6 +201,7 @@ class Settings : public QObject
 
 		QString getApplicationBinDir();
 		QString getApplicationDataDir();
+        QString getSshConfigDataDir();
 
 		// writable settings
 		QString getServerName();
@@ -343,6 +345,7 @@ class Settings : public QObject
 		QSettings* appData; // writable settings
 		QString applicationBinDir;
 		QString applicationDataDir;
+        QString sshConfigDataDir;
 		QDateTime installDate;
 		QStringList supportedLanguages;
 

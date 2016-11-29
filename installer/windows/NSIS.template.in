@@ -450,14 +450,10 @@ Section "Copy dependencies for Cygwin tools"
 ${If} ${RunningX64}
      SetOutPath "$INSTDIR\bin"
      File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/"
-     SetOutPath "$PROFILE\.sepiola" 
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/.ssh"
     Goto endCygwin
 ${Else}
      SetOutPath "$INSTDIR\bin"
      File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/"
-     SetOutPath "$PROFILE\.sepiola" 
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/.ssh"
     Goto endCygwin
 ${EndIf}  
     endCygwin:
@@ -473,7 +469,6 @@ Section "Add to path"
     Call AddToPath
   doNotAddToPath:
 SectionEnd
-
 Section "Installer Section" InstSection
 
   ;Libraries from the MinGW installation, make sure to explicitly delete them in the uninstall section
