@@ -789,28 +789,18 @@ QStringList Rsync::getRsyncSshArguments()
     QString argument;
 	Settings* settings = Settings::getInstance();
 	arguments << "-e";
-#ifdef Q_OS_WIN32
+
     argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
-    argument.append(" -F " + StringUtils::quoteText(settings->getApplicationDataDir() + ".ssh" + "/" + "config", "'"));
+    argument.append(" -F " + StringUtils::quoteText(settings->getSshConfigDataDir() + "config", "'"));
     argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
     // overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
-    argument.append(" -o " + StringUtils::quoteText("UserKnownHostsFile = " + settings->getApplicationDataDir()  + ".ssh" + "/" + "known_hosts" , "'"));
+    argument.append(" -o " + StringUtils::quoteText("UserKnownHostsFile = " + settings->getSshConfigDataDir() + "known_hosts", "'"));
     argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
     // ignore any running SSH agents since they may offer additional keys first, causing authentication failures
     argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
     arguments << argument;
 
-#else
-    argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
-    argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
-    // overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
-    argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
-    // ignore any running SSH agents since they may offer additional keys first, causing authentication failures
-    argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
-    arguments << argument;
-#endif
-
-return arguments;
+    return arguments;
 }
 
 QString Rsync::getValidDestinationPath( const QString& destination )
