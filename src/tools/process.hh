@@ -47,6 +47,15 @@ public:
 
 protected:
 
+    /**
+     * Creates a new process for the given external program with the given arguments
+     * @param executableName name of the external program
+     * @param arguments list of arguments for the external program
+     * @param filteredEnvVars list of environment variables, which should be removed for this process.
+     */
+    void createProcess(const QString& executableName, const QStringList& arguments,
+                                                  const QList<QString>& filteredEnvVars);
+
 	/**
 	 * Creates a new process for the given external program with the given arguments
 	 * @param executableName name of the external program
@@ -141,6 +150,7 @@ private:
 	static const int MAX_LINE_SIZE;
 	QString executableName;
 	QStringList arguments;
+    QList<QString> filteredEnvironmentVars;
 };
 
 inline QByteArray Process::readAllStandardError()

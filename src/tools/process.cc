@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QMutex>
+#include <QProcessEnvironment>
 
 #include "settings/settings.hh"
 #include "tools/process.hh"
@@ -50,19 +51,35 @@ void Process::createProcess(const QString& executableName)
 
 void Process::createProcess(const QString& executableName, const QStringList& arguments)
 {
-	terminate();
-	delete qProcess;
-	abort = false;
-	killed = false;
-	qProcess = new ExtendedQProcess;
-	this->executableName = executableName;
-	this->arguments = arguments;
+    QList<QString> filteredEvnVars;
+    createProcess(executableName, arguments, filteredEvnVars);
+}
+
+void Process::createProcess(const QString& executableName, const QStringList& arguments,
+                                              const QList<QString>& filteredEnvVars)
+{
+    terminate();
+    delete qProcess;
+    abort = false;
+    killed = false;
+    qProcess = new ExtendedQProcess;
+    this->executableName = executableName;
+    this->arguments = arguments;
+    this->filteredEnvironmentVars = filteredEnvVars;
 }
 
 void Process::start()
 {
 	assert(qProcess);
-
+    // Remove environment variables if the given list is not empty.
+    if ( !this->filteredEnvironmentVars.empty() ) {
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        for(auto const &i : this->filteredEnvironmentVars) {
+            env.remove(i);
+            LogFileUtils::getInstance()->writeLog(" Filter environment variables: " + (i));
+         }
+        qProcess->setProcessEnvironment(env);
+    }
 	// As we don't want to log the password, we need to filter it
 	QStringList log_arguments = arguments;
 
