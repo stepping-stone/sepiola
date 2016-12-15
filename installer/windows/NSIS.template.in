@@ -449,11 +449,15 @@ FunctionEnd
 Section "Copy dependencies for Cygwin tools"
 ${If} ${RunningX64}
      SetOutPath "$INSTDIR\bin"
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/bin/"
+     SetOutPath "$INSTDIR"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/etc"
     Goto endCygwin
 ${Else}
      SetOutPath "$INSTDIR\bin"
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/bin/"
+     SetOutPath "$INSTDIR"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/etc"
     Goto endCygwin
 ${EndIf}  
     endCygwin:
@@ -609,6 +613,9 @@ Section "Uninstall"
 
   ;Remove the application bin foler even if it is not empty. 
   RMDir /r "$INSTDIR\bin"
+
+  ;Remove cygwins etc folder even if it is not empty. 
+  RMDir /r "$INSTDIR\etc"
 
   ;Remove the temporary application folder
   RMDir /r "$TEMP\@CPACK_PACKAGE_NAME@"
