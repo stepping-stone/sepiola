@@ -136,6 +136,7 @@ protected:
 	void setReadChannel(QProcess::ProcessChannel channel);
 	QProcess::ProcessState state() const;
 	bool isAlive();
+    void prepareEnvironmentVariables();
 
 private:
 	/**

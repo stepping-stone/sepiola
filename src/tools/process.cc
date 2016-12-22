@@ -71,15 +71,7 @@ void Process::createProcess(const QString& executableName, const QStringList& ar
 void Process::start()
 {
 	assert(qProcess);
-    // Remove environment variables if the given list is not empty.
-    if ( !this->filteredEnvironmentVars.empty() ) {
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        for(auto const &i : this->filteredEnvironmentVars) {
-            env.remove(i);
-            LogFileUtils::getInstance()->writeLog(" Filter environment variables: " + (i));
-         }
-        qProcess->setProcessEnvironment(env);
-    }
+    prepareEnvironmentVariables();
 	// As we don't want to log the password, we need to filter it
 	QStringList log_arguments = arguments;
 
@@ -288,5 +280,27 @@ bool Process::isAlive()
 	}
 
 	return true;
+}
+
+void Process::prepareEnvironmentVariables()
+{
+    Settings* settings = Settings::getInstance();
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if ( !this->filteredEnvironmentVars.empty() ) {
+        for(auto const &i : this->filteredEnvironmentVars) {
+            env.remove(i);
+            LogFileUtils::getInstance()->writeLog(" Filter environment variables: " + (i));
+         }
+    }
+    if (this->executableName == settings->getRsyncName() ) {
+        QString libraryPaths = env.value("LD_LIBRARY_PATH", "");
+        if (env.contains("LD_LIBRARY_PATH") &! libraryPaths.isEmpty() ) {
+            libraryPaths.prepend( settings->getApplicationBinDir() + ":" );
+            env.insert("LD_LIBRARY_PATH", libraryPaths);
+        } else {
+            env.insert("LD_LIBRARY_PATH", settings->getApplicationBinDir() );
+        }
+    }
+    qProcess->setProcessEnvironment(env);
 }
 
