@@ -40,6 +40,8 @@
 #include "utils/log_file_utils.hh"
 #include "utils/string_utils.hh"
 
+const QList<QString> Rsync::FILTERED_ENVIRONMENT_VAR_LIST({"CYGWIN"});
+
 Rsync::Rsync() :
     progress_bytesRead(0),
     progress_bytesWritten(0),
@@ -105,7 +107,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		qDebug() << "unable to write directory-names to file" << include_dirs_filename << ".";
 	}
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess(settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
 	foreach ( QByteArray rule, convertedRules )
 	{
@@ -289,7 +291,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		}
 	}
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess(settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
 	foreach ( QString item, items )
 	{
@@ -477,7 +479,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	{
 		// read download list from input
 		arguments << "--files-from=-";
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 		foreach ( QString item, customItemList )
 		{
@@ -498,7 +500,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	}
 	else
 	{
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 	}
 	QStringList downloadedItems;
@@ -563,12 +565,12 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
         if (StringUtils::writeQByteArrayListToFile( calculateRsyncRulesFromIncludeRules(includeRules), includesFilename, QByteArray(Platform::EOL_CHARACTER) )) {
 			arguments << "--include-from=" + convertFilenameForRsyncArgument(includesFilename);
 		}
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 	}
 	else
 	{
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 	}
 	QStringList downloadedItems;
@@ -657,7 +659,7 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination, cons
 	arguments << src;
 	arguments << getValidDestinationPath( destination );
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST);
 	start();
 
 	QStringList downloadedRestoreInfoFiles;
@@ -716,7 +718,7 @@ QStringList Rsync::getPrefixes()
 	arguments << "--exclude=*";
 	arguments << src;
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
 
 	QStringList prefixes;
@@ -789,28 +791,18 @@ QStringList Rsync::getRsyncSshArguments()
     QString argument;
 	Settings* settings = Settings::getInstance();
 	arguments << "-e";
-#ifdef Q_OS_WIN32
+
     argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
-    argument.append(" -F " + StringUtils::quoteText(settings->getApplicationDataDir() + ".ssh" + "/" + "config", "'"));
+    argument.append(" -F " + StringUtils::quoteText(settings->getSshConfigDataDir() + "config", "'"));
     argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
     // overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
-    argument.append(" -o " + StringUtils::quoteText("UserKnownHostsFile = " + settings->getApplicationDataDir()  + ".ssh" + "/" + "known_hosts" , "'"));
+    argument.append(" -o " + StringUtils::quoteText("UserKnownHostsFile = " + settings->getSshConfigDataDir() + "known_hosts", "'"));
     argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
     // ignore any running SSH agents since they may offer additional keys first, causing authentication failures
     argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
     arguments << argument;
 
-#else
-    argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
-    argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
-    // overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
-    argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
-    // ignore any running SSH agents since they may offer additional keys first, causing authentication failures
-    argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
-    arguments << argument;
-#endif
-
-return arguments;
+    return arguments;
 }
 
 QString Rsync::getValidDestinationPath( const QString& destination )

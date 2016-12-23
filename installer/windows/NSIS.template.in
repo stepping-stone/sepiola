@@ -449,15 +449,15 @@ FunctionEnd
 Section "Copy dependencies for Cygwin tools"
 ${If} ${RunningX64}
      SetOutPath "$INSTDIR\bin"
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/"
-     SetOutPath "$PROFILE\.sepiola" 
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/.ssh"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/bin/"
+     SetOutPath "$INSTDIR"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-x86_64/cygwin/etc"
     Goto endCygwin
 ${Else}
      SetOutPath "$INSTDIR\bin"
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/"
-     SetOutPath "$PROFILE\.sepiola" 
-     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/.ssh"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/bin/"
+     SetOutPath "$INSTDIR"
+     File /r "@CPACK_PROJECT_SOURCE_DIR@/tools/windows-i386/cygwin/etc"
     Goto endCygwin
 ${EndIf}  
     endCygwin:
@@ -473,7 +473,6 @@ Section "Add to path"
     Call AddToPath
   doNotAddToPath:
 SectionEnd
-
 Section "Installer Section" InstSection
 
   ;Libraries from the MinGW installation, make sure to explicitly delete them in the uninstall section
@@ -612,13 +611,11 @@ Section "Uninstall"
 @CPACK_NSIS_DELETE_FILES@
 @CPACK_NSIS_DELETE_DIRECTORIES@
 
-  Delete "$INSTDIR\bin\QtCore@CPACK_NSIS_QT_SUFFIX@4.dll"
-  Delete "$INSTDIR\bin\QtGui@CPACK_NSIS_QT_SUFFIX@4.dll"
-  Delete "$INSTDIR\bin\QtNetwork@CPACK_NSIS_QT_SUFFIX@4.dll"
-  Delete "$INSTDIR\bin\zlib1.dll"
-  Delete "$INSTDIR\bin\libpng*.dll"
-  Delete "$INSTDIR\bin\libstdc++-6.dll"
-  Delete "$INSTDIR\bin\libgcc_s_*.dll"
+  ;Remove the application bin foler even if it is not empty. 
+  RMDir /r "$INSTDIR\bin"
+
+  ;Remove cygwins etc folder even if it is not empty. 
+  RMDir /r "$INSTDIR\etc"
 
   ;Remove the temporary application folder
   RMDir /r "$TEMP\@CPACK_PACKAGE_NAME@"

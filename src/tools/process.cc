@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QProcess>
 #include <QMutex>
+#include <QProcessEnvironment>
 
 #include "settings/settings.hh"
 #include "tools/process.hh"
@@ -50,19 +51,27 @@ void Process::createProcess(const QString& executableName)
 
 void Process::createProcess(const QString& executableName, const QStringList& arguments)
 {
-	terminate();
-	delete qProcess;
-	abort = false;
-	killed = false;
-	qProcess = new ExtendedQProcess;
-	this->executableName = executableName;
-	this->arguments = arguments;
+    QList<QString> filteredEvnVars;
+    createProcess(executableName, arguments, filteredEvnVars);
+}
+
+void Process::createProcess(const QString& executableName, const QStringList& arguments,
+                                              const QList<QString>& filteredEnvVars)
+{
+    terminate();
+    delete qProcess;
+    abort = false;
+    killed = false;
+    qProcess = new ExtendedQProcess;
+    this->executableName = executableName;
+    this->arguments = arguments;
+    this->filteredEnvironmentVars = filteredEnvVars;
 }
 
 void Process::start()
 {
 	assert(qProcess);
-
+    prepareEnvironmentVariables();
 	// As we don't want to log the password, we need to filter it
 	QStringList log_arguments = arguments;
 
@@ -271,5 +280,27 @@ bool Process::isAlive()
 	}
 
 	return true;
+}
+
+void Process::prepareEnvironmentVariables()
+{
+    Settings* settings = Settings::getInstance();
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    if ( !this->filteredEnvironmentVars.empty() ) {
+        for(auto const &i : this->filteredEnvironmentVars) {
+            env.remove(i);
+            LogFileUtils::getInstance()->writeLog(" Filter environment variables: " + (i));
+         }
+    }
+    if (this->executableName == settings->getRsyncName() ) {
+        QString libraryPaths = env.value("LD_LIBRARY_PATH", "");
+        if (env.contains("LD_LIBRARY_PATH") &! libraryPaths.isEmpty() ) {
+            libraryPaths.prepend( settings->getApplicationBinDir() + ":" );
+            env.insert("LD_LIBRARY_PATH", libraryPaths);
+        } else {
+            env.insert("LD_LIBRARY_PATH", settings->getApplicationBinDir() );
+        }
+    }
+    qProcess->setProcessEnvironment(env);
 }
 

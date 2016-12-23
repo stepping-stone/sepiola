@@ -177,6 +177,7 @@ private:
 	long files_total;
 	long cur_n_files_done;
 	QDateTime lastUpdateTime;
+    static const QList<QString> FILTERED_ENVIRONMENT_VAR_LIST;
 
 	QFileInfo downloadSingleFile( const QString& source, const QString& destination, const QFileInfo& fileName, bool compress, bool emitErrorSignal );
 	QStringList download( const QString& source, const QString& destination, bool compress);
