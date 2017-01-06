@@ -25,6 +25,7 @@
 
 #include "gui/traffic_progress_dialog.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "utils/debug_timer.hh"
 
 
@@ -72,7 +73,7 @@ void TrafficProgressDialog::appendInfo( const QString& info )
 	const int msecs_to_wait_for_flush = 500;
 	QDateTime currentTime = QDateTime::currentDateTime();
 	this->outputCache.append( info );
-	this->outputCache.append( Settings::getInstance()->getEOLCharacter() );
+    this->outputCache.append( Platform::EOL_CHARACTER );
 	if ( this->lastUpdateTextLog.addMSecs(msecs_to_wait_for_flush) <= currentTime )
 	{
 		// update, but only after a second, such that following messages ariving in the next second are also flushed

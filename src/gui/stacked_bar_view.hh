@@ -21,7 +21,7 @@ class StackedBarView :
 public:
     StackedBarView(QWidget* p = 0);
 
-    QModelIndex	indexAt(const QPoint & point) const;
+    QModelIndex indexAt(const QPoint & point) const;
 
     void scrollTo(const QModelIndex & index, ScrollHint hint = EnsureVisible);
 
@@ -30,16 +30,16 @@ public:
     QPixmap legendIcon(const QModelIndex & index) const;
 
 protected:
-    int	horizontalOffset() const;
-    int	verticalOffset() const;
+    int horizontalOffset() const;
+    int verticalOffset() const;
 
     bool isIndexHidden(const QModelIndex & index) const;
 
-    QModelIndex	moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
+    QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
 
     void setSelection(const QRect & rect, QItemSelectionModel::SelectionFlags flags);
 
-    QRegion	visualRegionForSelection(const QItemSelection & selection) const;
+    QRegion visualRegionForSelection(const QItemSelection & selection) const;
 
     void paintEvent(QPaintEvent* event);
 

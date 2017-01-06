@@ -75,12 +75,6 @@ class Settings : public QObject
 		void reloadSettings();
 
 		/**
-		 * Gets the end of line character for the current operating system
-		 * @return an end of line character
-		 */
-		const char* getEOLCharacter();
-
-		/**
 		 * Gets a list of available application languages
 		 * @return list of languages
 		 */
@@ -174,13 +168,6 @@ class Settings : public QObject
 		int getRsyncTimeout();
 
 		/**
-		 * Indicates whether to use the openssh client instead of plink for rsync
-		 * This is a workaround for rsync-plink deadlock problem
-		 * (see bug 854 https://old-bugzilla.puzzle.ch/show_bug.cgi?id=854 for a detail description)
-		 */
-		bool useOpenSshInsteadOfPlinkForRsync();
-
-		/**
 		 * returns the provided reseller address from config_reseller
 		 */
 		QString getResellerAddress();
@@ -192,7 +179,8 @@ class Settings : public QObject
 		QString getMetaFolderName();
 		QString getBackupRootFolder();
 		QString getRestoreRootFolder();
-		QString getMetadataFileName();
+        QString getMetadataFileName();
+        QString getSshConfigFileName();
 		QString getTempMetadataFileName();
 		QString getBackupContentFileName();
 		QString getBackupTimeFileName();
@@ -213,6 +201,7 @@ class Settings : public QObject
 
 		QString getApplicationBinDir();
 		QString getApplicationDataDir();
+        QString getSshConfigDataDir();
 
 		// writable settings
 		QString getServerName();
@@ -356,6 +345,7 @@ class Settings : public QObject
 		QSettings* appData; // writable settings
 		QString applicationBinDir;
 		QString applicationDataDir;
+        QString sshConfigDataDir;
 		QDateTime installDate;
 		QStringList supportedLanguages;
 

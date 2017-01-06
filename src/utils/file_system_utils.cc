@@ -115,6 +115,13 @@ void FileSystemUtils::convertToServerPath(QString* path)
         *path = QString("/") + (*path)[0].toUpper() + path->right(path->size() - 2);
     }
 }
+void FileSystemUtils::convertToCygwinPath(QString* path) {
+    *path = QDir::fromNativeSeparators( *path);
+    if (path->size()> 1 && (*path)[0].isLetter() && (*path)[1] == ':')
+    {
+        *path = QString("/cygdrive/") + (*path)[0].toLower() + path->right(path->size() - 2);
+    }
+}
 #else
 void FileSystemUtils::convertToServerPath(QString*)
 {

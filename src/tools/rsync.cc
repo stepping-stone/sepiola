@@ -33,11 +33,14 @@
 
 #include "model/restore_name.hh"
 #include "settings/settings.hh"
+#include "settings/platform.hh"
 #include "tools/rsync.hh"
 #include "test/test_manager.hh"
 #include "utils/file_system_utils.hh"
 #include "utils/log_file_utils.hh"
 #include "utils/string_utils.hh"
+
+const QList<QString> Rsync::FILTERED_ENVIRONMENT_VAR_LIST({"CYGWIN"});
 
 Rsync::Rsync() :
     progress_bytesRead(0),
@@ -65,7 +68,9 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QString include_dirs_filename = settings->getApplicationDataDir() + "includes";
 
 	QString source(src);
-	FileSystemUtils::convertToServerPath( &source );
+#ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &source );
+#endif
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -95,20 +100,21 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	QList<QByteArray> convertedRules = calculateRsyncRulesFromIncludeRules(includeRules, &include_dirs_list);
 	QList<QByteArray> convertedIncludeDirs;
 	foreach ( QString include_dir, include_dirs_list ) { /* qDebug() << "$$$" << include_dir; */ convertedIncludeDirs.append(convertFilenameForRsyncArgument(include_dir)); }
-	if (StringUtils::writeQByteArrayListToFile(convertedIncludeDirs, include_dirs_filename, settings->getEOLCharacter())) {
+    if (StringUtils::writeQByteArrayListToFile(convertedIncludeDirs, include_dirs_filename, Platform::EOL_CHARACTER )) {
 		arguments << "--files-from=" + convertFilenameForRsyncArgument(include_dirs_filename);
 		qDebug() << "written directory-names to file" << include_dirs_filename << ":\n" << include_dirs_list;
 	} else {
 		qDebug() << "unable to write directory-names to file" << include_dirs_filename << ".";
 	}
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess(settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
 	foreach ( QByteArray rule, convertedRules )
 	{
 		write(rule); // write( convertFilenameForRsyncArgument(rule) );
 		qDebug() << rule; // TODO: delete again
-		write( settings->getEOLCharacter() );
+        LogFileUtils::getInstance()->writeLog(" Pattern rule:  " + rule );
+        write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
 		waitForBytesWritten();
 	}
 	closeWriteChannel();
@@ -126,7 +132,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	{
 		// qDebug() << "first in while" << readAllStandardError(); // $$$ delete again
 		qDebug() << lineData;
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		if (lineData.size() > 0) {
 			endReached = (endReached || (lineData.contains(STATISTICS_FIRST_LABEL)));
 			if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
@@ -241,7 +247,10 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	Settings* settings = Settings::getInstance();
 
 	QString source(src);
-	FileSystemUtils::convertToServerPath( &source );
+
+#ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &source );
+#endif
 
 	QStringList arguments;
 	arguments << getRsyncGeneralArguments();
@@ -282,7 +291,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		}
 	}
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess(settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
 	foreach ( QString item, items )
 	{
@@ -297,7 +306,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 #else
         write( item.toLocal8Bit() );
 #endif
-		write( settings->getEOLCharacter() );
+        write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
 		waitForBytesWritten();
 	}
 
@@ -309,8 +318,7 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 	bool endReached = false;
 	while( blockingReadLine( &lineData, 2147483647 ) ) // -1 does not work on windows
 	{
-		//qDebug() << lineData;
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		endReached = endReached || lineData.contains(STATISTICS_FIRST_LABEL);
 		if (lineData.contains(STATISTICS_FIRST_USED_LABEL)) {
 			endReached = true; // hopefully not necessary
@@ -471,7 +479,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	{
 		// read download list from input
 		arguments << "--files-from=-";
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 		foreach ( QString item, customItemList )
 		{
@@ -485,14 +493,14 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 #else
             write( item.toLocal8Bit() );
 #endif
-			write( settings->getEOLCharacter() );
+            write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
 			waitForBytesWritten();
 		}
 		closeWriteChannel();
 	}
 	else
 	{
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 	}
 	QStringList downloadedItems;
@@ -500,7 +508,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647 ) ) // -1 does not work on windows
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
 		if (item != "") {
 			removeSymlinkString( &item );
@@ -554,15 +562,15 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	if ( includeRules.size() > 0 )
 	{
 		QString includesFilename = settings->getApplicationDataDir() + "restore_includes";
-		if (StringUtils::writeQByteArrayListToFile( calculateRsyncRulesFromIncludeRules(includeRules), includesFilename, QByteArray(settings->getEOLCharacter()) )) {
+        if (StringUtils::writeQByteArrayListToFile( calculateRsyncRulesFromIncludeRules(includeRules), includesFilename, QByteArray(Platform::EOL_CHARACTER) )) {
 			arguments << "--include-from=" + convertFilenameForRsyncArgument(includesFilename);
 		}
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 	}
 	else
 	{
-		createProcess( settings->getRsyncName() , arguments );
+        createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 		start();
 	}
 	QStringList downloadedItems;
@@ -572,7 +580,7 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647, rsyncEolChar ) ) // -1 does not work on windows
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		// qDebug() << lineData;
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
 		if (item != "") {
@@ -651,14 +659,14 @@ QStringList Rsync::downloadAllRestoreInfoFiles( const QString& destination, cons
 	arguments << src;
 	arguments << getValidDestinationPath( destination );
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST);
 	start();
 
 	QStringList downloadedRestoreInfoFiles;
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647 ) )
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		QString item = getItemAndStoreTransferredBytes( lineData ).first;
 		if ( !item.contains( "=>" ) && item.contains( settings->getMetaFolderName() + "/" + settings->getBackupTimeFileName() ) )
 		{
@@ -710,14 +718,14 @@ QStringList Rsync::getPrefixes()
 	arguments << "--exclude=*";
 	arguments << src;
 
-	createProcess( settings->getRsyncName() , arguments );
+    createProcess( settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
 
 	QStringList prefixes;
 	QString lineData;
 	while( blockingReadLine( &lineData, 2147483647 ) )
 	{
-		lineData.replace( settings->getEOLCharacter(), "");
+        lineData.replace( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER, "");
 		qDebug() << "Rsync::getPrefixes():" << lineData;
 
 		QString column;
@@ -780,29 +788,21 @@ QStringList Rsync::getRsyncDownloadArguments()
 QStringList Rsync::getRsyncSshArguments()
 {
 	QStringList arguments;
+    QString argument;
 	Settings* settings = Settings::getInstance();
 	arguments << "-e";
 
-	if ( settings->useOpenSshInsteadOfPlinkForRsync() )
-	{
-		QString argument;
-		argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
-		argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
-		// overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
-		argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
-		// ignore any running SSH agents since they may offer additional keys first, causing authentication failures
-		argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
-		arguments << argument;
-	}
-	else
-	{
-		QString argument;
-		argument.append( StringUtils::quoteText(settings->getPlinkName(), "'") );
-		argument.append(" -noagent");
-		argument.append(" -i " + StringUtils::quoteText(settings->createPrivatePuttyKeyFile(), "'"));
-		arguments << argument;
-	}
-	return arguments;
+    argument.append( StringUtils::quoteText(settings->getSshName(), "'") );
+    argument.append(" -F " + StringUtils::quoteText(settings->getSshConfigDataDir() + "config", "'"));
+    argument.append(" -i " + StringUtils::quoteText(settings->createPrivateOpenSshKeyFile(), "'"));
+    // overwrite any defaults possibly specified in ~/.ssh/config wrt preferred authentication
+    argument.append(" -o " + StringUtils::quoteText("UserKnownHostsFile = " + settings->getSshConfigDataDir() + "known_hosts", "'"));
+    argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
+    // ignore any running SSH agents since they may offer additional keys first, causing authentication failures
+    argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
+    arguments << argument;
+
+    return arguments;
 }
 
 QString Rsync::getValidDestinationPath( const QString& destination )
@@ -812,14 +812,18 @@ QString Rsync::getValidDestinationPath( const QString& destination )
 	{
 		validDestination = validDestination.left( validDestination.size() -1 );
 	}
-	FileSystemUtils::convertToServerPath( &validDestination );
+#ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &validDestination );
+#else
+    FileSystemUtils::convertToServerPath( &validDestination );
+#endif
 	return validDestination;
 	// return convertFilenameForRsyncArgument(validDestination);
 }
 
 QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> Rsync::getItem( QString rsyncOutputLine )
 {
-	static QRegExp itemRegExp("([<>ch.][fdLDS][cstpogz. +?]{7}|\\*deleted) (.*)");
+    static QRegExp itemRegExp("([<>ch.][fdLDS][cstpogz. +?]{7,9}|\\*deleted) (.*)");
 
 	if (itemRegExp.exactMatch(rsyncOutputLine))
 	{
@@ -929,12 +933,14 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 }
 
 QByteArray Rsync::convertFilenameForRsyncArgument(QString filename) {
-	FileSystemUtils::convertToServerPath( &filename );
 #ifdef Q_OS_WIN32
+    FileSystemUtils::convertToCygwinPath( &filename );
     return( filename.toUtf8() );
 #elif defined Q_OS_MAC
+    FileSystemUtils::convertToServerPath( &filename );
     return(filename.normalized( QString::NormalizationForm_D ).toUtf8());
 #else
+    FileSystemUtils::convertToServerPath( &filename );
     return( filename.toLocal8Bit() );
 #endif
 }
@@ -1021,45 +1027,61 @@ void Rsync::abort()
 
 void Rsync::processWarningsAndErrors(QString* warnings)
 {
+	QString standardErrors = StringUtils::fromLocalEnc(readAllStandardError());
+
 	if (this->isAlive()) {
-		QString standardErrors = readAllStandardError();
-		if ( standardErrors != "" )
+		if (!standardErrors.isEmpty())
 		{
 			qWarning() << "Error occurred while uploading: " + standardErrors;
 			throw ProcessException(standardErrors);
 		}
-	} else {
-		int exitCode = this->exitCode();
-		if (exitCode == 0) return;
-		if (warnings)
-		{
-			switch (exitCode)
-			{
-				case 23:  // Partial transfer due to error
-					*warnings += StringUtils::fromLocalEnc(readAllStandardError());
-					*warnings += "\n";
-					*warnings += tr("Warning: At least one file could not be backuped up. See above for details.");
-					return;
-				case 24:  // Partial transfer due to vanished source files
-					*warnings += StringUtils::fromLocalEnc(readAllStandardError());
-					*warnings += "\n";
-					*warnings += tr("Warning: Some files have been renamed, moved or deleted during backup before they could be uploaded to the server.\n"
-								   "Usually this concerns temporary files and this warning can be ignored. See above for details.");
-					return;
-			}
-		} else if ( exitCode == 23 )
-		{
-		    // If there were no warnings, check if it the exit code is 23, if
-		    // yes it means that the disk quota is exceeded and the rsync cannot
-		    // execute mkstemp
-		    *warnings += StringUtils::fromLocalEnc(readAllStandardError());
-		    *warnings += "\n";
-		    *warnings += tr("Warning: Server disk quota exceeded. No more backups possible");
-		    return;
-		}
 
-		throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(exitCode).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
+		// the process is still running and no errors so far
+		return;
 	}
+
+	int exitCode = this->exitCode();
+
+	// the process exited cleanly
+	if (exitCode == 0)
+		return;
+
+	// if the warnings pointer is NULL, always throw since we have no other way to report
+	if (warnings == nullptr)
+		throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).")
+				.arg(exitCode)
+				.arg(standardErrors)
+				.arg(readAllStandardOutput().data()) );
+
+	if (warnings->isEmpty())
+	{
+		// if we have already accumulated errors, interpret the error
+		switch (exitCode)
+		{
+			case 23:  // Partial transfer due to error
+				*warnings += standardErrors;
+				*warnings += "\n";
+				*warnings += tr("Warning: At least one file could not be backuped up. See above for details.");
+				return;
+			case 24:  // Partial transfer due to vanished source files
+				*warnings += standardErrors;
+				*warnings += "\n";
+				*warnings += tr("Warning: Some files have been renamed, moved or deleted during backup before they could be uploaded to the server.\n"
+							   "Usually this concerns temporary files and this warning can be ignored. See above for details.");
+				return;
+		}
+	} else if (exitCode == 23)
+	{
+		// If there were no warnings, check if it the exit code is 23, if
+		// yes it means that the disk quota is exceeded and the rsync cannot
+		// execute mkstemp
+		*warnings += standardErrors;
+		*warnings += "\n";
+		*warnings += tr("Warning: Server disk quota exceeded. No more backups possible");
+		return;
+	}
+
+	throw ProcessException( QObject::tr( "rsync exited with exitCode %1 (%2 %3).").arg(exitCode).arg(readAllStandardError().data()).arg(readAllStandardOutput().data()) );
 }
 
 void Rsync::testGetItem()

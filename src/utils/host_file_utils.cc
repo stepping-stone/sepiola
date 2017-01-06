@@ -19,6 +19,7 @@
 #include "utils/host_file_utils.hh"
 #include "utils/file_system_utils.hh"
 
+#include <QSettings>
 #include <QDebug>
 #include <QtEndian>
 #include <QHostInfo>
@@ -27,6 +28,19 @@
 
 void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QString& sshhostkeysFileName, const QString& sshKnownHostsFileName )
 {
+#ifdef Q_OS_WIN32
+    // Read the SshHostKey fingerprint form the registry.
+    QString rsaPrefix("0x23,0x");
+    QSettings puttySshHostKey("HKEY_CURRENT_USER\\Software\\SimonTatham\\PUTTY\\SshHostKeys", QSettings::NativeFormat);
+    QString hostKeyValue = puttySshHostKey.value("rsa2@22:kvm-0003.stepping-stone.ch", "keyNotFound").toString();
+    if (hostKeyValue.compare("keyNotFound") == 0) {
+      qWarning() << "Can not find the given putty key in the Windows registry";
+      return;
+    }
+    hostKeyValue.remove(0 , rsaPrefix.length());
+    QString sshKey = convertPuttyKey(hostKeyValue, host);
+    addOpenSshKey( sshKey, host, sshKnownHostsFileName);
+#else
 	QString puttyKey = getPuttyKey( host, sshhostkeysFileName );
 	if( puttyKey.isEmpty() )
 	{
@@ -34,9 +48,12 @@ void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QStr
 	}
 	else
 	{
+        int prefix = 16 + host.length(); //rsa2@22:host 0x23,0x
+        puttyKey.remove(0,  prefix);
 		QString sshKey = convertPuttyKey( puttyKey, host );
 		addOpenSshKey( sshKey, host, sshKnownHostsFileName );
 	}
+#endif
 }
 
 QString HostFileUtils::getPuttyKey( const QString& host, const QString& sshhostkeysFileName )
@@ -57,8 +74,7 @@ QString HostFileUtils::getPuttyKey( const QString& host, const QString& sshhostk
 QString HostFileUtils::convertPuttyKey( const QString& puttyKeyString, const QString& host )
 {
     QByteArray puttyKey;
-    int keyStartPosition = 16 + host.length(); //rsa2@22:host 0x23,0x
-    puttyKey.append( puttyKeyString.mid( keyStartPosition ) );
+    puttyKey.append(puttyKeyString);
 
     // key example: 00 00 00 07  73 73 68 2D  72 73 61 00  00 00 01 23  00 00 00 81  00 9F 5F 3C  AB 99 A2 D
     QByteArray entry = QByteArray::fromHex( "00000007" );

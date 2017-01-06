@@ -20,6 +20,7 @@
 #include <QObject>
 #include <QHostInfo>
 #include <QDir>
+#include <QFile>
 #include <QDebug>
 #include <QCoreApplication>
 #include <QLocale>
@@ -170,6 +171,7 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	}
 	applicationDataDir = homeDir.absolutePath() + "/" + applicationDataDirName + "/";
 	QString appDataSettingsFileName  = applicationDataDir + configFile.fileName() + appDataAffix;
+    sshConfigDataDir = this->getApplicationDataDir() + ".ssh" + "/";
 
 #ifndef PORTABLE_INSTALLATION
     applicationBinDir = "/";
@@ -185,6 +187,11 @@ void Settings::loadSettings( const QFileInfo& configFile, const QString& reselle
 	userSettings =        new QSettings( applicationDataDir + configFile.fileName(), QSettings::IniFormat );
 	if (appData != 0)             { delete appData; }
 	appData =             new QSettings( appDataSettingsFileName, QSettings::IniFormat );
+
+    QString sshConfigFileName = this->getSshConfigFileName();
+    if (sshConfigFileName.isEmpty()) {
+        qWarning() << "Could not create ssh config file in directory " + this->getSshConfigDataDir();
+    }
 
 	if ( QFile( resellerSettingsFileName ).exists() )
 	{
@@ -547,6 +554,27 @@ QString Settings::getMetadataFileName()
 #endif
 }
 
+QString Settings::getSshConfigFileName() {
+    QDir sshDir( this->getSshConfigDataDir() );
+    QFile sshConfigFile( this->getSshConfigDataDir() + "config" );
+    if ( !sshDir.exists() ) {
+        if ( sshDir.mkpath(this->getSshConfigDataDir()) ) {
+            if ( sshConfigFile.open(QIODevice::ReadWrite) ) {
+                sshConfigFile.close();
+                return sshConfigFile.fileName();
+            }
+            return QString();
+        }
+    } if ( !sshConfigFile.exists() ) {
+        if ( sshConfigFile.open(QIODevice::ReadWrite) ) {
+            sshConfigFile.close();
+            return sshConfigFile.fileName();
+        }
+        return QString();
+    }
+    return sshConfigFile.fileName();
+}
+
 QString Settings::getTempMetadataFileName()
 {
 	return getMetadataFileName() + "_tmp";
@@ -559,15 +587,6 @@ void Settings::saveBackupPrefix( const QString& backupPrefix )
 		this->backupPrefix = backupPrefix;
 		userSettings->setValue( SETTINGS_BACKUP_PREFIX, backupPrefix );
 	}
-}
-
-const char* Settings::getEOLCharacter()
-{
-#ifdef Q_OS_WIN32
-    return "\r\n";
-#else
-	return "\n";
-#endif
 }
 
 void Settings::saveWindowSize( QSize size )
@@ -763,6 +782,11 @@ QString Settings::getApplicationDataDir()
 	return applicationDataDir;
 }
 
+QString Settings::getSshConfigDataDir()
+{
+    return sshConfigDataDir;
+}
+
 QString Settings::getSetAclName()
 {
 	return getApplicationBinDir() + setacl;
@@ -911,15 +935,6 @@ QSize Settings::getWindowSize()
 QPoint Settings::getWindowPosition()
 {
 	return windowPosition;
-}
-
-bool Settings::useOpenSshInsteadOfPlinkForRsync()
-{
-#if defined Q_OS_MAC || defined Q_OS_UNIX
-    return true;
-#else
-    return false;
-#endif
 }
 
 QString Settings::getResellerAddress()
