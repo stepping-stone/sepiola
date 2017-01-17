@@ -231,10 +231,17 @@ void BackupThread::run()
 							  this, SIGNAL( errorSignal( const QString& ) ) );
 			QFileInfo currentMetadataFileName = rsync->downloadCurrentMetadata( settings->getApplicationDataDir(), false );
 			checkAbortState();
-			QFileInfo newMetadataFileName = metadata->getMetadata( settings->getApplicationDataDir() + settings->getTempMetadataFileName(), processedItems, &warning );
+
+            //Convert the processedItem-path to the correspondign operating system: E.g. windows: /C/User/USERNAME  -> C:\User\USERNAME
+            QList<UploadedFile> convertedItems;
+            foreach( UploadedFile item, processedItems ) {
+                FileSystemUtils::convertToLocalPath(&item.first);
+                convertedItems.append(item);
+            }
+            QFileInfo newMetadataFileName = metadata->getMetadata( settings->getApplicationDataDir() + settings->getTempMetadataFileName(), convertedItems, &warning );
 			if (!warning.isEmpty()) warnings.append(warning);
 			checkAbortState();
-			metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, processedItems );
+            metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, convertedItems );
 			checkAbortState();
 			emit infoSignal( tr( "Uploading permission meta data" ) );
 
