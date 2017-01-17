@@ -35,9 +35,6 @@ FilesystemSnapshot::FilesystemSnapshot( const BackupSelectionHash& includes)
     // Get the snapshot implementation
     this->snapshot = ToolFactory::getSnapshotImpl();
 
-    // Immediately check if the snapshot needs some cleanup
-    this->snapshot->checkCleanup();
-
     // Move the snapshot object to the newly created thread
     this->snapshot->moveToThread( this->snapshotThread );
 
@@ -75,9 +72,6 @@ FilesystemSnapshot::FilesystemSnapshot( )
 
     // Get the snapshot implementation
     this->snapshot = ToolFactory::getSnapshotImpl();
-
-    // Immediately check if the snapshot needs some cleanup
-    this->snapshot->checkCleanup();
 
     // Move the snapshot object to the newly created thread
     this->snapshot->moveToThread( this->snapshotThread );

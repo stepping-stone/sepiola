@@ -40,14 +40,11 @@ typedef HRESULT(STDAPICALLTYPE * _CreateVssBackupComponentsInternal)(
     OUT IVssBackupComponents** ppBackup);
 typedef void(APIENTRY * _VssFreeSnapshotPropertiesInternal)(IN VSS_SNAPSHOT_PROP* pProp);
 static _CreateVssBackupComponentsInternal CreateVssBackupComponentsInternal_I;
-static _VssFreeSnapshotPropertiesInternal VssFreeSnapshotPropertiesInternal_I;
 
 /* Funktions in kernel32.dll */
 typedef BOOL (WINAPI* CreateSymbolicLinkProc) (LPCSTR, LPCSTR, DWORD);
 typedef BOOL (WINAPI* RemoveDirectoryProc) (LPCSTR);
 typedef BOOL (WINAPI* PathFileExistsProc) (LPCSTR);
-
-const QString ShadowCopy::MOUNT_PREFIX = "mount_shadow_copy_";
 
 ShadowCopy::ShadowCopy()
 {
@@ -94,7 +91,6 @@ void ShadowCopy::createSnapshotObject()
         emit sendSnapshotObjectCreated( SNAPSHOT_CANNOT_CREATE_SNASPHOT_OBJECT );
         return;
     }
-
     emit sendSnapshotObjectCreated( SNAPSHOT_SUCCESS );
 }
 
@@ -327,53 +323,9 @@ void ShadowCopy::takeSnapshot()
         QStringRef harddiskVolumeShadowCopy = snapshotPath.midRef(22);
         QString snapshotPathForCygwin = "/proc/sys/device/" + harddiskVolumeShadowCopy.toString() + "/";
         LogFileUtils::getInstance()->writeLog("snapshotPathForCygwin: " + snapshotPathForCygwin);
-	
-        QString linkname = getMountDirectory();
-        linkname.append( MOUNT_PREFIX );
-        linkname.append(partition);
-        snapshotPath.append("\\");
-
-        HMODULE lib;
-        CreateSymbolicLinkProc CreateSymbolicLink_func;
-        DWORD flags = 1;
-
-        lib = LoadLibrary("kernel32");
-        CreateSymbolicLink_func =
-            (CreateSymbolicLinkProc)GetProcAddress(lib,"CreateSymbolicLinkW");
-
-        QString fullLinkname = linkname;
-        fullLinkname.prepend("\\\\?\\");
-
-        LPCSTR link = (LPCSTR) fullLinkname.utf16();
-        LPCSTR target = (LPCSTR) snapshotPathForCygwin.utf16();
-
-        // Check if the link already (what would be wrong) exists, if yes,
-        // remove it
-        PathFileExistsProc PathFileExists_func;
-        PathFileExists_func =
-                    (PathFileExistsProc)GetProcAddress(lib,"PathFileExistsW");
-
-
-//        if ( (*PathFileExists_func)(link) == 1 )
-//            removeWindowsSymlink( linkname ); TODO check why not this does not work
-
-        if (CreateSymbolicLink_func == NULL)
-        {
-            qDebug() << "WinAPI function CreateSymbolicLinkW not available";
-            emit sendSnapshotTaken( SNAPSHOR_CANNOT_MOUNT_SNAPSHOT );
-            return;
-        } else
-        {
-            if ((*CreateSymbolicLink_func)(link, target, flags) == 0)
-            {
-                qDebug() <<  "WinAPI call CreateSymbolicLink failed" << GetLastError();
-                emit sendSnapshotTaken( SNAPSHOR_CANNOT_MOUNT_SNAPSHOT );
-                return;
-            }
-        }
 
         FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
-        mapper.setSnapshotPath( linkname );
+        mapper.setSnapshotPath( snapshotPathForCygwin );
         this->snapshotPathMappers.insert( partition, mapper);
 
         // As the mounting takes some time, delay the execution of the next
@@ -413,8 +365,7 @@ QString ShadowCopy::getDriveLetterByFile( const QString filename )
 
 void ShadowCopy::cleanupSnapshot()
 {
-    // Go through all snapshot and delete the shadow copy itself and the symlink
-    // to it
+    // Go through all snapshot and delete the shadow copy itself.
 
     if ( this->snapshot_set_ids.isEmpty() )
     {
@@ -423,15 +374,6 @@ void ShadowCopy::cleanupSnapshot()
         emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
         return;
     } 
-
-    foreach ( QString partition, this->snapshot_set_ids.keys() )
-    {
-        // Get the symlink name for the given partition
-        QString linkname = this->snapshotPathMappers.value( partition ).getSnapshotPath();
-
-        // Simply remove the symlink
-        removeWindowsSymlink( linkname );
-    }
 
     // Finally remove the shadow copy itself
 
@@ -458,47 +400,6 @@ void ShadowCopy::cleanupSnapshot()
     emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
 }
 
-void ShadowCopy::checkCleanup()
-{
-    qDebug() << "Checking for filesystem snapshot cleanup";
-
-    // Check in the MOUNT_DIRECTORY if there are any links with MOUNT_PREFIX
-    QStringList nameFilter(MOUNT_PREFIX + "*");
-    QDir directory( getMountDirectory() );
-    QStringList oldShadowCopyMounts = directory.entryList(nameFilter);
-
-    qDebug() << "Found the following leftovers of old FS Snapshots: " << oldShadowCopyMounts;
-
-    // If yes, remove them
-    foreach( QString oldMount, oldShadowCopyMounts )
-    {
-	QString linkname = oldMount;
-	linkname.prepend( getMountDirectory() );
-
-        qDebug() << "Removing:" << linkname;
-
-        removeWindowsSymlink( linkname );
-    }
-
-}
-
-bool ShadowCopy::removeWindowsSymlink( QString linkname)
-{
-    // Take the linkname and prepend the necessary Windows UNC path
-    linkname.prepend("\\\\?\\");
-
-    HMODULE lib;
-    RemoveDirectoryProc RemoveDirectory_func;
-
-    lib = LoadLibrary("kernel32");
-    RemoveDirectory_func =
-        (RemoveDirectoryProc)GetProcAddress(lib,"RemoveDirectoryW");
-
-    LPCSTR link = (LPCSTR) linkname.utf16();
-
-    return (*RemoveDirectory_func)(link);
-}
-
 const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()
 {
     return this->snapshotPathMappers;
@@ -513,17 +414,4 @@ void ShadowCopy::setSnapshotPathMappers(
 QString ShadowCopy::wCharArrayToQString( WCHAR* string)
 {
     return QString::fromWCharArray( string, wcslen(string) );
-}
-
-QString ShadowCopy::getMountDirectory()
-{
-    // Get the application data directory from the settings class
-    QString applicationDataDir = Settings::getInstance()->getApplicationDataDir();
-
-    // As this string contains normal slashes, we need to replace them by
-    // windows style backslashes
-    applicationDataDir.replace("/","\\");
-
-    // Now we can return the applicationDataDir
-    return applicationDataDir;
 }
