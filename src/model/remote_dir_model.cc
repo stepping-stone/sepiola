@@ -42,14 +42,11 @@ QString sortKey(QString file)
 
 RemoteDirModel::RemoteDirModel( QStringList backupContent )
 {
-	qDebug() << "RemoteDirModel::RemoteDirModel(QStringList)";
-
-	qSort(backupContent.begin(), backupContent.end(), fileLessThan);
-
-	if (!backupContent.isEmpty() && !FileSystemUtils::isRoot(backupContent.first()))
-	{
-		backupContent.push_front("/");
-	}
+    qSort(backupContent.begin(), backupContent.end(), fileLessThan);
+    if (!backupContent.isEmpty() && !FileSystemUtils::isRoot(backupContent.first()))
+    {
+        backupContent.push_front( FileSystemUtils::getRootItemFromAbsPath(backupContent.first()));
+    }
 
 	QFileIconProvider iconProvider;
 	setHorizontalHeaderLabels( QStringList( QObject::tr( "Name" ) ) );

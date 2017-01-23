@@ -155,6 +155,24 @@ bool FileSystemUtils::isRoot(const QString& path)
 	return ( (path.size() == 1 && path.startsWith( '/') ) || (path.size() == 3 && path[0].isLetter() && path[1] == ':' ) );
 }
 
+#ifdef Q_OS_WIN32
+QString FileSystemUtils::getRootItemFromAbsPath(const QString& path)
+{
+    if (path.at(0).isLetter() && path.at(1) == ':')
+        return QString(path.at(0).toUpper()) + ":\\";
+    else
+        return QString("");
+}
+#else
+QString FileSystemUtils::getRootItemFromAbsPath(const QString& path)
+{
+    if (path.at(0) == '/')
+        return QString("/");
+    else
+        return QString("");
+}
+#endif
+
 bool FileSystemUtils::isDir(const QString& path)
 {
 	return path.endsWith("/") || path.endsWith("\\");

@@ -94,6 +94,14 @@ public:
 	 */
 	static bool isRoot( const QString& path );
 
+    /**
+     * Returns the root directory on the corresponding operating system. The root directory is "/" on Linux and Mac,
+     * on Windows it is a letter followed by a ":" and a "\", for instance C:\
+     * @param path: Path to determine the root directory.
+     * @return param: A string, which contains the root directory. "/" on Linux and Mac, "C:\" on Windows.
+     */
+    static QString getRootItemFromAbsPath( const QString& path);
+
 	/**
 	 * Checks if this path points to a directory
 	 * @param path path to check
