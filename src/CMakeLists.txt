@@ -195,6 +195,7 @@ QT4_WRAP_CPP(
 	tools/rsync.hh
 	settings/settings.hh
 	utils/log_file_utils.hh
+        utils/single_application_guard.hh
 	model/backup_thread.hh
 	model/main_model.hh
 	model/restore_thread.hh
@@ -256,6 +257,7 @@ SET(BASE_SOURCE_FILES
 	utils/log_file_utils.cc
 	utils/host_file_utils.cc
 	utils/progress_task.cc
+        utils/single_application_guard.cc
 	model/backup_thread.cc
 	model/dir_tree_item.cc
 	model/main_model.cc
