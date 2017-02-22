@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>719</width>
-    <height>571</height>
+    <height>684</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -433,26 +433,7 @@ p, li { white-space: pre-wrap; }
      <property name="title">
       <string/>
      </property>
-     <layout class="QVBoxLayout">
-      <property name="leftMargin">
-       <number>6</number>
-      </property>
-      <property name="topMargin">
-       <number>3</number>
-      </property>
-      <property name="rightMargin">
-       <number>6</number>
-      </property>
-      <property name="bottomMargin">
-       <number>3</number>
-      </property>
-      <item>
-       <widget class="QCheckBox" name="checkBoxShowHiddenFiles">
-        <property name="text">
-         <string>Show hidden files &amp;&amp; folders</string>
-        </property>
-       </widget>
-      </item>
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QCheckBox" name="checkBoxKeepDeletedFiles">
         <property name="text">
@@ -462,9 +443,26 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="checkBoxShowHiddenFiles">
+        <property name="text">
+         <string>Show hidden files &amp;&amp; folders</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="checkBoxVerboseLogging">
         <property name="text">
          <string>Verbose logging</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxUseShadowCopy">
+        <property name="text">
+         <string>Use shadow copy</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -573,8 +571,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>checkBoxKeepDeletedFiles</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
- <resources>
-  <include location="resources/screen.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

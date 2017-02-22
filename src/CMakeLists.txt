@@ -299,12 +299,14 @@ IF(Q_WS_WIN)
     QT4_WRAP_CPP(
         sepiola_win_MOC
         tools/shadow_copy.hh
+        tools/optionalSnapshot.hh
     )
     LIST(APPEND BASE_SOURCE_FILES
         tools/at.cc
         tools/schtasks.cc
         tools/set_acl.cc
         tools/shadow_copy.cc
+        tools/optionalSnapshot.cc
         ${sepiola_win_MOC}
     )
 ELSEIF(Q_WS_MAC)

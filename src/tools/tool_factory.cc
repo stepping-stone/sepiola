@@ -29,6 +29,7 @@
 #include "tools/at.hh"
 #include "tools/schtasks.hh"
 #include "tools/shadow_copy.hh"
+#include "tools/optionalSnapshot.hh"
 #else
 #include "tools/crontab.hh"
 #include "tools/dummy_snapshot.hh"
@@ -46,6 +47,8 @@
 #endif
 
 #include "tools/tool_factory.hh"
+
+#include <memory>
 
 ToolFactory::ToolFactory()
 {
@@ -93,7 +96,7 @@ AbstractScheduler * ToolFactory::getSchedulerImpl()
 AbstractSnapshot * ToolFactory::getSnapshotImpl()
 {
 #ifdef Q_OS_WIN32
-    return new ShadowCopy;
+    return new OptionalSnapshot(shared_ptr<AbstractSnapshot> (new ShadowCopy));
 #else
     return new DummySnapshot;
 #endif

@@ -163,6 +163,27 @@ QString FileSystemUtils::getRootItemFromAbsPath(const QString& path)
     else
         return QString("");
 }
+
+QString FileSystemUtils::getDriveLetterByFile( const QString filename )
+{
+    // The filename will be something like <LETTER>:\path\to\file so get the <LETTER>
+    QRegExp regex("^\\w:\\/");
+
+    // Get the first occurrence of the regex in the filename
+    int pos = regex.indexIn( filename );
+    QString letter;
+    if ( pos > -1 )
+    {
+        letter = regex.cap(0).left(1);
+    } else
+    {
+        // TODO: What if no drive letter was found?
+        qDebug() << filename << "does not math ^\\w:\\/";
+    }
+    // Return the drive letter
+    return letter;
+}
+
 #else
 QString FileSystemUtils::getRootItemFromAbsPath(const QString& path)
 {

@@ -92,6 +92,7 @@ const QString Settings::SETTINGS_WINDOW_SIZE = "WindowSize";
 const QString Settings::SETTINGS_DELETE_EXTRANEOUS_ITEMS = "DeleteExtraneousItems";
 const QString Settings::SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS = "ShowHiddenFilesAndFolders";
 const QString Settings::SETTINGS_LOG_DEBUG_MESSAGE = "LogDebugMessage";
+const QString Settings::SETTINGS_DO_SNAPSHOT = "DoSnapshot";
 const QString Settings::SETTINGS_BANDWITH_LIMIT = "BandwidthLimit";
 
 // [Reseller]
@@ -125,6 +126,7 @@ Settings::Settings() :
     userSettings(0),
     appData(0),
     logDebugMessage(false),
+    doSnapshot(true),
     ignoreReinstall(false),
     maxLogLines(10000),
     rsyncTimeout(43200),
@@ -301,7 +303,8 @@ void Settings::reloadSettings()
 	showHiddenFilesAndFolders = userSettings->value( SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, false ).toBool();
 	windowSize = userSettings->value( SETTINGS_WINDOW_SIZE ).toSize();
 	windowPosition = userSettings->value( SETTINGS_WINDOW_POSITION, QPoint( 200, 200 ) ).toPoint();
-	logDebugMessage = userSettings->value( SETTINGS_LOG_DEBUG_MESSAGE ).toBool();
+    logDebugMessage = userSettings->value( SETTINGS_LOG_DEBUG_MESSAGE ).toBool();
+    doSnapshot = userSettings->value( SETTINGS_DO_SNAPSHOT, true ).toBool();
 	bandwidthLimit = userSettings->value( SETTINGS_BANDWITH_LIMIT ).toInt();
 
 	// [AppData]
@@ -974,6 +977,20 @@ void Settings::saveLogDebugMessages(bool logDebugMessage)
 bool Settings::getLogDebugMessages() const
 {
     return logDebugMessage;
+}
+
+void Settings::saveDoSnapshot(bool doSnapshot)
+{
+    if (this->doSnapshot != doSnapshot)
+    {
+        this->doSnapshot = doSnapshot;
+        userSettings->setValue(SETTINGS_DO_SNAPSHOT, doSnapshot);
+    }
+}
+
+bool Settings::getDoSnapshot() const
+{
+    return doSnapshot;
 }
 
 void Settings::saveBandwidthLimit(int bandwidthLimit)

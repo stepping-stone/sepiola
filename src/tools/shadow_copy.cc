@@ -18,6 +18,7 @@
 
 #include "shadow_copy.hh"
 #include "settings/settings.hh"
+#include "utils/file_system_utils.hh"
 
 #include <QString>
 #include <QDebug>
@@ -27,8 +28,6 @@
 #include <QStringList>
 #include <QWaitCondition>
 #include <QMutex>
-
-#include "utils/log_file_utils.hh"
 
 #ifndef __GNUC__
 // only valid for Visual C++ linker (either with Visual C++ or clang frontend)
@@ -177,7 +176,7 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
         qDebug() << "Adding file" << file << "to the snapshot mapper";
 
         // Get the driveletter of the current file
-        QString driveLetter = getDriveLetterByFile( file );
+        QString driveLetter = FileSystemUtils::getDriveLetterByFile( file );
 
         // Get the relative filename
         QString relativeFileName = file;
@@ -322,7 +321,6 @@ void ShadowCopy::takeSnapshot()
         // Remove the frist 22 characters: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy7   ->   HarddiskVolumeShadowCopy7
         QStringRef harddiskVolumeShadowCopy = snapshotPath.midRef(22);
         QString snapshotPathForCygwin = "/proc/sys/device/" + harddiskVolumeShadowCopy.toString() + "/";
-        LogFileUtils::getInstance()->writeLog("snapshotPathForCygwin: " + snapshotPathForCygwin);
 
         FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
         mapper.setSnapshotPath( snapshotPathForCygwin );
@@ -336,31 +334,6 @@ void ShadowCopy::takeSnapshot()
     }
 
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
-}
-
-
-QString ShadowCopy::getDriveLetterByFile( const QString filename )
-{
-    // The filename will be something like <LETTER>:\path\to\file so get the
-    // <LETTER>:
-    QRegExp regex("^\\w:\\/");
-
-    // Get the first occurrence of the regex in the filename
-    int pos = regex.indexIn( filename );
-
-    QString letter;
-    if ( pos > -1 )
-    {
-        letter = regex.cap(0).left(1);
-    } else
-    {
-        // TODO: What if no drive letter was found?
-        qDebug() << filename << "does not math ^\\w:\\/";
-    }
-
-    // Return the drive letter
-    return letter;
-
 }
 
 void ShadowCopy::cleanupSnapshot()

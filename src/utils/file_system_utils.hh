@@ -102,6 +102,13 @@ public:
      */
     static QString getRootItemFromAbsPath( const QString& path);
 
+    /**
+     * The filename will be something like <LETTER>:\path\to\file. This function returns the <LETTER>
+     * @param filename: e.g. C:\path\to\file
+     * @return The drive letter: <LETTER> e.g. C
+     */
+    static QString getDriveLetterByFile( const QString filename );
+
 	/**
 	 * Checks if this path points to a directory
 	 * @param path path to check
