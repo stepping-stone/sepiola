@@ -96,11 +96,11 @@ public:
 
     /**
      * Returns the root directory on the corresponding operating system. The root directory is "/" on Linux and Mac,
-     * on Windows it is a letter followed by a ":" and a "\", for instance C:\
-     * @param path: Path to determine the root directory.
-     * @return param: A string, which contains the root directory. "/" on Linux and Mac, "C:\" on Windows.
+     * on Windows it is one or more letters followed by a ":" and a "\", for instance C:\
+     * @param content: A list of absolut paths.
+     * @return param: A list, which contains the root directory. "/" on Linux and Mac, "C:\" "F:\" on Windows.
      */
-    static QString getRootItemFromAbsPath( const QString& path);
+    static QStringList getRootItemsOutFromAbsolutPaths( const QStringList& content);
 
     /**
      * The filename will be something like <LETTER>:\path\to\file. This function returns the <LETTER>

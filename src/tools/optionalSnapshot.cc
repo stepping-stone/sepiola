@@ -99,14 +99,14 @@ void OptionalSnapshot::addFilesToSnapshot(const BackupSelectionHash includeRules
             {
                 FilesystemSnapshotPathMapper mapper = this->_snapshotPathMappers.value( driveLetter );
                 mapper.addFileToRelativeIncludes( relativeFileName, true);
-                mapper.setSnapshotPath(FileSystemUtils::getRootItemFromAbsPath(file));
+                mapper.setSnapshotPath(driveLetter + ":\\");
                 this->_snapshotPathMappers.insert (driveLetter, mapper );
             } else
             {
                 QHash<QString,bool> empty;
                 FilesystemSnapshotPathMapper mapper(driveLetter, empty);
                 mapper.addFileToRelativeIncludes( relativeFileName, true);
-                mapper.setSnapshotPath(FileSystemUtils::getRootItemFromAbsPath(file));
+                mapper.setSnapshotPath(driveLetter + ":\\");
                 this->_snapshotPathMappers.insert( driveLetter, mapper );
             }
         }

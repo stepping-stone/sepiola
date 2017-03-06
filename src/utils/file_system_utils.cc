@@ -152,16 +152,23 @@ void FileSystemUtils::convertToLocalPath(QString*)
 
 bool FileSystemUtils::isRoot(const QString& path)
 {
-	return ( (path.size() == 1 && path.startsWith( '/') ) || (path.size() == 3 && path[0].isLetter() && path[1] == ':' ) );
+    return ( (path.size() == 1 && path.startsWith( '/') ) || (path.size() == 3 && path[0].isLetter() && path[1] == ':' ) || (path.size() == 1)  );
 }
 
 #ifdef Q_OS_WIN32
-QString FileSystemUtils::getRootItemFromAbsPath(const QString& path)
+QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList& paths)
 {
-    if (path.at(0).isLetter() && path.at(1) == ':')
-        return QString(path.at(0).toUpper()) + ":\\";
-    else
-        return QString("");
+    QStringList rootItems;
+    QString drive("");
+    foreach(QString path, paths) {
+       if (path.at(0).isLetter() && path.at(1) == ':') {
+           drive = path.at(0).toUpper();
+           drive.append(":\\");
+           if (!rootItems.contains(drive))
+             rootItems.append(drive);
+       }
+    }
+    return rootItems;
 }
 
 QString FileSystemUtils::getDriveLetterByFile( const QString filename )
@@ -185,13 +192,16 @@ QString FileSystemUtils::getDriveLetterByFile( const QString filename )
 }
 
 #else
-QString FileSystemUtils::getRootItemFromAbsPath(const QString& path)
+QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList& content)
 {
-    if (path.at(0) == '/')
-        return QString("/");
+    QStringList rootItem;
+    if (content.first().startsWith('/'))
+        rootItem.append("/");
     else
-        return QString("");
+        rootItem.append("");
+    return rootItem;
 }
+
 #endif
 
 bool FileSystemUtils::isDir(const QString& path)

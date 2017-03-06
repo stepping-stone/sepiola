@@ -42,36 +42,36 @@ QString sortKey(QString file)
 
 RemoteDirModel::RemoteDirModel( QStringList backupContent )
 {
-    qSort(backupContent.begin(), backupContent.end(), fileLessThan);
-    if (!backupContent.isEmpty() && !FileSystemUtils::isRoot(backupContent.first()))
-    {
-        backupContent.push_front( FileSystemUtils::getRootItemFromAbsPath(backupContent.first()));
+    QStringList rootItems = FileSystemUtils::getRootItemsOutFromAbsolutPaths(backupContent);
+    foreach(QString rootItem, rootItems) {
+        backupContent.push_front(rootItem);
     }
+    qSort(backupContent.begin(), backupContent.end(), fileLessThan);
 
-	QFileIconProvider iconProvider;
-	setHorizontalHeaderLabels( QStringList( QObject::tr( "Name" ) ) );
-	QStack< QPair< QString, QStandardItem* > > dirStack;
-	dirStack.push( qMakePair( QString(), invisibleRootItem() ) );
-	foreach ( QString file, backupContent )
-	{
-		if ( file.isEmpty() ) continue;
-		while ( dirStack.size() > 1 && !file.startsWith( dirStack.top().first ) )
-		{
-			dirStack.pop();
-		}
-		if ( FileSystemUtils::isDir( file ) )
-		{
-			QStandardItem* dirTreeItem = new DirTreeItem( file, iconProvider );
-			dirStack.top().second->appendRow( dirTreeItem );
-			dirStack.push( qMakePair( file, dirTreeItem ) );
-		}
-		else
-		{
-			dirStack.top().second->appendRow( new DirTreeItem( file, iconProvider ) );
-		}
-	}
+    QFileIconProvider iconProvider;
+    setHorizontalHeaderLabels( QStringList( QObject::tr( "Name" ) ) );
+    QStack< QPair< QString, QStandardItem* > > dirStack;
+    dirStack.push( qMakePair( QString(), invisibleRootItem() ) );
 
-	qDebug() << "RemoteDirModel::RemoteDirModel(QStringList) done";
+    foreach ( QString file, backupContent )
+    {
+        if ( file.isEmpty() ) continue;
+        while ( dirStack.size() > 1 && !file.startsWith( dirStack.top().first ) )
+        {
+            dirStack.pop();
+        }
+        if ( FileSystemUtils::isDir( file ) )
+        {
+            QStandardItem* dirTreeItem = new DirTreeItem( file, iconProvider );
+            dirStack.top().second->appendRow( dirTreeItem );
+            dirStack.push( qMakePair( file, dirTreeItem ) );
+        }
+        else
+        {
+            dirStack.top().second->appendRow( new DirTreeItem( file, iconProvider ) );
+        }
+    }
+    qDebug() << "RemoteDirModel::RemoteDirModel(QStringList) done";
 }
 
 Qt::ItemFlags RemoteDirModel::flags(const QModelIndex& index) const
