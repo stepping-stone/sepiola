@@ -52,9 +52,6 @@ public:
 
     virtual const SnapshotMapper& getSnapshotPathMappers() = 0;
 
-    virtual void setSnapshotPathMappers(
-            const SnapshotMapper& snapshotPathMappers) = 0;
-
 private:
     SnapshotMapper snapshotPathMappers;
 

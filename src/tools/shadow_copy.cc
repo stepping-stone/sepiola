@@ -378,12 +378,6 @@ const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()
     return this->snapshotPathMappers;
 }
 
-void ShadowCopy::setSnapshotPathMappers(
-        const SnapshotMapper& snapshotPathMappers)
-{
-    this->snapshotPathMappers = snapshotPathMappers;
-}
-
 QString ShadowCopy::wCharArrayToQString( WCHAR* string)
 {
     return QString::fromWCharArray( string, wcslen(string) );

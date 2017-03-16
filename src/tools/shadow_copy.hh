@@ -66,9 +66,6 @@ public:
 
     const SnapshotMapper& getSnapshotPathMappers();
 
-    void setSnapshotPathMappers(
-            const SnapshotMapper& snapshotPathMappers);
-
 public slots:
 
     /**

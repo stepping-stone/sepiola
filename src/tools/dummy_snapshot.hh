@@ -43,9 +43,6 @@ public:
 
     const SnapshotMapper& getSnapshotPathMappers();
 
-    void setSnapshotPathMappers(
-            const SnapshotMapper& snapshotPathMappers);
-
 private:
     SnapshotMapper snapshotPathMappers;
 

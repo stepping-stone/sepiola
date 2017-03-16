@@ -142,12 +142,3 @@ const SnapshotMapper& OptionalSnapshot::getSnapshotPathMappers()
     } else
         return this->_snapshotPathMappers;
 }
-
-void OptionalSnapshot::setSnapshotPathMappers(
-        const SnapshotMapper& snapshotPathMappers)
-{
-    if (Settings::getInstance()->getDoSnapshot()) {
-        _snapshot->setSnapshotPathMappers(snapshotPathMappers);
-    } else
-        this->_snapshotPathMappers = snapshotPathMappers;
-}

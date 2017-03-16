@@ -23,9 +23,6 @@ public:
 
     const SnapshotMapper& getSnapshotPathMappers();
 
-    void setSnapshotPathMappers(
-            const SnapshotMapper& snapshotPathMappers);
-
 private:
     SnapshotMapper _snapshotPathMappers;
     shared_ptr<AbstractSnapshot> _snapshot;
