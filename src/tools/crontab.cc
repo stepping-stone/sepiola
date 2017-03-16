@@ -117,7 +117,6 @@ QStringList Crontab::readAllCrontabEntries()
 bool Crontab::writeCrontabEntries_Helper( QStringList& crontabEntries, QString& return_error )
 {
 	qDebug() << "Crontab::writeCrontabEntriesToFile( " << crontabEntries << " )";
-	Settings* settings = Settings::getInstance();
 	
 	QTemporaryFile tmpFile;
 	if ( !tmpFile.open() )
