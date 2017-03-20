@@ -72,7 +72,7 @@ void DummySnapshot::cleanupSnapshot()
     emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
 }
 
-const SnapshotMapper& DummySnapshot::getSnapshotPathMappers()
+const SnapshotMapper& DummySnapshot::getSnapshotPathMappers() const
 {
     return this->snapshotPathMappers;
 }

@@ -48,7 +48,7 @@ public:
     QString getMetadata(
         const QString& aclFileName,
         const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
-        QString* warnings);
+        const FilesystemSnapshot*, QString* warnings);
 
 	/**
 	 * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )

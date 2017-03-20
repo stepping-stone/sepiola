@@ -45,7 +45,7 @@ void TestPosixAcl::getMetadata()
     processedItems << qMakePair(QString("/etc/hosts"), AbstractRsync::TRANSFERRED);
 
     PosixAcl posixAcl("/bin/getfacl", "/bin/setfacl");
-    QString destinationFile = posixAcl.getMetadata(desiredDestinationFile, processedItems, 0);
+    QString destinationFile = posixAcl.getMetadata(desiredDestinationFile, processedItems, 0, 0);
 
     QCOMPARE(desiredDestinationFile, destinationFile);
 }

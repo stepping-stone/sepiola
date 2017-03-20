@@ -135,7 +135,7 @@ void OptionalSnapshot::cleanupSnapshot()
     }
 }
 
-const SnapshotMapper& OptionalSnapshot::getSnapshotPathMappers()
+const SnapshotMapper& OptionalSnapshot::getSnapshotPathMappers() const
 {
     if (Settings::getInstance()->getDoSnapshot()) {
         return _snapshot->getSnapshotPathMappers();

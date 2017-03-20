@@ -21,7 +21,7 @@ public:
      */
     virtual ~OptionalSnapshot();
 
-    const SnapshotMapper& getSnapshotPathMappers();
+    const SnapshotMapper& getSnapshotPathMappers() const;
 
 private:
     SnapshotMapper _snapshotPathMappers;

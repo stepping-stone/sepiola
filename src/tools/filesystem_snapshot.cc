@@ -221,7 +221,7 @@ void FilesystemSnapshot::snapshotTaken(int result)
     }
 }
 
-const SnapshotMapper& FilesystemSnapshot::getSnapshotPathMappers()
+const SnapshotMapper& FilesystemSnapshot::getSnapshotPathMappers() const
 {
     return this->snapshot->getSnapshotPathMappers();
 }

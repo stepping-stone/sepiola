@@ -45,7 +45,7 @@ public:
 	/**
 	 * @see AbstractMetadata::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
 	 */
-	QString getMetadata( const QString& aclFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 );
+    QString getMetadata( const QString& aclFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, const FilesystemSnapshot* fsSnapshot, QString* warnings = 0);
 
 	/**
 	 * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
@@ -65,12 +65,12 @@ public:
 private:
 	static const QString ITEM_NAME_PREFIX;
 	static const uint ITEM_NAME_PREFIX_SIZE;
-
-    QString setAclName;
+    const QString setAclName;
 
 	void populateMapFromFile( const QFileInfo& aclFileName, QMap<QString, QString>* aclMap);
 	void writeMapContentToFile( const QMap<QString, QString>& aclMap, const QFileInfo& aclFileName);
 	QString extractItemNameFromAclValue( const QString aclValue );
+    void replaceUncPathsByLocalPathsInMetadataFile(const QFileInfo &Filename, const FilesystemSnapshot *snapshot) const;
 };
 
 #endif

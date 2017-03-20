@@ -26,6 +26,7 @@
 
 #include "tools/abstract_rsync.hh"
 #include "tools/abstract_informing_process.hh"
+#include "tools/filesystem_snapshot.hh"
 
 /**
  * The AbstractMetadata class provides methods for getting and setting file and directory meta data
@@ -49,7 +50,7 @@ public:
 	virtual QString getMetadata(
             const QString& metadataFileName,
             const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
-            QString* warnings = 0 ) = 0;
+            const FilesystemSnapshot* fsSnapshot, QString* warnings = 0) = 0;
 
 	/**
 	 * Merges the data from the new and the existing metadata file and deletes items if necessary

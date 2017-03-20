@@ -163,7 +163,6 @@ void BackupThread::run()
 		// Backup all partitions on their own to be able to match the snapshot
 		// path to the original path on the backup server
 		QList<UploadedFile> processedItems;
-		QList<UploadedFile> relativeProcessedItems;
 		foreach ( FilesystemSnapshotPathMapper mapper, this->fsSnapshot->getSnapshotPathMappers() )
 		{
 		    QString tmp_source = mapper.getSnapshotPath();
@@ -182,9 +181,6 @@ void BackupThread::run()
 		    }
 
 		}
-
-		//QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems = rsync->upload( includeRules, source, destination, setDeleteFlag, compressedUpload, bandwidthLimit, &warnings, false );
-
 		checkAbortState();
 		if ((subPt = this->pt.getSubtask(TASKNAME_FILE_UPLOAD)) != 0) subPt->setTerminated(true);
 
@@ -232,16 +228,11 @@ void BackupThread::run()
 			QFileInfo currentMetadataFileName = rsync->downloadCurrentMetadata( settings->getApplicationDataDir(), false );
 			checkAbortState();
 
-            //Convert the processedItem-path to the correspondign operating system: E.g. windows: /C/User/USERNAME  -> C:\User\USERNAME
-            QList<UploadedFile> convertedItems;
-            foreach( UploadedFile item, processedItems ) {
-                FileSystemUtils::convertToLocalPath(&item.first);
-                convertedItems.append(item);
-            }
-            QFileInfo newMetadataFileName = metadata->getMetadata( settings->getApplicationDataDir() + settings->getTempMetadataFileName(), convertedItems, &warning );
+            QFileInfo newMetadataFileName = metadata->getMetadata( settings->getApplicationDataDir() + settings->getTempMetadataFileName(), processedItems, this->fsSnapshot, &warning );
+
 			if (!warning.isEmpty()) warnings.append(warning);
 			checkAbortState();
-            metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, convertedItems );
+            metadata->mergeMetadata( newMetadataFileName, currentMetadataFileName, processedItems );
 			checkAbortState();
 			emit infoSignal( tr( "Uploading permission meta data" ) );
 

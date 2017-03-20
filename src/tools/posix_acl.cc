@@ -44,7 +44,7 @@ PosixAcl::~PosixAcl()
 QString PosixAcl::getMetadata(
         const QString& aclFileName,
         const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
-        QString* warnings)
+        const FilesystemSnapshot*, QString* warnings)
 {
 	qDebug() << "PosixAcl::getMetadata( processedItems )";
 	QStringList arguments;

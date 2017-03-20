@@ -40,7 +40,7 @@ public:
     FilesystemSnapshot( );
     virtual ~FilesystemSnapshot();
     void doSnapshot();
-    const SnapshotMapper& getSnapshotPathMappers();
+    const SnapshotMapper& getSnapshotPathMappers() const;
     void setIncludeRules( const BackupSelectionHash& includes );
     void cleanup();
 

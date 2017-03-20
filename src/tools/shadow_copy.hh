@@ -64,7 +64,7 @@ public:
      */
     virtual ~ShadowCopy();
 
-    const SnapshotMapper& getSnapshotPathMappers();
+    const SnapshotMapper& getSnapshotPathMappers() const;
 
 public slots:
 

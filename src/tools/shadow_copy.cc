@@ -317,12 +317,13 @@ void ShadowCopy::takeSnapshot()
         // Store the snapshot properties according to the partition name in the
         // FilesystemSnapshotPathMapper object
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
+        FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
+        mapper.setSnapshotUncPath(snapshotPath);
 
         // Remove the frist 22 characters: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy7   ->   HarddiskVolumeShadowCopy7
         QStringRef harddiskVolumeShadowCopy = snapshotPath.midRef(22);
         QString snapshotPathForCygwin = "/proc/sys/device/" + harddiskVolumeShadowCopy.toString() + "/";
 
-        FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
         mapper.setSnapshotPath( snapshotPathForCygwin );
         this->snapshotPathMappers.insert( partition, mapper);
 
@@ -373,7 +374,7 @@ void ShadowCopy::cleanupSnapshot()
     emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
 }
 
-const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()
+const SnapshotMapper& ShadowCopy::getSnapshotPathMappers() const
 {
     return this->snapshotPathMappers;
 }

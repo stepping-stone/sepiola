@@ -41,7 +41,7 @@ public:
      */
     virtual ~DummySnapshot();
 
-    const SnapshotMapper& getSnapshotPathMappers();
+    const SnapshotMapper& getSnapshotPathMappers() const;
 
 private:
     SnapshotMapper snapshotPathMappers;

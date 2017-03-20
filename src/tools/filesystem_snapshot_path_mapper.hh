@@ -64,6 +64,12 @@ public:
      */
     const QString& getSnapshotPath() const;
 
+    /**
+     * Returns the local snapshot path in unc format for the given partition
+     * @return The local snapshot path in unc format for the given partition
+     */
+    const QString& getSnapshotUncPath() const;
+
     // Setters
     /**
      * Sets the partition name (mount point)
@@ -78,10 +84,24 @@ public:
     void setRelativeIncludes(const BackupSelectionHash& relativeIncludes);
 
     /**
-     * Sets the local snapshot path for the given partition
+     * Sets the absolute snapshot path in cygwin format (/proc/sys/device/HarddiskVolumeShadowCopy)
+     * for the given partition
      * @param The local snapshot path for the given partition
      */
     void setSnapshotPath(const QString& snapshotPath);
+
+    /**
+     * Sets the absolute snapshot path in unc format (\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy)
+     * for the given partition
+     * @param The absolute snapshot path in unc format for the given partition
+     */
+    void setSnapshotUncPath(const QString& snapshotUncPath);
+
+    /**
+     * Converts a local Windows path to absolut unc path for the given partition
+     * @param The absolute unc path for the given partition
+     */
+    const QString& toAbsUncPath(QString& path) const;
 
     /**
      * Add a single file to the relativeInclude list of this mapper object
@@ -93,6 +113,7 @@ public:
 private:
     QString partition;
     QString snapshotPath;
+    QString snapshotUncPath;
     BackupSelectionHash relativeIncludes;
 };
 

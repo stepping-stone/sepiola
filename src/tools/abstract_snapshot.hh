@@ -50,7 +50,7 @@ public:
     virtual ~AbstractSnapshot();
 
 
-    virtual const SnapshotMapper& getSnapshotPathMappers() = 0;
+    virtual const SnapshotMapper& getSnapshotPathMappers() const = 0;
 
 private:
     SnapshotMapper snapshotPathMappers;
