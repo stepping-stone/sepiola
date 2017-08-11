@@ -30,6 +30,7 @@
 #include <QTextCodec>
 #include <QTextStream>
 #include <QStack>
+#include <iostream>
 
 #include "model/restore_name.hh"
 #include "settings/settings.hh"
@@ -59,6 +60,7 @@ Rsync::~Rsync()
 
 QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, int bandwidthLimit, QString* warnings, bool dry_run )
 {
+    std::cout << "src:  "  << src.toStdString() << std::endl;
 	qDebug() << "Rsync::upload(" << includeRules << "," << src << "," << destination << "," << setDeleteFlag << "," << compress << "," << (warnings ? *warnings : "(no warnings)") << "," << dry_run << ")";
 	enum DryrunStates { DRY_RUN_START, DRY_RUN_COUNT_FILES, DRY_RUN_CALCULATE_SIZE, DRY_RUN_END };
 	QRegExp vanishedRegExp("file has vanished: \"([^\"]+)\".*");
@@ -107,10 +109,18 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 		qDebug() << "unable to write directory-names to file" << include_dirs_filename << ".";
 	}
 
+    QString shF = src.right(19);
+    QString filter = "/";
+    bool noIncludeRulesAvailable = !convertedRules.first().contains(filter.toUtf8());
+
     createProcess(settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
 	foreach ( QByteArray rule, convertedRules )
 	{
+        if (noIncludeRulesAvailable)
+          write( shF.toUtf8());
+
+        std::cout << "rule" << rule.data() << std::endl;
 		write(rule); // write( convertFilenameForRsyncArgument(rule) );
 		qDebug() << rule; // TODO: delete again
         LogFileUtils::getInstance()->writeLog(" Pattern rule:  " + rule );

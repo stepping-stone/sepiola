@@ -66,6 +66,11 @@ public:
 
     const SnapshotMapper& getSnapshotPathMappers() const;
 
+    /**
+     * Checks if there is something to clean up
+     */
+    virtual void checkCleanup();
+
 public slots:
 
     /**
@@ -97,11 +102,14 @@ public slots:
 
 private:
     QString wCharArrayToQString( WCHAR* string);
+    bool removeWindowsSymlink(QString linkname);
+    QString getMountDirectory();
     SnapshotMapper snapshotPathMappers;
     static const _VSS_SNAPSHOT_CONTEXT SC_SNAPSHOT_CONTEXT = VSS_CTX_BACKUP;
     static const VSS_BACKUP_TYPE SC_SNAPSHOT_TYPE = VSS_BT_COPY;
     static const bool SC_SNAPSHOT_BOOTABLE_STATE = false;
     static const bool SC_SNAPSHOT_SELECT_COMPONENTS = false;
+    static const QString MOUNT_PREFIX;
 
     HMODULE vssapiBase;
     IVssBackupComponents *pBackup = NULL;
