@@ -65,6 +65,11 @@ void DummySnapshot::takeSnapshot()
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
 }
 
+void DummySnapshot::checkCleanup()
+{
+    // Nothing to do here, no cleanup needed
+}
+
 void DummySnapshot::cleanupSnapshot()
 {
     // Nothing to do as nothing was done while taking the snapshot, just send

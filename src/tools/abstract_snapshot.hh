@@ -52,6 +52,11 @@ public:
 
     virtual const SnapshotMapper& getSnapshotPathMappers() const = 0;
 
+    /**
+     * Checks if there is something to clean up
+     */
+    virtual void checkCleanup() = 0;
+
 private:
     SnapshotMapper snapshotPathMappers;
 

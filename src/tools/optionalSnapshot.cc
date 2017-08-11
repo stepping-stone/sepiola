@@ -142,3 +142,14 @@ const SnapshotMapper& OptionalSnapshot::getSnapshotPathMappers() const
     } else
         return this->_snapshotPathMappers;
 }
+
+void OptionalSnapshot::checkCleanup() {
+
+    if (Settings::getInstance()->getDoSnapshot()) {
+        _snapshot->checkCleanup();
+    } else {
+        // Nothing to do as nothing was done while taking the snapshot, just send
+        // the signal to continue
+        emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
+    }
+}
