@@ -41,6 +41,11 @@ public:
 
     const SnapshotMapper& getSnapshotPathMappers() const;
 
+    /**
+     * Checks if there is something to clean up
+     */
+    virtual void checkCleanup();
+
 private:
     SnapshotMapper _snapshotPathMappers;
     shared_ptr<AbstractSnapshot> _snapshot;

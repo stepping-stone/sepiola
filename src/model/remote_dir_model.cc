@@ -25,7 +25,6 @@
 #include "settings/settings.hh"
 #include "utils/file_system_utils.hh"
 
-#include <iostream>
 
 QString sortKey(QString file)
 {
