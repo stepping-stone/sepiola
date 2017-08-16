@@ -78,12 +78,6 @@ public:
     void setPartition(const QString& partition);
 
     /**
-     * Sets the relative include rules (for the given partition)
-     * @param The relative BackupSelectionHash
-     */
-    void setRelativeIncludes(const BackupSelectionHash& relativeIncludes);
-
-    /**
      * Sets the absolute snapshot path in cygwin format (/proc/sys/device/HarddiskVolumeShadowCopy)
      * for the given partition
      * @param The local snapshot path for the given partition

@@ -39,11 +39,6 @@ const BackupSelectionHash& FilesystemSnapshotPathMapper::getRelativeIncludes() c
     return relativeIncludes;
 }
 
-void FilesystemSnapshotPathMapper::setRelativeIncludes(const BackupSelectionHash& relativeIncludes)
-{
-    this->relativeIncludes = relativeIncludes;
-}
-
 const QString& FilesystemSnapshotPathMapper::getSnapshotPath() const
 {
     return snapshotPath;
