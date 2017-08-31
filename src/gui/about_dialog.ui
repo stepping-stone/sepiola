@@ -81,7 +81,7 @@
          </sizepolicy>
         </property>
         <property name="pixmap">
-         <pixmap resource="resources/screen.qrc">:/main/about_image.png</pixmap>
+         <pixmap resource="../../build/src/logos_images.qrc">:/main/about_image.png</pixmap>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -179,14 +179,14 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Copyright 2013 by stepping stone GmbH</string>
+      <string>Copyright 2017 by stepping stone GmbH</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <resources>
-  <include location="resources/screen.qrc"/>
+  <include location="../../build/src/logos_images.qrc"/>
  </resources>
  <connections>
   <connection>

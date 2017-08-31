@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -93,6 +93,21 @@ public:
 	 * @return true if path is a root directory
 	 */
 	static bool isRoot( const QString& path );
+
+    /**
+     * Returns the root directory on the corresponding operating system. The root directory is "/" on Linux and Mac,
+     * on Windows it is one or more letters followed by a ":" and a "\", for instance C:\
+     * @param content: A list of absolut paths.
+     * @return param: A list, which contains the root directory. "/" on Linux and Mac, "C:\" "F:\" on Windows.
+     */
+    static QStringList getRootItemsOutFromAbsolutPaths( const QStringList& content);
+
+    /**
+     * The filename will be something like <LETTER>:\path\to\file. This function returns the <LETTER>
+     * @param filename: e.g. C:\path\to\file
+     * @return The drive letter: <LETTER> e.g. C
+     */
+    static QString getDriveLetterByFile( const QString filename );
 
 	/**
 	 * Checks if this path points to a directory

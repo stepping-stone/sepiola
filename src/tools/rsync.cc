@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -109,14 +109,15 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
     createProcess(settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
-	foreach ( QByteArray rule, convertedRules )
-	{
-		write(rule); // write( convertFilenameForRsyncArgument(rule) );
-		qDebug() << rule; // TODO: delete again
+
+    foreach ( QByteArray rule, convertedRules )
+    {
+        write(rule); // write( convertFilenameForRsyncArgument(rule) );
+        qDebug() << rule; // TODO: delete again
         LogFileUtils::getInstance()->writeLog(" Pattern rule:  " + rule );
         write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
-		waitForBytesWritten();
-	}
+        waitForBytesWritten();
+    }
 	closeWriteChannel();
 
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > uploadedItems;
@@ -920,7 +921,13 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 		}
 	}
-	filters << convertRuleToByteArray( "**",false );
+    // backup the entire volume
+    if (includeRules.isEmpty() ) {
+        filters.clear();
+    }
+
+    if (filters.contains("+"))
+      filters << convertRuleToByteArray( "**",false );
 
 	if (files_from_list != 0) { qSort((*files_from_list)); }
 	qDebug() << "include rules for rsync:";

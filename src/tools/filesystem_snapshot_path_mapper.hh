@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2014 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -64,6 +64,12 @@ public:
      */
     const QString& getSnapshotPath() const;
 
+    /**
+     * Returns the local snapshot path in unc format for the given partition
+     * @return The local snapshot path in unc format for the given partition
+     */
+    const QString& getSnapshotUncPath() const;
+
     // Setters
     /**
      * Sets the partition name (mount point)
@@ -72,16 +78,24 @@ public:
     void setPartition(const QString& partition);
 
     /**
-     * Sets the relative include rules (for the given partition)
-     * @param The relative BackupSelectionHash
-     */
-    void setRelativeIncludes(const BackupSelectionHash& relativeIncludes);
-
-    /**
-     * Sets the local snapshot path for the given partition
+     * Sets the absolute snapshot path in cygwin format (/proc/sys/device/HarddiskVolumeShadowCopy)
+     * for the given partition
      * @param The local snapshot path for the given partition
      */
     void setSnapshotPath(const QString& snapshotPath);
+
+    /**
+     * Sets the absolute snapshot path in unc format (\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy)
+     * for the given partition
+     * @param The absolute snapshot path in unc format for the given partition
+     */
+    void setSnapshotUncPath(const QString& snapshotUncPath);
+
+    /**
+     * Converts a local Windows path to absolut unc path for the given partition
+     * @param The absolute unc path for the given partition
+     */
+    const QString& toAbsUncPath(QString& path) const;
 
     /**
      * Add a single file to the relativeInclude list of this mapper object
@@ -93,6 +107,7 @@ public:
 private:
     QString partition;
     QString snapshotPath;
+    QString snapshotUncPath;
     BackupSelectionHash relativeIncludes;
 };
 

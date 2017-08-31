@@ -6,6 +6,7 @@
  */
 
 #include "filesystem_snapshot_path_mapper.hh"
+#include "settings/settings.hh"
 
 #include <QString>
 
@@ -38,11 +39,6 @@ const BackupSelectionHash& FilesystemSnapshotPathMapper::getRelativeIncludes() c
     return relativeIncludes;
 }
 
-void FilesystemSnapshotPathMapper::setRelativeIncludes(const BackupSelectionHash& relativeIncludes)
-{
-    this->relativeIncludes = relativeIncludes;
-}
-
 const QString& FilesystemSnapshotPathMapper::getSnapshotPath() const
 {
     return snapshotPath;
@@ -52,6 +48,26 @@ void FilesystemSnapshotPathMapper::setSnapshotPath(const QString& snapshotPath)
 {
     this->snapshotPath = snapshotPath;
 }
+
+const QString& FilesystemSnapshotPathMapper::getSnapshotUncPath() const
+{
+    return snapshotUncPath;
+}
+
+void FilesystemSnapshotPathMapper::setSnapshotUncPath(const QString &snapshotUncPath)
+{
+    this->snapshotUncPath = snapshotUncPath;
+}
+
+const QString& FilesystemSnapshotPathMapper::toAbsUncPath(QString& path) const
+{
+    if(path.startsWith(this->getPartition())) {
+        path.remove(0, 2); // replace the local mount-piont (C:\) by the shadow copy.
+        path.prepend(this->getSnapshotUncPath());
+    }
+    return path;
+}
+
 
 void FilesystemSnapshotPathMapper::addFileToRelativeIncludes(QString filename, bool backup)
 {

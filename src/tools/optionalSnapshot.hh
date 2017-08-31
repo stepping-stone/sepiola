@@ -16,30 +16,28 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef DUMMY_SNAPSHOT_HH_
-#define DUMMY_SNAPSHOT_HH_
+#ifndef DUMMY_WINDOWS_SNAPSHOT_HH
+#define DUMMY_WINDOWS_SNAPSHOT_HH
 
 #include "abstract_snapshot.hh"
 
-/**
- * The dummy snapshot class provides an empty snapshot method
- * @author Pat Kläy, pat.klaey@stepping-stone.ch
- */
-class DummySnapshot : public AbstractSnapshot
+#include <memory>
+
+class OptionalSnapshot : public AbstractSnapshot
 {
     Q_OBJECT
 
 public:
 
     /**
-     * Creates the DummySnapshot object
+     * Creates the OptionalSnapshot object
      */
-    DummySnapshot();
+    OptionalSnapshot(shared_ptr<AbstractSnapshot> ptr);
 
     /**
-     * Destroys the DummySnapshot
+     * Destroys the OptionalSnapshot
      */
-    virtual ~DummySnapshot();
+    virtual ~OptionalSnapshot();
 
     const SnapshotMapper& getSnapshotPathMappers() const;
 
@@ -48,9 +46,9 @@ public:
      */
     virtual void checkCleanup();
 
-
 private:
-    SnapshotMapper snapshotPathMappers;
+    SnapshotMapper _snapshotPathMappers;
+    shared_ptr<AbstractSnapshot> _snapshot;
 
 public slots:
 
@@ -80,7 +78,6 @@ public slots:
      * Cleans up the snapshot
      */
     void cleanupSnapshot();
-
 };
 
-#endif /* DUMMY_SNAPSHOT_HH_ */
+#endif // DUMMY_WINDOWS_SNAPSHOT_HH

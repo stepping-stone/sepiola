@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -62,6 +62,15 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	QObject::connect( this->buttonBox, SIGNAL( accepted() ), this, SLOT( save() ) );
 	QObject::connect( this->buttonBox, SIGNAL( rejected() ), this, SLOT( reset() ) );
 	QObject::connect( this, SIGNAL( updateOverviewFormLastBackupsInfo() ), parent, SIGNAL ( updateOverviewFormLastBackupsInfo() ) );
+
+#ifdef Q_OS_WIN32
+    checkBoxUseShadowCopy->setEnabled(true);
+#else
+    checkBoxUseShadowCopy->setChecked(false);
+    checkBoxUseShadowCopy->setCheckable(false);
+    checkBoxUseShadowCopy->setEnabled(false);
+#endif
+
 	reload();
 }
 
@@ -78,6 +87,7 @@ void SettingsForm::reload()
 	this->checkBoxShowHiddenFiles->setChecked( settings->getShowHiddenFilesAndFolders() );
 	this->checkBoxKeepDeletedFiles->setChecked( !settings->getDeleteExtraneousItems() );
 	this->checkBoxVerboseLogging->setChecked( settings->getLogDebugMessages() );
+    this->checkBoxUseShadowCopy->setChecked( settings->getDoSnapshot() );
 	this->spinBoxBandwidthLimit->setValue( settings->getBandwidthLimit() );
 
 	this->comboBoxLanguage->clear();
@@ -100,6 +110,7 @@ void SettingsForm::save()
 		settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
 		settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
 		settings->saveLogDebugMessages( this->checkBoxVerboseLogging->isChecked() );
+        settings->saveDoSnapshot( this->checkBoxUseShadowCopy->isChecked() );
 		settings->saveBandwidthLimit( this->spinBoxBandwidthLimit->value() );
 
 		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
@@ -197,4 +208,9 @@ void SettingsForm::on_checkBoxKeepDeletedFiles_stateChanged( int state )
 void SettingsForm::on_checkBoxVerboseLogging_stateChanged( int state )
 {
 	formChanged = ((state==Qt::Checked) != (Settings::getInstance()->getLogDebugMessages()));
+}
+
+void SettingsForm::on_checkBoxUseShadowCopy_stateChanged( int state )
+{
+    formChanged = ((state==Qt::Checked) != (Settings::getInstance()->getDoSnapshot()));
 }

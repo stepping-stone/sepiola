@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -240,6 +240,8 @@ class Settings : public QObject
 		void saveWindowPosition( QPoint position );
         void saveLogDebugMessages(bool logDebugMessage);
         bool getLogDebugMessages() const;
+        void saveDoSnapshot(bool doSnapshot);
+        bool getDoSnapshot() const;
         void saveBandwidthLimit(int bandwidthLimit);
         int getBandwidthLimit() const;
 
@@ -270,6 +272,7 @@ class Settings : public QObject
 		static const QString SETTINGS_LOCK_FILE_NAME;
 		static const QString SETTINGS_LOG_FILE_NAME;
 		static const QString SETTINGS_LOG_DEBUG_MESSAGE;
+        static const QString SETTINGS_DO_SNAPSHOT;
 		static const QString SETTINGS_IGNORE_REINSTALL;
 		static const QString SETTINGS_INCLUDE_PATTERN_FILE_NAME;
 		static const QString SETTINGS_EXCLUDE_PATTERN_FILE_NAME;
@@ -359,6 +362,7 @@ class Settings : public QObject
 		QString lockFileName;
 		QString logFileName;
 		bool logDebugMessage;
+        bool doSnapshot;
 		bool ignoreReinstall;
 		int maxLogLines;
 		int rsyncTimeout;

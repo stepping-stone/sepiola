@@ -32,8 +32,8 @@ https://github.com/stepping-stone/sepiola/issues</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="183"/>
-        <source>Copyright 2013 by stepping stone GmbH</source>
-        <translation>Urheberrecht 2013 bei stepping stone GmbH</translation>
+        <source>Copyright 2007-2017 by stepping stone GmbH</source>
+        <translation>Urheberrecht 2007-2017 bei stepping stone GmbH</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="103"/>

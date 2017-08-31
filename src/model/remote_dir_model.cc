@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2011 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -25,7 +25,6 @@
 #include "settings/settings.hh"
 #include "utils/file_system_utils.hh"
 
-#include <iostream>
 
 QString sortKey(QString file)
 {
@@ -42,39 +41,36 @@ QString sortKey(QString file)
 
 RemoteDirModel::RemoteDirModel( QStringList backupContent )
 {
-	qDebug() << "RemoteDirModel::RemoteDirModel(QStringList)";
+    QStringList rootItems = FileSystemUtils::getRootItemsOutFromAbsolutPaths(backupContent);
+    foreach(QString rootItem, rootItems) {
+        backupContent.push_front(rootItem);
+    }
+    qSort(backupContent.begin(), backupContent.end(), fileLessThan);
 
-	qSort(backupContent.begin(), backupContent.end(), fileLessThan);
+    QFileIconProvider iconProvider;
+    setHorizontalHeaderLabels( QStringList( QObject::tr( "Name" ) ) );
+    QStack< QPair< QString, QStandardItem* > > dirStack;
+    dirStack.push( qMakePair( QString(), invisibleRootItem() ) );
 
-	if (!backupContent.isEmpty() && !FileSystemUtils::isRoot(backupContent.first()))
-	{
-		backupContent.push_front("/");
-	}
-
-	QFileIconProvider iconProvider;
-	setHorizontalHeaderLabels( QStringList( QObject::tr( "Name" ) ) );
-	QStack< QPair< QString, QStandardItem* > > dirStack;
-	dirStack.push( qMakePair( QString(), invisibleRootItem() ) );
-	foreach ( QString file, backupContent )
-	{
-		if ( file.isEmpty() ) continue;
-		while ( dirStack.size() > 1 && !file.startsWith( dirStack.top().first ) )
-		{
-			dirStack.pop();
-		}
-		if ( FileSystemUtils::isDir( file ) )
-		{
-			QStandardItem* dirTreeItem = new DirTreeItem( file, iconProvider );
-			dirStack.top().second->appendRow( dirTreeItem );
-			dirStack.push( qMakePair( file, dirTreeItem ) );
-		}
-		else
-		{
-			dirStack.top().second->appendRow( new DirTreeItem( file, iconProvider ) );
-		}
-	}
-
-	qDebug() << "RemoteDirModel::RemoteDirModel(QStringList) done";
+    foreach ( QString file, backupContent )
+    {
+        if ( file.isEmpty() ) continue;
+        while ( dirStack.size() > 1 && !file.startsWith( dirStack.top().first ) )
+        {
+            dirStack.pop();
+        }
+        if ( FileSystemUtils::isDir( file ) )
+        {
+            QStandardItem* dirTreeItem = new DirTreeItem( file, iconProvider );
+            dirStack.top().second->appendRow( dirTreeItem );
+            dirStack.push( qMakePair( file, dirTreeItem ) );
+        }
+        else
+        {
+            dirStack.top().second->appendRow( new DirTreeItem( file, iconProvider ) );
+        }
+    }
+    qDebug() << "RemoteDirModel::RemoteDirModel(QStringList) done";
 }
 
 Qt::ItemFlags RemoteDirModel::flags(const QModelIndex& index) const

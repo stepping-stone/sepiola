@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2014 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -65,6 +65,11 @@ void DummySnapshot::takeSnapshot()
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
 }
 
+void DummySnapshot::checkCleanup()
+{
+    // Nothing to do here, no cleanup needed
+}
+
 void DummySnapshot::cleanupSnapshot()
 {
     // Nothing to do as nothing was done while taking the snapshot, just send
@@ -72,18 +77,7 @@ void DummySnapshot::cleanupSnapshot()
     emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
 }
 
-void DummySnapshot::checkCleanup()
-{
-    // Nothing to do here, no cleanup needed
-}
-
-const SnapshotMapper& DummySnapshot::getSnapshotPathMappers()
+const SnapshotMapper& DummySnapshot::getSnapshotPathMappers() const
 {
     return this->snapshotPathMappers;
-}
-
-void DummySnapshot::setSnapshotPathMappers(
-        const SnapshotMapper& snapshotPathMappers)
-{
-    this->snapshotPathMappers = snapshotPathMappers;
 }
