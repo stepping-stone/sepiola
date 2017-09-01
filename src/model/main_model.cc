@@ -60,9 +60,10 @@ MainModel::MainModel() :
 
 MainModel::~MainModel()
 {
-	delete localDirModel;
-	delete remoteDirModel;
+    delete localDirModel;
+    delete remoteDirModel;
     delete spaceUsageModel;
+    delete fsSnapshot;
 }
 
 void MainModel::keepSettings()
