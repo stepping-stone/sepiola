@@ -751,9 +751,9 @@ QStringList Rsync::getRsyncGeneralArguments()
 	QStringList result;
 	result << "--timeout=" + QString::number(Settings::getInstance()->getRsyncTimeout());
 #ifdef Q_OS_WIN32
-    result << "-iirtxS8";
+    result << "-iirtS8";
 #else
-    result << "-iilrtxHS8";
+    result << "-iilrtHS8";
     result << "--specials";
 #endif
 	return result;
