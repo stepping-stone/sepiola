@@ -82,6 +82,8 @@ void OptionalSnapshot::initializeSnapshot()
 
 void OptionalSnapshot::addFilesToSnapshot(const BackupSelectionHash includeRules)
 {
+    this->_snapshotPathMappers.clear();
+
     if (Settings::getInstance()->getDoSnapshot()) {
         _snapshot->addFilesToSnapshot(includeRules);
     } else {
@@ -98,14 +100,16 @@ void OptionalSnapshot::addFilesToSnapshot(const BackupSelectionHash includeRules
             if ( this->_snapshotPathMappers.contains( driveLetter ) )
             {
                 FilesystemSnapshotPathMapper mapper = this->_snapshotPathMappers.value( driveLetter );
-                mapper.addFileToRelativeIncludes( relativeFileName, true);
+                if (!relativeFileName.isEmpty())
+                    mapper.addFileToRelativeIncludes( relativeFileName, includeRules[file]);
                 mapper.setSnapshotPath(driveLetter + ":\\");
                 this->_snapshotPathMappers.insert (driveLetter, mapper );
             } else
             {
                 QHash<QString,bool> empty;
                 FilesystemSnapshotPathMapper mapper(driveLetter, empty);
-                mapper.addFileToRelativeIncludes( relativeFileName, true);
+                if (!relativeFileName.isEmpty())
+                    mapper.addFileToRelativeIncludes( relativeFileName, includeRules[file]);
                 mapper.setSnapshotPath(driveLetter + ":\\");
                 this->_snapshotPathMappers.insert( driveLetter, mapper );
             }
