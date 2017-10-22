@@ -173,6 +173,9 @@ void ShadowCopy::initializeSnapshot()
 
 void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
 {
+    this->snapshotPathMappers.clear();
+    this->snapshot_set_ids.clear();
+
     // Go through all files and add the corresponding partition name to the hash
     foreach( QString file, includeRules.keys() )
     {
@@ -195,7 +198,7 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
             // FilesystemSnapshotPathMapper object
             FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( driveLetter );
             if (!relativeFileName.isEmpty())
-              mapper.addFileToRelativeIncludes( relativeFileName, true);
+                mapper.addFileToRelativeIncludes( relativeFileName,  includeRules[file]);
             this->snapshotPathMappers.insert (driveLetter, mapper );
         } else
         {
@@ -204,7 +207,7 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
             QHash<QString,bool> empty;
             FilesystemSnapshotPathMapper mapper(driveLetter, empty);
             if (!relativeFileName.isEmpty())
-              mapper.addFileToRelativeIncludes( relativeFileName, true);
+                mapper.addFileToRelativeIncludes( relativeFileName,  includeRules[file]);
             this->snapshotPathMappers.insert( driveLetter, mapper );
             qDebug() << "Added a new snapshotmapper for partition" << driveLetter << "which is:" << this->snapshotPathMappers.value( driveLetter).getRelativeIncludes();
         }

@@ -926,8 +926,12 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
         filters.clear();
     }
 
-    if (filters.contains("+"))
-      filters << convertRuleToByteArray( "**",false );
+    foreach (QByteArray filter, filters) {
+        if (filter.startsWith('+')) {
+            filters << convertRuleToByteArray( "**",false );
+            break;
+        }
+    }
 
 	if (files_from_list != 0) { qSort((*files_from_list)); }
 	qDebug() << "include rules for rsync:";
