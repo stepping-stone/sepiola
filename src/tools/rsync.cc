@@ -921,16 +921,12 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 		}
 	}
-    // backup the entire volume
+
+    // backup the entire volume if no rules are available
     if (includeRules.isEmpty() ) {
         filters.clear();
-    }
-
-    foreach (QByteArray filter, filters) {
-        if (filter.startsWith('+')) {
-            filters << convertRuleToByteArray( "**",false );
-            break;
-        }
+    } else if (includeRules[includeRulesList.first()]) { // the toplevel rule distinguishes between include or exclude
+        filters << convertRuleToByteArray( "**",false );
     }
 
 	if (files_from_list != 0) { qSort((*files_from_list)); }
