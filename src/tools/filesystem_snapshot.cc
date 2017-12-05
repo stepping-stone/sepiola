@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2014 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -75,6 +75,7 @@ FilesystemSnapshot::FilesystemSnapshot( )
 
     // Get the snapshot implementation
     this->snapshot = ToolFactory::getSnapshotImpl();
+
 
     // Immediately check if the snapshot needs some cleanup
     this->snapshot->checkCleanup();
@@ -227,7 +228,7 @@ void FilesystemSnapshot::snapshotTaken(int result)
     }
 }
 
-const SnapshotMapper& FilesystemSnapshot::getSnapshotPathMappers()
+const SnapshotMapper& FilesystemSnapshot::getSnapshotPathMappers() const
 {
     return this->snapshot->getSnapshotPathMappers();
 }

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -21,8 +21,11 @@
 #include <QMap>
 #include <QDir>
 
+#include "settings/settings.hh"
 #include "tools/set_acl.hh"
 #include "utils/file_system_utils.hh"
+
+typedef QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> UploadedFile;
 
 SetAcl::SetAcl(const QString& setAcl) :
     setAclName(setAcl)
@@ -36,41 +39,53 @@ SetAcl::~SetAcl()
 const QString SetAcl::ITEM_NAME_PREFIX = "\"\\\\?\\";
 const uint SetAcl::ITEM_NAME_PREFIX_SIZE = 5;
 
-QString SetAcl::getMetadata(const QString& aclFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
+QString SetAcl::getMetadata(const QString& aclFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, const FilesystemSnapshot* fsSnapshot, QString* )
 {
+    Settings* settings = Settings::getInstance();
 	qDebug() << "SetAcl::getMetadata( processedItems )";
 	QStringList arguments;
-	arguments << "-ot" << "file" << "-rec" << "no" << "-actn" << "list" << "-lst" << "f:sddl;w:d,s,o,g" << "-bckp" << aclFileName;
+    arguments << "-ot" << "file" << "-rec" << "no" << "-actn" << "list" << "-lst" << "f:sddl;w:d,s,o,g" << "-bckp" << aclFileName;
 	createProcess( setAclName, arguments );
 	start();
 	setTextModeEnabled(true);
-	//waitForStarted();
-/*	QFile setAclInFile(settings->getApplicationDataDir() + "setacl-input.txt");
-	setAclInFile.open(QIODevice::WriteOnly | QIODevice::Text);
-	QTextStream setAclInStream(&setAclInFile);
-	setAclInStream.setCodec("UTF-16");
-	setAclInStream.setGenerateByteOrderMark(true); */
 	QTextStream outStream;
 	retrieveStream(&outStream);
 	outStream.setCodec("UTF-16");
-	for( int i=0; i<processedItems.size(); i++ )
-	{
-		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>  processedItem = processedItems.at( i );
-		if( processedItem.second != AbstractRsync::DELETED )
-		{
-			//emit infoSignal( QObject::tr( "Getting metadata for %1" ).arg( processedItem.first ) );
-			outStream << processedItem.first << endl;
-			//setAclInStream << processedItem.first << endl;
-			waitForBytesWritten();
-		}
-	}
 
+    //Convert the processedItems to windows paths: /C/User/USERNAME  -> C:\User\USERNAME
+    QList< UploadedFile > localPathsWindows;
+    QList< UploadedFile > absolutUncPaths;
+    foreach( UploadedFile  item, processedItems ) {
+        FileSystemUtils::convertToLocalPath(&item.first);
+        localPathsWindows.append(item);
+        absolutUncPaths.append(item);
+    }
+    if (settings->getDoSnapshot()) {
+        // Convert the item paths to unc. read the acl form the shadow copy if a shadwo copy was taken.
+        QString absolutePath;
+        absolutUncPaths.clear();
+        foreach(FilesystemSnapshotPathMapper mapper, fsSnapshot->getSnapshotPathMappers()) {
+            foreach( UploadedFile  item, localPathsWindows) {
+                if (item.first.startsWith(mapper.getPartition())) {
+                    absolutePath = mapper.toAbsUncPath(item.first);
+                    absolutePath.remove("\\\\?\\");
+                    UploadedFile file( absolutePath, item.second);
+                    absolutUncPaths.append(file);
+                }
+            }
+        }
+    }
+    foreach (UploadedFile item, absolutUncPaths) {
+        if(item.second != AbstractRsync::DELETED) {
+            outStream << item.first << endl;
+            waitForBytesWritten();
+        }
+    }
 	closeWriteChannel();
 	QString errors;
 	if (!waitForFinished())
 	{
-		qDebug() << "Process state: " << state();
-		//errors = "Error or timeout waiting for SetACL";
+        qDebug() << "Process state: " << state();
 	}
 	else
 	{
@@ -81,11 +96,21 @@ QString SetAcl::getMetadata(const QString& aclFileName, const QList< QPair<QStri
 		qWarning() << "Error occurred while getting ACL's: " << errors;
 		throw ProcessException( QObject::tr( "Error occurred while getting ACL's:\n" ) + errors );
 	}
+
+    if(settings->getDoSnapshot())
+      replaceUncPathsByLocalPathsInMetadataFile(aclFileName, fsSnapshot);
+
 	return aclFileName;
 }
 
 void SetAcl::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
 {
+    //Convert the processedItem-path to the correspondign operating system: E.g. windows: /C/User/USERNAME  -> C:\User\USERNAME
+    QList<UploadedFile> localPathsWindows;
+    foreach( UploadedFile item, processedItems ) {
+        FileSystemUtils::convertToLocalPath(&item.first);
+        localPathsWindows.append(item);
+    }
 	qDebug() << "SetAcl::mergeMetadata( " << newMetadataFileName.absoluteFilePath() << ", " << currentMetadataFileName.absoluteFilePath() << ")";
 
 	QMap<QString, QString> aclMap; // key: file or dir name, value: acl data (one line)
@@ -93,15 +118,12 @@ void SetAcl::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInf
 	// read all acl's from the current acl file and put them in a map
 	populateMapFromFile( currentMetadataFileName, &aclMap );
 
-	// delete all acl's for deleted items
-	for( int i=0; i<processedItems.size(); i++ )
-	{
-		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>  processedItem = processedItems.at( i );
-		if( processedItem.second == AbstractRsync::DELETED )
-		{
-			aclMap.remove( processedItem.first );
-		}
-	}
+    // delete all acl's for deleted items
+    foreach (UploadedFile item, localPathsWindows) {
+        if (item.second == AbstractRsync::DELETED) {
+            aclMap.remove( item.first );
+        }
+    }
 
 	// read all acl's from the new acl file and put them in the map. if there is already an entry, replace it
 	populateMapFromFile( newMetadataFileName, &aclMap );
@@ -125,7 +147,6 @@ void SetAcl::setMetadata( const QFileInfo& metadataFileName, const QStringList& 
 		QString aclValue = aclMap.take(item);
 		if (aclValue.isEmpty()) continue;
 
-		//QString itemName = extractItemNameFromAclValue( aclValue );
 		if ( downloadDestination == "/" )
 		{
 			newAclMap.insert(item, aclValue);
@@ -134,12 +155,8 @@ void SetAcl::setMetadata( const QFileInfo& metadataFileName, const QStringList& 
 		{
 			FileSystemUtils::convertToServerPath( &item );
 			QString absoluteItemPath = QDir::toNativeSeparators( downloadDestination + item);
-			aclValue = ITEM_NAME_PREFIX + absoluteItemPath + aclValue.right( aclValue.size() - item.size() - ITEM_NAME_PREFIX_SIZE );
-			newAclMap.insert( absoluteItemPath, aclValue ); // insert new
-			/*if (FileSystemUtils::isDir(absoluteItemPath))
-			{
-				emit infoSignal( QObject::tr( "Setting metadata for %1" ).arg( absoluteItemPath ) );
-			}*/
+            aclValue = ITEM_NAME_PREFIX + absoluteItemPath + aclValue.right( aclValue.size() - item.size() - ITEM_NAME_PREFIX_SIZE );
+            newAclMap.insert( absoluteItemPath, aclValue ); // insert new
 		}
 	}
 
@@ -155,37 +172,17 @@ void SetAcl::setMetadata( const QFileInfo& metadataFileName, const QStringList& 
 	createProcess( setAclName , arguments );
 
 	setReadChannel(QProcess::StandardOutput);
-	/*setProcessChannelMode(QProcess::MergedChannels);
-	setTextModeEnabled(true);
-	QTextStream inputStream;
-	retrieveStream(&inputStream);*/
-	//inputStream.setCodec("UTF-16");
-
 	start();
 
 	QByteArray line;
 	while( blockingReadLine( &line, 2147483647 ) )
 	{
 		emit infoSignal( line.trimmed() );
-		//qDebug() << line;
 	}
-
-	/*QString line;
-	for (int i = 0; i < 10; i++ )
-	{
-		qDebug() << inputStream.readLine();
-	}*/
-	/*while (!inputStream.atEnd())
-	{
-		line = inputStream.readLine();
-		qDebug() << line;
-	}*/
-
 	QString errors;
 	if (!waitForFinished())
 	{
-		qDebug() << "Process state: " << state();
-		// errors = "Error or timeout waiting for SetACL";
+        qDebug() << "Process state: " << state();
 	}
 	else
 	{
@@ -223,7 +220,7 @@ void SetAcl::populateMapFromFile( const QFileInfo& aclFileName, QMap<QString, QS
 	}
 
 	QTextStream textStream( &aclFile );
-	textStream.setCodec( "UTF-16" );
+    textStream.setCodec( "UTF-16" );
 	textStream.setGenerateByteOrderMark(true);
 	while ( !textStream.atEnd() )
 	{
@@ -242,7 +239,7 @@ void SetAcl::populateMapFromFile( const QFileInfo& aclFileName, QMap<QString, QS
 QString SetAcl::extractItemNameFromAclValue( const QString aclValue )
 {
 	int itemNameStartPosition = ITEM_NAME_PREFIX.size();
-	int itemNameEndPosition = aclValue.indexOf( "\"", itemNameStartPosition ) - itemNameStartPosition;
+    int itemNameEndPosition = aclValue.indexOf( "\"", itemNameStartPosition ) - itemNameStartPosition;
 	return aclValue.mid( itemNameStartPosition, itemNameEndPosition );
 }
 
@@ -272,4 +269,44 @@ void SetAcl::writeMapContentToFile( const QMap<QString, QString>& aclMap, const 
 	}
 	textStream.flush();
 	aclFile.close();
+}
+
+void SetAcl::replaceUncPathsByLocalPathsInMetadataFile(const QFileInfo &Filename,  const FilesystemSnapshot *snapshot) const {
+    QStringList aclMetadataFromUncPath;
+    QStringList aclMetadataFromLocalPath;
+    QFile origMetadataFile(Filename.absoluteFilePath());
+    QTextStream readStream(&origMetadataFile);
+    readStream.setCodec("UTF-16");
+
+    if(!origMetadataFile.open(QIODevice::ReadWrite)) {
+        qWarning() << "Can not write to file " << origMetadataFile.fileName();
+        return;
+    } else {
+        while (!readStream.atEnd()) {
+            QString line = readStream.readLine();
+            aclMetadataFromUncPath.append(line);
+        }
+        origMetadataFile.close();
+    }
+    foreach(FilesystemSnapshotPathMapper mapper, snapshot->getSnapshotPathMappers()) {
+        foreach(QString line, aclMetadataFromUncPath) {
+            line.remove(0, 1); // remove the leading quotation mark
+            if (line.startsWith(mapper.getSnapshotUncPath())) {
+                line.remove(0, mapper.getSnapshotUncPath().size());
+                line.prepend(ITEM_NAME_PREFIX + mapper.getPartition() + ":");
+                aclMetadataFromLocalPath.append(line);
+           }
+        }
+    }
+    if (!origMetadataFile.open(QFile::WriteOnly | QFile::Truncate)) {
+        qWarning() << "Can not write to file " << origMetadataFile.fileName();
+        return;
+    } else {
+        QTextStream outStream(&origMetadataFile);
+        outStream.setCodec("UTF-16");
+        foreach(QString item, aclMetadataFromLocalPath) {
+            outStream << item << '\n';
+        }
+        origMetadataFile.close();
+    }
 }

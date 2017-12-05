@@ -1,5 +1,5 @@
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007, 2008  stepping stone GmbH
+#| Copyright (C) 2007, 2017  stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -195,6 +195,7 @@ QT4_WRAP_CPP(
 	tools/rsync.hh
 	settings/settings.hh
 	utils/log_file_utils.hh
+        utils/single_application_guard.hh
 	model/backup_thread.hh
 	model/main_model.hh
 	model/restore_thread.hh
@@ -256,6 +257,7 @@ SET(BASE_SOURCE_FILES
 	utils/log_file_utils.cc
 	utils/host_file_utils.cc
 	utils/progress_task.cc
+        utils/single_application_guard.cc
 	model/backup_thread.cc
 	model/dir_tree_item.cc
 	model/main_model.cc
@@ -297,12 +299,14 @@ IF(Q_WS_WIN)
     QT4_WRAP_CPP(
         sepiola_win_MOC
         tools/shadow_copy.hh
+        tools/optionalSnapshot.hh
     )
     LIST(APPEND BASE_SOURCE_FILES
         tools/at.cc
         tools/schtasks.cc
         tools/set_acl.cc
         tools/shadow_copy.cc
+        tools/optionalSnapshot.cc
         ${sepiola_win_MOC}
     )
 ELSEIF(Q_WS_MAC)

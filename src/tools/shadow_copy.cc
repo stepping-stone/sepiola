@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2014 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
 
 #include "shadow_copy.hh"
 #include "settings/settings.hh"
+#include "utils/file_system_utils.hh"
 
 #include <QString>
 #include <QDebug>
@@ -27,8 +28,6 @@
 #include <QStringList>
 #include <QWaitCondition>
 #include <QMutex>
-
-#include "utils/log_file_utils.hh"
 
 #ifndef __GNUC__
 // only valid for Visual C++ linker (either with Visual C++ or clang frontend)
@@ -94,7 +93,6 @@ void ShadowCopy::createSnapshotObject()
         emit sendSnapshotObjectCreated( SNAPSHOT_CANNOT_CREATE_SNASPHOT_OBJECT );
         return;
     }
-
     emit sendSnapshotObjectCreated( SNAPSHOT_SUCCESS );
 }
 
@@ -175,13 +173,16 @@ void ShadowCopy::initializeSnapshot()
 
 void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
 {
+    this->snapshotPathMappers.clear();
+    this->snapshot_set_ids.clear();
+
     // Go through all files and add the corresponding partition name to the hash
     foreach( QString file, includeRules.keys() )
     {
         qDebug() << "Adding file" << file << "to the snapshot mapper";
 
         // Get the driveletter of the current file
-        QString driveLetter = getDriveLetterByFile( file );
+        QString driveLetter = FileSystemUtils::getDriveLetterByFile( file );
 
         // Get the relative filename
         QString relativeFileName = file;
@@ -196,7 +197,8 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
             // If it exists simply add the file to the list of files of the
             // FilesystemSnapshotPathMapper object
             FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( driveLetter );
-            mapper.addFileToRelativeIncludes( relativeFileName, true);
+            if (!relativeFileName.isEmpty())
+                mapper.addFileToRelativeIncludes( relativeFileName,  includeRules[file]);
             this->snapshotPathMappers.insert (driveLetter, mapper );
         } else
         {
@@ -204,7 +206,8 @@ void ShadowCopy::addFilesToSnapshot( const BackupSelectionHash includeRules )
             // FilesystemSnapshotPathMapper object to the SnapshotMapper
             QHash<QString,bool> empty;
             FilesystemSnapshotPathMapper mapper(driveLetter, empty);
-            mapper.addFileToRelativeIncludes( relativeFileName, true);
+            if (!relativeFileName.isEmpty())
+                mapper.addFileToRelativeIncludes( relativeFileName,  includeRules[file]);
             this->snapshotPathMappers.insert( driveLetter, mapper );
             qDebug() << "Added a new snapshotmapper for partition" << driveLetter << "which is:" << this->snapshotPathMappers.value( driveLetter).getRelativeIncludes();
         }
@@ -322,12 +325,13 @@ void ShadowCopy::takeSnapshot()
         // Store the snapshot properties according to the partition name in the
         // FilesystemSnapshotPathMapper object
         QString snapshotPath = wCharArrayToQString(tmp_snapshot_prop.m_pwszSnapshotDeviceObject);
+        FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
+        mapper.setSnapshotUncPath(snapshotPath);
 
         // Remove the frist 22 characters: \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy7   ->   HarddiskVolumeShadowCopy7
         QStringRef harddiskVolumeShadowCopy = snapshotPath.midRef(22);
         QString snapshotPathForCygwin = "/proc/sys/device/" + harddiskVolumeShadowCopy.toString() + "/";
-        LogFileUtils::getInstance()->writeLog("snapshotPathForCygwin: " + snapshotPathForCygwin);
-	
+
         QString linkname = getMountDirectory();
         linkname.append( MOUNT_PREFIX );
         linkname.append(partition);
@@ -353,10 +357,6 @@ void ShadowCopy::takeSnapshot()
         PathFileExists_func =
                     (PathFileExistsProc)GetProcAddress(lib,"PathFileExistsW");
 
-
-//        if ( (*PathFileExists_func)(link) == 1 )
-//            removeWindowsSymlink( linkname ); TODO check why not this does not work
-
         if (CreateSymbolicLink_func == NULL)
         {
             qDebug() << "WinAPI function CreateSymbolicLinkW not available";
@@ -372,7 +372,6 @@ void ShadowCopy::takeSnapshot()
             }
         }
 
-        FilesystemSnapshotPathMapper mapper = this->snapshotPathMappers.value( partition );
         mapper.setSnapshotPath( linkname );
         this->snapshotPathMappers.insert( partition, mapper);
 
@@ -386,35 +385,9 @@ void ShadowCopy::takeSnapshot()
     emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
 }
 
-
-QString ShadowCopy::getDriveLetterByFile( const QString filename )
-{
-    // The filename will be something like <LETTER>:\path\to\file so get the
-    // <LETTER>:
-    QRegExp regex("^\\w:\\/");
-
-    // Get the first occurrence of the regex in the filename
-    int pos = regex.indexIn( filename );
-
-    QString letter;
-    if ( pos > -1 )
-    {
-        letter = regex.cap(0).left(1);
-    } else
-    {
-        // TODO: What if no drive letter was found?
-        qDebug() << filename << "does not math ^\\w:\\/";
-    }
-
-    // Return the drive letter
-    return letter;
-
-}
-
 void ShadowCopy::cleanupSnapshot()
 {
-    // Go through all snapshot and delete the shadow copy itself and the symlink
-    // to it
+    // Go through all snapshot and delete the shadow copy itself.
 
     if ( this->snapshot_set_ids.isEmpty() )
     {
@@ -423,7 +396,6 @@ void ShadowCopy::cleanupSnapshot()
         emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
         return;
     } 
-
     foreach ( QString partition, this->snapshot_set_ids.keys() )
     {
         // Get the symlink name for the given partition
@@ -472,8 +444,8 @@ void ShadowCopy::checkCleanup()
     // If yes, remove them
     foreach( QString oldMount, oldShadowCopyMounts )
     {
-	QString linkname = oldMount;
-	linkname.prepend( getMountDirectory() );
+    QString linkname = oldMount;
+    linkname.prepend( getMountDirectory() );
 
         qDebug() << "Removing:" << linkname;
 
@@ -499,15 +471,9 @@ bool ShadowCopy::removeWindowsSymlink( QString linkname)
     return (*RemoveDirectory_func)(link);
 }
 
-const SnapshotMapper& ShadowCopy::getSnapshotPathMappers()
+const SnapshotMapper& ShadowCopy::getSnapshotPathMappers() const
 {
     return this->snapshotPathMappers;
-}
-
-void ShadowCopy::setSnapshotPathMappers(
-        const SnapshotMapper& snapshotPathMappers)
-{
-    this->snapshotPathMappers = snapshotPathMappers;
 }
 
 QString ShadowCopy::wCharArrayToQString( WCHAR* string)

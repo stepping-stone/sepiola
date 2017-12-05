@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -60,9 +60,10 @@ MainModel::MainModel() :
 
 MainModel::~MainModel()
 {
-	delete localDirModel;
-	delete remoteDirModel;
+    delete localDirModel;
+    delete remoteDirModel;
     delete spaceUsageModel;
+    delete fsSnapshot;
 }
 
 void MainModel::keepSettings()

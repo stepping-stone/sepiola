@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -109,14 +109,15 @@ QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > Rsync::upload( const
 
     createProcess(settings->getRsyncName() , arguments, FILTERED_ENVIRONMENT_VAR_LIST );
 	start();
-	foreach ( QByteArray rule, convertedRules )
-	{
-		write(rule); // write( convertFilenameForRsyncArgument(rule) );
-		qDebug() << rule; // TODO: delete again
+
+    foreach ( QByteArray rule, convertedRules )
+    {
+        write(rule); // write( convertFilenameForRsyncArgument(rule) );
+        qDebug() << rule; // TODO: delete again
         LogFileUtils::getInstance()->writeLog(" Pattern rule:  " + rule );
         write( Platform::SYSTEM_INDEPENDENT_EOL_CHARACTER );
-		waitForBytesWritten();
-	}
+        waitForBytesWritten();
+    }
 	closeWriteChannel();
 
 	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > uploadedItems;
@@ -750,9 +751,9 @@ QStringList Rsync::getRsyncGeneralArguments()
 	QStringList result;
 	result << "--timeout=" + QString::number(Settings::getInstance()->getRsyncTimeout());
 #ifdef Q_OS_WIN32
-    result << "-iirtxS8";
+    result << "-iirtS8";
 #else
-    result << "-iilrtxHS8";
+    result << "-iilrtHS8";
     result << "--specials";
 #endif
 	return result;
@@ -920,7 +921,13 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules( const BackupSelect
 			filters << convertRuleToByteArray( dirToClose.first + "**",dirToClose.second );
 		}
 	}
-	filters << convertRuleToByteArray( "**",false );
+
+    // backup the entire volume if no rules are available
+    if (includeRules.isEmpty() ) {
+        filters.clear();
+    } else if (includeRules[includeRulesList.first()]) { // the toplevel rule distinguishes between include or exclude
+        filters << convertRuleToByteArray( "**",false );
+    }
 
 	if (files_from_list != 0) { qSort((*files_from_list)); }
 	qDebug() << "include rules for rsync:";

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -47,6 +47,7 @@
 #include "settings/settings.hh"
 #include "settings/platform.hh"
 #include "test/test_manager.hh"
+#include "utils/single_application_guard.hh"
 #include "utils/log_file_utils.hh"
 
 #include "config.h"
@@ -148,38 +149,16 @@ bool isProcessRunning(const int& processId)
 
 bool assertSingleApplication()
 {
-	Settings* settings = Settings::getInstance();
-	QFile lockFile(settings->getApplicationDataDir() + settings->getLockFileName() );
-	if ( !lockFile.open(QIODevice::ReadWrite) )
-	{
-		fprintf( stderr, "Can not read lock file\n");
-		return false;
-	}
-	QTextStream in( &lockFile);
-	int existingProcessId;
-	in >> existingProcessId;
-	lockFile.close();
-	int currentProcessId = getpid();
+    Settings* settings = Settings::getInstance();
+    QString userName = settings->getClientUserName();
 
-	if (existingProcessId != currentProcessId)
-	{
-		// find out if the existingProcessId is still running
-		if (isProcessRunning(existingProcessId) )
-		{
-			return false;
-		}
+    //The userName is neede to create a shared memory segment for each user.
+    //This allows each user to run one instance of the sepiola application.
+    static SingleApplicationGuard singleApp( userName );
+    if (singleApp.tryToCreateSharedMemory())
+        return true;
 
-		if ( !lockFile.open(QIODevice::WriteOnly | QIODevice::Truncate) )
-		{
-			fprintf( stderr, "Can not write to lock file\n");
-			return false;
-		}
-		QTextStream out( &lockFile);
-		out << currentProcessId;
-		lockFile.close();
-		return true;
-	}
-	return false;
+    return false;
 }
 
 void setHomeDir()

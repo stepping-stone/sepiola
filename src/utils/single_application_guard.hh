@@ -14,23 +14,35 @@
 #| You should have received a copy of the GNU General Public License
 #| along with this program; if not, write to the Free Software
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#|
+#|
+#|
+#| This class takes the responsibility for running sepiola as a single instance.
+#| This is based on ideas and code from http://aeguana.com/blog/how-to-run-a-single-app-instance-in-qt/
 */
 
-#include "gui/logfile_form.hh"
+#ifndef SINGLE_APPLICATION_GUARD_HH
+#define SINGLE_APPLICATION_GUARD_HH
 
-LogfileForm::LogfileForm( QWidget* parent, MainModel* /*model*/) : QWidget ( parent )
-{
-	setupUi( this );
-}
+#include <QSharedMemory>
 
-LogfileForm::~LogfileForm()
-{
-}
 
-void LogfileForm::appendLines( const QStringList& logfileLines )
+class SingleApplicationGuard
 {
-	foreach( QString line, logfileLines )
-	{
-		this->textEditLogfile->append( line );
-	}
-}
+
+public:
+    SingleApplicationGuard( const QString& key );
+    ~SingleApplicationGuard();
+
+    bool tryToCreateSharedMemory();
+
+
+private:
+    void _releaseMemory();
+
+    const QString _userName;
+    const QString _sharedmemKey;
+    QSharedMemory _sharedMem;
+
+};
+#endif // SINGLE_APPLICATION_GUARD_HH

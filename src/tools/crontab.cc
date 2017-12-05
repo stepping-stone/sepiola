@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2011 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -117,7 +117,6 @@ QStringList Crontab::readAllCrontabEntries()
 bool Crontab::writeCrontabEntries_Helper( QStringList& crontabEntries, QString& return_error )
 {
 	qDebug() << "Crontab::writeCrontabEntriesToFile( " << crontabEntries << " )";
-	Settings* settings = Settings::getInstance();
 	
 	QTemporaryFile tmpFile;
 	if ( !tmpFile.open() )

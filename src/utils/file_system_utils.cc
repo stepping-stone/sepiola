@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2012 stepping stone GmbH
+#| Copyright (C) 2007-2017 stepping stone GmbH
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -152,8 +152,57 @@ void FileSystemUtils::convertToLocalPath(QString*)
 
 bool FileSystemUtils::isRoot(const QString& path)
 {
-	return ( (path.size() == 1 && path.startsWith( '/') ) || (path.size() == 3 && path[0].isLetter() && path[1] == ':' ) );
+    return ( (path.size() == 1 && path.startsWith( '/') ) || (path.size() == 3 && path[0].isLetter() && path[1] == ':' ) || (path.size() == 1)  );
 }
+
+#ifdef Q_OS_WIN32
+QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList& paths)
+{
+    QStringList rootItems;
+    QString drive("");
+    foreach(QString path, paths) {
+       if (path.at(0).isLetter() && path.at(1) == ':') {
+           drive = path.at(0).toUpper();
+           drive.append(":\\");
+           if (!rootItems.contains(drive))
+             rootItems.append(drive);
+       }
+    }
+    return rootItems;
+}
+
+QString FileSystemUtils::getDriveLetterByFile( const QString filename )
+{
+    // The filename will be something like <LETTER>:\path\to\file so get the <LETTER>
+    QRegExp regex("^\\w:\\/");
+
+    // Get the first occurrence of the regex in the filename
+    int pos = regex.indexIn( filename );
+    QString letter;
+    if ( pos > -1 )
+    {
+        letter = regex.cap(0).left(1);
+    } else
+    {
+        // TODO: What if no drive letter was found?
+        qDebug() << filename << "does not math ^\\w:\\/";
+    }
+    // Return the drive letter
+    return letter;
+}
+
+#else
+QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList& content)
+{
+    QStringList rootItem;
+    if (content.first().startsWith('/'))
+        rootItem.append("/");
+    else
+        rootItem.append("");
+    return rootItem;
+}
+
+#endif
 
 bool FileSystemUtils::isDir(const QString& path)
 {
