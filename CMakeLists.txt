@@ -58,8 +58,8 @@ if (GIT_DESC)
     STRING(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_GIT "${GIT_DESC}")
 else ()
     SET(CPACK_PACKAGE_VERSION_MAJOR 2)
-    SET(CPACK_PACKAGE_VERSION_MINOR 4)
-    SET(CPACK_PACKAGE_VERSION_PATCH 0)
+    SET(CPACK_PACKAGE_VERSION_MINOR 5)
+    SET(CPACK_PACKAGE_VERSION_PATCH 0-rc.0)
 endif ()
 
 # set automatically by CMake, but we need it early

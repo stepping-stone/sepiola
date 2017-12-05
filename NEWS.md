@@ -1,5 +1,17 @@
 # Sepiola Release Notes
 
+## Version 2.5.0
+
+* Windows: Made usage of Shadow Copy Service configurable
+
+* Windows Fix several issues related with the update of `rsync` in 2.4.0
+
+  Selecting, backing up and restoring to individual drives is now possible,
+  ACLs are properly restored again.
+
+* All OS: Corner case for detection of running Sepiola resolved
+
+
 ## Version 2.4.0
 
 * Update `rsync` and `ssh` to their latest version for Windows and Linux
