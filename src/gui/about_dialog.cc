@@ -26,21 +26,27 @@ const int AboutDialog::MAX_IMAGE_WIDTH = 150;
 
 AboutDialog::AboutDialog()
 {
-	setupUi( this );
-	this->setBackgroundRole( QPalette::Base );
-	Settings* settings = Settings::getInstance();
-	this->labelVersion->setText( tr( "%1\nVersion %2" ).arg( settings->getApplicationName(), Settings::VERSION ) );
+    setupUi(this);
+    this->setBackgroundRole(QPalette::Base);
+    Settings* settings = Settings::getInstance();
+    this->labelVersion->setText(tr( "%1\nVersion %2" ).arg(settings->getApplicationName(), Settings::VERSION));
+
+    // make clicks on links directly open a browser instead of emitting a signal
+    this->labelSupport->setOpenExternalLinks(true);
 
 #ifdef IS_RESELLER
-    this->labelSupport->setText( settings->getResellerAddress() );
+    this->labelSupport->setText(settings->getResellerAddress());
+
     // rescale image if needed
-    if ( this->imageAbout->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT || this->imageAbout->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH ) {
-        this->imageAbout->setPixmap(this->imageAbout->pixmap()->scaled(AboutDialog::MAX_IMAGE_WIDTH, AboutDialog::MAX_IMAGE_HEIGHT, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    if ((this->imageAbout->pixmap()->height() > AboutDialog::MAX_IMAGE_HEIGHT)
+	|| (this->imageAbout->pixmap()->width() > AboutDialog::MAX_IMAGE_WIDTH))
+    {
+	this->imageAbout->setPixmap(
+		this->imageAbout->pixmap()->scaled(
+		    AboutDialog::MAX_IMAGE_WIDTH,
+		    AboutDialog::MAX_IMAGE_HEIGHT,
+		    Qt::KeepAspectRatio, Qt::SmoothTransformation)
+		);
     }
 #endif
-
-}
-
-AboutDialog::~AboutDialog()
-{
 }
