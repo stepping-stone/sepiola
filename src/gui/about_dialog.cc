@@ -31,9 +31,6 @@ AboutDialog::AboutDialog()
     Settings* settings = Settings::getInstance();
     this->labelVersion->setText(tr( "%1\nVersion %2" ).arg(settings->getApplicationName(), Settings::VERSION));
 
-    // make clicks on links directly open a browser instead of emitting a signal
-    this->labelSupport->setOpenExternalLinks(true);
-
 #ifdef IS_RESELLER
     this->labelSupport->setText(settings->getResellerAddress());
 
