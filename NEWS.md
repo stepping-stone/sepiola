@@ -2,14 +2,14 @@
 
 ## Version 2.5.0
 
-* Windows: Made usage of Shadow Copy Service configurable
+* Windows: Made usage of Shadow Copy Service configurable.
 
-* Windows Fix several issues related with the update of `rsync` in 2.4.0
+* Windows: Fix several issues related with the update of `rsync` in 2.4.0.
 
-  Selecting, backing up and restoring to individual drives is now possible,
+* Windows:  Selecting, backing up and restoring to individual drives is now possible,
   ACLs are properly restored again.
 
-* All OS: Corner case for detection of running Sepiola resolved
+* All Operating Systems: Corner case for detection of running Sepiola resolved.
 
 
 ## Version 2.4.0
