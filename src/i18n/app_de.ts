@@ -19,7 +19,7 @@
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../gui/about_dialog.ui" line="130"/>
+        <location filename="../gui/about_dialog.ui" line="131"/>
         <source>Support</source>
         <translation>Support</translation>
     </message>
@@ -31,9 +31,9 @@ https://github.com/stepping-stone/sepiola/issues</source>
 https://github.com/stepping-stone/sepiola/issues</translation>
     </message>
     <message>
-        <location filename="../gui/about_dialog.ui" line="183"/>
-        <source>Copyright 2007-2017 by stepping stone GmbH</source>
-        <translation>Urheberrecht 2007-2017 bei stepping stone GmbH</translation>
+        <location filename="../gui/about_dialog.ui" line="185"/>
+        <source>Copyright %1 by stepping stone GmbH</source>
+        <translation>Urheberrecht %1 bei stepping stone GmbH</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="103"/>

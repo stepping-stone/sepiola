@@ -30,6 +30,7 @@ AboutDialog::AboutDialog()
     this->setBackgroundRole(QPalette::Base);
     Settings* settings = Settings::getInstance();
     this->labelVersion->setText(tr( "%1\nVersion %2" ).arg(settings->getApplicationName(), Settings::VERSION));
+    this->labelCopyright->setText(this->labelCopyright->text().arg(Settings::RELEASE_DATE.year()));
 
 #ifdef IS_RESELLER
     this->labelSupport->setText(settings->getResellerAddress());
