@@ -136,6 +136,9 @@
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please report bugs at&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/stepping-stone/sepiola/issues&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://github.com/stepping-stone/sepiola/issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -171,7 +174,7 @@
     </spacer>
    </item>
    <item row="4" column="1" colspan="2">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="labelCopyright">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -179,7 +182,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Copyright 2017 by stepping stone GmbH</string>
+      <string>Copyright %1 by stepping stone GmbH</string>
      </property>
     </widget>
    </item>

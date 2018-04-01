@@ -35,10 +35,13 @@
 #include "utils/datatypes.hh"
 #include "model/scheduled_task.hh"
 
+#include "config.h"
+
 const bool Settings::SHOW_PROGRESS = false;
 
 const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );
 const QString Settings::VERSION = QString( SSBACKUP_VERSION );
+const QDate Settings::RELEASE_DATE = QDate::fromString( SSBACKUP_RELEASE_DATE, "yyyy-MM-dd" ); // format must match cmake's: %Y-%m-%d
 
 // [Client]
 const QString Settings::SETTINGS_GROUP_CLIENT = "Client";

@@ -43,7 +43,7 @@ public:
 	/**
 	 * Destroys the Aboutdialog
 	 */
-	virtual ~AboutDialog();
+	virtual ~AboutDialog() {}
 };
 
 #endif

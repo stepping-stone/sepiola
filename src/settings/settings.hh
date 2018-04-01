@@ -28,8 +28,6 @@
 #include <QSize>
 #include <QPoint>
 
-#include "config.h"
-
 #include "model/backup_task.hh"
 #include "model/scheduled_task.hh"
 #include "utils/datatypes.hh"
@@ -257,6 +255,7 @@ class Settings : public QObject
 		void saveBackupSelectionRules( const BackupSelectionHash& selectionRules );
 
 		static const QString VERSION;
+		static const QDate RELEASE_DATE;
 
 	private:
 		static const QString EXECUTABLE_NAME;

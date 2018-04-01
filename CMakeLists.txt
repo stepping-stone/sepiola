@@ -14,7 +14,7 @@
 #| along with this program; if not, write to the Free Software
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 2.8.11)
 
 # If available, enable developer warnings for the build system
 if(POLICY CMP0005)
@@ -56,11 +56,22 @@ if (GIT_DESC)
     STRING(REGEX REPLACE "^v[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_MINOR "${GIT_DESC}")
     STRING(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" CPACK_PACKAGE_VERSION_PATCH "${GIT_DESC}")
     STRING(REGEX REPLACE "^v[0-9]+\\.[0-9]+\\.[0-9]+(.*)" "\\1" VERSION_GIT "${GIT_DESC}")
+
+    execute_process(
+	COMMAND git log -1 --format=%aI
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+	OUTPUT_VARIABLE GIT_COMMIT_DATE
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
+    # take only the date from the git timestamp:
+    STRING(REGEX REPLACE "^([0-9\\-]+)T.*" "\\1" SSBACKUP_RELEASE_DATE "${GIT_COMMIT_DATE}")
 else ()
     SET(CPACK_PACKAGE_VERSION_MAJOR 2)
     SET(CPACK_PACKAGE_VERSION_MINOR 5)
-    SET(CPACK_PACKAGE_VERSION_PATCH 0-rc.0)
+    SET(CPACK_PACKAGE_VERSION_PATCH 0-rc.1)
+    SET(SSBACKUP_RELEASE_DATE "2018-04-01")
 endif ()
+
 
 # set automatically by CMake, but we need it early
 SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}${VERSION_GIT}")
