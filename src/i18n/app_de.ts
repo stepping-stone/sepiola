@@ -25,10 +25,8 @@
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="137"/>
-        <source>Please report bugs at
-https://github.com/stepping-stone/sepiola/issues</source>
-        <translation>Bitte melden Sie bugs unter
-https://github.com/stepping-stone/sepiola/issues</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Please report bugs at&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/stepping-stone/sepiola/issues&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://github.com/stepping-stone/sepiola/issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bitte melden Sie Fehler unter&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/stepping-stone/sepiola/issues&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0057ae;&quot;&gt;https://github.com/stepping-stone/sepiola/issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="185"/>
@@ -348,6 +346,35 @@ Version %2</source>
         <location filename="../model/backup_thread.cc" line="391"/>
         <source>traffic / transferred</source>
         <translation>Datenverkehr / übertragen</translation>
+    </message>
+</context>
+<context>
+    <name>FilesystemSnapshot</name>
+    <message>
+        <location filename="../tools/filesystem_snapshot.cc" line="152"/>
+        <source>Taking filesystem snapshot, this might take some time ...</source>
+        <translation>Erstelle Dateisystem-Schnappschuss, dies könnte eine Weile dauern ...</translation>
+    </message>
+    <message>
+        <location filename="../tools/filesystem_snapshot.cc" line="178"/>
+        <location filename="../tools/filesystem_snapshot.cc" line="226"/>
+        <source>Cannot create filesystem snapshot, stopping backup here</source>
+        <translation>Kann Dateisystem-Schnappschuss nicht erstellen, Sicherung wird abgebrochen</translation>
+    </message>
+    <message>
+        <location filename="../tools/filesystem_snapshot.cc" line="194"/>
+        <source>Cannot create filesystem snapshot (initialization failed), stopping backup here</source>
+        <translation>Kann Dateisystem-Schnappschuss nicht erstellen (Initialisierung fehlgeschlagen), Sicherung wird abgebrochen</translation>
+    </message>
+    <message>
+        <location filename="../tools/filesystem_snapshot.cc" line="209"/>
+        <source>Cannot create filesystem snapshot (adding partition to snapshot failed), stopping backup here</source>
+        <translation>Kann Dateisystem-Schnappschuss nicht erstellen (Hinzufügen der Partition ist fehlgeschlagen), Sicherung wird abgebrochen</translation>
+    </message>
+    <message>
+        <location filename="../tools/filesystem_snapshot.cc" line="220"/>
+        <source>Filesystem snapshot successfully taken</source>
+        <translation>Dateisystem-Schnappschuss wurde erfolgreich erstellt</translation>
     </message>
 </context>
 <context>
@@ -763,6 +790,17 @@ Next Backup</source>
 <context>
     <name>Plink</name>
     <message>
+        <location filename="../tools/plink.cc" line="257"/>
+        <source>Error occurred during login, perhaps invalid username</source>
+        <translation>Fehler während der Anmeldung: möglicherweise falscher Benutzername</translation>
+    </message>
+    <message>
+        <location filename="../tools/plink.cc" line="274"/>
+        <location filename="../tools/plink.cc" line="289"/>
+        <source>Timeout occurred during login</source>
+        <translation>Fehler während der Anmeldung: Zeitlimit erreicht</translation>
+    </message>
+    <message>
         <location filename="../tools/plink.cc" line="279"/>
         <location filename="../tools/plink.cc" line="300"/>
         <source>Username or password not valid</source>
@@ -786,12 +824,12 @@ Warning: The permissions of some files could not be backed up. See above for det
         <translation>Der Prozess %1 ist wurde nicht gestartet. Entweder ist das aufgerufene Programm nicht vorhanden, oder Sie haben nicht genügend Rechte um es auszuführen.</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="140"/>
+        <location filename="../settings/settings.cc" line="143"/>
         <source>English</source>
         <translation>Englisch</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="141"/>
+        <location filename="../settings/settings.cc" line="144"/>
         <source>German</source>
         <translation>Deutsch</translation>
     </message>
@@ -919,6 +957,16 @@ Stellen Sie sicher, dass Sie über genügend Rechte verfügen. Starten Sie die A
         <translation>Geplanter Task konnte nicht aktualisiert werden</translation>
     </message>
     <message>
+        <location filename="../utils/file_system_utils.cc" line="74"/>
+        <source>Could not open file %1</source>
+        <translation>Datei %1 konnte nicht geöffnet werden</translation>
+    </message>
+    <message>
+        <location filename="../utils/file_system_utils.cc" line="79"/>
+        <source>Could not open temporary file %1</source>
+        <translation>Temporäre Datei %1 konnte nicht geöffnet werden</translation>
+    </message>
+    <message>
         <location filename="../utils/file_system_utils.cc" line="96"/>
         <source>converted data could not be written to temporary file %1</source>
         <translation>Konvertierte Daten konnten nicht in die temporäre Datei %1 geschrieben werden</translation>
@@ -1043,7 +1091,7 @@ Stellen Sie sicher, dass Sie über genügend Rechte verfügen. Starten Sie die A
         <translation>%1 Minuten nach dem Hochfahren der Computers</translation>
     </message>
     <message>
-        <location filename="../settings/settings.cc" line="262"/>
+        <location filename="../settings/settings.cc" line="265"/>
         <source>reseller address (missing)</source>
         <translation>Wiederverkäufer Adresse (fehlend)</translation>
     </message>
@@ -1401,7 +1449,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="323"/>
-        <location filename="../settings/settings.cc" line="743"/>
+        <location filename="../settings/settings.cc" line="746"/>
         <source>English</source>
         <translatorcomment>Hier wird die Sprache in der jeweiligen Sprache eingetragen.</translatorcomment>
         <translation>Deutsch</translation>
@@ -1425,13 +1473,18 @@ p, li { white-space: pre-wrap; }
         <location filename="../gui/settings_form.ui" line="440"/>
         <source>Keep locally deleted files on the server forever
 (it is recommended not to choose this option, as your backups would grow very big very rapidly)</source>
-        <translation>Halten Sie lokal gelöschten Dateien für immer auf dem Server 
+        <translation>Lokal gelöschte Dateien für immer auf dem Server behalten
 (es wird empfohlen diese Option nicht zu wählen, weil die Backups sehr schnell gross werden)</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="455"/>
         <source>Verbose logging</source>
         <translation>Ausführliche Protokollierung</translation>
+    </message>
+    <message>
+        <location filename="../gui/settings_form.ui" line="462"/>
+        <source>Use shadow copy</source>
+        <translation>Volumenschattenkopie benutzen</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="481"/>
@@ -1466,7 +1519,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="105"/>
-        <source>Do you really want to cancel</source>
+        <source>Do you really want to cancel?</source>
         <translation>Wollen Sie wirklich abbrechen?</translation>
     </message>
     <message>

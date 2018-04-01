@@ -102,7 +102,7 @@ void TrafficProgressDialog::appendError( const QString& error )
 void TrafficProgressDialog::on_btnCancel_clicked()
 {
 	qDebug() << "BackupProgress::on_btnCancel_clicked(): switching Button-visibility";
-	int answer = QMessageBox::question(this, tr("Cancel"), tr("Do you really want to cancel"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+	int answer = QMessageBox::question(this, tr("Cancel"), tr("Do you really want to cancel?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 	if (answer == QMessageBox::Yes) {
 		emit abort();
 		this->btnClose->setEnabled(true);
