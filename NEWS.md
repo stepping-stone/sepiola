@@ -11,6 +11,8 @@
 
 * All Operating Systems: Corner case for detection of running Sepiola resolved.
 
+* All Operating Systems: Translations for German updated.
+
 
 ## Version 2.4.0
 
