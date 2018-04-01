@@ -454,7 +454,7 @@
            <enum>Qt::DefaultContextMenu</enum>
           </property>
           <property name="text">
-           <string>Backup</string>
+           <string notr="true">Backup</string>
           </property>
          </widget>
         </item>
@@ -467,7 +467,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Freitag</string>
+           <string notr="true">Freitag</string>
           </property>
          </widget>
         </item>
@@ -480,7 +480,7 @@
            </size>
           </property>
           <property name="text">
-           <string>10.03.2011</string>
+           <string notr="true">10.03.2011</string>
           </property>
          </widget>
         </item>
@@ -493,7 +493,7 @@
            </size>
           </property>
           <property name="text">
-           <string>12:34</string>
+           <string notr="true">12:34</string>
           </property>
          </widget>
         </item>
@@ -548,7 +548,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Backup</string>
+           <string notr="true">Backup</string>
           </property>
          </widget>
         </item>
@@ -561,7 +561,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Donnerstag</string>
+           <string notr="true">Donnerstag</string>
           </property>
          </widget>
         </item>
@@ -574,7 +574,7 @@
            </size>
           </property>
           <property name="text">
-           <string>09.03.2011</string>
+           <string notr="true">09.03.2011</string>
           </property>
          </widget>
         </item>
@@ -587,7 +587,7 @@
            </size>
           </property>
           <property name="text">
-           <string>12:34</string>
+           <string notr="true">12:34</string>
           </property>
          </widget>
         </item>
@@ -642,7 +642,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Backup</string>
+           <string notr="true">Backup</string>
           </property>
          </widget>
         </item>
@@ -655,7 +655,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Mittwoch</string>
+           <string notr="true">Mittwoch</string>
           </property>
          </widget>
         </item>
@@ -668,7 +668,7 @@
            </size>
           </property>
           <property name="text">
-           <string>08.03.2011</string>
+           <string notr="true">08.03.2011</string>
           </property>
          </widget>
         </item>
@@ -681,7 +681,7 @@
            </size>
           </property>
           <property name="text">
-           <string>12:34</string>
+           <string notr="true">12:34</string>
           </property>
          </widget>
         </item>
@@ -736,7 +736,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Backup</string>
+           <string notr="true">Backup</string>
           </property>
          </widget>
         </item>
@@ -749,7 +749,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Dienstag</string>
+           <string notr="true">Dienstag</string>
           </property>
          </widget>
         </item>
@@ -762,7 +762,7 @@
            </size>
           </property>
           <property name="text">
-           <string>07.03.2011</string>
+           <string notr="true">07.03.2011</string>
           </property>
          </widget>
         </item>
@@ -775,7 +775,7 @@
            </size>
           </property>
           <property name="text">
-           <string>12:34</string>
+           <string notr="true">12:34</string>
           </property>
          </widget>
         </item>
@@ -830,7 +830,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Backup</string>
+           <string notr="true">Backup</string>
           </property>
          </widget>
         </item>
@@ -843,7 +843,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Montag</string>
+           <string notr="true">Montag</string>
           </property>
          </widget>
         </item>
@@ -856,7 +856,7 @@
            </size>
           </property>
           <property name="text">
-           <string>06.03.2011</string>
+           <string notr="true">06.03.2011</string>
           </property>
          </widget>
         </item>
@@ -869,7 +869,7 @@
            </size>
           </property>
           <property name="text">
-           <string>12:34</string>
+           <string notr="true">12:34</string>
           </property>
          </widget>
         </item>
@@ -938,7 +938,7 @@ Next Backup</string>
            </size>
           </property>
           <property name="text">
-           <string>next Backup</string>
+           <string notr="true">next Backup</string>
           </property>
          </widget>
         </item>
@@ -951,7 +951,7 @@ Next Backup</string>
            </size>
           </property>
           <property name="text">
-           <string>Samstag</string>
+           <string notr="true">Samstag</string>
           </property>
          </widget>
         </item>
@@ -964,7 +964,7 @@ Next Backup</string>
            </size>
           </property>
           <property name="text">
-           <string>11.03.2011</string>
+           <string notr="true">11.03.2011</string>
           </property>
          </widget>
         </item>
@@ -977,7 +977,7 @@ Next Backup</string>
            </size>
           </property>
           <property name="text">
-           <string>12.34</string>
+           <string notr="true">12.34</string>
           </property>
          </widget>
         </item>

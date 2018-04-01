@@ -603,11 +603,6 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="102"/>
-        <location filename="../gui/overview_form.ui" line="457"/>
-        <location filename="../gui/overview_form.ui" line="551"/>
-        <location filename="../gui/overview_form.ui" line="645"/>
-        <location filename="../gui/overview_form.ui" line="739"/>
-        <location filename="../gui/overview_form.ui" line="833"/>
         <source>Backup</source>
         <translation>Backup</translation>
     </message>
@@ -679,32 +674,9 @@ Next Backup</source>
         <translation>Geplante Backups</translation>
     </message>
     <message>
-        <location filename="../gui/overview_form.ui" line="941"/>
-        <source>next Backup</source>
-        <translation>Nächster Backup</translation>
-    </message>
-    <message>
-        <location filename="../gui/overview_form.ui" line="845"/>
+        <location filename="../gui/overview_form.ui" line="1007"/>
         <source>B&amp;ackup now</source>
         <translation>B&amp;ackup jetzt starten</translation>
-    </message>
-    <message>
-        <location filename="../gui/overview_form.ui" line="470"/>
-        <location filename="../gui/overview_form.ui" line="606"/>
-        <location filename="../gui/overview_form.ui" line="674"/>
-        <location filename="../gui/overview_form.ui" line="742"/>
-        <source>Freitag, 10.03.2011  12:34</source>
-        <translation>Freitag, 10.03.2011  12:34</translation>
-    </message>
-    <message>
-        <location filename="../gui/overview_form.ui" line="538"/>
-        <source>Donnerstag, 10.03.2011  12:34</source>
-        <translation>Donnerstag, 10.03.2011  12:34</translation>
-    </message>
-    <message>
-        <location filename="../gui/overview_form.ui" line="818"/>
-        <source>Freitag, 04.06.2012  23:05</source>
-        <translation>Freitag, 04.06.2012  23:05</translation>
     </message>
 </context>
 <context>
