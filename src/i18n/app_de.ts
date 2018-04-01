@@ -1202,7 +1202,7 @@ Stellen Sie sicher, dass Sie über genügend Rechte verfügen. Starten Sie die A
     <message>
         <location filename="../gui/restore_form.ui" line="102"/>
         <source>Select name:</source>
-        <translation>Name auwsählen:</translation>
+        <translation>Name auswählen:</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="188"/>
