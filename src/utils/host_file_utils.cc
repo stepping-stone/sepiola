@@ -28,78 +28,82 @@
 
 void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QString& sshhostkeysFileName, const QString& sshKnownHostsFileName )
 {
+    QString puttyKey;
+
 #ifdef Q_OS_WIN32
     // Read the SshHostKey fingerprint form the registry.
-    QString rsaPrefix("0x23,0x");
     QSettings puttySshHostKey("HKEY_CURRENT_USER\\Software\\SimonTatham\\PUTTY\\SshHostKeys", QSettings::NativeFormat);
-    QString hostKeyValue = puttySshHostKey.value("rsa2@22:kvm-0003.stepping-stone.ch", "keyNotFound").toString();
-    if (hostKeyValue.compare("keyNotFound") == 0) {
-      qWarning() << "Can not find the given putty key in the Windows registry";
-      return;
+    QVariant puttyKeyValue = puttySshHostKey.value(QString("rsa2@22:%2".arg(host)));
+
+    if (puttyKeyValue.isNull()) {
+        qWarning() << "Can not find the given putty key in the Windows registry";
+        return;
     }
-    hostKeyValue.remove(0 , rsaPrefix.length());
-    QString sshKey = convertPuttyKey(hostKeyValue, host);
-    addOpenSshKey( sshKey, host, sshKnownHostsFileName);
+
+    puttyKey = puttyKeyValue.toString();
 #else
-	QString puttyKey = getPuttyKey( host, sshhostkeysFileName );
-	if( puttyKey.isEmpty() )
-	{
-		qDebug() << "no putty key found for host " << host;
-	}
-	else
-	{
-        int prefix = 16 + host.length(); //rsa2@22:host 0x23,0x
-        puttyKey.remove(0,  prefix);
-		QString sshKey = convertPuttyKey( puttyKey, host );
-		addOpenSshKey( sshKey, host, sshKnownHostsFileName );
-	}
+    puttyKey = getPuttyKey(host, sshhostkeysFileName);
+
+    if( puttyKey.isEmpty() )
+    {
+        qDebug() << "no putty key found for host " << host;
+        return;
+    }
+    // on *nix, they key is of the format "rsa2@<port>:<host> 0x10001,0xcd7843370db6046..."
+    puttyKey = puttyKey.split(' ').at(1); // split it and continue with the actual host-key part
 #endif
+
+    QString sshKey = convertPuttyKey(puttyKey, host);
+    addOpenSshKey(sshKey, host, sshKnownHostsFileName);
 }
 
 QString HostFileUtils::getPuttyKey( const QString& host, const QString& sshhostkeysFileName )
 {
-	QStringList allKeys = FileSystemUtils::readLinesFromFile( sshhostkeysFileName );
+    QStringList allKeys = FileSystemUtils::readLinesFromFile( sshhostkeysFileName );
 
     QString hostSearchPattern = ":" + host + " "; //rsa2@22:host 0x23,0x
-    foreach( QString key, allKeys )
-    {
-        if( key.contains( hostSearchPattern )) {
+
+    foreach (QString key, allKeys)
+        if (key.contains( hostSearchPattern))
             return key;
-        }
-    }
+
     qDebug() << "key not found";
     return QString();
 }
 
-QString HostFileUtils::convertPuttyKey( const QString& puttyKeyString, const QString& host )
+QString HostFileUtils::convertPuttyKey( const QString& puttyData, const QString& host )
 {
-    QByteArray puttyKey;
-    puttyKey.append(puttyKeyString);
+    // the format of the puttyKeyString is:
+    //     0x10001,0xcd7843370db6046...
 
-    // key example: 00 00 00 07  73 73 68 2D  72 73 61 00  00 00 01 23  00 00 00 81  00 9F 5F 3C  AB 99 A2 D
-    QByteArray entry = QByteArray::fromHex( "00000007" );
-    entry.append("ssh-rsa");
-    entry.append( QByteArray::fromHex( "0000000123" ) );
+    // build the list of subkeys first
+    // the first element for openSSH is again the keytype
+    QList<QByteArray> subkeys({"ssh-rsa"});
+    for (const QString& entry: puttyData.split(','))
+        subkeys.append(QByteArray::fromHex(entry.mid(2).toAscii()));
 
-    // key length
-    qDebug() << QByteArray::fromHex( puttyKey ).length();
-    int length = qToBigEndian( QByteArray::fromHex( puttyKey ).length() + 1 );
-    //TODO:  mit right die rechten 4 bytes der Länge nehmen.
-    // Auf 32 und 64 pcs ist int 32 bt breit -> auf Mac tetsten
-    QByteArray lengthBytes((const char*)&length, sizeof(length));
-    entry.append( lengthBytes );
+    // the actual key has to be left padded with a 0, but why?
+    Q_ASSERT(subkeys.size() == 3); // make sure we really have only 3 elements, otherwise our assumptions are incorrect
+    subkeys[2].insert(0, '\0');
 
-    entry.append( QByteArray::fromHex( "00" ) );
+    // merge the subkeys, the format expected by OpenSSH is:
+    // <n1><c1_1><c1_2>...<c1_n1><n2><c2_1><c2_2>...<c2_n2>...
+    // where the n's are uint32 in big endian order and the c's are single bytes
+    // therefore the "magic" 00 00 00 07 ... at the beginning of each ssh-rsa key type: len("ssh-rsa") = 7
+    QByteArray key;
+    for (const auto& entry: subkeys)
+    {
+        quint32 length = qToBigEndian(entry.size()); // make sure the length has the correct byte order
+        key.append(static_cast<const char*>(static_cast<void*>(&length)), 4); // a uint32 is guaranteed to be 4 bytes
+        key.append(entry);
+    }
 
-    // putty key
-    entry.append( QByteArray::fromHex( puttyKey ) );
-    QString result;
-    result.append( host );
-    result.append( "," );
-    result.append( getIpAddress( host ) );
-    result.append( " ssh-rsa ");
-    result.append( entry.toBase64() );
-    return result;
+    // the SSH format is: <hostname>,<ip> <key format> <key data (base64-encoded)>:
+    return QString("%1,%2 %3 %4")
+        .arg(host)
+        .arg(getIpAddress(host))
+        .arg("ssh-rsa")
+        .arg(key.toBase64().data());
 }
 
 void HostFileUtils::addOpenSshKey( const QString& openSshKey, const QString& host, const QString& knownHostsFile )
