@@ -19,7 +19,7 @@
 #ifndef TEST_HOST_FILE_UTILS_HH
 #define TEST_HOST_FILE_UTILS_HH
 
-#include <QtTest/QtTest>
+#include <QtTest/QTest>
 
 class TestHostFileUtils : public QObject
 {
