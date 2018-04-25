@@ -13,10 +13,8 @@ RsyncTimeout=43200
 IgnoreReinstall=false
 
 [Server]
-ServerKey=e3:6d:87:79:1c:e3:0e:bc:ea:89:54:20:d9:2c:f5:cb
-Host=kvm-0003.stepping-stone.ch
-#ServerKey=6c:33:eb:2f:a8:73:25:34:fd:6f:36:15:58:db:d0:d8
-#Host=localhost
+ServerKey=af:79:39:f7:89:c2:88:7a:17:80:73:a6:08:23:a2:2e
+Host=backup.stoney-backup.com
 BackupFolderName=backup
 MetaFolderName=.sepiola_backup
 BackupRootFolder=incoming/

@@ -42,6 +42,8 @@ const QString Plink::START_PRIVATE_KEY_ECHO_MESSAGE = "StartPrivateKey";
 const QString Plink::END_PRIVATE_KEY_ECHO_MESSAGE = "EndPrivateKey";
 const QString Plink::START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE = "StartPrivateOpenSshKey";
 const QString Plink::END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE = "EndPrivateOpenSshKey";
+const QString Plink::KEY_LENGTH = "2048";
+const QString Plink::KEY_TYPE = "dsa";
 
 Plink::Plink() :
     plinkName(Settings::getInstance()->getPlinkName())
@@ -216,124 +218,127 @@ void Plink::uploadToMetaFolder( const QFileInfo& file, bool append )
 
 bool Plink::generateKeys( const QString& password )
 {
-	qDebug() << "Plink::generateKeys( pw )";
-	Settings* settings = Settings::getInstance();
-	settings->deletePrivateKeyFiles();
-	QString publicKeyFileName = settings->getAuthorizedKeyFolderName() + "key.public-openssh";
-	QString privatePuttyKeyFileName = settings->getAuthorizedKeyFolderName() + "key.private-putty";
-	QString privateOpenSshKeyFileName = settings->getAuthorizedKeyFolderName() + "key.private-openssh";
-	QString authorizedKeyFileName = settings->getAuthorizedKeyFolderName() + settings->getAuthorizedKeyFileName();
+    qDebug() << "Plink::generateKeys( pw )";
+    Settings* settings = Settings::getInstance();
+    settings->deletePrivateKeyFiles();
+    QString publicKeyFileName = settings->getAuthorizedKeyFolderName() + "key.public-openssh";
+    QString privatePuttyKeyFileName = settings->getAuthorizedKeyFolderName() + "key.private-putty";
+    QString privateOpenSshKeyFileName = settings->getAuthorizedKeyFolderName() + "key.private-openssh";
+    QString authorizedKeyFileName = settings->getAuthorizedKeyFolderName() + settings->getAuthorizedKeyFileName();
 
-	QStringList arguments;
-	arguments << "-noagent";
-	arguments << settings->getServerUserName() + "@" + settings->getServerName();
-	QString shellArguments;
-	arguments << "sh" << "-c";
-	shellArguments.append( "echo " + LOGIN_ECHO_MESSAGE + ";" );
-	shellArguments.append( "puttygen -q -t dsa -b 1024 -o " + privatePuttyKeyFileName + " 2>&1;" );
-	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + publicKeyFileName + " -O public-openssh 2>&1;" );
-	shellArguments.append( "puttygen " + privatePuttyKeyFileName + " -o " + privateOpenSshKeyFileName + " -O private-openssh 2>&1;" );
-	shellArguments.append( "cat " + publicKeyFileName + " >> " + authorizedKeyFileName + ";" );
-	shellArguments.append( "echo " + START_PRIVATE_KEY_ECHO_MESSAGE +";" );
-	shellArguments.append( "cat " + privatePuttyKeyFileName + ";" );
-	shellArguments.append( "echo " + END_PRIVATE_KEY_ECHO_MESSAGE +";" );
-	shellArguments.append( "echo " + START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE +";" );
-	shellArguments.append( "cat " + privateOpenSshKeyFileName + ";" );
-	shellArguments.append( "echo " + END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE +";" );
-	shellArguments.append( "rm " + privatePuttyKeyFileName + ";" );
-	shellArguments.append( "rm " + privateOpenSshKeyFileName + ";" );
-	shellArguments.append( "rm " + publicKeyFileName);
-	shellArguments = StringUtils::quoteText(shellArguments, "'");
-	arguments << shellArguments;
+    QStringList arguments({
+	"-noagent",
+	QString("%1@%2").arg(settings->getServerUserName(), settings->getServerName()),
+	"sh", "-c"
+	});
 
-	emit infoSignal( QObject::tr( "Log in ..." ) );
-	createProcess( settings->getPlinkName(), arguments );
-	start();
+    QStringList shellArguments({
+	QString("echo %1").arg(LOGIN_ECHO_MESSAGE),
+	QString("puttygen -q -t %2 -b %3 -o %1 2>&1").arg(privatePuttyKeyFileName, KEY_TYPE, KEY_LENGTH),
+	QString("puttygen %1 -o %2 -O public-openssh 2>&1" ).arg(privatePuttyKeyFileName, publicKeyFileName),
+	QString("puttygen %1 -o %2 -O private-openssh 2>&1" ).arg(privatePuttyKeyFileName, privateOpenSshKeyFileName),
+	QString("cat %1 >> %2").arg(publicKeyFileName, authorizedKeyFileName),
+	QString("echo %1").arg(START_PRIVATE_KEY_ECHO_MESSAGE),
+	QString("cat %1").arg(privatePuttyKeyFileName),
+	QString("echo %1").arg(END_PRIVATE_KEY_ECHO_MESSAGE),
+	QString("echo %1").arg(START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE),
+	QString("cat %1").arg(privateOpenSshKeyFileName),
+	QString("echo %1").arg(END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE),
+	QString("rm %1").arg(privatePuttyKeyFileName),
+	QString("rm %1").arg(privateOpenSshKeyFileName),
+	QString("rm %1").arg(publicKeyFileName)
+	});
 
-	while (true)
-	{
-		// the server terminates the connection immediately in case of an invalid username (but not only then)
-		if (!waitForReadyRead())
-			throw LoginException(qApp->translate("Plink", "Error occurred during login, perhaps invalid username"));
+    arguments << StringUtils::quoteText(shellArguments.join(";"), "'");
 
-		QString line = readAll();
+    emit infoSignal( QObject::tr( "Log in ..." ) );
+    createProcess( settings->getPlinkName(), arguments );
+    start();
 
-		if (line.contains("password:", Qt::CaseInsensitive))
-		{
-			qDebug() << "Password line: " << line;
-			break;
-		}
-
-		qDebug() << "ignoring message from plink:" << line;
-	}
-
-	write( password.toLocal8Bit() );
-    write( Platform::EOL_CHARACTER );
-
+    while (true)
+    {
+	// the server terminates the connection immediately in case of an invalid username (but not only then)
 	if (!waitForReadyRead())
-		throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
-
-	if (readAllStandardError().contains("Access denied"))
-	{
-		qWarning() << "Access denied. Username or password not valid";
-		throw LoginException( qApp->translate( "Plink", "Username or password not valid" ) );
-	}
+	    throw LoginException(qApp->translate("Plink", "Error occurred during login, perhaps invalid username"));
 
 	QString line = readAll();
+
+	if (line.contains("password:", Qt::CaseInsensitive))
+	{
+	    qDebug() << "Password line: " << line;
+	    break;
+	}
+
+	qDebug() << "ignoring message from plink:" << line;
+    }
+
+    write( password.toLocal8Bit() );
+    write( Platform::EOL_CHARACTER );
+
+    if (!waitForReadyRead())
+	throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
+
+    if (readAllStandardError().contains("Access denied"))
+    {
+	qWarning() << "Access denied. Username or password not valid";
+	throw LoginException( qApp->translate( "Plink", "Username or password not valid" ) );
+    }
+
+    QString line = readAll();
+    line.replace( "\n", "" );
+    line.replace( "\r", "" );
+    qDebug() << "loggedInMessage1: " << line;
+    if ( line == "" )
+    {
+	if (!waitForReadyRead())
+	    throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
+
+	line = readAll();
 	line.replace( "\n", "" );
 	line.replace( "\r", "" );
-	qDebug() << "loggedInMessage1: " << line;
-	if ( line == "" )
-	{
-		if (!waitForReadyRead())
-			throw LoginException(qApp->translate("Plink", "Timeout occurred during login"));
+	qDebug() << "loggedInMessage2: " << line;
+    }
 
-		line = readAll();
-		line.replace( "\n", "" );
-		line.replace( "\r", "" );
-		qDebug() << "loggedInMessage2: " << line;
-	}
+    if ( line != LOGIN_ECHO_MESSAGE )
+    {
+	qWarning() << "Username or password not valid";
+	throw LoginException( qApp->translate( "Plink", "Username or password not valid" ) );
+    }
+    emit infoSignal( QObject::tr( "Login successful" ) );
+    emit infoSignal( QObject::tr( "Generating key pair ... (This may take a while)" ) );
+    qDebug() << "Login successful. Creating key pair ...";
+    waitForReadyRead( 10*60*1000 ); //10 minutes
 
-	if ( line != LOGIN_ECHO_MESSAGE )
-	{
-		qWarning() << "Username or password not valid";
-		throw LoginException( qApp->translate( "Plink", "Username or password not valid" ) );
-	}
-	emit infoSignal( QObject::tr( "Login successful" ) );
-	emit infoSignal( QObject::tr( "Generating key pair ... (This may take a while)" ) );
-	qDebug() << "Login successful. Creating key pair ...";
-	waitForReadyRead( 10*60*1000 ); //10 minutes
+    write( "\n" ); // no passphrase
 
-	write( "\n" ); // no passphrase
+    waitForReadyRead();
+    readAll();
+    write( "\n" ); // repeat no passphrase
 
-	waitForReadyRead();
-	readAll();
-	write( "\n" ); // repeat no passphrase
+    // read the private keys (first key is putty, second is openssh)
+    QStringList keyLines;
+    while ( blockingReadLine( &line ) )
+    {
+	keyLines << line;
+    }
+    waitForFinished();
 
-	// read the private keys (first key is putty, second is openssh)
-	QStringList keyLines;
-	while ( blockingReadLine( &line ) )
-	{
-		keyLines << line;
-	}
-	waitForFinished();
+    QString privatePuttyKeyString = extractKey( keyLines, START_PRIVATE_KEY_ECHO_MESSAGE, END_PRIVATE_KEY_ECHO_MESSAGE );
+    QString privateOpenSshKeyString = extractKey( keyLines, START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE, END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE );
 
-	QString privatePuttyKeyString = extractKey( keyLines, START_PRIVATE_KEY_ECHO_MESSAGE, END_PRIVATE_KEY_ECHO_MESSAGE );
-	QString privateOpenSshKeyString = extractKey( keyLines, START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE, END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE );
+    if ( !privatePuttyKeyString.startsWith( PUTTY_HEADER_FIRST_LINE ) ||
+	    !privateOpenSshKeyString.startsWith( OPEN_SSH_HEADER_FIRST_LINE ) )
+    {
+	emit errorSignal( QObject::tr( "Key has not been generated" ) );
+	return false;
+    }
 
-	if ( !privatePuttyKeyString.startsWith( PUTTY_HEADER_FIRST_LINE ) ||
-			 !privateOpenSshKeyString.startsWith( OPEN_SSH_HEADER_FIRST_LINE ) )
-	{
-		emit errorSignal( QObject::tr( "Key has not been generated" ) );
-		return false;
-	}
+    // save the keys
+    settings->savePrivatePuttyKey( privatePuttyKeyString );
+    settings->savePrivateOpenSshKey( privateOpenSshKeyString );
 
-	// save the keys
-	settings->savePrivatePuttyKey( privatePuttyKeyString );
-	settings->savePrivateOpenSshKey( privateOpenSshKeyString );
-
-	emit infoSignal( QObject::tr( "Key has been generated" ) );
-	return true;
+    emit infoSignal( QObject::tr( "Key has been generated" ) );
+    return true;
 }
 
 QString Plink::extractKey( const QStringList& keyLines, const QString& startLine, const QString& endLine )

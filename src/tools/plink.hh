@@ -29,73 +29,75 @@
 class Plink : public AbstractSsh, public Process
 {
 
-public:	
+    public:
 
-	/**
-	 * Constructs a Plink
-	 */
-	Plink();
-	
-	/**
-	 * Destroys the Plink
-	 */
-	virtual ~Plink();
+        /**
+         * Constructs a Plink
+         */
+        Plink();
 
-	/**
-	 * @see AbstractSsh::uploadToMetaFolder( const QFileInfo& file, bool append )
-	 */
-	void uploadToMetaFolder( const QFileInfo& file, bool append );
-	
-	/**
-	 * @see AbstractSsh::generateKeys( const QString& password )
-	 */
-	bool generateKeys( const QString& password );
-	
-	/**
-	 * @see AbstractSsh::loginWithKey()
-	 */
-	bool loginWithKey();
-	
-	/**
-	 * @see AbstractSsh::assertCorrectFingerprint()
-	 */
-	bool assertCorrectFingerprint();
+        /**
+         * Destroys the Plink
+         */
+        virtual ~Plink();
 
-    bool assertCorrectFingerprint(const QString& userName, const QString& serverName, const QString& savedKey);
-	
-	/**
-	 * @see AbstractSsh::getServerQuotaValues()
-	 */
-	QList<int> getServerQuotaValues();
-	
-	/**
-	 * Tests the generateKeys method
-	 * @see generateKeys()
-	 */
-	static void testGenerateKeys();
-	
-	/**
-	 * Tests the loginWithKey method
-	 */
-	static void testLoginWithKey();
-	
-	/**
-	 * Tests the assertCorrectFingerprint method
-	 */
-	static void testAssertCorrectFingerprint();
+        /**
+         * @see AbstractSsh::uploadToMetaFolder( const QFileInfo& file, bool append )
+         */
+        void uploadToMetaFolder( const QFileInfo& file, bool append );
 
-private:
-	static const QString PUTTY_HEADER_FIRST_LINE;
-	static const QString OPEN_SSH_HEADER_FIRST_LINE;
-	static const QString LOGIN_ECHO_MESSAGE;
-	static const QString START_PRIVATE_KEY_ECHO_MESSAGE;
-	static const QString END_PRIVATE_KEY_ECHO_MESSAGE;
-	static const QString START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
-	static const QString END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
+        /**
+         * @see AbstractSsh::generateKeys( const QString& password )
+         */
+        bool generateKeys( const QString& password );
 
-    const QString plinkName;
+        /**
+         * @see AbstractSsh::loginWithKey()
+         */
+        bool loginWithKey();
 
-	static QString extractKey( const QStringList& keyLines, const QString& startLine, const QString& endLine );
+        /**
+         * @see AbstractSsh::assertCorrectFingerprint()
+         */
+        bool assertCorrectFingerprint();
+
+        bool assertCorrectFingerprint(const QString& userName, const QString& serverName, const QString& savedKey);
+
+        /**
+         * @see AbstractSsh::getServerQuotaValues()
+         */
+        QList<int> getServerQuotaValues();
+
+        /**
+         * Tests the generateKeys method
+         * @see generateKeys()
+         */
+        static void testGenerateKeys();
+
+        /**
+         * Tests the loginWithKey method
+         */
+        static void testLoginWithKey();
+
+        /**
+         * Tests the assertCorrectFingerprint method
+         */
+        static void testAssertCorrectFingerprint();
+
+    private:
+        static const QString PUTTY_HEADER_FIRST_LINE;
+        static const QString OPEN_SSH_HEADER_FIRST_LINE;
+        static const QString LOGIN_ECHO_MESSAGE;
+        static const QString START_PRIVATE_KEY_ECHO_MESSAGE;
+        static const QString END_PRIVATE_KEY_ECHO_MESSAGE;
+        static const QString START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
+        static const QString END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
+        static const QString KEY_LENGTH;
+        static const QString KEY_TYPE;
+
+        const QString plinkName;
+
+        static QString extractKey( const QStringList& keyLines, const QString& startLine, const QString& endLine );
 };
 
 #endif
