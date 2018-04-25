@@ -13,6 +13,12 @@
 
 * All Operating Systems: Translations for German updated.
 
+* All Operating Systems: Raise minimal key length to 2048 bytes.
+
+* All Operating Systems: Fix conversion of longer RSA host keys from Putty- to OpenSSH-format.
+
+* All Operating Systems: Switch default backup host to `backup.stoney-backup.com`
+
 
 ## Version 2.4.0
 
