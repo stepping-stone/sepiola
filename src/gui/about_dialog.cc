@@ -20,6 +20,7 @@
 
 #include "gui/about_dialog.hh"
 #include "settings/settings.hh"
+#include "config.h"
 
 const int AboutDialog::MAX_IMAGE_HEIGHT = 75; 
 const int AboutDialog::MAX_IMAGE_WIDTH = 150; 
