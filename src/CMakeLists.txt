@@ -131,7 +131,7 @@ else()
     message(STATUS "lrelease could not be found. You're losing the localisation.")
 endif()
 
-set(qt_translations /usr/share/qt/translations/qt_de.qm)
+set(qt_translations /usr/share/qt5/translations/qt_de.qm)
 foreach(qt_translation ${qt_translations})
     get_filename_component(qm ${qt_translation} NAME_WE)
     set(qm "${CMAKE_CURRENT_BINARY_DIR}/${qm}.qm")
