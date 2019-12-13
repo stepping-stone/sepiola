@@ -9,10 +9,10 @@
 
 #include "stacked_bar_view.hh"
 
-#include <QtGui/QPaintEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QPen>
-#include <QtGui/QScrollBar>
+#include <QPaintEvent>
+#include <QPainter>
+#include <QPen>
+#include <QScrollBar>
 
 namespace {
 static const int DATA_COLUMN = 0;
