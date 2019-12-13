@@ -19,7 +19,7 @@
 #ifndef TEST_POSIX_ACL_H
 #define TEST_POSIX_ACL_H
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
 class TestPosixAcl: public QObject
 {

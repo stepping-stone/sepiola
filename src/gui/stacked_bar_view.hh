@@ -10,8 +10,8 @@
 #ifndef STACKED_BAR_VIEW_HH
 #define STACKED_BAR_VIEW_HH
 
-#include <QtGui/QAbstractItemView>
-#include <QtGui/QPixmap>
+#include <QAbstractItemView>
+#include <QPixmap>
 
 class StackedBarView :
     public QAbstractItemView

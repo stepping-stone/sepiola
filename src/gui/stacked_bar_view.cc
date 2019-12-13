@@ -9,10 +9,10 @@
 
 #include "stacked_bar_view.hh"
 
-#include <QtGui/QPen>
-#include <QtGui/QPainter>
-#include <QtGui/QPaintEvent>
-#include <QtGui/QScrollBar>
+#include <QPen>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QScrollBar>
 
 namespace
 {
