@@ -51,19 +51,6 @@ ScheduledTask::ScheduledTask(int minutes) :
 {
 }
 
-/**
- * Copy-constructor
- */
-ScheduledTask::ScheduledTask(const ScheduledTask& task)
-{
-	this->type = task.getType();
-	this->weekdays = task.getWeekdays();
-	this->timeToRun = task.getTimeToRun();
-	this->minutesAfterStartup = task.getMinutesAfterStartup();
-}
-
-ScheduledTask::~ScheduledTask() {}
-
 ScheduleRule::ScheduleType ScheduledTask::getType() const
 {
 	return this->type;

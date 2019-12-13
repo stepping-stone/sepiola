@@ -278,7 +278,7 @@ void Settings::reloadSettings()
 
 	serverName = userSettings->value( SETTINGS_HOST, serverName ).toString();
 	serverUserName = userSettings->value( SETTINGS_USERNAME ).toString();
-    
+
     language = userSettings->value( SETTINGS_LANGUAGE ).toString();
 
     // Convert old index values to new language codes
@@ -733,7 +733,7 @@ QList<std::pair<QString, QString>> Settings::getAvailableLanguages()
 {
     QList<std::pair<QString, QString>> languages;
     languages << std::make_pair("English", "en"); // the native language
-    
+
     QDir translationDir(getApplicationBinDir());
 
     QRegExp regex("^app_(.*)\\.qm$");

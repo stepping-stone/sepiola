@@ -37,11 +37,9 @@ class ScheduledTask
 	public:
 
 		ScheduledTask();
-		ScheduledTask(const ScheduledTask& task);
 		ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time);
 		ScheduledTask(int minutes);
 
-		~ScheduledTask();
 		ScheduleRule::ScheduleType getType() const;
 		void setType(ScheduleRule::ScheduleType type);
 		QSet<ScheduleRule::Weekdays> getWeekdays() const;
@@ -56,7 +54,7 @@ class ScheduledTask
 		void setMinutesAfterStartup(int minutesAfterStartup);
 		QString toString() const;
 		bool equals(const ScheduledTask& scheduledTask) const;
-		
+
 	private:
 		ScheduleRule::ScheduleType type;
 		QSet<ScheduleRule::Weekdays> weekdays;

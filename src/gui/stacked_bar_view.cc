@@ -159,7 +159,7 @@ void StackedBarView::paintEvent(QPaintEvent* event)
     painter.restore();
 }
 
-void StackedBarView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void StackedBarView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &)
 {
     QAbstractItemView::dataChanged(topLeft, bottomRight);
 
@@ -177,7 +177,7 @@ void StackedBarView::dataChanged(const QModelIndex &topLeft, const QModelIndex &
         {
             _validItems += 1;
             _totalValue += value;
-        }    
+        }
     }
 
     viewport()->update();
@@ -196,7 +196,7 @@ void StackedBarView::rowsInserted(const QModelIndex &parent, int start, int end)
         {
             _validItems += 1;
             _totalValue += value;
-        }    
+        }
     }
 
     QAbstractItemView::rowsInserted(parent, start, end);
@@ -215,7 +215,7 @@ void StackedBarView::rowsAboutToBeRemoved(const QModelIndex &parent, int start, 
         {
             _validItems -= 1;
             _totalValue -= value;
-        }    
+        }
     }
 
     QAbstractItemView::rowsAboutToBeRemoved(parent, start, end);
