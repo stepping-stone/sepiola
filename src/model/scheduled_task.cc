@@ -149,7 +149,7 @@ QString ScheduledTask::toString() const
 				QList<QDateTime> nextBackupDatesList;
 				const QDateTime now = QDateTime::currentDateTime();
 				const int wd_now = now.date().dayOfWeek();
-				//qStableSort(wdList.begin(), wdList.end());
+				//std::stable_sort(wdList.begin(), wdList.end());
 				//QString wdStr = "";
 				for (int i = 0; i < wdList.size(); i++)
 				{
@@ -161,7 +161,7 @@ QString ScheduledTask::toString() const
 					nextBackupDatesList.append(nextBkup);
 				}
 				//wdStr.chop(tok.length());
-				qStableSort(nextBackupDatesList.begin(), nextBackupDatesList.end());
+				std::stable_sort(nextBackupDatesList.begin(), nextBackupDatesList.end());
 
 				// full info (not desired by stst
 				// return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"), nextBackupDatesList.at(0).toString());

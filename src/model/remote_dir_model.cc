@@ -45,7 +45,7 @@ RemoteDirModel::RemoteDirModel( QStringList backupContent )
     foreach(QString rootItem, rootItems) {
         backupContent.push_front(rootItem);
     }
-    qSort(backupContent.begin(), backupContent.end(), fileLessThan);
+    std::sort(backupContent.begin(), backupContent.end(), fileLessThan);
 
     QFileIconProvider iconProvider;
     setHorizontalHeaderLabels( QStringList( QObject::tr( "Name" ) ) );
@@ -156,4 +156,3 @@ bool RemoteDirModel::setData(const QModelIndex& index, const QVariant& value, in
 RemoteDirModel::~RemoteDirModel()
 {
 }
-
