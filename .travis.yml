@@ -1,9 +1,18 @@
+dist: bionic
+
+language: cpp
+compiler: gcc
+
 env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "g6juqk/pIJTlmM+8aOAO69Pu3nze7uEifn58DtqG/9CKUlRSjnhAqG9EO7UyH1z0GnAEDj/ZRHFiAycYv9tLcFhzhOYCTiYUl4d7PwSd5vS1liDgfrQJNtdR1W2oqr+wVt8g3sReGBbgUlMrGu6fP3G8Xsv1OOj5mFR/LxVECXI="
+
 addons:
+  apt:
+    packages:
+      - qtbase5-dev
   coverity_scan:
     project:
       name: "stepping-stone/sepiola"
@@ -11,18 +20,11 @@ addons:
     notification_email: info@stepping-stone.ch
     build_command: "make"
     branch_pattern: coverity_scan
-  apt:
-    sources:
-      - george-edison55-precise-backports
-    packages:
-      - libqt4-dev
-      - cmake-data
-      - cmake
-language: cpp
-compiler: gcc
+
 before_script:
   - mkdir build
   - cd build
   - cmake ..
+
 script:
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make ; fi

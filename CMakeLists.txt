@@ -1,20 +1,20 @@
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007, 2017  stepping stone GmbH
-#| 
+#| Copyright (C) 2007, 2017, 2019  stepping stone AG
+#|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
 #| Version 2 as published by the Free Software Foundation.
-#| 
+#|
 #| This program is distributed in the hope that it will be useful,
 #| but WITHOUT ANY WARRANTY; without even the implied warranty of
 #| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #| GNU General Public License for more details.
-#| 
+#|
 #| You should have received a copy of the GNU General Public License
 #| along with this program; if not, write to the Free Software
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.12.0)
 
 # If available, enable developer warnings for the build system
 if(POLICY CMP0005)
@@ -43,8 +43,11 @@ IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
-SET(Qt4_FIND_REQUIRED TRUE)
-INCLUDE(FindQt4)
+FIND_PACKAGE(Qt5Core REQUIRED)
+FIND_PACKAGE(Qt5Widgets REQUIRED)
+FIND_PACKAGE(Qt5Network REQUIRED)
+FIND_PACKAGE(Qt5Test REQUIRED)
+FIND_PACKAGE(Qt5LinguistTools)
 
 # Translatable source files
 FILE(GLOB_RECURSE translate_files src/*.cc src/*.hh src/*.ui)
@@ -99,7 +102,7 @@ SET(CPACK_SSBACKUP_APPLICATION_FULL_NAME "${SSBACKUP_APPLICATION_FULL_NAME}")
 
 target_architecture(TARGET_ARCH)
 
-IF(Q_WS_WIN)
+IF(WIN32)
 	SET(CPACK_GENERATOR "NSIS")
 	IF(TARGET_ARCH STREQUAL "x86_64")
 		SET(WINDOWS_NAME win64)
@@ -111,16 +114,16 @@ IF(Q_WS_WIN)
 	SET(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${WINDOWS_NAME}${CPACK_PACKAGE_FILE_NAME_SUFFIX})
 	SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/installer/windows/" ${CMAKE_MODULE_PATH})
 	INCLUDE(CPack)
-ELSEIF(Q_WS_MAC)
+ELSEIF(APPLE)
 	ADD_CUSTOM_TARGET(package
 			  COMMAND rm -rf ${CMAKE_BINARY_DIR}/staging
 			  COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/staging -P cmake_install.cmake
 			  COMMAND hdiutil create -ov -srcfolder
 			  ${CMAKE_BINARY_DIR}/staging/${PROJECT_NAME} ${SSBACKUP_EXECUTABLE_NAME}-${CPACK_PACKAGE_VERSION}-Mac-universal${CPACK_PACKAGE_FILE_NAME_SUFFIX}.dmg)
-ELSE(Q_WS_WIN)
+ELSE(WIN32)
 	EXECUTE_PROCESS(COMMAND arch OUTPUT_VARIABLE ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 	SET(CPACK_GENERATOR "STGZ")
 	SET(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-Linux-${TARGET_ARCH}${CPACK_PACKAGE_FILE_NAME_SUFFIX})
 	SET(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/installer/linux/" ${CMAKE_MODULE_PATH})
 	INCLUDE(CPack)
-ENDIF(Q_WS_WIN)
+ENDIF(WIN32)

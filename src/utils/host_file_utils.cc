@@ -80,7 +80,7 @@ QString HostFileUtils::convertPuttyKey( const QString& puttyData, const QString&
     // the first element for openSSH is again the keytype
     QList<QByteArray> subkeys({"ssh-rsa"});
     for (const QString& entry: puttyData.split(','))
-        subkeys.append(QByteArray::fromHex(entry.mid(2).toAscii()));
+        subkeys.append(QByteArray::fromHex(entry.mid(2).toLatin1()));
 
     // the actual key has to be left padded with a 0, but why?
     Q_ASSERT(subkeys.size() == 3); // make sure we really have only 3 elements, otherwise our assumptions are incorrect

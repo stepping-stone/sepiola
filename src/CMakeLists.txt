@@ -67,7 +67,7 @@ SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" )
 
 SET(CMAKE_CXX_FLAGS_DEPLOY ${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO})
 
-IF(Q_WS_WIN)
+IF(WIN32)
     include(CMakeDetermineRCCompiler)
 	# add windows icon/ressources
         ADD_CUSTOM_COMMAND(
@@ -75,18 +75,16 @@ IF(Q_WS_WIN)
 		COMMAND ${CMAKE_RC_COMPILER} ${PROJECT_SOURCE_DIR}/${WINDOWS_RESSOURCE_FILE} -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o
 	)
 	SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
-ENDIF(Q_WS_WIN)
+ENDIF(WIN32)
 
 GENERATE_QT_RESOURCE_FROM_FILES(
 	"${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
 	"/main"
 	"${PROJECT_SOURCE_DIR}/${ABOUT_IMAGE_FILE};${PROJECT_SOURCE_DIR}/${WINDOW_ICON_FILE}")
 
-ADD_DEFINITIONS(${QT_DEFINITIONS})
-
-IF(Q_WS_WIN)
+IF(WIN32)
     SET(OS_HEADER_DIRECTORIES /usr/local/inc/win2003/)
-ENDIF(Q_WS_WIN)
+ENDIF(WIN32)
 
 INCLUDE_DIRECTORIES(
 	.
@@ -95,27 +93,16 @@ INCLUDE_DIRECTORIES(
 )
 
 INCLUDE_DIRECTORIES(SYSTEM
-	${QT_INCLUDE_DIR}
-	${QT_QTCORE_INCLUDE_DIR} 
-	${QT_QTGUI_INCLUDE_DIR}
-	${QT_QTNETWORK_INCLUDE_DIR}
 	${OS_HEADER_DIRECTORIES}
 )
 
-FIND_PROGRAM(QT_LUPDATE 
-	NAMES lupdate-qt4 lupdate
+FIND_PROGRAM(QT_LUPDATE
+	NAMES lupdate-qt5 lupdate
 	PATHS $ENV{QTDIR}/bin
 	DOC "Path to the lupdate program"
 )
 
-FIND_PROGRAM(QT_LRELEASE
-	NAMES lrelease-qt4 lrelease
-	PATHS $ENV{QTDIR}/bin
-	DOC "Path to the lrelease program"
-)
-
 SET(translation_sources ${translation_sources} i18n/app_de.ts)
-SET(qt_translations /usr/share/qt4/translations/qt_de.qm)
 
 # Update translations (note that lupdate target write to source directory)
 IF(QT_LUPDATE)
@@ -137,35 +124,20 @@ ELSE(QT_LUPDATE)
 ENDIF(QT_LUPDATE)
 
 # Build translations
-IF(QT_LRELEASE)
-	# Clear list
-	SET(qms)
-
-	# Add command to build X.qm from X.ts
-	FOREACH(ts ${translation_sources})
-		GET_FILENAME_COMPONENT(qm ${ts} NAME_WE)
-		SET(qm "${CMAKE_CURRENT_BINARY_DIR}/${qm}.qm")
-		SET(ts "${CMAKE_CURRENT_SOURCE_DIR}/${ts}")
-		ADD_CUSTOM_COMMAND(OUTPUT ${qm} 
-		COMMAND ${QT_LRELEASE} ${ts} -qm ${qm}
-		DEPENDS ${ts})
-		SET(qms ${qms} ${qm})
-		SET(translation_binaries ${translation_binaries} ${qm})
-	ENDFOREACH(ts)
+IF (Qt5LinguistTools_FOUND)
+    qt5_create_translation(translation_binaries ${CMAKE_SOURCE_DIR} ${translation_sources})
 
 	# Finish off with a command that builds *.qm
-	ADD_CUSTOM_TARGET(lrelease ALL DEPENDS ${qms})
-ELSE(QT_LRELEASE)
+    ADD_CUSTOM_TARGET(lrelease ALL DEPENDS ${QM_FILES})
+ELSE ()
 	MESSAGE(STATUS "lrelease could not be found. You're losing the localisation.")
-ENDIF(QT_LRELEASE)
+ENDIF ()
 
-# Clear list
-SET(qms)
-
+SET(qt_translations /usr/share/qt/translations/qt_de.qm)
 FOREACH(qt_translation ${qt_translations})
     GET_FILENAME_COMPONENT(qm ${qt_translation} NAME_WE)
     SET(qm "${CMAKE_CURRENT_BINARY_DIR}/${qm}.qm")
-    ADD_CUSTOM_COMMAND(OUTPUT ${qm} 
+    ADD_CUSTOM_COMMAND(OUTPUT ${qm}
         COMMAND ${CMAKE_COMMAND} -E copy ${qt_translation} ${qm}
         DEPENDS ${qt_translation})
     SET(qms ${qms} ${qm})
@@ -184,7 +156,7 @@ ENDIF (NOT PORTABLE_INSTALLATION)
 
 CONFIGURE_FILE(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-QT4_WRAP_CPP(
+QT5_WRAP_CPP(
 	sepiola_base_MOC
 	tools/abstract_informing_process.hh
 	tools/abstract_rsync.hh
@@ -202,41 +174,41 @@ QT4_WRAP_CPP(
 	model/space_usage_model.hh
 )
 
-QT4_WRAP_CPP(
+QT5_WRAP_CPP(
 	sepiola_ui_MOC
 	cli/cli_manager.hh
 	gui/about_dialog.hh
-	gui/backup_form.hh 
+	gui/backup_form.hh
 	gui/logfile_form.hh
-	gui/main_window.hh 
-	gui/overview_form.hh 
-	gui/restore_form.hh 
+	gui/main_window.hh
+	gui/overview_form.hh
+	gui/restore_form.hh
 	gui/settings_form.hh
 	gui/text_input_dialog.hh
-	gui/password_dialog.hh 
+	gui/password_dialog.hh
 	gui/pattern_dialog.hh
-	gui/output_dialog.hh 
+	gui/output_dialog.hh
 	gui/traffic_progress_dialog.hh
 	gui/stacked_bar_view.hh
 )
 
-QT4_WRAP_UI(
-	sepiola_UI 
-	gui/about_dialog.ui 
-	gui/backup_form.ui 
+QT5_WRAP_UI(
+	sepiola_UI
+	gui/about_dialog.ui
+	gui/backup_form.ui
 	gui/logfile_form.ui
-	gui/main_window.ui 
-	gui/overview_form.ui 
-	gui/restore_form.ui 
-	gui/settings_form.ui 
+	gui/main_window.ui
+	gui/overview_form.ui
+	gui/restore_form.ui
+	gui/settings_form.ui
 	gui/text_input_dialog.ui
-	gui/password_dialog.ui 
+	gui/password_dialog.ui
 	gui/pattern_dialog.ui
 	gui/output_dialog.ui
-	gui/traffic_progress_dialog.ui 
+	gui/traffic_progress_dialog.ui
 )
 
-QT4_ADD_RESOURCES(
+QT5_ADD_RESOURCES(
 	sepiola_RC
 	gui/resources/screen.qrc
 	"${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
@@ -275,15 +247,15 @@ SET(UI_SOURCE_FILES
 	main.cc
 	cli/cli_manager.cc
 	gui/about_dialog.cc
-	gui/backup_form.cc 
+	gui/backup_form.cc
 	gui/logfile_form.cc
-	gui/main_window.cc 
+	gui/main_window.cc
 	gui/overview_form.cc
 	gui/traffic_progress_dialog.cc
 	gui/output_dialog.cc
 	gui/password_dialog.cc
 	gui/pattern_dialog.cc
-	gui/restore_form.cc 
+	gui/restore_form.cc
 	gui/settings_form.cc
 	gui/text_input_dialog.cc
 	gui/stacked_bar_view.cc
@@ -293,10 +265,10 @@ SET(UI_SOURCE_FILES
 	${sepiola_CFG}
 )
 
-# Use Q_WS_WIN from Qt-module instead of WIN32 from cmake
+# Use WIN32 from Qt-module instead of WIN32 from cmake
 # to make it work when cross-compiling using MinGW
-IF(Q_WS_WIN)
-    QT4_WRAP_CPP(
+IF(WIN32)
+    QT5_WRAP_CPP(
         sepiola_win_MOC
         tools/shadow_copy.hh
         tools/optionalSnapshot.hh
@@ -309,80 +281,116 @@ IF(Q_WS_WIN)
         tools/optionalSnapshot.cc
         ${sepiola_win_MOC}
     )
-ELSEIF(Q_WS_MAC)
+ELSEIF(APPLE)
     LIST(APPEND BASE_SOURCE_FILES
 	    tools/unix_permissions.cc
     )
-ELSEIF(Q_WS_X11)
+ELSEIF(UNIX)
     LIST(APPEND BASE_SOURCE_FILES
         tools/crontab.cc
         tools/posix_acl.cc
     )
-ENDIF(Q_WS_WIN)
+ENDIF(WIN32)
 
 ADD_LIBRARY(sepiola_base_objects OBJECT ${BASE_SOURCE_FILES})
 ADD_LIBRARY(sepiola_ui_objects OBJECT ${UI_SOURCE_FILES})
+
+# workaround since TARGET_LINK_LIBRARIES can not be applied to OBJECT
+# libraries at the moment, see
+# https://gitlab.kitware.com/cmake/cmake/issues/14778
+TARGET_INCLUDE_DIRECTORIES(sepiola_base_objects SYSTEM PRIVATE
+    $<TARGET_PROPERTY:Qt5::Core,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:Qt5::Widgets,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:Qt5::Network,INTERFACE_INCLUDE_DIRECTORIES>
+    )
+TARGET_INCLUDE_DIRECTORIES(sepiola_ui_objects SYSTEM PRIVATE
+    $<TARGET_PROPERTY:Qt5::Core,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:Qt5::Widgets,INTERFACE_INCLUDE_DIRECTORIES>
+    $<TARGET_PROPERTY:Qt5::Network,INTERFACE_INCLUDE_DIRECTORIES>
+    )
+
+TARGET_COMPILE_DEFINITIONS(sepiola_base_objects PRIVATE
+    $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_DEFINITIONS>
+    $<TARGET_PROPERTY:Qt5::Widgets,INTERFACE_COMPILE_DEFINITIONS>
+    $<TARGET_PROPERTY:Qt5::Network,INTERFACE_COMPILE_DEFINITIONS>
+    )
+TARGET_COMPILE_DEFINITIONS(sepiola_ui_objects PRIVATE
+    $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_DEFINITIONS>
+    $<TARGET_PROPERTY:Qt5::Widgets,INTERFACE_COMPILE_DEFINITIONS>
+    $<TARGET_PROPERTY:Qt5::Network,INTERFACE_COMPILE_DEFINITIONS>
+    )
+
+TARGET_COMPILE_OPTIONS(sepiola_base_objects PRIVATE
+    $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_OPTIONS>
+    $<TARGET_PROPERTY:Qt5::Widgets,INTERFACE_COMPILE_OPTIONS>
+    $<TARGET_PROPERTY:Qt5::Network,INTERFACE_COMPILE_OPTIONS>
+    )
+TARGET_COMPILE_OPTIONS(sepiola_ui_objects PRIVATE
+    $<TARGET_PROPERTY:Qt5::Core,INTERFACE_COMPILE_OPTIONS>
+    $<TARGET_PROPERTY:Qt5::Widgets,INTERFACE_COMPILE_OPTIONS>
+    $<TARGET_PROPERTY:Qt5::Network,INTERFACE_COMPILE_OPTIONS>
+    )
 
 ADD_EXECUTABLE(
 	${SSBACKUP_EXECUTABLE_NAME}
 	WIN32
 	MACOSX_BUNDLE
-    $<TARGET_OBJECTS:sepiola_base_objects>
-    $<TARGET_OBJECTS:sepiola_ui_objects>
-    ${sepiola_RC}
+	$<TARGET_OBJECTS:sepiola_base_objects>
+	$<TARGET_OBJECTS:sepiola_ui_objects>
+	${sepiola_RC}
 )
 
-IF(Q_WS_WIN)
+IF(WIN32)
 	ADD_EXECUTABLE(
 		${SSBACKUP_EXECUTABLE_NAME}.com
-        $<TARGET_OBJECTS:sepiola_base_objects>
-        $<TARGET_OBJECTS:sepiola_ui_objects>
-   	    ${sepiola_RC}
+		$<TARGET_OBJECTS:sepiola_base_objects>
+		$<TARGET_OBJECTS:sepiola_ui_objects>
+		${sepiola_RC}
 	)
 	SET_TARGET_PROPERTIES(${SSBACKUP_EXECUTABLE_NAME}.com PROPERTIES SUFFIX "")  # don't add .exe suffix
 
 	# for second binary
-	TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com ${QT_QTGUI_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QT_QTCORE_LIBRARY})
-	TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com debug ${QT_QTGUI_LIBRARY_DEBUG} ${QT_QTNETWORK_LIBRARY_DEBUG} ${QT_QTCORE_LIBRARY_DEBUG})
-ENDIF(Q_WS_WIN)
+	TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
+	TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com debug Qt5::Core Qt5::Widgets Qt5::Network)
+ENDIF(WIN32)
 
-TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ${QT_QTGUI_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QT_QTCORE_LIBRARY})
-TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} debug ${QT_QTGUI_LIBRARY_DEBUG} ${QT_QTNETWORK_LIBRARY_DEBUG} ${QT_QTCORE_LIBRARY_DEBUG})
+TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
+TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} debug Qt5::Core Qt5::Widgets Qt5::Network)
 
 IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
-	IF(Q_WS_WIN)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ${QT_GUI_LIB_DEPENDENCIES} ${QT_NETWORK_LIB_DEPENDENCIES} ${QT_CORE_LIB_DEPENDENCIES} ${QT_PLUGINS_DIR}/imageformats/libqsvg.a ${QT_QTSVG_LIBRARY} ${QT_QTXML_LIBRARY})
+	IF(WIN32)
+		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ole32 oleaut32 uuid winspool)
 		# for second binary
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com ${QT_GUI_LIB_DEPENDENCIES} ${QT_NETWORK_LIB_DEPENDENCIES} ${QT_CORE_LIB_DEPENDENCIES} ${QT_PLUGINS_DIR}/imageformats/libqsvg.a ${QT_QTSVG_LIBRARY} ${QT_QTXML_LIBRARY})
+		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com ole32 oleaut32 uuid winspool gdi32 comdlg32)
-	ELSEIF(Q_WS_MAC)
+	ELSEIF(APPLE)
 		SET(CMAKE_CXX_FLAGS_DEPLOY "${CMAKE_CXX_FLAGS_DEPLOY} -mmacosx-version-min=10.3 -arch ppc -arch i386")
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ${QT_GUI_LIB_DEPENDENCIES} ${QT_NETWORK_LIB_DEPENDENCIES} ${QT_CORE_LIB_DEPENDENCIES} ${QT_PLUGINS_DIR}/imageformats/libqsvg.a ${QT_QTSVG_LIBRARY} ${QT_QTXML_LIBRARY})
+		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} "-framework AppKit" iconv System)
-	ELSE(Q_WS_WIN)
+	ELSE(WIN32)
 		SET(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -static-libstdc++ -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ${QT_NETWORK_LIB_DEPENDENCIES} ${QT_CORE_LIB_DEPENDENCIES} ${QT_PLUGINS_DIR}/imageformats/libqsvg.a ${QT_QTSVG_LIBRARY} ${QT_QTXML_LIBRARY})
+		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
 		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} SM ICE Xi Xext X11 rt m fontconfig)
-	ENDIF(Q_WS_WIN)
+	ENDIF(WIN32)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 
 SET(APP_DIR bin)
 SET(RESOURCE_DIR resource)
-IF(Q_WS_MAC)
+IF(APPLE)
 	SET(APP_DIR ${PROJECT_NAME})
-ENDIF(Q_WS_MAC)
+ENDIF(APPLE)
 
 INSTALL(TARGETS ${SSBACKUP_EXECUTABLE_NAME} RUNTIME DESTINATION ${APP_DIR})
 # for second binary
-IF(Q_WS_WIN)
+IF(WIN32)
 	INSTALL(TARGETS ${SSBACKUP_EXECUTABLE_NAME}.com RUNTIME DESTINATION ${APP_DIR})
-ENDIF(Q_WS_WIN)
+ENDIF(WIN32)
 
 
-IF(Q_WS_WIN)
+IF(WIN32)
 	FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink-*)
 	FILE(GLOB SETACL_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/setacl-*)
 	ADD_CUSTOM_TARGET(copy ALL
@@ -400,14 +408,14 @@ IF(Q_WS_WIN)
             ${CMAKE_CURRENT_BINARY_DIR})
 	ENDIF(DEFINED RESELLER)
 	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
-	
-	INSTALL(PROGRAMS 
+
+	INSTALL(PROGRAMS
 			${CMAKE_CURRENT_BINARY_DIR}/plink.exe
 			${CMAKE_CURRENT_BINARY_DIR}/setacl.exe
 			DESTINATION ${APP_DIR}
 		)
-ELSEIF(Q_WS_MAC)
-	ADD_CUSTOM_TARGET(copy ALL 
+ELSEIF(APPLE)
+	ADD_CUSTOM_TARGET(copy ALL
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/config/config
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
@@ -430,7 +438,7 @@ ELSEIF(Q_WS_MAC)
             ${PROJECT_SOURCE_DIR}/${MACOSX_ICON_FILE}
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/Resources/icon.icns
 	)
-	
+
 
 	# work around cmake bug
 	IF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
@@ -450,14 +458,14 @@ ELSEIF(Q_WS_MAC)
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
-ELSE(Q_WS_WIN)
+ELSE(WIN32)
 	EXECUTE_PROCESS(COMMAND arch OUTPUT_VARIABLE ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
 	IF(ARCH MATCHES "64$")
 		SET(LINUX_DIR linux-x86_64)
 	ELSE(ARCH MATCHES "64$")
 		SET(LINUX_DIR linux-i386)
 	ENDIF(ARCH MATCHES "64$")
-	ADD_CUSTOM_TARGET(copy ALL 
+	ADD_CUSTOM_TARGET(copy ALL
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/config/config
             ${CMAKE_CURRENT_BINARY_DIR}
@@ -510,7 +518,7 @@ ELSE(Q_WS_WIN)
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/getfacl               DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setfacl               DESTINATION ${APP_DIR})
 	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png DESTINATION ${RESOURCE_DIR})
-ENDIF(Q_WS_WIN)
+ENDIF(WIN32)
 
 ADD_CUSTOM_TARGET(
 	copyright
