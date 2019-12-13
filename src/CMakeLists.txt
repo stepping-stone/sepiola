@@ -133,7 +133,7 @@ ELSE ()
 	MESSAGE(STATUS "lrelease could not be found. You're losing the localisation.")
 ENDIF ()
 
-SET(qt_translations /usr/share/qt/translations/qt_de.qm)
+SET(qt_translations /usr/share/qt5/translations/qt_de.qm)
 FOREACH(qt_translation ${qt_translations})
     GET_FILENAME_COMPONENT(qm ${qt_translation} NAME_WE)
     SET(qm "${CMAKE_CURRENT_BINARY_DIR}/${qm}.qm")
