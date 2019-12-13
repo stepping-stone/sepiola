@@ -78,18 +78,19 @@ bool initSettings(QCoreApplication *app)
     return true;
 }
 
-void messageHandler(QtMsgType type, const char *msg)
+void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
+    QByteArray localMsg = msg.toLocal8Bit();
     if (Settings::getInstance()->isLogDebugMessageEnabled()) {
         switch (type) {
         case QtDebugMsg:
         case QtWarningMsg:
-            fprintf(stdout, "%s%s", msg, Platform::EOL_CHARACTER);
+            fprintf(stdout, "%s%s", localMsg.constData(), Platform::EOL_CHARACTER);
             fflush(stdout);
             break;
         case QtCriticalMsg:
         case QtFatalMsg:
-            fprintf(stderr, "%s%s", msg, Platform::EOL_CHARACTER);
+            fprintf(stderr, "%s%s", localMsg.constData(), Platform::EOL_CHARACTER);
             fflush(stderr);
             break;
         }
@@ -253,7 +254,7 @@ int main(int argc, char *argv[])
         }
         LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(),
                                           Settings::getInstance()->getMaxLogLines());
-        qInstallMsgHandler(messageHandler);
+        qInstallMessageHandler(messageHandler);
         TestManager::run(argc, argv);
         app.exit();
         LogFileUtils::getInstance()->close();
@@ -273,7 +274,7 @@ int main(int argc, char *argv[])
         }
         LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(),
                                           Settings::getInstance()->getMaxLogLines());
-        qInstallMsgHandler(messageHandler);
+        qInstallMessageHandler(messageHandler);
         CliManager cliManager;
         cliManager.runCli(argc, argv);
         app.exit();
@@ -293,7 +294,7 @@ int main(int argc, char *argv[])
         }
         LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(),
                                           Settings::getInstance()->getMaxLogLines());
-        qInstallMsgHandler(messageHandler);
+        qInstallMessageHandler(messageHandler);
         CliManager::runSchedule();
         app.exit();
         LogFileUtils::getInstance()->close();
@@ -302,7 +303,7 @@ int main(int argc, char *argv[])
 
     // run with gui
     QApplication app(argc, argv);
-    qInstallMsgHandler(messageHandler);
+    qInstallMessageHandler(messageHandler);
     if (!initSettings(&app) || !assertCliDependencies()) {
         QMessageBox::critical(0, "Dependency missing", DEPENDENCY_MISSING);
         return -1;

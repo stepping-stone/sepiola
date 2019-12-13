@@ -16,13 +16,13 @@
 
 # Unix specific tests
 
-if(Q_WS_X11)
+if(UNIX)
 
     # TODO:
     # - remove Settings::SHOW_PROGRESS in process.cc such that we can
     #   remove settings.{cc,hh} and it's rev-deps here
 
-    qt4_wrap_cpp(
+    qt5_wrap_cpp(
         test_posix_acl_MOC test_posix_acl.hh ../tools/posix_acl.hh
         ../tools/abstract_informing_process.hh ../utils/log_file_utils.hh ../settings/settings.hh)
 
@@ -39,21 +39,19 @@ if(Q_WS_X11)
         ../model/backup_task.cc
         ../model/scheduled_task.cc)
 
-    target_link_libraries(test_posix_acl ${QT_QTTEST_LIBRARY} ${QT_QTCORE_LIBRARY}
-                          ${QT_QTNETWORK_LIBRARY})
+    target_link_libraries(test_posix_acl Qt5::Core Qt5::Widgets Qt5::Network Qt5::Test)
 
     add_test(test_posix_acl ${CMAKE_CURRENT_BINARY_DIR}/test_posix_acl)
 
-endif(Q_WS_X11)
+endif(UNIX)
 
 # All-platform tests
 
-qt4_wrap_cpp(test_host_file_utils_MOC test_host_file_utils.hh ../utils/host_file_utils.hh)
+qt5_wrap_cpp(test_host_file_utils_MOC test_host_file_utils.hh ../utils/host_file_utils.hh)
 
 add_executable(test_host_file_utils test_host_file_utils.cc ${test_host_file_utils_MOC}
                                     ../utils/host_file_utils.cc ../utils/file_system_utils.cc)
 
-target_link_libraries(test_host_file_utils ${QT_QTTEST_LIBRARY} ${QT_QTCORE_LIBRARY}
-                      ${QT_QTNETWORK_LIBRARY})
+target_link_libraries(test_host_file_utils Qt5::Core Qt5::Widgets Qt5::Network Qt5::Test)
 
 add_test(test_host_file_utils ${CMAKE_CURRENT_BINARY_DIR}/test_host_file_utils)

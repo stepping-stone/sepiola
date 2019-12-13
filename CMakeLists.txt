@@ -14,7 +14,7 @@
 #| along with this program; if not, write to the Free Software
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.12.0)
 
 # If available, enable developer warnings for the build system
 if(POLICY CMP0005)
@@ -43,8 +43,11 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)
 
-set(Qt4_FIND_REQUIRED TRUE)
-include(FindQt4)
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Network REQUIRED)
+find_package(Qt5Test REQUIRED)
+find_package(Qt5LinguistTools)
 
 # Translatable source files
 file(GLOB_RECURSE translate_files src/*.cc src/*.hh src/*.ui)
@@ -100,7 +103,7 @@ set(CPACK_SSBACKUP_APPLICATION_FULL_NAME "${SSBACKUP_APPLICATION_FULL_NAME}")
 
 target_architecture(TARGET_ARCH)
 
-if(Q_WS_WIN)
+if(WIN32)
     set(CPACK_GENERATOR "NSIS")
     if(TARGET_ARCH STREQUAL "x86_64")
         set(WINDOWS_NAME win64)
@@ -113,7 +116,7 @@ if(Q_WS_WIN)
         ${PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${WINDOWS_NAME}${CPACK_PACKAGE_FILE_NAME_SUFFIX})
     set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/installer/windows/" ${CMAKE_MODULE_PATH})
     include(CPack)
-elseif(Q_WS_MAC)
+elseif(APPLE)
     add_custom_target(
         package
         COMMAND rm -rf ${CMAKE_BINARY_DIR}/staging
@@ -123,7 +126,7 @@ elseif(Q_WS_MAC)
             hdiutil create -ov -srcfolder ${CMAKE_BINARY_DIR}/staging/${PROJECT_NAME}
             ${SSBACKUP_EXECUTABLE_NAME}-${CPACK_PACKAGE_VERSION}-Mac-universal${CPACK_PACKAGE_FILE_NAME_SUFFIX}.dmg
     )
-else(Q_WS_WIN)
+else(WIN32)
     execute_process(COMMAND arch OUTPUT_VARIABLE ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
     set(CPACK_GENERATOR "STGZ")
     set(CPACK_PACKAGE_FILE_NAME
@@ -131,4 +134,4 @@ else(Q_WS_WIN)
     )
     set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/installer/linux/" ${CMAKE_MODULE_PATH})
     include(CPack)
-endif(Q_WS_WIN)
+endif(WIN32)
