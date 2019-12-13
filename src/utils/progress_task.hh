@@ -20,6 +20,7 @@
 #define PROGRESS_TASK_HH
 
 #include <QDateTime>
+#include <QDebug>
 #include <QString>
 
 #include "test/test_manager.hh"
