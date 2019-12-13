@@ -21,6 +21,7 @@
 
 #include <QString>
 #include <QDateTime>
+#include <QDebug>
 
 #include "test/test_manager.hh"
 #include "utils/datetime_utils.hh"
