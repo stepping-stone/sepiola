@@ -78,12 +78,13 @@ bool initSettings(QCoreApplication *app)
     return true;
 }
 
-void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void messageHandler(QtMsgType type, const QMessageLogContext &, const QString &msg)
 {
     QByteArray localMsg = msg.toLocal8Bit();
     if (Settings::getInstance()->isLogDebugMessageEnabled()) {
         switch (type) {
         case QtDebugMsg:
+        case QtInfoMsg:
         case QtWarningMsg:
             fprintf(stdout, "%s%s", localMsg.constData(), Platform::EOL_CHARACTER);
             fflush(stdout);

@@ -105,7 +105,7 @@ QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> Rsync::upload(
     }
 
     if (bandwidthLimit > 0)
-        arguments << QString("--bwlimit=%1").arg(bandwidthLimit);
+		arguments << QString("--bwlimit=%1").arg(bandwidthLimit);
 
     arguments << source;
     arguments << getValidDestinationPath(destination);
@@ -319,7 +319,7 @@ QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> Rsync::upload(
     }
 
     if (bandwidthLimit > 0)
-        arguments << QString("--bwlimit=%1").arg(bandwidthLimit);
+		arguments << QString("--bwlimit=%1").arg(bandwidthLimit);
 
     arguments << source;
     arguments << getValidDestinationPath(destination);

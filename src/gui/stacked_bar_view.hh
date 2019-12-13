@@ -45,7 +45,7 @@ protected:
     bool edit(const QModelIndex &, EditTrigger, QEvent *);
 
 protected slots:
-    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
     void rowsInserted(const QModelIndex &parent, int start, int end);
     void rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
 

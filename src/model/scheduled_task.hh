@@ -38,7 +38,10 @@ public:
     ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time);
     ScheduledTask(int minutes);
 
-    ~ScheduledTask();
+    ScheduledTask();
+    ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time);
+    ScheduledTask(int minutes);
+
     ScheduleRule::ScheduleType getType() const;
     void setType(ScheduleRule::ScheduleType type);
     QSet<ScheduleRule::Weekdays> getWeekdays() const;
