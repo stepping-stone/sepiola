@@ -366,7 +366,7 @@ QList<RestoreName> MainModel::getRestoreNames(const QString &backup_prefix)
             it.next();
             backupNames << it.value();
         }
-        qSort(backupNames.begin(), backupNames.end());
+        std::sort(backupNames.begin(), backupNames.end());
         if (wasError) {
             emit showCriticalMessageBox(tr("Some restore info files could not be opened"));
         } else {

@@ -44,7 +44,7 @@ RemoteDirModel::RemoteDirModel(QStringList backupContent)
     foreach (QString rootItem, rootItems) {
         backupContent.push_front(rootItem);
     }
-    qSort(backupContent.begin(), backupContent.end(), fileLessThan);
+    std::sort(backupContent.begin(), backupContent.end(), fileLessThan);
 
     QFileIconProvider iconProvider;
     setHorizontalHeaderLabels(QStringList(QObject::tr("Name")));
@@ -113,6 +113,7 @@ QVariant RemoteDirModel::data(const QModelIndex &index, int role) const
     }
     return QStandardItemModel::data(index, role);
 }
+
 /**
  * remove all rules on children
  * if rule exists on current node: negate it

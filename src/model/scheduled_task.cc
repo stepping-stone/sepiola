@@ -143,7 +143,7 @@ QString ScheduledTask::toString() const
             QList<QDateTime> nextBackupDatesList;
             const QDateTime now = QDateTime::currentDateTime();
             const int wd_now = now.date().dayOfWeek();
-            // qStableSort(wdList.begin(), wdList.end());
+            // std::stable_sort(wdList.begin(), wdList.end());
             // QString wdStr = "";
             for (int i = 0; i < wdList.size(); i++) {
                 QDateTime nextBkup = QDateTime::currentDateTime();
@@ -157,7 +157,7 @@ QString ScheduledTask::toString() const
                 nextBackupDatesList.append(nextBkup);
             }
             // wdStr.chop(tok.length());
-            qStableSort(nextBackupDatesList.begin(), nextBackupDatesList.end());
+            std::stable_sort(nextBackupDatesList.begin(), nextBackupDatesList.end());
 
             // full info (not desired by stst
             // return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"),
@@ -167,13 +167,23 @@ QString ScheduledTask::toString() const
         } else {
             return QObject::tr("no weekdays selected");
         }
+        // wdStr.chop(tok.length());
+        qStableSort(nextBackupDatesList.begin(), nextBackupDatesList.end());
+
+        // full info (not desired by stst
+        // return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"),
+        // nextBackupDatesList.at(0).toString());
+        return QObject::tr("%1").arg(
+            nextBackupDatesList.at(0).toString("dddd,\tdd.MM.yyyy  hh:mm"));
+    }
+        else { return QObject::tr("no weekdays selected"); }
     }
 
-    case ScheduleRule::AFTER_BOOT: {
-        return QObject::tr("%1 minutes after startup").arg(this->minutesAfterStartup);
-    }
-    }
-    return QString();
+case ScheduleRule::AFTER_BOOT: {
+    return QObject::tr("%1 minutes after startup").arg(this->minutesAfterStartup);
+}
+}
+return QString();
 }
 
 bool ScheduledTask::equals(const ScheduledTask &scheduledTask) const

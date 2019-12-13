@@ -981,7 +981,7 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules(const BackupSelecti
     QStack<QPair<QString, bool>> unclosedDirs;
     QString curDir = "/";
     QList<QString> includeRulesList = includeRules.keys();
-    qSort(includeRulesList);
+    std::sort(includeRulesList.begin(), includeRulesList.end());
 
     qDebug() << "provided selection rules:";
     log->writeLog("provided selection rules:");
@@ -1055,9 +1055,8 @@ QList<QByteArray> Rsync::calculateRsyncRulesFromIncludeRules(const BackupSelecti
         filters << convertRuleToByteArray("**", false);
     }
 
-    if (files_from_list != 0) {
-        qSort((*files_from_list));
-    }
+    if (files_from_list != 0)
+        std::sort(files_from_list->begin(), files_from_list->end());
     qDebug() << "include rules for rsync:";
     log->writeLog("include rules for rsync:");
     foreach (QByteArray filter, filters) {
