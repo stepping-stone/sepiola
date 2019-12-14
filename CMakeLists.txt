@@ -48,6 +48,7 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Test REQUIRED)
 find_package(Qt5LinguistTools)
+include(QtTranslationsPath)
 
 # Translatable source files
 file(GLOB_RECURSE translate_files src/*.cc src/*.hh src/*.ui)
