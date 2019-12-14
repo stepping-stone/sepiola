@@ -13,6 +13,7 @@ addons:
   apt:
     packages:
       - qtbase5-dev
+      - qttranslations5-l10n
   coverity_scan:
     project:
       name: "stepping-stone/sepiola"
