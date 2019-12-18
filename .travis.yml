@@ -1,7 +1,15 @@
-dist: bionic
-
 language: cpp
-compiler: gcc
+
+os:
+  - linux
+  - osx
+
+dist: bionic
+osx_image: xcode11.2
+
+compiler:
+  - clang
+  - gcc
 
 env:
   global:
@@ -13,20 +21,24 @@ env:
 cache:
   directories:
   - $HOME/deps
+  - $HOME/Library/Caches/Homebrew
 
 install:
   - DEPS_DIR="${HOME}/deps"
   - mkdir -p ${DEPS_DIR} && cd "${DEPS_DIR}"
   - |
-    [ "${TRAVIS_OS_NAME}" = "linux" ] && CMAKE_ARCH="Linux-x86_64" || CMAKE_ARCH="Darwin-x86_64"
-    CMAKE_DIR="cmake-${CMAKE_VERSION}-${CMAKE_ARCH}"
-    CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION%.*}/${CMAKE_DIR}.tar.gz"
-    if [[ ! -e "${CMAKE_DIR}" ]] ; then
-      rm -rf cmake-*
-      mkdir "${CMAKE_DIR}"
-      travis_retry wget --no-check-certificate --quiet -O - "${CMAKE_URL}" | tar -xz
+    if [ "${TRAVIS_OS_NAME}" = "linux" ] ; then
+        CMAKE_ARCH="Linux-x86_64"
+        CMAKE_DIR="cmake-${CMAKE_VERSION}-${CMAKE_ARCH}"
+        CMAKE_URL="https://cmake.org/files/v${CMAKE_VERSION%.*}/${CMAKE_DIR}.tar.gz"
+        if [[ ! -e "${CMAKE_DIR}" ]] ; then
+          rm -rf cmake-*
+          mkdir "${CMAKE_DIR}"
+          travis_retry wget --no-check-certificate --quiet -O - "${CMAKE_URL}" | tar -xz
+        fi
+        export PATH="${DEPS_DIR}/${CMAKE_DIR}/bin:${PATH}"
     fi
-    export PATH="${DEPS_DIR}/${CMAKE_DIR}/bin:${DEPS_DIR}/${CMAKE_DIR}/CMake.app/Contents/bin:${PATH}"
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ] ; then export PATH="/usr/local/opt/qt5/bin:${PATH}" ; fi
   - cd ${TRAVIS_BUILD_DIR}
 
 addons:
@@ -34,6 +46,9 @@ addons:
     packages:
       - qtbase5-dev
       - qttranslations5-l10n
+  homebrew:
+    packages:
+    - qt
   coverity_scan:
     project:
       name: "stepping-stone/sepiola"
@@ -49,3 +64,9 @@ before_script:
 
 script:
   - if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then make ; fi
+
+matrix:
+  exclude:
+  # Ignore gcc on macOS since it's a symlink to clang (alternative: make cmake pick up g++ from homebrew)
+  - os: osx
+    compiler: gcc
