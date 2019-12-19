@@ -33,7 +33,7 @@ SET(RESELLER_CONFIG_FILE config/config_reseller
     CACHE PATH "Configuration file for the reseller")
 
 IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
-	ADD_DEFINITIONS(-DCMAKE_BUILD_TYPE_DEPLOY)
+    ADD_DEFINITIONS(-DCMAKE_BUILD_TYPE_DEPLOY)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
@@ -69,68 +69,68 @@ SET(CMAKE_CXX_FLAGS_DEPLOY ${CMAKE_CXX_FLAGS_RELWITHDEBUGINFO})
 
 IF(WIN32)
     include(CMakeDetermineRCCompiler)
-	# add windows icon/ressources
+    # add windows icon/ressources
         ADD_CUSTOM_COMMAND(
-		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
-		COMMAND ${CMAKE_RC_COMPILER} ${PROJECT_SOURCE_DIR}/${WINDOWS_RESSOURCE_FILE} -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o
-	)
-	SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/resource.o
+        COMMAND ${CMAKE_RC_COMPILER} ${PROJECT_SOURCE_DIR}/${WINDOWS_RESSOURCE_FILE} -o ${CMAKE_CURRENT_BINARY_DIR}/resource.o
+    )
+    SET(sepiola_RC ${sepiola_RC} ${CMAKE_CURRENT_BINARY_DIR}/resource.o)
 ENDIF(WIN32)
 
 GENERATE_QT_RESOURCE_FROM_FILES(
-	"${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
-	"/main"
-	"${PROJECT_SOURCE_DIR}/${ABOUT_IMAGE_FILE};${PROJECT_SOURCE_DIR}/${WINDOW_ICON_FILE}")
+    "${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
+    "/main"
+    "${PROJECT_SOURCE_DIR}/${ABOUT_IMAGE_FILE};${PROJECT_SOURCE_DIR}/${WINDOW_ICON_FILE}")
 
 IF(WIN32)
     SET(OS_HEADER_DIRECTORIES /usr/local/inc/win2003/)
 ENDIF(WIN32)
 
 INCLUDE_DIRECTORIES(
-	.
-	${CMAKE_CURRENT_BINARY_DIR}
-	${OS_HEADER_DIRECTORIES}
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${OS_HEADER_DIRECTORIES}
 )
 
 INCLUDE_DIRECTORIES(SYSTEM
-	${OS_HEADER_DIRECTORIES}
+    ${OS_HEADER_DIRECTORIES}
 )
 
 FIND_PROGRAM(QT_LUPDATE
-	NAMES lupdate-qt5 lupdate
-	PATHS $ENV{QTDIR}/bin
-	DOC "Path to the lupdate program"
+    NAMES lupdate-qt5 lupdate
+    PATHS $ENV{QTDIR}/bin
+    DOC "Path to the lupdate program"
 )
 
 SET(translation_sources ${translation_sources} i18n/app_de.ts)
 
 # Update translations (note that lupdate target write to source directory)
 IF(QT_LUPDATE)
-	# Update all translations and remove obsolete strings
-	ADD_CUSTOM_TARGET(
-		lupdate
-		${QT_LUPDATE} -noobsolete ${translate_files} -ts ${translation_sources}
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-	)
+    # Update all translations and remove obsolete strings
+    ADD_CUSTOM_TARGET(
+        lupdate
+        ${QT_LUPDATE} -noobsolete ${translate_files} -ts ${translation_sources}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    )
 
-	# Create template.ts to be used for new translations
-	ADD_CUSTOM_COMMAND(OUTPUT template.ts
-		COMMAND ${QT_LUPDATE} -noobsolete ${translate_files} -ts template.ts
-		DEPENDS ${translate_files}
-	)
-	ADD_CUSTOM_TARGET(create-ts-template DEPENDS template.ts)
+    # Create template.ts to be used for new translations
+    ADD_CUSTOM_COMMAND(OUTPUT template.ts
+        COMMAND ${QT_LUPDATE} -noobsolete ${translate_files} -ts template.ts
+        DEPENDS ${translate_files}
+    )
+    ADD_CUSTOM_TARGET(create-ts-template DEPENDS template.ts)
 ELSE(QT_LUPDATE)
-	MESSAGE(STATUS "lupdate could not be found. You will not be able to update the translations.")
+    MESSAGE(STATUS "lupdate could not be found. You will not be able to update the translations.")
 ENDIF(QT_LUPDATE)
 
 # Build translations
 IF (Qt5LinguistTools_FOUND)
     qt5_create_translation(translation_binaries ${CMAKE_SOURCE_DIR} ${translation_sources})
 
-	# Finish off with a command that builds *.qm
+    # Finish off with a command that builds *.qm
     ADD_CUSTOM_TARGET(lrelease ALL DEPENDS ${QM_FILES})
 ELSE ()
-	MESSAGE(STATUS "lrelease could not be found. You're losing the localisation.")
+    MESSAGE(STATUS "lrelease could not be found. You're losing the localisation.")
 ENDIF ()
 
 SET(qt_translations "${QT_TRANSLATIONS_PATH}/qt_de.qm")
@@ -157,112 +157,112 @@ ENDIF (NOT PORTABLE_INSTALLATION)
 CONFIGURE_FILE(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 QT5_WRAP_CPP(
-	sepiola_base_MOC
-	tools/abstract_informing_process.hh
-	tools/abstract_rsync.hh
-	tools/abstract_scheduler.hh
-	tools/abstract_snapshot.hh
-	tools/dummy_snapshot.hh
-	tools/filesystem_snapshot.hh
-	tools/rsync.hh
-	settings/settings.hh
-	utils/log_file_utils.hh
+    sepiola_base_MOC
+    tools/abstract_informing_process.hh
+    tools/abstract_rsync.hh
+    tools/abstract_scheduler.hh
+    tools/abstract_snapshot.hh
+    tools/dummy_snapshot.hh
+    tools/filesystem_snapshot.hh
+    tools/rsync.hh
+    settings/settings.hh
+    utils/log_file_utils.hh
         utils/single_application_guard.hh
-	model/backup_thread.hh
-	model/main_model.hh
-	model/restore_thread.hh
-	model/space_usage_model.hh
+    model/backup_thread.hh
+    model/main_model.hh
+    model/restore_thread.hh
+    model/space_usage_model.hh
 )
 
 QT5_WRAP_CPP(
-	sepiola_ui_MOC
-	cli/cli_manager.hh
-	gui/about_dialog.hh
-	gui/backup_form.hh
-	gui/logfile_form.hh
-	gui/main_window.hh
-	gui/overview_form.hh
-	gui/restore_form.hh
-	gui/settings_form.hh
-	gui/text_input_dialog.hh
-	gui/password_dialog.hh
-	gui/pattern_dialog.hh
-	gui/output_dialog.hh
-	gui/traffic_progress_dialog.hh
-	gui/stacked_bar_view.hh
+    sepiola_ui_MOC
+    cli/cli_manager.hh
+    gui/about_dialog.hh
+    gui/backup_form.hh
+    gui/logfile_form.hh
+    gui/main_window.hh
+    gui/overview_form.hh
+    gui/restore_form.hh
+    gui/settings_form.hh
+    gui/text_input_dialog.hh
+    gui/password_dialog.hh
+    gui/pattern_dialog.hh
+    gui/output_dialog.hh
+    gui/traffic_progress_dialog.hh
+    gui/stacked_bar_view.hh
 )
 
 QT5_WRAP_UI(
-	sepiola_UI
-	gui/about_dialog.ui
-	gui/backup_form.ui
-	gui/logfile_form.ui
-	gui/main_window.ui
-	gui/overview_form.ui
-	gui/restore_form.ui
-	gui/settings_form.ui
-	gui/text_input_dialog.ui
-	gui/password_dialog.ui
-	gui/pattern_dialog.ui
-	gui/output_dialog.ui
-	gui/traffic_progress_dialog.ui
+    sepiola_UI
+    gui/about_dialog.ui
+    gui/backup_form.ui
+    gui/logfile_form.ui
+    gui/main_window.ui
+    gui/overview_form.ui
+    gui/restore_form.ui
+    gui/settings_form.ui
+    gui/text_input_dialog.ui
+    gui/password_dialog.ui
+    gui/pattern_dialog.ui
+    gui/output_dialog.ui
+    gui/traffic_progress_dialog.ui
 )
 
 QT5_ADD_RESOURCES(
-	sepiola_RC
-	gui/resources/screen.qrc
-	"${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
+    sepiola_RC
+    gui/resources/screen.qrc
+    "${CMAKE_CURRENT_BINARY_DIR}/logos_images.qrc"
 )
 
 SET(BASE_SOURCE_FILES
-	settings/settings.cc
-	tools/plink.cc
-	tools/process.cc
-	tools/rsync.cc
-	tools/dummy_snapshot.cc
-	tools/filesystem_snapshot.cc
-	tools/filesystem_snapshot_path_mapper.cc
-	tools/tool_factory.cc
-	utils/string_utils.cc
-	utils/extended_file.cc
-	utils/file_system_utils.cc
-	utils/log_file_utils.cc
-	utils/host_file_utils.cc
-	utils/progress_task.cc
+    settings/settings.cc
+    tools/plink.cc
+    tools/process.cc
+    tools/rsync.cc
+    tools/dummy_snapshot.cc
+    tools/filesystem_snapshot.cc
+    tools/filesystem_snapshot_path_mapper.cc
+    tools/tool_factory.cc
+    utils/string_utils.cc
+    utils/extended_file.cc
+    utils/file_system_utils.cc
+    utils/log_file_utils.cc
+    utils/host_file_utils.cc
+    utils/progress_task.cc
         utils/single_application_guard.cc
-	model/backup_thread.cc
-	model/dir_tree_item.cc
-	model/main_model.cc
-	model/restore_name.cc
-	model/restore_thread.cc
-	model/remote_dir_model.cc
-	model/local_dir_model.cc
-	model/scheduled_task.cc
-	model/backup_task.cc
-	model/space_usage_model.cc
-	${sepiola_base_MOC}
+    model/backup_thread.cc
+    model/dir_tree_item.cc
+    model/main_model.cc
+    model/restore_name.cc
+    model/restore_thread.cc
+    model/remote_dir_model.cc
+    model/local_dir_model.cc
+    model/scheduled_task.cc
+    model/backup_task.cc
+    model/space_usage_model.cc
+    ${sepiola_base_MOC}
 )
 
 SET(UI_SOURCE_FILES
-	main.cc
-	cli/cli_manager.cc
-	gui/about_dialog.cc
-	gui/backup_form.cc
-	gui/logfile_form.cc
-	gui/main_window.cc
-	gui/overview_form.cc
-	gui/traffic_progress_dialog.cc
-	gui/output_dialog.cc
-	gui/password_dialog.cc
-	gui/pattern_dialog.cc
-	gui/restore_form.cc
-	gui/settings_form.cc
-	gui/text_input_dialog.cc
-	gui/stacked_bar_view.cc
-	test/test_manager.cc
-	${sepiola_UI}
-	${sepiola_ui_MOC}
-	${sepiola_CFG}
+    main.cc
+    cli/cli_manager.cc
+    gui/about_dialog.cc
+    gui/backup_form.cc
+    gui/logfile_form.cc
+    gui/main_window.cc
+    gui/overview_form.cc
+    gui/traffic_progress_dialog.cc
+    gui/output_dialog.cc
+    gui/password_dialog.cc
+    gui/pattern_dialog.cc
+    gui/restore_form.cc
+    gui/settings_form.cc
+    gui/text_input_dialog.cc
+    gui/stacked_bar_view.cc
+    test/test_manager.cc
+    ${sepiola_UI}
+    ${sepiola_ui_MOC}
+    ${sepiola_CFG}
 )
 
 # Use WIN32 from Qt-module instead of WIN32 from cmake
@@ -283,7 +283,7 @@ IF(WIN32)
     )
 ELSEIF(APPLE)
     LIST(APPEND BASE_SOURCE_FILES
-	    tools/unix_permissions.cc
+        tools/unix_permissions.cc
     )
 ELSEIF(UNIX)
     LIST(APPEND BASE_SOURCE_FILES
@@ -332,55 +332,55 @@ TARGET_COMPILE_OPTIONS(sepiola_ui_objects PRIVATE
     )
 
 ADD_EXECUTABLE(
-	${SSBACKUP_EXECUTABLE_NAME}
-	WIN32
-	MACOSX_BUNDLE
-	$<TARGET_OBJECTS:sepiola_base_objects>
-	$<TARGET_OBJECTS:sepiola_ui_objects>
-	${sepiola_RC}
+    ${SSBACKUP_EXECUTABLE_NAME}
+    WIN32
+    MACOSX_BUNDLE
+    $<TARGET_OBJECTS:sepiola_base_objects>
+    $<TARGET_OBJECTS:sepiola_ui_objects>
+    ${sepiola_RC}
 )
 
 IF(WIN32)
-	ADD_EXECUTABLE(
-		${SSBACKUP_EXECUTABLE_NAME}.com
-		$<TARGET_OBJECTS:sepiola_base_objects>
-		$<TARGET_OBJECTS:sepiola_ui_objects>
-		${sepiola_RC}
-	)
-	SET_TARGET_PROPERTIES(${SSBACKUP_EXECUTABLE_NAME}.com PROPERTIES SUFFIX "")  # don't add .exe suffix
+    ADD_EXECUTABLE(
+        ${SSBACKUP_EXECUTABLE_NAME}.com
+        $<TARGET_OBJECTS:sepiola_base_objects>
+        $<TARGET_OBJECTS:sepiola_ui_objects>
+        ${sepiola_RC}
+    )
+    SET_TARGET_PROPERTIES(${SSBACKUP_EXECUTABLE_NAME}.com PROPERTIES SUFFIX "")  # don't add .exe suffix
 
-	# for second binary
-	TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
-	TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com debug Qt5::Core Qt5::Widgets Qt5::Network)
+    # for second binary
+    TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
+    TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com debug Qt5::Core Qt5::Widgets Qt5::Network)
 ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
 TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} debug Qt5::Core Qt5::Widgets Qt5::Network)
 
 IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
-	IF(WIN32)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ole32 oleaut32 uuid winspool)
-		# for second binary
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com ole32 oleaut32 uuid winspool gdi32 comdlg32)
-	ELSEIF(APPLE)
-		SET(CMAKE_CXX_FLAGS_DEPLOY "${CMAKE_CXX_FLAGS_DEPLOY} -mmacosx-version-min=10.3 -arch ppc -arch i386")
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} "-framework AppKit" iconv System)
-	ELSE(WIN32)
-		SET(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -static-libstdc++ -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
-		TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} SM ICE Xi Xext X11 rt m fontconfig)
-	ENDIF(WIN32)
+    IF(WIN32)
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ole32 oleaut32 uuid winspool)
+        # for second binary
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com ole32 oleaut32 uuid winspool gdi32 comdlg32)
+    ELSEIF(APPLE)
+        SET(CMAKE_CXX_FLAGS_DEPLOY "${CMAKE_CXX_FLAGS_DEPLOY} -mmacosx-version-min=10.3 -arch ppc -arch i386")
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} "-framework AppKit" iconv System)
+    ELSE(WIN32)
+        SET(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -static-libstdc++ -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
+        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} SM ICE Xi Xext X11 rt m fontconfig)
+    ENDIF(WIN32)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 
 SET(APP_DIR bin)
 SET(RESOURCE_DIR resource)
 IF(APPLE)
-	SET(APP_DIR ${PROJECT_NAME})
+    SET(APP_DIR ${PROJECT_NAME})
 ENDIF(APPLE)
 
 INSTALL(TARGETS ${SSBACKUP_EXECUTABLE_NAME}
@@ -389,97 +389,98 @@ INSTALL(TARGETS ${SSBACKUP_EXECUTABLE_NAME}
     )
 # for second binary
 IF(WIN32)
-	INSTALL(TARGETS ${SSBACKUP_EXECUTABLE_NAME}.com RUNTIME DESTINATION ${APP_DIR})
+    INSTALL(TARGETS ${SSBACKUP_EXECUTABLE_NAME}.com RUNTIME DESTINATION ${APP_DIR})
 ENDIF(WIN32)
 
 
 IF(WIN32)
-	FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink-*)
-	FILE(GLOB SETACL_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/setacl-*)
-	ADD_CUSTOM_TARGET(copy ALL
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PLINK_BIN} ${CMAKE_CURRENT_BINARY_DIR}/plink.exe
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SETACL_BIN} ${CMAKE_CURRENT_BINARY_DIR}/setacl.exe
-	)
+    FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink-*)
+    FILE(GLOB SETACL_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/setacl-*)
+    ADD_CUSTOM_TARGET(copy ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config ${CMAKE_CURRENT_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PLINK_BIN} ${CMAKE_CURRENT_BINARY_DIR}/plink.exe
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${SETACL_BIN} ${CMAKE_CURRENT_BINARY_DIR}/setacl.exe
+    )
 
-	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
+    INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
     IF(DEFINED RESELLER)
         INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR})
-	    ADD_CUSTOM_TARGET(copy_reseller ALL
-		    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ADD_CUSTOM_TARGET(copy_reseller ALL
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE}
             ${CMAKE_CURRENT_BINARY_DIR})
-	ENDIF(DEFINED RESELLER)
-	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
+    ENDIF(DEFINED RESELLER)
+    INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
 
-	INSTALL(PROGRAMS
-			${CMAKE_CURRENT_BINARY_DIR}/plink.exe
-			${CMAKE_CURRENT_BINARY_DIR}/setacl.exe
-			DESTINATION ${APP_DIR}
-		)
+    INSTALL(PROGRAMS
+            ${CMAKE_CURRENT_BINARY_DIR}/plink.exe
+            ${CMAKE_CURRENT_BINARY_DIR}/setacl.exe
+            DESTINATION ${APP_DIR}
+        )
 ELSEIF(APPLE)
-	ADD_CUSTOM_TARGET(copy ALL
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ADD_CUSTOM_TARGET(copy ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/config/config
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/mac-universal/plink-*
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/mac-universal/ssh-*
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/mac-universal/rsync-*
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${translation_binaries}
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/${MACOSX_ICON_FILE}
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/Resources/icon.icns
-	)
+        DEPENDS ${translation_binaries}
+    )
 
 
-	# work around cmake bug
-	IF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
-		SET_TARGET_PROPERTIES(${SSBACKUP_EXECUTABLE_NAME} PROPERTIES LINK_FLAGS "-framework QtGui")
-	ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
+    # work around cmake bug
+    IF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
+        SET_TARGET_PROPERTIES(${SSBACKUP_EXECUTABLE_NAME} PROPERTIES LINK_FLAGS "-framework QtGui")
+    ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
 
-	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+    INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
     IF(DEFINED RESELLER)
-		INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
-	    ADD_CUSTOM_TARGET(copy_reseller ALL
-		    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+        ADD_CUSTOM_TARGET(copy_reseller ALL
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE}
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
     ENDIF(DEFINED RESELLER)
 
-	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+    INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/plink DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/ssh DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS/rsync DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
 ELSE(WIN32)
-	EXECUTE_PROCESS(COMMAND arch OUTPUT_VARIABLE ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
-	IF(ARCH MATCHES "64$")
-		SET(LINUX_DIR linux-x86_64)
-	ELSE(ARCH MATCHES "64$")
-		SET(LINUX_DIR linux-i386)
-	ENDIF(ARCH MATCHES "64$")
-	ADD_CUSTOM_TARGET(copy ALL
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    EXECUTE_PROCESS(COMMAND arch OUTPUT_VARIABLE ARCH OUTPUT_STRIP_TRAILING_WHITESPACE)
+    IF(ARCH MATCHES "64$")
+        SET(LINUX_DIR linux-x86_64)
+    ELSE(ARCH MATCHES "64$")
+        SET(LINUX_DIR linux-i386)
+    ENDIF(ARCH MATCHES "64$")
+    ADD_CUSTOM_TARGET(copy ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/config/config
             ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/plink-*
             ${CMAKE_CURRENT_BINARY_DIR}/plink
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/plink
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/plink
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/ssh-*
             ${CMAKE_CURRENT_BINARY_DIR}/ssh
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/ssh
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/ssh
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/libcrypto.so.1.0.1e
             ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e
@@ -489,42 +490,42 @@ ELSE(WIN32)
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync-*
             ${CMAKE_CURRENT_BINARY_DIR}/rsync
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/rsync
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/rsync
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/getfacl-*
             ${CMAKE_CURRENT_BINARY_DIR}/getfacl
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/getfacl
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/getfacl
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/setfacl-*
             ${CMAKE_CURRENT_BINARY_DIR}/setfacl
-		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/setfacl
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/setfacl
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/${LINUX_ICON_FILE}
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png
-	)
+    )
 
-	INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
+    INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
     IF(DEFINED RESELLER)
-		INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR})
-	    ADD_CUSTOM_TARGET(copy_reseller ALL
-		    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        INSTALL(FILES ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE} DESTINATION ${APP_DIR})
+        ADD_CUSTOM_TARGET(copy_reseller ALL
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/${RESELLER_CONFIG_FILE}
             ${CMAKE_CURRENT_BINARY_DIR}
             VERBATIM)
     ENDIF(DEFINED RESELLER)
-	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/plink                 DESTINATION ${APP_DIR})
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ssh                   DESTINATION ${APP_DIR})
+    INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/plink                 DESTINATION ${APP_DIR})
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ssh                   DESTINATION ${APP_DIR})
         INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e   DESTINATION ${APP_DIR})
         INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.10       DESTINATION ${APP_DIR})
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/rsync                 DESTINATION ${APP_DIR})
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/getfacl               DESTINATION ${APP_DIR})
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setfacl               DESTINATION ${APP_DIR})
-	INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png DESTINATION ${RESOURCE_DIR})
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/rsync                 DESTINATION ${APP_DIR})
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/getfacl               DESTINATION ${APP_DIR})
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setfacl               DESTINATION ${APP_DIR})
+    INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png DESTINATION ${RESOURCE_DIR})
 ENDIF(WIN32)
 
 ADD_CUSTOM_TARGET(
-	copyright
+    copyright
 )
 
 ADD_SUBDIRECTORY(test)
