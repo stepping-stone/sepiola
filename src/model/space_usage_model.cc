@@ -11,7 +11,7 @@
 
 #include <QtGui/QColor>
 
-SpaceUsageModel::SpaceUsageModel(QObject* p = 0) :
+SpaceUsageModel::SpaceUsageModel(QObject* p) :
     QAbstractTableModel(p),
     _spaceUsage(0, 0, 0, 0)
 {
@@ -76,18 +76,18 @@ bool SpaceUsageModel::setData(const QModelIndex & index, const QVariant & value,
 
     return true;
 }
-    
+
 void SpaceUsageModel::setSpaceUsage(const SpaceUsageData& spaceUsage)
 {
     _spaceUsage = spaceUsage;
     emit(dataChanged(index(0, 0), index(std::tuple_size<SpaceUsageData>::value, 0)));
 }
-    
+
 void SpaceUsageModel::setSpaceUsage(double backup, double incremental, double free, double quota)
 {
     setSpaceUsage(std::tie(backup, incremental, free, quota));
 }
-    
+
 SpaceUsageModel::SpaceUsageData SpaceUsageModel::getSpaceUsage() const
 {
     return _spaceUsage;

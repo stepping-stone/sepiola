@@ -26,7 +26,7 @@ public:
 
     /** Construct a model with all space usage values set to 0
      */
-    SpaceUsageModel(QObject* p);
+    SpaceUsageModel(QObject* p = nullptr);
 
     /** Set the space usage data using the custom type.
      */
