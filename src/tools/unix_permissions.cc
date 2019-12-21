@@ -28,15 +28,7 @@
 #include "utils/extended_file.hh"
 #include "utils/unicode_text_stream.hh"
 
-UnixPermissions::UnixPermissions()
-{
-}
-
-UnixPermissions::~UnixPermissions()
-{
-}
-
-QString UnixPermissions::getMetadata(const QString& metadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
+QString UnixPermissions::getMetadata(const QString& metadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, const FilesystemSnapshot*, QString*)
 {
 	qDebug() << "UnixPermissions::getMetadata( processedItems )";
 
