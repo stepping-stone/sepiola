@@ -43,8 +43,7 @@ if(CMAKE_BUILD_TYPE STREQUAL Deploy)
 endif(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-    # The GCC on Travis CI does not support -std=c++11 yet
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized -Winit-self")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wstrict-null-sentinel")
@@ -52,7 +51,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     #    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wshadow")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal -Wno-long-long")
-else(CMAKE_COMPILER_IS_GNUCXX)
+else()
     # on Clang we have one flag to rule them all: -Weverything (includes all
     # warnings, including the ones enabled with -pedantic)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Weverything")
@@ -64,7 +63,7 @@ else(CMAKE_COMPILER_IS_GNUCXX)
     # disable warnings about C++98 incompatibility since we require C++11
     # from now on anyway
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
-endif(CMAKE_COMPILER_IS_GNUCXX)
+endif()
 
 # The following works on GNU C++ and LLVM only, but those are the only ones we
 # currently support anyway (C++ native, MinGW C++ for win32 and LLVM on OSX)
@@ -276,7 +275,7 @@ if(WIN32)
         tools/optionalSnapshot.cc
         ${sepiola_win_MOC})
 elseif(APPLE)
-    list(APPEND BASE_SOURCE_FILES tools/unix_permissions.cc)
+    list(APPEND BASE_SOURCE_FILES tools/crontab.cc tools/unix_permissions.cc)
 elseif(UNIX)
     list(APPEND BASE_SOURCE_FILES tools/crontab.cc tools/posix_acl.cc)
 endif(WIN32)
@@ -341,10 +340,8 @@ target_link_libraries(${SSBACKUP_EXECUTABLE_NAME} debug Qt5::Core Qt5::Widgets Q
 
 if(CMAKE_BUILD_TYPE STREQUAL Deploy)
     if(WIN32)
-        target_link_libraries(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
         target_link_libraries(${SSBACKUP_EXECUTABLE_NAME} ole32 oleaut32 uuid winspool)
         # for second binary
-        target_link_libraries(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
         target_link_libraries(
             ${SSBACKUP_EXECUTABLE_NAME}.com
             ole32
@@ -356,7 +353,6 @@ if(CMAKE_BUILD_TYPE STREQUAL Deploy)
     elseif(APPLE)
         set(CMAKE_CXX_FLAGS_DEPLOY
             "${CMAKE_CXX_FLAGS_DEPLOY} -mmacosx-version-min=10.3 -arch ppc -arch i386")
-        target_link_libraries(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
         target_link_libraries(${SSBACKUP_EXECUTABLE_NAME} "-framework AppKit" iconv System)
     else(WIN32)
         set(CMAKE_CXX_LINK_EXECUTABLE
@@ -376,7 +372,6 @@ if(CMAKE_BUILD_TYPE STREQUAL Deploy)
             expat
             stdc++
             -Wl,-Bdynamic)
-        target_link_libraries(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
         target_link_libraries(
             ${SSBACKUP_EXECUTABLE_NAME}
             SM
@@ -461,11 +456,6 @@ elseif(APPLE)
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/Resources/icon.icns
         DEPENDS ${translation_binaries})
 
-    # work around cmake bug
-    if(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
-        set_target_properties(${SSBACKUP_EXECUTABLE_NAME} PROPERTIES LINK_FLAGS "-framework QtGui")
-    endif(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
-
     install(FILES ${PROJECT_SOURCE_DIR}/config/config
             DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
     if(DEFINED RESELLER)
@@ -500,8 +490,6 @@ else(WIN32)
     endif(ARCH MATCHES "64$")
     add_custom_target(
         copy ALL
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config
-                ${CMAKE_CURRENT_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/plink-* ${CMAKE_CURRENT_BINARY_DIR}/plink
         COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/plink
