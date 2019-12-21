@@ -36,9 +36,8 @@ IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
     ADD_DEFINITIONS(-DCMAKE_BUILD_TYPE_DEPLOY)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
 
-IF(CMAKE_COMPILER_IS_GNUCXX)
-    # The GCC on Travis CI does not support -std=c++11 yet
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+IF (CMAKE_COMPILER_IS_GNUCXX)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized -Winit-self")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls -Wstrict-null-sentinel")
@@ -46,7 +45,7 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
     #    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wshadow")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Woverloaded-virtual")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal -Wno-long-long")
-ELSE(CMAKE_COMPILER_IS_GNUCXX)
+ELSE ()
     # on Clang we have one flag to rule them all: -Weverything (includes all
     # warnings, including the ones enabled with -pedantic)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Weverything")
@@ -58,7 +57,7 @@ ELSE(CMAKE_COMPILER_IS_GNUCXX)
     # disable warnings about C++98 incompatibility since we require C++11
     # from now on anyway
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-c++98-compat")
-ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+ENDIF ()
 
 # The following works on GNU C++ and LLVM only, but those are the only ones we
 # currently support anyway (C++ native, MinGW C++ for win32 and LLVM on OSX)
@@ -283,6 +282,7 @@ IF(WIN32)
     )
 ELSEIF(APPLE)
     LIST(APPEND BASE_SOURCE_FILES
+        tools/crontab.cc
         tools/unix_permissions.cc
     )
 ELSEIF(UNIX)
@@ -359,19 +359,15 @@ TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} debug Qt5::Core Qt5::Widgets Q
 
 IF(CMAKE_BUILD_TYPE STREQUAL Deploy)
     IF(WIN32)
-        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
         TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} ole32 oleaut32 uuid winspool)
         # for second binary
-        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com Qt5::Core Qt5::Widgets Qt5::Network)
         TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME}.com ole32 oleaut32 uuid winspool gdi32 comdlg32)
     ELSEIF(APPLE)
         SET(CMAKE_CXX_FLAGS_DEPLOY "${CMAKE_CXX_FLAGS_DEPLOY} -mmacosx-version-min=10.3 -arch ppc -arch i386")
-        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
         TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} "-framework AppKit" iconv System)
     ELSE(WIN32)
         SET(CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
         TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} -static-libgcc -static-libstdc++ -Wl,-Bstatic Xfixes Xrender Xrandr Xcursor Xinerama freetype expat stdc++ -Wl,-Bdynamic)
-        TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} Qt5::Core Qt5::Widgets Qt5::Network)
         TARGET_LINK_LIBRARIES(${SSBACKUP_EXECUTABLE_NAME} SM ICE Xi Xext X11 rt m fontconfig)
     ENDIF(WIN32)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Deploy)
@@ -442,12 +438,6 @@ ELSEIF(APPLE)
             ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/Resources/icon.icns
         DEPENDS ${translation_binaries}
     )
-
-
-    # work around cmake bug
-    IF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
-        SET_TARGET_PROPERTIES(${SSBACKUP_EXECUTABLE_NAME} PROPERTIES LINK_FLAGS "-framework QtGui")
-    ENDIF(NOT CMAKE_BUILD_TYPE STREQUAL Deploy)
 
     INSTALL(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR}/${SSBACKUP_EXECUTABLE_NAME}.app/Contents/MacOS)
     IF(DEFINED RESELLER)
