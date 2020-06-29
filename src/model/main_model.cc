@@ -192,11 +192,11 @@ void MainModel::backup( const BackupSelectionHash& includeRules, const bool& sta
 	// uploadFiles slot so as soon as the snapshot is finished, the files can
 	// be uploaded
 	QObject::connect( this->fsSnapshot, SIGNAL( sendSnapshotDone(int) ),
-	                   this, SLOT( uploadFiles( int ) ) );
+			this, SLOT( uploadFiles( int ) ) );
 
 	// Connect the info and error signals to the info and error slot
-    QObject::connect( this->fsSnapshot, SIGNAL( infoSignal(const QString&) ),
-                       this, SLOT( infoSlot(const QString&) ) );
+	QObject::connect( this->fsSnapshot, SIGNAL( infoSignal(const QString&) ),
+			this, SLOT( infoSlot(const QString&) ) );
 
 	// Start the fs snapshot
 	this->fsSnapshot->doSnapshot();
@@ -581,6 +581,11 @@ void MainModel::uploadFiles( int result )
         emit backupFinished();
         return;
     }
+    // Cleanup snapshot signals
+    QObject::disconnect( this->fsSnapshot, SIGNAL( infoSignal(const QString&) ),
+		    this, SLOT( infoSlot(const QString&) ) );
+    QObject::disconnect( this->fsSnapshot, SIGNAL( sendSnapshotDone(int) ),
+		    this, SLOT( uploadFiles( int ) ) );
 
     QObject::connect( backupThread, SIGNAL( backupFinished() ),
                       this, SIGNAL( backupFinished() ) );

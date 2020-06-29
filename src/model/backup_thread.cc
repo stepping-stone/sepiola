@@ -119,6 +119,7 @@ BackupThread::~BackupThread()
 						 this, SLOT( rsyncUploadProgressHandler( const QString&, float, quint64, quint64 ) ) );
 	QObject::disconnect( this, SIGNAL( abort_rsync() ),
 							 rsync.get(), SLOT( abort() ) );
+	QObject::disconnect( this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
 void BackupThread::startInCurrentThread()
