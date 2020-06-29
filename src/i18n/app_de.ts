@@ -539,10 +539,6 @@ Version %2</source>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="345"/>
-        <source>About</source>
-        <translation>Info</translation>
-    </message>
-    <message>
         <location filename="../gui/main_window.ui" line="348"/>
         <location filename="../gui/main_window.ui" line="351"/>
         <source>About</source>
@@ -753,6 +749,7 @@ Next Backup</source>
     <name>PatternDialog</name>
     <message>
         <location filename="../gui/pattern_dialog.cc" line="70"/>
+        <location filename="../gui/pattern_dialog.ui" line="29"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
@@ -772,17 +769,13 @@ Next Backup</source>
         <translation>Beschriftung</translation>
     </message>
     <message>
-        <location filename="../gui/pattern_dialog.ui" line="29"/>
-        <source>Add</source>
-        <translation>Hinzufügen</translation>
-    </message>
-    <message>
         <location filename="../gui/pattern_dialog.ui" line="43"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
     <message>
         <location filename="../gui/pattern_dialog.cc" line="84"/>
+        <location filename="../gui/pattern_dialog.ui" line="36"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
@@ -790,11 +783,6 @@ Next Backup</source>
         <location filename="../gui/pattern_dialog.cc" line="84"/>
         <source>Edit %1 pattern</source>
         <translation>Verzeichnis %1 bearbeiten</translation>
-    </message>
-    <message>
-        <location filename="../gui/pattern_dialog.ui" line="36"/>
-        <source>Edit</source>
-        <translation>Bearbeiten</translation>
     </message>
 </context>
 <context>
@@ -1524,6 +1512,7 @@ p, li { white-space: pre-wrap; }
     <name>TrafficProgressDialog</name>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="105"/>
+        <location filename="../gui/traffic_progress_dialog.ui" line="435"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -1602,11 +1591,6 @@ p, li { white-space: pre-wrap; }
         <location filename="../gui/traffic_progress_dialog.ui" line="425"/>
         <source>Pause</source>
         <translation>Pause</translation>
-    </message>
-    <message>
-        <location filename="../gui/traffic_progress_dialog.ui" line="435"/>
-        <source>Cancel</source>
-        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="445"/>
