@@ -28,6 +28,7 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 	setupUi( this );
 	this->model = model;
 	// Change the labels of accept and reject buttons to 'Save' and 'Discard'
+	// and disable both until the form has been changed
 	QList<QAbstractButton*> buttons = this->buttonBox->buttons();
 	foreach( QAbstractButton* button, buttons )
 	{
@@ -35,12 +36,15 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 		{
 			case QDialogButtonBox::AcceptRole:
 				button->setText( tr( "Save" ) );
+				button->setDisabled( true );
 				break;
 			case QDialogButtonBox::RejectRole:
 				button->setText( tr( "Discard" ) );
+				button->setDisabled( true );
 				break;
 			default:
 				qWarning() << "Found unexpected button";
+				break;
 		}
 	}
 	Settings* settings = Settings::getInstance();
@@ -87,7 +91,7 @@ void SettingsForm::reload()
 	this->checkBoxShowHiddenFiles->setChecked( settings->getShowHiddenFilesAndFolders() );
 	this->checkBoxKeepDeletedFiles->setChecked( !settings->getDeleteExtraneousItems() );
 	this->checkBoxVerboseLogging->setChecked( settings->getLogDebugMessages() );
-    this->checkBoxUseShadowCopy->setChecked( settings->getDoSnapshot() );
+	this->checkBoxUseShadowCopy->setChecked( settings->getDoSnapshot() );
 	this->spinBoxBandwidthLimit->setValue( settings->getBandwidthLimit() );
 
 	this->comboBoxLanguage->clear();
@@ -95,46 +99,40 @@ void SettingsForm::reload()
 		this->comboBoxLanguage->addItem( language.first, language.second );
 
 	this->comboBoxLanguage->setCurrentIndex( this->comboBoxLanguage->findData(settings->getLanguage()) );
-	formChanged = false;
+	onFormChange();
 }
 
 void SettingsForm::save()
 {
-	if ( formChanged )
-	{
-		Settings* settings = Settings::getInstance();
-		settings->saveServerUserName( this->lineEditUsername->text() );
-		settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );
-		settings->saveLanguage( this->comboBoxLanguage->itemData(this->comboBoxLanguage->currentIndex()).toString() );
-		settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
-		settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
-		settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
-		settings->saveLogDebugMessages( this->checkBoxVerboseLogging->isChecked() );
+	Settings* settings = Settings::getInstance();
+	settings->saveServerUserName( this->lineEditUsername->text() );
+	settings->saveBackupPrefix( this->lineEditBackupPrefix->text() );
+	settings->saveLanguage( this->comboBoxLanguage->itemData(this->comboBoxLanguage->currentIndex()).toString() );
+	settings->saveNOfLastBackups( this->spinBoxNOfShownLastBackups->value() );
+	settings->saveShowHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
+	settings->saveDeleteExtraneousItems( !this->checkBoxKeepDeletedFiles->isChecked() );
+	settings->saveLogDebugMessages( this->checkBoxVerboseLogging->isChecked() );
         settings->saveDoSnapshot( this->checkBoxUseShadowCopy->isChecked() );
-		settings->saveBandwidthLimit( this->spinBoxBandwidthLimit->value() );
+	settings->saveBandwidthLimit( this->spinBoxBandwidthLimit->value() );
 
-		QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
-		emit updateOverviewFormLastBackupsInfo();
-		emit showHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
-		formChanged = false;
-	}
+	QMessageBox::information( this, tr( "Settings saved" ), tr( "Settings have been saved." ) );
+	emit updateOverviewFormLastBackupsInfo();
+	emit showHiddenFilesAndFolders( this->checkBoxShowHiddenFiles->isChecked() );
+	onFormChange();
 }
 
 void SettingsForm::reset()
 {
 	qDebug() << "SettingsForm::reset()";
-	if ( formChanged )
+	int answer = QMessageBox::warning( this, tr( "Unsaved settings" ), tr( "Your settings have been modified.\n" "Do you want to restore your previous settings?" ), QMessageBox::Yes | QMessageBox::No );
+	switch ( answer )
 	{
-		int answer = QMessageBox::warning( this, tr( "Unsaved settings" ), tr( "Your settings have been modified.\n" "Do you want to restore your previous settings?" ), QMessageBox::Yes | QMessageBox::No );
-		switch ( answer )
-		{
-			case QMessageBox::Yes:
-				reload();
-				break;
-			default:
-				// do nothing
-				break;
-		}
+		case QMessageBox::Yes:
+			reload();
+			break;
+		default:
+			// do nothing
+			break;
 	}
 }
 
@@ -164,53 +162,86 @@ bool SettingsForm::onLeave()
 	return true;
 }
 
-void SettingsForm::on_lineEditUsername_textEdited( QString username )
+void SettingsForm::onFormChange()
 {
-	formChanged = ( username != Settings::getInstance()->getServerUserName() );
+	Settings* settings = Settings::getInstance();
+	if (
+		this->lineEditUsername->text() != settings->getServerUserName() ||
+		this->lineEditBackupPrefix->text() != settings->getBackupPrefix() ||
+		this->spinBoxNOfShownLastBackups->value() != settings->getNOfLastBackups() ||
+		this->checkBoxShowHiddenFiles->isChecked() != settings->getShowHiddenFilesAndFolders() ||
+		this->checkBoxKeepDeletedFiles->isChecked() != !settings->getDeleteExtraneousItems() ||
+		this->checkBoxVerboseLogging->isChecked() != settings->getLogDebugMessages() ||
+		this->checkBoxUseShadowCopy->isChecked() != settings->getDoSnapshot() ||
+		this->spinBoxBandwidthLimit->value() != settings->getBandwidthLimit() ||
+		this->comboBoxLanguage->currentIndex() != this->comboBoxLanguage->findData(settings->getLanguage())
+	)
+	{
+		formChanged = true;
+	}
+	else
+	{
+		formChanged = false;
+	}
+
+	QList<QAbstractButton*> buttons = this->buttonBox->buttons();
+	foreach( QAbstractButton* button, buttons )
+	{
+		if ( this->buttonBox->buttonRole( button ) == QDialogButtonBox::AcceptRole || this->buttonBox->
+buttonRole( button ) == QDialogButtonBox::RejectRole )
+		{
+			button->setDisabled( !formChanged );
+		}
+	}
 }
 
-void SettingsForm::on_comboBoxLanguage_currentIndexChanged( int languageIndex )
+void SettingsForm::on_lineEditUsername_textEdited()
 {
-	formChanged = ( this->comboBoxLanguage->itemData(languageIndex).toString() != Settings::getInstance()->getLanguage() );
+	onFormChange();
 }
 
-void SettingsForm::on_lineEditBackupPrefix_textEdited( QString backupPrefix )
+void SettingsForm::on_comboBoxLanguage_currentIndexChanged()
 {
-	formChanged = ( backupPrefix != Settings::getInstance()->getBackupPrefix() );
+	onFormChange();
 }
 
-void SettingsForm::on_spinBoxNOfShownLastBackups_valueChanged( int i )
+void SettingsForm::on_lineEditBackupPrefix_textEdited()
 {
-	formChanged = (i != Settings::getInstance()->getNOfLastBackups());
+	onFormChange();
 }
 
-void SettingsForm::on_spinBoxBandwidthLimit_valueChanged( int i )
+void SettingsForm::on_spinBoxNOfShownLastBackups_valueChanged()
 {
-	formChanged = (i != Settings::getInstance()->getBandwidthLimit());
+	onFormChange();
+}
+
+void SettingsForm::on_spinBoxBandwidthLimit_valueChanged()
+{
+	onFormChange();
 }
 
 void SettingsForm::on_btnDefaultPrefix_clicked()
 {
 	this->lineEditBackupPrefix->setText( Settings::getInstance()->getLocalHostName() );
-	formChanged = true;
+	onFormChange();
 }
 
-void SettingsForm::on_checkBoxShowHiddenFiles_stateChanged( int state )
+void SettingsForm::on_checkBoxShowHiddenFiles_stateChanged()
 {
-	formChanged = ((state==Qt::Checked) != Settings::getInstance()->getShowHiddenFilesAndFolders());
+	onFormChange();
 }
 
-void SettingsForm::on_checkBoxKeepDeletedFiles_stateChanged( int state )
+void SettingsForm::on_checkBoxKeepDeletedFiles_stateChanged()
 {
-	formChanged = ((state==Qt::Checked) != (!Settings::getInstance()->getDeleteExtraneousItems()));
+	onFormChange();
 }
 
-void SettingsForm::on_checkBoxVerboseLogging_stateChanged( int state )
+void SettingsForm::on_checkBoxVerboseLogging_stateChanged()
 {
-	formChanged = ((state==Qt::Checked) != (Settings::getInstance()->getLogDebugMessages()));
+	onFormChange();
 }
 
-void SettingsForm::on_checkBoxUseShadowCopy_stateChanged( int state )
+void SettingsForm::on_checkBoxUseShadowCopy_stateChanged()
 {
-    formChanged = ((state==Qt::Checked) != (Settings::getInstance()->getDoSnapshot()));
+	onFormChange();
 }

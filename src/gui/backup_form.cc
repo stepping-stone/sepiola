@@ -54,6 +54,7 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 				break;
 			default:
 				qWarning() << "Found unexpected button";
+				break;
 		}
 	}
 
