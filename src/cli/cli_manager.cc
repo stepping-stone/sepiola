@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -84,7 +84,7 @@ void CliManager::printUsage( int /*argc*/, char* argv[] )
 {
 	QString usage;
 	usage.append( Settings::getInstance()->getThisApplicationFullPathExecutable() + " Version " + Settings::VERSION + "\n" );
-	usage.append( "Copyright (C) 2007 by stepping stone GmbH\n" );
+	usage.append( "Copyright (c) 2007-2020 stepping stone AG\n" );
 	usage.append( "Usage: " );
 	usage.append( argv[0] );
 	usage.append( " [Options]\n\n" );

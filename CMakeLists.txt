@@ -1,5 +1,5 @@
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007, 2017  stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #| 
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -78,7 +78,7 @@ SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSIO
 
 SET(CPACK_PACKAGE_NAME ${SSBACKUP_EXECUTABLE_NAME})
 SET(CPACK_PACKAGE_FULL_NAME ${SSBACKUP_APPLICATION_FULL_NAME})
-SET(CPACK_PACKAGE_VENDOR "stepping stone GmbH")
+SET(CPACK_PACKAGE_VENDOR "stepping stone AG")
 SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_NAME}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 SET(CPACK_PACKAGE_EXECUTABLES ${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_FULL_NAME})

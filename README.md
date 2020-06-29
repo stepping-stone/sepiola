@@ -43,6 +43,6 @@ The development follows the [git flow](http://nvie.com/posts/a-successful-git-br
 
 # License & Copyright
 
-Copyright 2015 (c) stepping stone GmbH, Switzerland.
+Copyright (c) 2007-2020 stepping stone AG, Switzerland.
 
 Released under the GPL-2 license.

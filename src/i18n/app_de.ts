@@ -30,8 +30,8 @@
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="185"/>
-        <source>Copyright %1 by stepping stone GmbH</source>
-        <translation>Urheberrecht %1 bei stepping stone GmbH</translation>
+        <source>Copyright %1 by stepping stone AG</source>
+        <translation>Urheberrecht %1 bei stepping stone AG</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="103"/>
