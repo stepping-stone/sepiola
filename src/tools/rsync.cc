@@ -473,6 +473,8 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	arguments << getRsyncDownloadArguments();
 	arguments << getRsyncSshArguments();
 	if (compress) arguments << "-z";
+	// Cannot set dir times on root
+	if (destination == Platform::ROOT_PREFIX) arguments << "--omit-dir-times";
 	arguments << QDir::cleanPath( src );
 	arguments << getValidDestinationPath( destination );
 
@@ -557,6 +559,8 @@ QStringList Rsync::download( const QString& source, const QString& destination, 
 	if (Settings::SHOW_PROGRESS) { arguments << getRsyncProgressArguments(); }
 	arguments << getRsyncSshArguments();
 	if (compress) arguments << "-z";
+	// Cannot set dir times on root
+	if (destination == Platform::ROOT_PREFIX) arguments << "--omit-dir-times";
 	arguments << QDir::cleanPath( src ) + "/";
 	arguments << getValidDestinationPath( destination ) + "/";
 
