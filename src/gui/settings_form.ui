@@ -495,7 +495,7 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Kilobytes/Second</string>
+         <string>Kilobytes/Second (0 = no limit)</string>
         </property>
        </widget>
       </item>

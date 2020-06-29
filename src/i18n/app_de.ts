@@ -1493,8 +1493,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="498"/>
-        <source>Kilobytes/Second</source>
-        <translation>Kilobyte/Sekunde</translation>
+        <source>Kilobytes/Second (0 = no limit)</source>
+        <translation>Kilobyte/Sekunde (0 = keine Begrenzung)</translation>
     </message>
 </context>
 <context>
