@@ -27,20 +27,20 @@ SettingsForm::SettingsForm( QWidget *parent, MainModel *model ) : QWidget( paren
 {
 	setupUi( this );
 	this->model = model;
-	// change the label of ok and cancel button to save and cancel
+	// Change the labels of accept and reject buttons to 'Save' and 'Discard'
 	QList<QAbstractButton*> buttons = this->buttonBox->buttons();
 	foreach( QAbstractButton* button, buttons )
 	{
 		switch ( this->buttonBox->buttonRole( button ) )
 		{
 			case QDialogButtonBox::AcceptRole:
-				button->setText( tr( "S&ave" ) );
+				button->setText( tr( "Save" ) );
 				break;
 			case QDialogButtonBox::RejectRole:
-				button->setText( tr( "&Cancel" ) );
+				button->setText( tr( "Discard" ) );
 				break;
 			default:
-				qWarning() << "Not expected button found";
+				qWarning() << "Found unexpected button";
 		}
 	}
 	Settings* settings = Settings::getInstance();
@@ -125,7 +125,7 @@ void SettingsForm::reset()
 	qDebug() << "SettingsForm::reset()";
 	if ( formChanged )
 	{
-		int answer = QMessageBox::warning( this, tr( "Unsaved settings" ), tr( "Your settings have been modified.\n" "Do you want to restore the original settings?" ), QMessageBox::Yes | QMessageBox::No );
+		int answer = QMessageBox::warning( this, tr( "Unsaved settings" ), tr( "Your settings have been modified.\n" "Do you want to restore your previous settings?" ), QMessageBox::Yes | QMessageBox::No );
 		switch ( answer )
 		{
 			case QMessageBox::Yes:

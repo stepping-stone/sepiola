@@ -100,7 +100,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>&amp;OK</string>
+      <string>OK</string>
      </property>
      <property name="icon">
       <iconset>

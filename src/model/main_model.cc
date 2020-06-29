@@ -157,7 +157,7 @@ bool MainModel::initConnection()
 		}
 		else
 		{
-			emit infoSignal( tr( "Login with key was successful" ) );
+			emit infoSignal( tr( "Login with key was successful." ) );
 			isInitialized = true;
 		}
 		emit infoSignal( tr( "Connection established." ) );

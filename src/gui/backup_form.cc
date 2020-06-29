@@ -40,6 +40,23 @@ BackupForm::BackupForm( QWidget *parent, MainModel *model ) : QWidget ( parent )
 	this->model = model;
 	this->localDirModel = this->model->getLocalDirModel();
 
+	// Change the labels of accept and reject buttons to 'Save' and 'Discard'
+	QList<QAbstractButton*> buttons = this->buttonBox->buttons();
+	foreach( QAbstractButton* button, buttons )
+	{
+		switch ( this->buttonBox->buttonRole( button ) )
+		{
+			case QDialogButtonBox::AcceptRole:
+				button->setText( tr( "Save" ) );
+				break;
+			case QDialogButtonBox::RejectRole:
+				button->setText( tr( "Discard" ) );
+				break;
+			default:
+				qWarning() << "Found unexpected button";
+		}
+	}
+
 	this->reload();
 
 	QObject::connect( this, SIGNAL( updateOverviewFormScheduleInfo() ),
@@ -65,7 +82,7 @@ void BackupForm::reload() {
 	this->expandSelectedBranches();
 
 
-		// disable option "minutes after booting" if the scheduler does not support it
+	// Disable option "minutes after booting" if the scheduler does not support it
 	if ( !this->model->isSchedulingOnStartSupported() )
 	{
 		this->radioButtonMinutesAfterBooting->setEnabled( false );
