@@ -280,6 +280,8 @@ void Settings::reloadSettings()
 	serverUserName = userSettings->value( SETTINGS_USERNAME ).toString();
     
     language = userSettings->value( SETTINGS_LANGUAGE ).toString();
+    // Default to 'English' if language is not explicity set
+    if (language.length() == 0) language = "en";
 
     // Convert old index values to new language codes
     bool languageIsIndex(false);
