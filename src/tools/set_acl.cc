@@ -147,7 +147,7 @@ void SetAcl::setMetadata( const QFileInfo& metadataFileName, const QStringList& 
 		QString aclValue = aclMap.take(item);
 		if (aclValue.isEmpty()) continue;
 
-		if ( downloadDestination == "/" )
+		if ( downloadDestination == "/cygdrive" )
 		{
 			newAclMap.insert(item, aclValue);
 		}
