@@ -269,17 +269,22 @@ void RestoreForm::startRestore(bool isFullRestore, QString destination)
 		this->model->showInformationMessage( tr( "No files and/or directories has been selected." ) );
 		return;
 	}
-	bool selectionAborted = false;
-	while ( (destination == "" || !QFileInfo( destination ).exists()) && !(selectionAborted = !browseForDestinationFolder(destination)) && destination == "" )	{
-		this->model->showInformationMessage( "No valid destination folder has been selected.\nPlease select a valid restore destination." );
-	}
-	if (selectionAborted) {
-		return;
-	}
-	if ( destination != "/" && !QFileInfo( destination ).exists() )
+	if ( destination != Platform::ROOT_PREFIX)
 	{
-		this->model->showInformationMessage( tr( "Specific destination path is not valid" ) );
-		return;
+		bool selectionAborted = false;
+		while ( (destination == "" || !QFileInfo( destination ).exists()) && !(selectionAborted = !browseForDestinationFolder(destination)) && destination == "" )
+		{
+		this->model->showInformationMessage( "No valid destination folder has been selected.\nPlease select a valid restore destination." );
+		}
+		if (selectionAborted)
+		{
+			return;
+		}
+		if ( !QFileInfo( destination ).exists() )
+		{
+			this->model->showInformationMessage( tr( "Specific destination path is not valid" ) );
+			return;
+		}
 	}
 
 	destination = QDir::fromNativeSeparators( destination );
