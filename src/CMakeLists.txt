@@ -470,11 +470,11 @@ ELSE(Q_WS_WIN)
             ${CMAKE_CURRENT_BINARY_DIR}/ssh
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/ssh
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/libcrypto.so.1.0.1e
-            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e
-                COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e
+            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/libcrypto.so.1.1.1c
+            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c
+                COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c
                 COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.0.1e
-            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.10
+            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync-*
             ${CMAKE_CURRENT_BINARY_DIR}/rsync
@@ -504,8 +504,8 @@ ELSE(Q_WS_WIN)
 	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/plink                 DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ssh                   DESTINATION ${APP_DIR})
-        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e   DESTINATION ${APP_DIR})
-        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.10       DESTINATION ${APP_DIR})
+        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c   DESTINATION ${APP_DIR})
+        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1      DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/rsync                 DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/getfacl               DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setfacl               DESTINATION ${APP_DIR})

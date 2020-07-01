@@ -805,6 +805,7 @@ QStringList Rsync::getRsyncSshArguments()
     argument.append(" -o " + StringUtils::quoteText("PreferredAuthentications publickey", "'"));
     // ignore any running SSH agents since they may offer additional keys first, causing authentication failures
     argument.append(" -o " + StringUtils::quoteText("IdentitiesOnly yes", "'"));
+    argument.append(" -o " + StringUtils::quoteText("PubkeyAcceptedKeyTypes +ssh-dss", "'"));
     arguments << argument;
 
     return arguments;
