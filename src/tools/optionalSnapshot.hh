@@ -28,7 +28,6 @@ class OptionalSnapshot : public AbstractSnapshot
     Q_OBJECT
 
 public:
-
     /**
      * Creates the OptionalSnapshot object
      */
@@ -39,7 +38,7 @@ public:
      */
     virtual ~OptionalSnapshot();
 
-    const SnapshotMapper& getSnapshotPathMappers() const;
+    const SnapshotMapper &getSnapshotPathMappers() const;
 
     /**
      * Checks if there is something to clean up
@@ -67,7 +66,7 @@ public slots:
      * @param The BackupSelectionHash which defines all files which are later
      * backed-up
      */
-    void addFilesToSnapshot( const BackupSelectionHash includeRules );
+    void addFilesToSnapshot(const BackupSelectionHash includeRules);
 
     /**
      * Executes the snapshot

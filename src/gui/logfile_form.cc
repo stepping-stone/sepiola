@@ -18,19 +18,17 @@
 
 #include "gui/logfile_form.hh"
 
-LogfileForm::LogfileForm( QWidget* parent, MainModel* /*model*/) : QWidget ( parent )
+LogfileForm::LogfileForm(QWidget *parent, MainModel * /*model*/)
+    : QWidget(parent)
 {
-	setupUi( this );
+    setupUi(this);
 }
 
-LogfileForm::~LogfileForm()
-{
-}
+LogfileForm::~LogfileForm() {}
 
-void LogfileForm::appendLines( const QStringList& logfileLines )
+void LogfileForm::appendLines(const QStringList &logfileLines)
 {
-	foreach( QString line, logfileLines )
-	{
-		this->textEditLogfile->append( line );
-	}
+    foreach (QString line, logfileLines) {
+        this->textEditLogfile->append(line);
+    }
 }

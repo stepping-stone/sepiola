@@ -30,52 +30,50 @@
  */
 class OutputDialog : public QDialog, private Ui::OutputDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
+    /**
+     * Constructs a OutputDialog with a given title
+     */
+    OutputDialog(const QString &title);
 
-	/**
-	 * Constructs a OutputDialog with a given title
-	 */
-	OutputDialog( const QString& title );
+    /**
+     * Destroys the OutputDialog
+     */
+    virtual ~OutputDialog();
 
-	/**
-	 * Destroys the OutputDialog
-	 */
-	virtual ~OutputDialog();
+    /**
+     * Appends the given info to the dialog
+     * @param info text to append
+     */
+    void appendInfo(const QString &info);
 
-	/**
-	 * Appends the given info to the dialog
-	 * @param info text to append
-	 */
-	void appendInfo( const QString& info );
+    /**
+     * Appends the given error to the dialog
+     * @param error text to append
+     */
+    void appendError(const QString &error);
 
-	/**
-	 * Appends the given error to the dialog
-	 * @param error text to append
-	 */
-	void appendError( const QString& error );
+    /**
+     * Enables the finish button
+     */
+    void finished();
 
-	/**
-	 * Enables the finish button
-	 */
-	void finished();
-
-	void closeEvent( QCloseEvent * event );
+    void closeEvent(QCloseEvent *event);
 
 signals:
-	bool abort();
-	void refreshLastBackupOverview();
-
+    bool abort();
+    void refreshLastBackupOverview();
 
 private slots:
-	void on_btnCancel_clicked();
-	void flushCache();
+    void on_btnCancel_clicked();
+    void flushCache();
 
 private:
-	bool isErrorVisible;
-	QTime lastUpdate;
-	QString outputCache;
+    bool isErrorVisible;
+    QTime lastUpdate;
+    QString outputCache;
 };
 
 #endif

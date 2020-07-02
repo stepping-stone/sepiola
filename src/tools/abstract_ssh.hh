@@ -31,48 +31,45 @@
 class AbstractSsh : public AbstractInformingProcess
 {
 public:
+    /**
+     * Destroys the AbstractSsh
+     */
+    virtual ~AbstractSsh();
 
-	/**
-	 * Destroys the AbstractSsh
-	 */	
-	virtual ~AbstractSsh();
-	
-	/**
-	 * Uploads a given file.
-	 * @param file file to upload
-	 * @param append indicates whether the file will be appended or overridden 
-	 */
-	virtual void uploadToMetaFolder( const QFileInfo& file, bool append ) = 0;
-	
-	/**
-	 * Generates a public and a private SSH key on the server as follows:
-	 * - The public key will be directly appended to the authorized_keys file.
-	 * - The private keys (putty and openssh) will be downloaded and saved
-	 * - All keys will be deleted on the server 
-	 * @param password the user's password
-	 * @return flag if key generation was successful
-	 */
-	virtual bool generateKeys( const QString& password ) = 0;
-	
-	/**
-	 * Tests if the user can login to the server with a key
-	 */
-	virtual bool loginWithKey() = 0;
-	
-	/**
-	 * Asserts that the server has the same fingerprint as set in the settings
-	 */
-	virtual bool assertCorrectFingerprint() = 0;
-	
-	/**
-	 * calls a script on the server which returns quota-values (quota, 
-	 * backupSize, snapshotSize) and returns the values in a QList<int>
-	 */
-	virtual QList<int> getServerQuotaValues() = 0;
+    /**
+     * Uploads a given file.
+     * @param file file to upload
+     * @param append indicates whether the file will be appended or overridden
+     */
+    virtual void uploadToMetaFolder(const QFileInfo &file, bool append) = 0;
+
+    /**
+     * Generates a public and a private SSH key on the server as follows:
+     * - The public key will be directly appended to the authorized_keys file.
+     * - The private keys (putty and openssh) will be downloaded and saved
+     * - All keys will be deleted on the server
+     * @param password the user's password
+     * @return flag if key generation was successful
+     */
+    virtual bool generateKeys(const QString &password) = 0;
+
+    /**
+     * Tests if the user can login to the server with a key
+     */
+    virtual bool loginWithKey() = 0;
+
+    /**
+     * Asserts that the server has the same fingerprint as set in the settings
+     */
+    virtual bool assertCorrectFingerprint() = 0;
+
+    /**
+     * calls a script on the server which returns quota-values (quota,
+     * backupSize, snapshotSize) and returns the values in a QList<int>
+     */
+    virtual QList<int> getServerQuotaValues() = 0;
 };
 
-inline AbstractSsh::~AbstractSsh()
-{
-}
+inline AbstractSsh::~AbstractSsh() {}
 
 #endif

@@ -32,39 +32,38 @@ class QString;
  */
 class FilesystemSnapshot : public QObject
 {
-
     Q_OBJECT
 
 public:
-    FilesystemSnapshot( const BackupSelectionHash& includes );
-    FilesystemSnapshot( );
+    FilesystemSnapshot(const BackupSelectionHash &includes);
+    FilesystemSnapshot();
     virtual ~FilesystemSnapshot();
     void doSnapshot();
-    const SnapshotMapper& getSnapshotPathMappers() const;
-    void setIncludeRules( const BackupSelectionHash& includes );
+    const SnapshotMapper &getSnapshotPathMappers() const;
+    void setIncludeRules(const BackupSelectionHash &includes);
     void cleanup();
 
 private slots:
-    void snapshotObjectCreated( int result );
-    void snapshotInitialized( int result );
-    void filesAddedToSnapshot( int result );
-    void snapshotTaken( int result );
+    void snapshotObjectCreated(int result);
+    void snapshotInitialized(int result);
+    void filesAddedToSnapshot(int result);
+    void snapshotTaken(int result);
 
 signals:
     void sendCreateSnapshotObject();
     void sendInitializeSnapshot();
-    void sendAddFilesToSnapshot( const BackupSelectionHash includeRules );
+    void sendAddFilesToSnapshot(const BackupSelectionHash includeRules);
     void sendTakeSnapshot();
-    void sendSnapshotDone( int result );
+    void sendSnapshotDone(int result);
     void sendCleanupSnapshot();
 
     // Common signals
-    void infoSignal( const QString& text );
-    void errorSignal( const QString& text );
+    void infoSignal(const QString &text);
+    void errorSignal(const QString &text);
 
 private:
-    AbstractSnapshot * snapshot;
-    QThread * snapshotThread;
+    AbstractSnapshot *snapshot;
+    QThread *snapshotThread;
     BackupSelectionHash includeRules;
 };
 

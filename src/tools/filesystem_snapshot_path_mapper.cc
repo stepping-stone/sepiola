@@ -10,46 +10,43 @@
 
 #include <QString>
 
-FilesystemSnapshotPathMapper::FilesystemSnapshotPathMapper(const QString& _partition, const BackupSelectionHash& includeRules )
+FilesystemSnapshotPathMapper::FilesystemSnapshotPathMapper(const QString &_partition,
+                                                           const BackupSelectionHash &includeRules)
 {
     this->partition = _partition;
     this->relativeIncludes = includeRules;
 }
 
-FilesystemSnapshotPathMapper::FilesystemSnapshotPathMapper()
-{
-}
+FilesystemSnapshotPathMapper::FilesystemSnapshotPathMapper() {}
 
-FilesystemSnapshotPathMapper::~FilesystemSnapshotPathMapper()
-{
-}
+FilesystemSnapshotPathMapper::~FilesystemSnapshotPathMapper() {}
 
-const QString& FilesystemSnapshotPathMapper::getPartition() const
+const QString &FilesystemSnapshotPathMapper::getPartition() const
 {
     return partition;
 }
 
-void FilesystemSnapshotPathMapper::setPartition(const QString& partition)
+void FilesystemSnapshotPathMapper::setPartition(const QString &partition)
 {
     this->partition = partition;
 }
 
-const BackupSelectionHash& FilesystemSnapshotPathMapper::getRelativeIncludes() const
+const BackupSelectionHash &FilesystemSnapshotPathMapper::getRelativeIncludes() const
 {
     return relativeIncludes;
 }
 
-const QString& FilesystemSnapshotPathMapper::getSnapshotPath() const
+const QString &FilesystemSnapshotPathMapper::getSnapshotPath() const
 {
     return snapshotPath;
 }
 
-void FilesystemSnapshotPathMapper::setSnapshotPath(const QString& snapshotPath)
+void FilesystemSnapshotPathMapper::setSnapshotPath(const QString &snapshotPath)
 {
     this->snapshotPath = snapshotPath;
 }
 
-const QString& FilesystemSnapshotPathMapper::getSnapshotUncPath() const
+const QString &FilesystemSnapshotPathMapper::getSnapshotUncPath() const
 {
     return snapshotUncPath;
 }
@@ -59,17 +56,16 @@ void FilesystemSnapshotPathMapper::setSnapshotUncPath(const QString &snapshotUnc
     this->snapshotUncPath = snapshotUncPath;
 }
 
-const QString& FilesystemSnapshotPathMapper::toAbsUncPath(QString& path) const
+const QString &FilesystemSnapshotPathMapper::toAbsUncPath(QString &path) const
 {
-    if(path.startsWith(this->getPartition())) {
+    if (path.startsWith(this->getPartition())) {
         path.remove(0, 2); // replace the local mount-piont (C:\) by the shadow copy.
         path.prepend(this->getSnapshotUncPath());
     }
     return path;
 }
 
-
 void FilesystemSnapshotPathMapper::addFileToRelativeIncludes(QString filename, bool backup)
 {
-    this->relativeIncludes.insert( filename, backup );
+    this->relativeIncludes.insert(filename, backup);
 }

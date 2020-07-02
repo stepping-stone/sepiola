@@ -19,13 +19,13 @@
 #ifndef ABSTRACT_INFORMING_PROCESS_HH
 #define ABSTRACT_INFORMING_PROCESS_HH
 
-#include <QObject>
-#include <QString>
 #include <QDateTime>
 #include <QMetaType>
+#include <QObject>
+#include <QString>
 
-#include "utils/string_utils.hh"
 #include "utils/const_utils.hh"
+#include "utils/string_utils.hh"
 
 /**
  * The AbstractInformingProcess class provides methods for emitting message signals
@@ -34,20 +34,22 @@
 
 class AbstractInformingProcess : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-
-	/**
-	 * Destroys the AbstractInformingProcess
-	 */
-	virtual ~AbstractInformingProcess();
+    /**
+     * Destroys the AbstractInformingProcess
+     */
+    virtual ~AbstractInformingProcess();
 
 signals:
-	void infoSignal( const QString& text );
-	void errorSignal( const QString& text );
-	void progressSignal( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos = StringPairList() );
-	void finalStatusSignal( ConstUtils::StatusEnum status );
+    void infoSignal(const QString &text);
+    void errorSignal(const QString &text);
+    void progressSignal(const QString &taskText,
+                        float percentFinished,
+                        const QDateTime &timeRemaining,
+                        StringPairList infos = StringPairList());
+    void finalStatusSignal(ConstUtils::StatusEnum status);
 };
 
 inline AbstractInformingProcess::~AbstractInformingProcess() {}

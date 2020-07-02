@@ -19,8 +19,8 @@
 #ifndef DIR_TREE_ITEM_HH
 #define DIR_TREE_ITEM_HH
 
-#include <QStandardItem>
 #include <QFileIconProvider>
+#include <QStandardItem>
 
 /**
  * The DirTreeItem class represents an item (file or directory) for the RemoteDirModel
@@ -29,31 +29,30 @@
 class DirTreeItem : public QStandardItem
 {
 public:
-	/**
-	 * Constructs a DirTreeItem representing a path
-	 * @param path a path
-	 */
-	DirTreeItem( const QString& path, const QFileIconProvider& iconProvider );
+    /**
+     * Constructs a DirTreeItem representing a path
+     * @param path a path
+     */
+    DirTreeItem(const QString &path, const QFileIconProvider &iconProvider);
 
-	/**
-	 * Destroys the DirTreeItem
-	 */
-	virtual ~DirTreeItem();
+    /**
+     * Destroys the DirTreeItem
+     */
+    virtual ~DirTreeItem();
 
-	/**
-	 * Gets the absolute file or directory name
-	 * @return the absolute path
-	 */
-	QString getAbsoluteName();
+    /**
+     * Gets the absolute file or directory name
+     * @return the absolute path
+     */
+    QString getAbsoluteName();
 
 private:
-	QString absoluteName;
+    QString absoluteName;
 };
 
 inline QString DirTreeItem::getAbsoluteName()
 {
-	return this->absoluteName;
+    return this->absoluteName;
 }
 
 #endif
-

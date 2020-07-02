@@ -19,8 +19,8 @@
 #ifndef TEST_MANAGER_HH
 #define TEST_MANAGER_HH
 
-#include <QString>
 #include <QMap>
+#include <QString>
 
 /**
  * The TestManager class is used to test the application during development
@@ -29,53 +29,52 @@
 class TestManager
 {
 public:
+    /**
+     * Registers a test method with a given name
+     * @param testName the name of the test
+     * @param (*fun)() reference to the method
+     * @return just a dummy value
+     */
+    static int registerTest(const QString &testName, void (*fun)());
 
-	/**
-	 * Registers a test method with a given name
-	 * @param testName the name of the test
-	 * @param (*fun)() reference to the method
-	 * @return just a dummy value
-	 */
-	static int registerTest( const QString& testName, void (*fun)() );
-	
-	/**
-	 * Tests if a test argument is present in the start argument list 
-	 * @param argc number of arguments
-	 * @param argv argument values
-	 * @return true if a test argument is in the argument list	
-	 */
-	static bool isTestApplication( int argc, char* argv[] );
-	
-	/**
-	 * Runs the given tests
-	 * @param argc number of arguments
-	 * @param argv argument values
-	 */
-	static void run( int argc, char* argv[] );
+    /**
+     * Tests if a test argument is present in the start argument list
+     * @param argc number of arguments
+     * @param argv argument values
+     * @return true if a test argument is in the argument list
+     */
+    static bool isTestApplication(int argc, char *argv[]);
+
+    /**
+     * Runs the given tests
+     * @param argc number of arguments
+     * @param argv argument values
+     */
+    static void run(int argc, char *argv[]);
 
 private:
-	static QMap< QString, void (*)() >& functionMap();
-	static void runTest( const QString& testName);
-	static QStringList getTests( int argc, char* argv[] );
+    static QMap<QString, void (*)()> &functionMap();
+    static void runTest(const QString &testName);
+    static QStringList getTests(int argc, char *argv[]);
 };
 
-inline int TestManager::registerTest( const QString& testName, void (*fun)() )
+inline int TestManager::registerTest(const QString &testName, void (*fun)())
 {
-	functionMap().insert( testName, fun );
-	
-	return 0;
+    functionMap().insert(testName, fun);
+
+    return 0;
 }
 
-inline void TestManager::runTest( const QString& testName)
+inline void TestManager::runTest(const QString &testName)
 {
-	(*functionMap()[ testName ])();
+    (*functionMap()[testName])();
 }
 
-inline QMap< QString, void (*)() >& TestManager::functionMap()
+inline QMap<QString, void (*)()> &TestManager::functionMap()
 {
-	static QMap< QString, void (*)() > map;
-	
-	return map;
+    static QMap<QString, void (*)()> map;
+
+    return map;
 }
 
 #endif

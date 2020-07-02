@@ -19,13 +19,13 @@
 #ifndef ABSTRACT_ACL_HH
 #define ABSTRACT_ACL_HH
 
-#include <QString>
-#include <QStringList>
 #include <QFileInfo>
 #include <QPair>
+#include <QString>
+#include <QStringList>
 
-#include "tools/abstract_rsync.hh"
 #include "tools/abstract_informing_process.hh"
+#include "tools/abstract_rsync.hh"
 #include "tools/filesystem_snapshot.hh"
 
 /**
@@ -35,49 +35,54 @@
 class AbstractMetadata : public AbstractInformingProcess
 {
 public:
+    /**
+     * Destroys the AbstractMetadata
+     */
+    virtual ~AbstractMetadata();
 
-	/**
-	 * Destroys the AbstractMetadata
-	 */
-	virtual ~AbstractMetadata();
+    /**
+     * Creates a metadata file for the given file and directory list
+     * @param processedItems list of file and directory names
+     * @param warnings string to append warnings to. Warnings are discarded if it is 0.
+     * @return the full name of the created metadata file
+     */
+    virtual QString getMetadata(
+        const QString &metadataFileName,
+        const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems,
+        const FilesystemSnapshot *fsSnapshot,
+        QString *warnings = 0)
+        = 0;
 
-	/**
-	 * Creates a metadata file for the given file and directory list
-	 * @param processedItems list of file and directory names
-	 * @param warnings string to append warnings to. Warnings are discarded if it is 0.
-	 * @return the full name of the created metadata file
-	 */
-	virtual QString getMetadata(
-            const QString& metadataFileName,
-            const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
-            const FilesystemSnapshot* fsSnapshot, QString* warnings = 0) = 0;
+    /**
+     * Merges the data from the new and the existing metadata file and deletes items if necessary
+     * @param newMetadataFileName the name of the new file
+     * @param currentMetadataFileName the name of the current file
+     * @param processedItems list of file and directory names
+     */
+    virtual void mergeMetadata(
+        const QFileInfo &newMetadataFileName,
+        const QFileInfo &currentMetadataFileName,
+        const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems)
+        = 0;
 
-	/**
-	 * Merges the data from the new and the existing metadata file and deletes items if necessary
-	 * @param newMetadataFileName the name of the new file
-	 * @param currentMetadataFileName the name of the current file
-	 * @param processedItems list of file and directory names
-	 */
-	virtual void mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems ) = 0;
+    /**
+     * Sets the metadata from a metadata file for the items in the list
+     * @param metadataFile file containing the metadata
+     * @param downloadedItems list of file and directory names for setting the ACL's
+     * @param downloadDestination destination path of the restore
+     */
+    virtual void setMetadata(const QFileInfo &metadataFile,
+                             const QStringList &downloadedItems,
+                             const QString &downloadDestination)
+        = 0;
 
-	/**
-	 * Sets the metadata from a metadata file for the items in the list
-	 * @param metadataFile file containing the metadata
-	 * @param downloadedItems list of file and directory names for setting the ACL's
-	 * @param downloadDestination destination path of the restore
-	 */
-	virtual void setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination ) = 0;
-
-	/**
-	 * Returns a list of files and directories from a given ACL file
-	 * @param metadataFile file containing the metadata
-	 */
-	 virtual QStringList extractItems( const QFileInfo& metadataFile ) = 0;
+    /**
+     * Returns a list of files and directories from a given ACL file
+     * @param metadataFile file containing the metadata
+     */
+    virtual QStringList extractItems(const QFileInfo &metadataFile) = 0;
 };
 
-inline AbstractMetadata::~AbstractMetadata()
-{
-}
+inline AbstractMetadata::~AbstractMetadata() {}
 
 #endif
-

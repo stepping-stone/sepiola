@@ -30,7 +30,6 @@ class DummySnapshot : public AbstractSnapshot
     Q_OBJECT
 
 public:
-
     /**
      * Creates the DummySnapshot object
      */
@@ -41,13 +40,12 @@ public:
      */
     virtual ~DummySnapshot();
 
-    const SnapshotMapper& getSnapshotPathMappers() const;
+    const SnapshotMapper &getSnapshotPathMappers() const;
 
     /**
      * Checks if there is something to clean up
      */
     virtual void checkCleanup();
-
 
 private:
     SnapshotMapper snapshotPathMappers;
@@ -69,7 +67,7 @@ public slots:
      * @param The BackupSelectionHash which defines all files which are later
      * backed-up
      */
-    void addFilesToSnapshot( const BackupSelectionHash includeRules );
+    void addFilesToSnapshot(const BackupSelectionHash includeRules);
 
     /**
      * Executes the snapshot
@@ -80,7 +78,6 @@ public slots:
      * Cleans up the snapshot
      */
     void cleanupSnapshot();
-
 };
 
 #endif /* DUMMY_SNAPSHOT_HH_ */

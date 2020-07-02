@@ -19,8 +19,8 @@
 #ifndef RSYNC_HH
 #define RSYNC_HH
 
-#include <QString>
 #include <QFileInfo>
+#include <QString>
 
 #include "tools/abstract_rsync.hh"
 #include "tools/process.hh"
@@ -31,164 +31,222 @@
  */
 class Rsync : public AbstractRsync, public Process
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public slots:
-	void abort();
-	void bufferedInfoOutput();
+    void abort();
+    void bufferedInfoOutput();
 private slots:
-	void updateInfoOutput();
+    void updateInfoOutput();
 
 signals:
-	void volumeCalculationInfoSignal(const QString& filename, long files_total, long files_done);
-	void trafficInfoSignal(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten);
+    void volumeCalculationInfoSignal(const QString &filename, long files_total, long files_done);
+    void trafficInfoSignal(const QString &filename,
+                           float traffic,
+                           quint64 bytesRead,
+                           quint64 bytesWritten);
 
 public:
+    /**
+     * Constructs an Rsync
+     */
+    Rsync();
 
-	/**
-	 * Constructs an Rsync
-	 */
-	Rsync();
+    /**
+     * Destroys the Rsync
+     */
+    virtual ~Rsync();
 
-	/**
-	 * Destroys the Rsync
-	 */
-	virtual ~Rsync();
+    /**
+     * @see AbstractRsync::upload( const QStringList& items, const QString& source, const QString&
+     * destination, const QString& includePattern, const QString& excludePattern, QString* errors )
+     */
+    QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> upload(
+        const BackupSelectionHash &includeRules,
+        const QString &src,
+        const QString &destination,
+        bool setDeleteFlag,
+        bool compress,
+        int bandwidthLimit,
+        QString *warnings,
+        bool dry_run);
+    QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> upload(
+        const QStringList &items,
+        const QString &source,
+        const QString &destination,
+        const QStringList &includePatternList,
+        const QStringList &excludePatternList,
+        bool setDeleteFlag,
+        bool bCompress,
+        int bandwidthLimit,
+        QString *warnings,
+        bool dry_run);
 
-	/**
-	 * @see AbstractRsync::upload( const QStringList& items, const QString& source, const QString& destination, const QString& includePattern, const QString& excludePattern, QString* errors )
-	 */
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const BackupSelectionHash& includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, int bandwidthLimit, QString* warnings, bool dry_run );
-	QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > upload( const QStringList& items, const QString& source, const QString& destination, const QStringList& includePatternList, const QStringList& excludePatternList, bool setDeleteFlag, bool bCompress, int bandwidthLimit, QString* warnings, bool dry_run );
+    /**
+     *
+     */
+    long calculateUploadTransfer(const BackupSelectionHash includeRules,
+                                 const QString &src,
+                                 const QString &destination,
+                                 bool setDeleteFlag,
+                                 bool compress,
+                                 int bandwidthLimit,
+                                 QString *errors,
+                                 QString *warnings);
 
-	/**
-	 *
-	 */
-	long calculateUploadTransfer( const BackupSelectionHash includeRules, const QString& src, const QString& destination, bool setDeleteFlag, bool compress, int bandwidthLimit, QString* errors, QString* warnings );
+    /**
+     * @see AbstractRsync::downloadFullBackup( const QString& backup_prefix, const QString&
+     * backupName, const QString& destination )
+     */
+    QStringList downloadFullBackup(const QString &backup_prefix,
+                                   const QString &backupName,
+                                   const QString &destination);
 
-	/**
-	 * @see AbstractRsync::downloadFullBackup( const QString& backup_prefix, const QString& backupName, const QString& destination )
-	 */
-	QStringList downloadFullBackup( const QString& backup_prefix, const QString& backupName, const QString& destination );
+    /**
+     * @see AbstractRsync::downloadCustomBackup( const QString& backupName, const QStringList&
+     * itemList, const QString& destination )
+     */
+    QStringList downloadCustomBackup(const QString &backup_prefix,
+                                     const QString &backupName,
+                                     const BackupSelectionHash &selectionRules,
+                                     const QString &destination);
+    QStringList downloadCustomBackup(const QString &backup_prefix,
+                                     const QString &backupName,
+                                     const QStringList &itemList,
+                                     const QString &destination);
 
-	/**
-	 * @see AbstractRsync::downloadCustomBackup( const QString& backupName, const QStringList& itemList, const QString& destination )
-	 */
-	QStringList downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
-	QStringList downloadCustomBackup( const QString& backup_prefix, const QString& backupName, const QStringList& itemList, const QString& destination );
+    /**
+     * @see AbstractRsync::downloadBackupContentFile( const QString& backupName, const QString&
+     * destination )
+     */
+    QFileInfo downloadBackupContentFile(const QString &backup_prefix,
+                                        const QString &backupName,
+                                        const QString &destination);
 
-	/**
-	 * @see AbstractRsync::downloadBackupContentFile( const QString& backupName, const QString& destination )
-	 */
-	QFileInfo downloadBackupContentFile( const QString& backup_prefix, const QString& backupName, const QString& destination );
+    /**
+     * @see AbstractRsync::downloadCurrentBackupContentFile( const QString& destination )
+     */
+    QFileInfo downloadCurrentBackupContentFile(const QString &destination, bool emitErrorSignal);
 
-	/**
-	 * @see AbstractRsync::downloadCurrentBackupContentFile( const QString& destination )
-	 */
-	QFileInfo downloadCurrentBackupContentFile( const QString& destination, bool emitErrorSignal );
+    /**
+     * @see AbstractRsync::downloadMetadata( const QString& backup_prefix, const QString&
+     * backupName, const QString& destination )
+     */
+    QFileInfo downloadMetadata(const QString &backup_prefix,
+                               const QString &backupName,
+                               const QString &destination);
 
-	/**
-	 * @see AbstractRsync::downloadMetadata( const QString& backup_prefix, const QString& backupName, const QString& destination )
-	 */
-	QFileInfo downloadMetadata( const QString& backup_prefix, const QString& backupName, const QString& destination );
+    /**
+     * @see AbstractRsync::downloadCurrentMetadata( const QString& destination )
+     */
+    QFileInfo downloadCurrentMetadata(const QString &destination, bool emitErrorSignal = true);
 
-	/**
-	 * @see AbstractRsync::downloadCurrentMetadata( const QString& destination )
-	 */
-	QFileInfo downloadCurrentMetadata( const QString& destination, bool emitErrorSignal = true );
+    /**
+     * @see AbstractRsync::downloadAllRestoreInfoFiles( const QString& destination )
+     */
+    QStringList downloadAllRestoreInfoFiles(const QString &destination,
+                                            const QString &backup_prefix);
 
-	/**
-	 * @see AbstractRsync::downloadAllRestoreInfoFiles( const QString& destination )
-	 */
-	QStringList downloadAllRestoreInfoFiles( const QString& destination, const QString& backup_prefix );
+    /**
+     * @see AbstractRsync:deleteAllRestoreInfoFiles( const QString& destination )
+     */
+    void deleteAllRestoreInfoFiles(const QString &path);
 
-	/**
-	 * @see AbstractRsync:deleteAllRestoreInfoFiles( const QString& destination )
-	 */
-	 void deleteAllRestoreInfoFiles( const QString& path );
+    /**
+     * @see AbstractRsync::getPrefixes()
+     */
+    QStringList getPrefixes();
 
-	 /**
-		* @see AbstractRsync::getPrefixes()
-		*/
-	 QStringList getPrefixes();
+    /**
+     * Tests the getPrefixes method
+     * @see getPrefixes()
+     */
+    static void testGetPrefixes();
 
-	 /**
-	 * Tests the getPrefixes method
-	 * @see getPrefixes()
-	 */
-	static void testGetPrefixes();
+    /**
+     * Tests the backup method
+     * @see backup()
+     */
+    static void testUpload();
 
-	/**
-	 * Tests the backup method
-	 * @see backup()
-	 */
-	static void testUpload();
+    /**
+     * Tests the downloadCurrentMetadata method
+     * @see downloadCurrentMetadata()
+     */
+    static void testDownloadCurrentMetadata();
 
-	/**
-	 * Tests the downloadCurrentMetadata method
-	 * @see downloadCurrentMetadata()
-	 */
-	static void testDownloadCurrentMetadata();
+    /**
+     * Tests the downloadAllRestoreInfoFiles method
+     * @see downloadAllRestoreInfoFiles()
+     */
+    static void testDownloadAllRestoreInfoFiles();
 
-	/**
-	 * Tests the downloadAllRestoreInfoFiles method
-	 * @see downloadAllRestoreInfoFiles()
-	 */
-	static void testDownloadAllRestoreInfoFiles();
+    /**
+     * Tests the deleteAllRestoreInfoFiles method
+     * @see deleteAllRestoreInfoFiles()
+     */
+    static void testDeleteAllRestoreInfoFiles();
 
-	/**
-	 * Tests the deleteAllRestoreInfoFiles method
-	 * @see deleteAllRestoreInfoFiles()
-	 */
-	static void testDeleteAllRestoreInfoFiles();
+    /**
+     * Tests the downloadBackupContentFile method
+     * @see downloadBackupContentFile()
+     */
+    static void testDownloadBackupContentFile();
 
-	/**
-	 * Tests the downloadBackupContentFile method
-	 * @see downloadBackupContentFile()
-	 */
-	static void testDownloadBackupContentFile();
-
-	/**
-	 * Tests the private getItem method
-	 */
-	static void testGetItem();
-	static void testRsyncRulesConversion();
+    /**
+     * Tests the private getItem method
+     */
+    static void testGetItem();
+    static void testRsyncRulesConversion();
 
 private:
-	static QStringList getRsyncGeneralArguments();
-	static QStringList getRsyncUploadArguments();
-	static QStringList getRsyncDownloadArguments();
-	static QStringList getRsyncProgressArguments();
-	static QStringList getRsyncSshArguments();
+    static QStringList getRsyncGeneralArguments();
+    static QStringList getRsyncUploadArguments();
+    static QStringList getRsyncDownloadArguments();
+    static QStringList getRsyncProgressArguments();
+    static QStringList getRsyncSshArguments();
 
-	static QByteArray convertFilenameForRsyncArgument(QString filename);
-	static QString getValidDestinationPath( const QString& destination );
-	static QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItem( QString rsyncOutputLine );
-	QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItemAndStoreTransferredBytes( QString rsyncOutputLine );
-	static QList<QByteArray> calculateRsyncRulesFromIncludeRules( const BackupSelectionHash& includeRules, QStringList* files_from_list = 0 );
-	static void removeSymlinkString( QString* path );
+    static QByteArray convertFilenameForRsyncArgument(QString filename);
+    static QString getValidDestinationPath(const QString &destination);
+    static QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItem(QString rsyncOutputLine);
+    QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> getItemAndStoreTransferredBytes(
+        QString rsyncOutputLine);
+    static QList<QByteArray> calculateRsyncRulesFromIncludeRules(
+        const BackupSelectionHash &includeRules, QStringList *files_from_list = 0);
+    static void removeSymlinkString(QString *path);
 
-	quint64 progress_bytesRead;
-	quint64 progress_bytesWritten;
-	float progress_trafficB_s;
-	QString progress_lastFilename;
-	quint64 last_calculatedLiteralData;
+    quint64 progress_bytesRead;
+    quint64 progress_bytesWritten;
+    float progress_trafficB_s;
+    QString progress_lastFilename;
+    quint64 last_calculatedLiteralData;
 
-	long files_total;
-	long cur_n_files_done;
-	QDateTime lastUpdateTime;
+    long files_total;
+    long cur_n_files_done;
+    QDateTime lastUpdateTime;
     static const QList<QString> FILTERED_ENVIRONMENT_VAR_LIST;
 
-	QFileInfo downloadSingleFile( const QString& source, const QString& destination, const QFileInfo& fileName, bool compress, bool emitErrorSignal );
-	QStringList download( const QString& source, const QString& destination, bool compress);
-	QStringList download( const QString& source, const QString& destination, const QStringList& customItemList, bool compress, bool emitErrorSignal );
-	QStringList download( const QString& source, const QString& destination, const BackupSelectionHash& includeRules, bool compress, bool emitErrorSignal );
-	void processWarningsAndErrors(QString* warnings);
+    QFileInfo downloadSingleFile(const QString &source,
+                                 const QString &destination,
+                                 const QFileInfo &fileName,
+                                 bool compress,
+                                 bool emitErrorSignal);
+    QStringList download(const QString &source, const QString &destination, bool compress);
+    QStringList download(const QString &source,
+                         const QString &destination,
+                         const QStringList &customItemList,
+                         bool compress,
+                         bool emitErrorSignal);
+    QStringList download(const QString &source,
+                         const QString &destination,
+                         const BackupSelectionHash &includeRules,
+                         bool compress,
+                         bool emitErrorSignal);
+    void processWarningsAndErrors(QString *warnings);
 
-	static QFileInfo getWriteIncludeFileName(const BackupSelectionHash& includeRules);
-	static QByteArray convertRuleToByteArray(QString rule, bool modifier );
-	static QByteArray convertQStringToQByteArray(QString aStr);
+    static QFileInfo getWriteIncludeFileName(const BackupSelectionHash &includeRules);
+    static QByteArray convertRuleToByteArray(QString rule, bool modifier);
+    static QByteArray convertQStringToQByteArray(QString aStr);
 };
 
 #endif
-

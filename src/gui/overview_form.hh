@@ -33,45 +33,45 @@ class SpaceUsageModel;
  */
 class OverviewForm : public QWidget, private Ui::OverviewForm
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	static const int MAX_LAST_BACKUP_INFOS = 5;
+    static const int MAX_LAST_BACKUP_INFOS = 5;
 
-	/**
-	 * Constructs a OutputDialog with a given title
-	 */
-	OverviewForm( QWidget *parent, MainModel *model );
+    /**
+     * Constructs a OutputDialog with a given title
+     */
+    OverviewForm(QWidget *parent, MainModel *model);
 
-	/**
-	 * Destroys the OutputDialog
-	 */
-	virtual ~OverviewForm();
+    /**
+     * Destroys the OutputDialog
+     */
+    virtual ~OverviewForm();
 
 public slots:
-	/**
- 	 * Refreshes the graphical quota-statistics
-	 */
-	void refreshSpaceStatistic();
+    /**
+     * Refreshes the graphical quota-statistics
+     */
+    void refreshSpaceStatistic();
 
-	/**
-	 * Refreshes the overview of the last n backups
-	 */
-	void refreshLastBackupsOverview();
+    /**
+     * Refreshes the overview of the last n backups
+     */
+    void refreshLastBackupsOverview();
 
-	/**
-	 * Refreshes the overview of the scheduled backup
-	 */
-	void refreshScheduleOverview();
+    /**
+     * Refreshes the overview of the scheduled backup
+     */
+    void refreshScheduleOverview();
 
 private slots:
-	void on_btnBackupNow_clicked();
+    void on_btnBackupNow_clicked();
 
 signals:
-	void startBackupNow();
+    void startBackupNow();
 
 private:
-	MainModel* model;
-    SpaceUsageModel* spaceUsageModel;
+    MainModel *model;
+    SpaceUsageModel *spaceUsageModel;
 };
 
 #endif

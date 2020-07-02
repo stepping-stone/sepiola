@@ -28,15 +28,15 @@
 class LoginException : public Exception
 {
 public:
-	/**
-	 * Constructs a LoginException with the given message
-	 * @param message the exception's message
-	 */
-	LoginException( const QString& message );
+    /**
+     * Constructs a LoginException with the given message
+     * @param message the exception's message
+     */
+    LoginException(const QString &message);
 };
 
-inline LoginException::LoginException( const QString& message ) : Exception( message ) 
-{
-}
+inline LoginException::LoginException(const QString &message)
+    : Exception(message)
+{}
 
 #endif

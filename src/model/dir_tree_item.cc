@@ -17,43 +17,34 @@
 */
 
 #include <QDebug>
-#include <QFileInfo>
 #include <QDir>
 #include <QFileIconProvider>
+#include <QFileInfo>
 
 #include "dir_tree_item.hh"
 #include "utils/file_system_utils.hh"
 
-DirTreeItem::DirTreeItem( const QString& path, const QFileIconProvider& iconProvider )
+DirTreeItem::DirTreeItem(const QString &path, const QFileIconProvider &iconProvider)
 {
-	setEditable(false);
-	this->setCheckable(true);
-	this->setCheckState(Qt::Unchecked);
-			
-	this->absoluteName = path;
-	QFileInfo fileInfo( path );
+    setEditable(false);
+    this->setCheckable(true);
+    this->setCheckState(Qt::Unchecked);
 
-	if ( FileSystemUtils::isDir( path ) )
-	{
-		if ( FileSystemUtils::isRoot( path ) )
-		{
-			setIcon( iconProvider.icon( QFileIconProvider::Drive ) );
-			setText( path );
-		}
-		else
-		{
-			setIcon( iconProvider.icon( QFileIconProvider::Folder ) );
-			setText( fileInfo.dir().dirName() );
-		}
-	}
-	else
-	{
-		setIcon( iconProvider.icon( QFileIconProvider::File ) );
-		setText( fileInfo.fileName() );
-	}
+    this->absoluteName = path;
+    QFileInfo fileInfo(path);
+
+    if (FileSystemUtils::isDir(path)) {
+        if (FileSystemUtils::isRoot(path)) {
+            setIcon(iconProvider.icon(QFileIconProvider::Drive));
+            setText(path);
+        } else {
+            setIcon(iconProvider.icon(QFileIconProvider::Folder));
+            setText(fileInfo.dir().dirName());
+        }
+    } else {
+        setIcon(iconProvider.icon(QFileIconProvider::File));
+        setText(fileInfo.fileName());
+    }
 }
 
-DirTreeItem::~DirTreeItem()
-{
-}
-
+DirTreeItem::~DirTreeItem() {}

@@ -27,15 +27,15 @@
 class RuntimeException : public Exception
 {
 public:
-	/**
-	 * Constructs a RuntimeException with the given message
-	 * @param message the exception's message
-	 */
-	RuntimeException( const QString& message );
+    /**
+     * Constructs a RuntimeException with the given message
+     * @param message the exception's message
+     */
+    RuntimeException(const QString &message);
 };
 
-inline RuntimeException::RuntimeException( const QString& message ) : Exception( message ) 
-{
-}
+inline RuntimeException::RuntimeException(const QString &message)
+    : Exception(message)
+{}
 
 #endif /*RUNTIME_EXCEPTION_HH_*/

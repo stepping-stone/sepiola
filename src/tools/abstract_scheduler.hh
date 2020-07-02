@@ -31,57 +31,64 @@
  */
 class AbstractScheduler : public AbstractInformingProcess
 {
-	Q_OBJECT
-	
-public:	
+    Q_OBJECT
 
-	/**
-	 * Destroys the AbstractScheduler
-	 */
-	virtual ~AbstractScheduler();
-	
-	/**
-	 * Checks whether the scheduler supports running the task after booting or not
-	 * @return flag whether scheduling on start is supported
-	 */
-	virtual bool isSchedulingOnStartSupported() = 0;
-	
-	/**
-	 * Schedules the given task at the given time for the given days
-	 * @param execName the executable's name
-	 * @param cliArgument argument for starting in command line mode
-	 * @param time time to start the task
-	 * @param days a boolean array indicating the days to start the task
-	 */
-	virtual void scheduleTask( const QString& execName, const QString& cliArgument, const QTime& time, const bool days[] ) = 0;
+public:
+    /**
+     * Destroys the AbstractScheduler
+     */
+    virtual ~AbstractScheduler();
 
-	/**
-	 * Schedules the given task to start after booting
-	 * @param execName the executable's name
-	 * @param cliArgument argument for starting in command line mode
-	 * @param minutesToDelay 
-	 */
-	virtual void scheduleTask( const QString& execName, const QString& cliArgument, const int& minutesToDelay ) = 0;
-	
-	/**
-	 * Updates possible existing backup job entry
-	 * @param execName the executable's name
-	 * @param cliArgument argument for starting in command line mode
-	 */
-	virtual bool updateExistingTask( const QString& execName, const QString& cliArgument ) = 0;
+    /**
+     * Checks whether the scheduler supports running the task after booting or not
+     * @return flag whether scheduling on start is supported
+     */
+    virtual bool isSchedulingOnStartSupported() = 0;
 
-	/**
-	 * Deletes possible existing backup job entry
-	 * @param cliArgument argument for starting in command line mode
-	 */
-	virtual void deleteExistingTask( const QString& execName, const QString& cliArgument ) = 0;
-	
+    /**
+     * Schedules the given task at the given time for the given days
+     * @param execName the executable's name
+     * @param cliArgument argument for starting in command line mode
+     * @param time time to start the task
+     * @param days a boolean array indicating the days to start the task
+     */
+    virtual void scheduleTask(const QString &execName,
+                              const QString &cliArgument,
+                              const QTime &time,
+                              const bool days[])
+        = 0;
+
+    /**
+     * Schedules the given task to start after booting
+     * @param execName the executable's name
+     * @param cliArgument argument for starting in command line mode
+     * @param minutesToDelay
+     */
+    virtual void scheduleTask(const QString &execName,
+                              const QString &cliArgument,
+                              const int &minutesToDelay)
+        = 0;
+
+    /**
+     * Updates possible existing backup job entry
+     * @param execName the executable's name
+     * @param cliArgument argument for starting in command line mode
+     */
+    virtual bool updateExistingTask(const QString &execName, const QString &cliArgument) = 0;
+
+    /**
+     * Deletes possible existing backup job entry
+     * @param cliArgument argument for starting in command line mode
+     */
+    virtual void deleteExistingTask(const QString &execName, const QString &cliArgument) = 0;
+
 signals:
-	void askForPassword( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
+    void askForPassword(const QString &username,
+                        bool isUsernameEditable,
+                        int *result = 0,
+                        const QString &msg = "");
 };
 
-inline AbstractScheduler::~AbstractScheduler()
-{
-}
+inline AbstractScheduler::~AbstractScheduler() {}
 
 #endif

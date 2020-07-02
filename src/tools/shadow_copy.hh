@@ -21,18 +21,17 @@
 
 #include "abstract_snapshot.hh"
 
-#include <stdio.h>
-#include <tchar.h>
-#include <string>
-#include <iostream>
 #include "error.h"
+#include <iostream>
 #include <shlwapi.h>
+#include <stdio.h>
+#include <string>
+#include <tchar.h>
 #include <vss.h>
 #include <vswriter.h>
 #include <vsbackup.h>
-#include <QString>
 #include <QHash>
-
+#include <QString>
 
 /* Define some vss snapshot errors code which are 100 < code < 200*/
 #define SNAPSHOT_CANNOT_SET_BACKUP_CONTEXT 101
@@ -53,7 +52,6 @@ class ShadowCopy : public AbstractSnapshot
     Q_OBJECT
 
 public:
-
     /**
      * Creates the ShadowCopy object
      */
@@ -64,7 +62,7 @@ public:
      */
     virtual ~ShadowCopy();
 
-    const SnapshotMapper& getSnapshotPathMappers() const;
+    const SnapshotMapper &getSnapshotPathMappers() const;
 
     /**
      * Checks if there is something to clean up
@@ -88,7 +86,7 @@ public slots:
      * @param The BackupSelectionHash which defines all files which are later
      * backed-up
      */
-    void addFilesToSnapshot( const BackupSelectionHash includeRules );
+    void addFilesToSnapshot(const BackupSelectionHash includeRules);
 
     /**
      * Executes the snapshot
@@ -101,7 +99,7 @@ public slots:
     virtual void cleanupSnapshot();
 
 private:
-    QString wCharArrayToQString( WCHAR* string);
+    QString wCharArrayToQString(WCHAR *string);
     bool removeWindowsSymlink(QString linkname);
     QString getMountDirectory();
     SnapshotMapper snapshotPathMappers;
@@ -114,8 +112,8 @@ private:
     HMODULE vssapiBase;
     IVssBackupComponents *pBackup = NULL;
     IVssAsync *pAsync = NULL;
-    IVssAsync* pPrepare = NULL;
-    IVssAsync* pDoShadowCopy = NULL;
+    IVssAsync *pPrepare = NULL;
+    IVssAsync *pDoShadowCopy = NULL;
     QHash<QString, VSS_ID> snapshot_set_ids;
 };
 

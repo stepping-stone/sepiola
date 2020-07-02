@@ -20,8 +20,8 @@
 #define RESTORE_THREAD_HH
 
 #include <memory>
-#include <QThread>
 #include <QStringList>
+#include <QThread>
 
 #include "utils/const_utils.hh"
 #include "utils/datatypes.hh"
@@ -35,57 +35,65 @@ class AbstractRsync;
  */
 class RestoreThread : public QThread
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	/**
-	 * Creates a RestoreThread
-	 * @param backupName name of the backup for fetching the restore items
-	 * @param destination a destination path for restoring
-	 */
-	RestoreThread( const QString& backup_prefix, const QString& backupName, const BackupSelectionHash& selectionRules, const QString& destination );
+    /**
+     * Creates a RestoreThread
+     * @param backupName name of the backup for fetching the restore items
+     * @param destination a destination path for restoring
+     */
+    RestoreThread(const QString &backup_prefix,
+                  const QString &backupName,
+                  const BackupSelectionHash &selectionRules,
+                  const QString &destination);
 
-	/**
-	 * Destroyes the RestoreThread
-	 */
-	virtual ~RestoreThread();
-
+    /**
+     * Destroyes the RestoreThread
+     */
+    virtual ~RestoreThread();
 
 signals:
-	void showCriticalMessageBox( const QString& message );
-	void finishProgressDialog();
-	void abort();
-	void infoSignal( const QString& text );
-	void errorSignal( const QString& text );
+    void showCriticalMessageBox(const QString &message);
+    void finishProgressDialog();
+    void abort();
+    void infoSignal(const QString &text);
+    void errorSignal(const QString &text);
 
-	void progressSignal( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos = StringPairList());
-	void finalStatusSignal( ConstUtils::StatusEnum status );
+    void progressSignal(const QString &taskText,
+                        float percentFinished,
+                        const QDateTime &timeRemaining,
+                        StringPairList infos = StringPairList());
+    void finalStatusSignal(ConstUtils::StatusEnum status);
 
 public slots:
-	void abortRestoreProcess();
+    void abortRestoreProcess();
 
 protected:
-
-	/**
-	 * Runs the restore process
-	 */
-	void run();
+    /**
+     * Runs the restore process
+     */
+    void run();
 
 private:
-	void init();
-	void checkAbortState();
-	void applyMetadata( const QString& backup_prefix, const QString& backupName, const QStringList& downloadedItems, const QString& downloadDestination );
-	void pushStateEvent(ConstUtils::StatusEnum eventState);
+    void init();
+    void checkAbortState();
+    void applyMetadata(const QString &backup_prefix,
+                       const QString &backupName,
+                       const QStringList &downloadedItems,
+                       const QString &downloadDestination);
+    void pushStateEvent(ConstUtils::StatusEnum eventState);
 
     std::shared_ptr<AbstractRsync> rsync;
-	bool isAborted;
-	bool isCustomRestore;
-	QString backup_prefix;
-	QString backupName;
-	QStringList items;
-	BackupSelectionHash selectionRules;
-	QString destination;
-	ConstUtils::StatusEnum restoreState; // class should be named TimedTask, but was once created only for backup_thread
+    bool isAborted;
+    bool isCustomRestore;
+    QString backup_prefix;
+    QString backupName;
+    QStringList items;
+    BackupSelectionHash selectionRules;
+    QString destination;
+    ConstUtils::StatusEnum
+        restoreState; // class should be named TimedTask, but was once created only for backup_thread
 };
 
 #endif

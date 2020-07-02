@@ -17,36 +17,35 @@
 #|
 */
 
-#include <QDebug>
 #include <QCryptographicHash>
+#include <QDebug>
 
 #include "single_application_guard.hh"
 
-namespace
-{
+namespace {
 
-QString generateUserDependingHash( const QString& user)
+QString generateUserDependingHash(const QString &user)
 {
     QByteArray data;
 
-    data.append( user );
-    data = QCryptographicHash::hash( data, QCryptographicHash::Sha1 ).toHex();
+    data.append(user);
+    data = QCryptographicHash::hash(data, QCryptographicHash::Sha1).toHex();
     return data;
 }
 
-}
+} // namespace
 
-SingleApplicationGuard::SingleApplicationGuard( const QString& userName )
-    : _userName( userName ),
-    _sharedmemKey( generateUserDependingHash( _userName ) ),
-    _sharedMem( generateUserDependingHash( _userName ) )
+SingleApplicationGuard::SingleApplicationGuard(const QString &userName)
+    : _userName(userName)
+    , _sharedmemKey(generateUserDependingHash(_userName))
+    , _sharedMem(generateUserDependingHash(_userName))
 {
 #ifndef Q_OS_WIN32
     // On unix systems shared memory is not freed upon crash.
     // So if there is any trash form previous instance clean it.
-    QSharedMemory memoryToClear( _sharedmemKey );
+    QSharedMemory memoryToClear(_sharedmemKey);
     memoryToClear.lock();
-    if(memoryToClear.attach() ) {
+    if (memoryToClear.attach()) {
         memoryToClear.detach();
     }
     memoryToClear.unlock();
@@ -61,13 +60,14 @@ SingleApplicationGuard::~SingleApplicationGuard()
 bool SingleApplicationGuard::tryToCreateSharedMemory()
 {
     /**
-      *Try to create and attach a shared memory segment with the key passed to the constructor.
-      *This is based on ideas and code from http://aeguana.com/blog/how-to-run-a-single-app-instance-in-qt/
-      */
+     *Try to create and attach a shared memory segment with the key passed to the constructor.
+     *This is based on ideas and code from
+     *http://aeguana.com/blog/how-to-run-a-single-app-instance-in-qt/
+     */
     _sharedMem.lock();
-    const bool isSharedMemFree = _sharedMem.create( sizeof( quint64 ) );
+    const bool isSharedMemFree = _sharedMem.create(sizeof(quint64));
     _sharedMem.unlock();
-    if ( !isSharedMemFree ) {
+    if (!isSharedMemFree) {
         _releaseMemory();
         return false;
     }
@@ -77,7 +77,7 @@ bool SingleApplicationGuard::tryToCreateSharedMemory()
 void SingleApplicationGuard::_releaseMemory()
 {
     _sharedMem.lock();
-    if ( _sharedMem.isAttached() )
+    if (_sharedMem.isAttached())
         _sharedMem.detach();
     _sharedMem.unlock();
 }

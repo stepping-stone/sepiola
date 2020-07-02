@@ -19,8 +19,8 @@
 #ifndef MAIN_WINDOW_HH
 #define MAIN_WINDOW_HH
 
-#include <QMainWindow>
 #include <QCloseEvent>
+#include <QMainWindow>
 
 #include "ui_main_window.h"
 
@@ -39,69 +39,75 @@ class QStackedLayout;
  */
 class MainWindow : public QMainWindow, private Ui::MainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	/**
-	 * Constructs a MainWindow with a given model
-	 */
-	MainWindow ( MainModel *model );
+    /**
+     * Constructs a MainWindow with a given model
+     */
+    MainWindow(MainModel *model);
 
-	/**
-	 * Destroys the MainWindow
-	 */
-	virtual ~MainWindow();
-	void show();
+    /**
+     * Destroys the MainWindow
+     */
+    virtual ~MainWindow();
+    void show();
 
 signals:
-	void rejectPasswordDialog();
-	void writeLog( const QString& message );
+    void rejectPasswordDialog();
+    void writeLog(const QString &message);
 
-	void updateOverviewFormScheduleInfo();
-	void updateOverviewFormLastBackupsInfo();
+    void updateOverviewFormScheduleInfo();
+    void updateOverviewFormLastBackupsInfo();
 
 private:
-	enum FORM_INDEX { OVERVIEW, BACKUP, RESTORE, SETTINGS, LOGFILE };
-	QStackedLayout *stackedLayout;
-	MainModel* model;
-	OverviewForm* overviewForm;
-	BackupForm* backupForm;
-	RestoreForm* restoreForm;
-	SettingsForm* settingsForm;
-	LogfileForm* logfileForm;
-	TrafficProgressDialog* progressDialog;
+    enum FORM_INDEX { OVERVIEW, BACKUP, RESTORE, SETTINGS, LOGFILE };
+    QStackedLayout *stackedLayout;
+    MainModel *model;
+    OverviewForm *overviewForm;
+    BackupForm *backupForm;
+    RestoreForm *restoreForm;
+    SettingsForm *settingsForm;
+    LogfileForm *logfileForm;
+    TrafficProgressDialog *progressDialog;
 
-	void writeSettings();
-	void readSettings();
-	void closeEvent ( QCloseEvent *event );
-	void setFormIndex( FORM_INDEX index );
-	void showOverviewForm();
-	void showBackupForm();
-	void showRestoreForm();
-	void showSettingsForm();
-	void showLogfileForm();
+    void writeSettings();
+    void readSettings();
+    void closeEvent(QCloseEvent *event);
+    void setFormIndex(FORM_INDEX index);
+    void showOverviewForm();
+    void showBackupForm();
+    void showRestoreForm();
+    void showSettingsForm();
+    void showLogfileForm();
 
 private slots:
-	void showInformationMessageBox( const QString& message );
-	void showCriticalMessageBox( const QString& message );
-	void showServerPasswordDialog( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
-	void showClientPasswordDialog( const QString& username, bool isUsernameEditable, int* result = 0, const QString& msg = "" );
-	
-	void showProgressDialog( const QString& dialogTitle );
-	void finishProgressDialog();
-	void closeProgressDialog();
-	
-	void on_actionOverview_triggered();
-	void on_actionBackup_triggered();
-	void on_actionRestore_triggered();
-	void on_actionSettings_triggered();
-	void on_actionLogfile_triggered();
-	void on_actionAbout_triggered();
-	void on_btnOverview_clicked();
-	void on_btnBackup_clicked();
-	void on_btnRestore_clicked();
-	void on_btnSettings_clicked();
-	void on_btnLogfile_clicked();
+    void showInformationMessageBox(const QString &message);
+    void showCriticalMessageBox(const QString &message);
+    void showServerPasswordDialog(const QString &username,
+                                  bool isUsernameEditable,
+                                  int *result = 0,
+                                  const QString &msg = "");
+    void showClientPasswordDialog(const QString &username,
+                                  bool isUsernameEditable,
+                                  int *result = 0,
+                                  const QString &msg = "");
+
+    void showProgressDialog(const QString &dialogTitle);
+    void finishProgressDialog();
+    void closeProgressDialog();
+
+    void on_actionOverview_triggered();
+    void on_actionBackup_triggered();
+    void on_actionRestore_triggered();
+    void on_actionSettings_triggered();
+    void on_actionLogfile_triggered();
+    void on_actionAbout_triggered();
+    void on_btnOverview_clicked();
+    void on_btnBackup_clicked();
+    void on_btnRestore_clicked();
+    void on_btnSettings_clicked();
+    void on_btnLogfile_clicked();
 };
 
 #endif

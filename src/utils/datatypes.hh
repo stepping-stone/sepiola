@@ -19,15 +19,15 @@
 #ifndef DATATYPES_HH
 #define DATATYPES_HH
 
-#include <QMetaType>
 #include <QHash>
-#include <QString>
-#include <QPair>
 #include <QList>
+#include <QMetaType>
+#include <QPair>
+#include <QString>
 
-typedef QList<QPair<QString,QString> > StringPairList;
-Q_DECLARE_METATYPE( StringPairList )
-typedef QHash<QString,bool> BackupSelectionHash;
-Q_DECLARE_METATYPE( BackupSelectionHash )
+typedef QList<QPair<QString, QString>> StringPairList;
+Q_DECLARE_METATYPE(StringPairList)
+typedef QHash<QString, bool> BackupSelectionHash;
+Q_DECLARE_METATYPE(BackupSelectionHash)
 
 #endif /*DATATYPES_HH*/

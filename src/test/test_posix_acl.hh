@@ -21,7 +21,7 @@
 
 #include <QtTest/QtTest>
 
-class TestPosixAcl: public QObject
+class TestPosixAcl : public QObject
 {
     Q_OBJECT
 private slots:

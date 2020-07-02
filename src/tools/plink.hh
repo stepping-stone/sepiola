@@ -28,76 +28,78 @@
  */
 class Plink : public AbstractSsh, public Process
 {
+public:
+    /**
+     * Constructs a Plink
+     */
+    Plink();
 
-    public:
+    /**
+     * Destroys the Plink
+     */
+    virtual ~Plink();
 
-        /**
-         * Constructs a Plink
-         */
-        Plink();
+    /**
+     * @see AbstractSsh::uploadToMetaFolder( const QFileInfo& file, bool append )
+     */
+    void uploadToMetaFolder(const QFileInfo &file, bool append);
 
-        /**
-         * Destroys the Plink
-         */
-        virtual ~Plink();
+    /**
+     * @see AbstractSsh::generateKeys( const QString& password )
+     */
+    bool generateKeys(const QString &password);
 
-        /**
-         * @see AbstractSsh::uploadToMetaFolder( const QFileInfo& file, bool append )
-         */
-        void uploadToMetaFolder( const QFileInfo& file, bool append );
+    /**
+     * @see AbstractSsh::loginWithKey()
+     */
+    bool loginWithKey();
 
-        /**
-         * @see AbstractSsh::generateKeys( const QString& password )
-         */
-        bool generateKeys( const QString& password );
+    /**
+     * @see AbstractSsh::assertCorrectFingerprint()
+     */
+    bool assertCorrectFingerprint();
 
-        /**
-         * @see AbstractSsh::loginWithKey()
-         */
-        bool loginWithKey();
+    bool assertCorrectFingerprint(const QString &userName,
+                                  const QString &serverName,
+                                  const QString &savedKey);
 
-        /**
-         * @see AbstractSsh::assertCorrectFingerprint()
-         */
-        bool assertCorrectFingerprint();
+    /**
+     * @see AbstractSsh::getServerQuotaValues()
+     */
+    QList<int> getServerQuotaValues();
 
-        bool assertCorrectFingerprint(const QString& userName, const QString& serverName, const QString& savedKey);
+    /**
+     * Tests the generateKeys method
+     * @see generateKeys()
+     */
+    static void testGenerateKeys();
 
-        /**
-         * @see AbstractSsh::getServerQuotaValues()
-         */
-        QList<int> getServerQuotaValues();
+    /**
+     * Tests the loginWithKey method
+     */
+    static void testLoginWithKey();
 
-        /**
-         * Tests the generateKeys method
-         * @see generateKeys()
-         */
-        static void testGenerateKeys();
+    /**
+     * Tests the assertCorrectFingerprint method
+     */
+    static void testAssertCorrectFingerprint();
 
-        /**
-         * Tests the loginWithKey method
-         */
-        static void testLoginWithKey();
+private:
+    static const QString PUTTY_HEADER_FIRST_LINE;
+    static const QString OPEN_SSH_HEADER_FIRST_LINE;
+    static const QString LOGIN_ECHO_MESSAGE;
+    static const QString START_PRIVATE_KEY_ECHO_MESSAGE;
+    static const QString END_PRIVATE_KEY_ECHO_MESSAGE;
+    static const QString START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
+    static const QString END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
+    static const QString KEY_LENGTH;
+    static const QString KEY_TYPE;
 
-        /**
-         * Tests the assertCorrectFingerprint method
-         */
-        static void testAssertCorrectFingerprint();
+    const QString plinkName;
 
-    private:
-        static const QString PUTTY_HEADER_FIRST_LINE;
-        static const QString OPEN_SSH_HEADER_FIRST_LINE;
-        static const QString LOGIN_ECHO_MESSAGE;
-        static const QString START_PRIVATE_KEY_ECHO_MESSAGE;
-        static const QString END_PRIVATE_KEY_ECHO_MESSAGE;
-        static const QString START_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
-        static const QString END_PRIVATE_OPENSSH_KEY_ECHO_MESSAGE;
-        static const QString KEY_LENGTH;
-        static const QString KEY_TYPE;
-
-        const QString plinkName;
-
-        static QString extractKey( const QStringList& keyLines, const QString& startLine, const QString& endLine );
+    static QString extractKey(const QStringList &keyLines,
+                              const QString &startLine,
+                              const QString &endLine);
 };
 
 #endif

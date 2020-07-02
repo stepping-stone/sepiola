@@ -27,15 +27,15 @@
 class ProcessException : public Exception
 {
 public:
-	/**
-	 * Constructs a ProcessException with the given message
-	 * @param message the exception's message
-	 */
-	ProcessException( const QString& message );
+    /**
+     * Constructs a ProcessException with the given message
+     * @param message the exception's message
+     */
+    ProcessException(const QString &message);
 };
 
-inline ProcessException::ProcessException( const QString& message ) : Exception( message ) 
-{
-}
+inline ProcessException::ProcessException(const QString &message)
+    : Exception(message)
+{}
 
 #endif

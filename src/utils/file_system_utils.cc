@@ -23,167 +23,158 @@
 #include <QTextCodec>
 #include <QTextStream>
 
-#include "utils/file_system_utils.hh"
-#include "test/test_manager.hh"
-#include "settings/platform.hh"
 #include "exception/runtime_exception.hh"
+#include "settings/platform.hh"
+#include "test/test_manager.hh"
+#include "utils/file_system_utils.hh"
 
-FileSystemUtils::FileSystemUtils()
+FileSystemUtils::FileSystemUtils() {}
+
+FileSystemUtils::~FileSystemUtils() {}
+
+bool FileSystemUtils::rmDirRecursive(const QString &directory)
 {
+    QString directoryName = directory;
+    if (!directoryName.endsWith("/")) {
+        directoryName.append("/");
+    }
+    QDir dir(directoryName);
+    QList<QFileInfo> dirEntries = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::Hidden
+                                                    | QDir::NoDotAndDotDot);
+    foreach (QFileInfo entry, dirEntries) {
+        if (entry.isDir()) {
+            rmDirRecursive(entry.absoluteFilePath()); // recursive call for deleting directory
+        } else {
+            QFile::remove(entry.absoluteFilePath()); // delete file
+        }
+    }
+    return dir.rmdir(directoryName);
 }
 
-FileSystemUtils::~FileSystemUtils()
+void FileSystemUtils::removeFile(const QFileInfo &fileInfo)
 {
+    QFile file(fileInfo.absoluteFilePath());
+    file.remove();
 }
 
-bool FileSystemUtils::rmDirRecursive(const QString& directory)
+void FileSystemUtils::convertFile(const QString &fileName,
+                                  const QString &fromEncoding,
+                                  const QString &toEncoding)
 {
-	QString directoryName = directory;
-	if ( !directoryName.endsWith("/") )
-	{
-		directoryName.append("/");
-	}
-	QDir dir(directoryName);
-	QList<QFileInfo> dirEntries = dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
-	foreach( QFileInfo entry, dirEntries )
-	{
-		if ( entry.isDir() )
-		{
-			rmDirRecursive( entry.absoluteFilePath() ); // recursive call for deleting directory
-		}
-		else
-		{
-			QFile::remove( entry.absoluteFilePath() ); // delete file
-		}
-	}
-	return dir.rmdir(directoryName);
-}
+    qDebug() << "FileSystemUtils::convertFile"
+             << " " << fileName << " " << fromEncoding << " " << toEncoding;
 
-void FileSystemUtils::removeFile(const QFileInfo& fileInfo)
-{
-	QFile file(fileInfo.absoluteFilePath() );
-	file.remove();
-}
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly))
+        throw RuntimeException(QObject::tr("Could not open file %1").arg(fileName));
+    qDebug() << "File to convert: " << fileName << " size: " << file.size();
+    QTemporaryFile tmpFile(fileName);
+    tmpFile.setAutoRemove(false);
+    if (!tmpFile.open())
+        throw RuntimeException(
+            QObject::tr("Could not open temporary file %1").arg(tmpFile.fileName()));
 
-void FileSystemUtils::convertFile(const QString& fileName, const QString& fromEncoding, const QString& toEncoding)
-{
-	qDebug() << "FileSystemUtils::convertFile" << " " << fileName << " " << fromEncoding << " " << toEncoding;
+    qDebug() << "tmpFile: " << tmpFile.fileName();
 
-	QFile file(fileName);
-	if (!file.open(QIODevice::ReadOnly))
-	    throw RuntimeException( QObject::tr( "Could not open file %1" ).arg(fileName) );
-	qDebug() << "File to convert: " << fileName << " size: " << file.size();
-	QTemporaryFile tmpFile(fileName);
-	tmpFile.setAutoRemove(false);
-	if (!tmpFile.open())
-	    throw RuntimeException( QObject::tr( "Could not open temporary file %1" ).arg(tmpFile.fileName()) );
+    QTextStream inputStream(&file);
+    if (!fromEncoding.isEmpty())
+        inputStream.setCodec(fromEncoding.toLatin1());
 
-	qDebug() << "tmpFile: " << tmpFile.fileName();
+    QTextStream outputStream(&tmpFile);
+    if (!toEncoding.isEmpty())
+        outputStream.setCodec(toEncoding.toLatin1());
 
-	QTextStream inputStream(&file);
-	if (!fromEncoding.isEmpty())
-		inputStream.setCodec(fromEncoding.toLatin1());
-
-	QTextStream outputStream(&tmpFile);
-	if (!toEncoding.isEmpty())
-		outputStream.setCodec(toEncoding.toLatin1());
-
-	while (!inputStream.atEnd())
-	{
-		outputStream << inputStream.readLine() << endl;
-		if (tmpFile.error() != 0)
-		{
-			throw RuntimeException( QObject::tr( "converted data could not be written to temporary file %1" ).arg(tmpFile.fileName()) );
-		}
-	}
-	outputStream.flush();
-	file.close();
-	tmpFile.close();
-	// overwrite file by tmpFile
-	if (!file.remove())
-		throw RuntimeException( QObject::tr( "Trying to rename file %1 to %2:\n  -> file %1 could nod be removed." ).arg(tmpFile.fileName(), file.fileName()) );
-	if (!tmpFile.rename(fileName))
-		throw RuntimeException( QObject::tr( "Could not rename file %1 to %2." ).arg(tmpFile.fileName(), file.fileName()) );
+    while (!inputStream.atEnd()) {
+        outputStream << inputStream.readLine() << endl;
+        if (tmpFile.error() != 0) {
+            throw RuntimeException(
+                QObject::tr("converted data could not be written to temporary file %1")
+                    .arg(tmpFile.fileName()));
+        }
+    }
+    outputStream.flush();
+    file.close();
+    tmpFile.close();
+    // overwrite file by tmpFile
+    if (!file.remove())
+        throw RuntimeException(
+            QObject::tr("Trying to rename file %1 to %2:\n  -> file %1 could nod be removed.")
+                .arg(tmpFile.fileName(), file.fileName()));
+    if (!tmpFile.rename(fileName))
+        throw RuntimeException(
+            QObject::tr("Could not rename file %1 to %2.").arg(tmpFile.fileName(), file.fileName()));
 }
 
 #ifdef Q_OS_WIN32
-void FileSystemUtils::convertToServerPath(QString* path)
+void FileSystemUtils::convertToServerPath(QString *path)
 {
-    *path = QDir::fromNativeSeparators( *path);
-    if (path->size()> 2 && (*path)[0].isLetter() && (*path)[1] == ':' && (*path)[2] == '/')
-    {
+    *path = QDir::fromNativeSeparators(*path);
+    if (path->size() > 2 && (*path)[0].isLetter() && (*path)[1] == ':' && (*path)[2] == '/') {
         *path = QString("/") + (*path)[0].toUpper() + path->right(path->size() - 2);
     }
 }
-void FileSystemUtils::convertToCygwinPath(QString* path) {
-    *path = QDir::fromNativeSeparators( *path);
-    if (path->size()> 1 && (*path)[0].isLetter() && (*path)[1] == ':')
-    {
+void FileSystemUtils::convertToCygwinPath(QString *path)
+{
+    *path = QDir::fromNativeSeparators(*path);
+    if (path->size() > 1 && (*path)[0].isLetter() && (*path)[1] == ':') {
         *path = QString("/cygdrive/") + (*path)[0].toLower() + path->right(path->size() - 2);
     }
 }
 #else
-void FileSystemUtils::convertToServerPath(QString*)
-{
-}
+void FileSystemUtils::convertToServerPath(QString *) {}
 #endif
 
 #ifdef Q_OS_WIN32
-void FileSystemUtils::convertToLocalPath(QString* path)
+void FileSystemUtils::convertToLocalPath(QString *path)
 {
-    if (path->size()> 2 && (*path)[0] == '/' && (*path)[1].isLetter() && (*path)[2] == '/')
-    {
+    if (path->size() > 2 && (*path)[0] == '/' && (*path)[1].isLetter() && (*path)[2] == '/') {
         *path = (*path)[1] + ":" + path->right(path->size() - 2);
-        *path = QDir::toNativeSeparators( *path);
+        *path = QDir::toNativeSeparators(*path);
         return;
     }
-    if (path->size()> 1 && (*path)[0].isLetter() && (*path)[1] == '/')
-    {
+    if (path->size() > 1 && (*path)[0].isLetter() && (*path)[1] == '/') {
         *path = (*path)[0] + ":" + path->right(path->size() - 1);
-        *path = QDir::toNativeSeparators( *path);
+        *path = QDir::toNativeSeparators(*path);
         return;
     }
 }
 #else
-void FileSystemUtils::convertToLocalPath(QString*)
-{
-}
+void FileSystemUtils::convertToLocalPath(QString *) {}
 #endif
 
-bool FileSystemUtils::isRoot(const QString& path)
+bool FileSystemUtils::isRoot(const QString &path)
 {
-    return ( (path.size() == 1 && path.startsWith( '/') ) || (path.size() == 3 && path[0].isLetter() && path[1] == ':' ) || (path.size() == 1)  );
+    return ((path.size() == 1 && path.startsWith('/'))
+            || (path.size() == 3 && path[0].isLetter() && path[1] == ':') || (path.size() == 1));
 }
 
 #ifdef Q_OS_WIN32
-QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList& paths)
+QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList &paths)
 {
     QStringList rootItems;
     QString drive("");
-    foreach(QString path, paths) {
-       if (path.at(0).isLetter() && path.at(1) == ':') {
-           drive = path.at(0).toUpper();
-           drive.append(":\\");
-           if (!rootItems.contains(drive))
-             rootItems.append(drive);
-       }
+    foreach (QString path, paths) {
+        if (path.at(0).isLetter() && path.at(1) == ':') {
+            drive = path.at(0).toUpper();
+            drive.append(":\\");
+            if (!rootItems.contains(drive))
+                rootItems.append(drive);
+        }
     }
     return rootItems;
 }
 
-QString FileSystemUtils::getDriveLetterByFile( const QString filename )
+QString FileSystemUtils::getDriveLetterByFile(const QString filename)
 {
     // The filename will be something like <LETTER>:\path\to\file so get the <LETTER>
     QRegExp regex("^\\w:\\/");
 
     // Get the first occurrence of the regex in the filename
-    int pos = regex.indexIn( filename );
+    int pos = regex.indexIn(filename);
     QString letter;
-    if ( pos > -1 )
-    {
+    if (pos > -1) {
         letter = regex.cap(0).left(1);
-    } else
-    {
+    } else {
         // TODO: What if no drive letter was found?
         qDebug() << filename << "does not math ^\\w:\\/";
     }
@@ -192,7 +183,7 @@ QString FileSystemUtils::getDriveLetterByFile( const QString filename )
 }
 
 #else
-QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList& content)
+QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList &content)
 {
     QStringList rootItem;
     if (content.first().startsWith('/'))
@@ -204,51 +195,47 @@ QStringList FileSystemUtils::getRootItemsOutFromAbsolutPaths(const QStringList& 
 
 #endif
 
-bool FileSystemUtils::isDir(const QString& path)
+bool FileSystemUtils::isDir(const QString &path)
 {
-	return path.endsWith("/") || path.endsWith("\\");
+    return path.endsWith("/") || path.endsWith("\\");
 }
 
-void FileSystemUtils::writeLinesToFile(const QString& fileName, const QStringList& lines, const QString& encoding)
+void FileSystemUtils::writeLinesToFile(const QString &fileName,
+                                       const QStringList &lines,
+                                       const QString &encoding)
 {
-	qDebug() << "FileSystemUtils::writeLinesToFile( " << fileName << ", ... )";
-	QStringList result;
-	QFile file(fileName);
-	if ( !file.open(QIODevice::WriteOnly) )
-	{
-		qWarning() << "Can not write to file " + fileName;
-	}
-	QTextStream out( &file);
-	if (!encoding.isEmpty())
-	{
-		out.setCodec(encoding.toLatin1());
-		//out.setGenerateByteOrderMark(true);
-	}
-	foreach( QString line, lines )
-	{
-		out << line << Platform::EOL_CHARACTER;
-	}
+    qDebug() << "FileSystemUtils::writeLinesToFile( " << fileName << ", ... )";
+    QStringList result;
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can not write to file " + fileName;
+    }
+    QTextStream out(&file);
+    if (!encoding.isEmpty()) {
+        out.setCodec(encoding.toLatin1());
+        // out.setGenerateByteOrderMark(true);
+    }
+    foreach (QString line, lines) {
+        out << line << Platform::EOL_CHARACTER;
+    }
 }
 
-QStringList FileSystemUtils::readLinesFromFile(const QString& fileName, const QString& encoding)
+QStringList FileSystemUtils::readLinesFromFile(const QString &fileName, const QString &encoding)
 {
-	qDebug() << "FileSystemUtils::readLinesFromFile( " << fileName << " )";
-	QStringList result;
-	QFile file(fileName);
-	if ( !file.open(QIODevice::ReadWrite) )
-	{
-		qWarning() << "Can not read from file " + fileName;
-		return result;
-	}
-	QTextStream in(&file);
-	if (!encoding.isEmpty())
-	{
-		in.setCodec(encoding.toLatin1());
-	}
-	while ( !in.atEnd() )
-	{
-		QString line = in.readLine();
-		result << line;
-	}
-	return result;
+    qDebug() << "FileSystemUtils::readLinesFromFile( " << fileName << " )";
+    QStringList result;
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadWrite)) {
+        qWarning() << "Can not read from file " + fileName;
+        return result;
+    }
+    QTextStream in(&file);
+    if (!encoding.isEmpty()) {
+        in.setCodec(encoding.toLatin1());
+    }
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        result << line;
+    }
+    return result;
 }

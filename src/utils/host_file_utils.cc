@@ -19,20 +19,23 @@
 #include "utils/host_file_utils.hh"
 #include "utils/file_system_utils.hh"
 
-#include <QSettings>
-#include <QDebug>
-#include <QtEndian>
-#include <QHostInfo>
 #include <QByteArray>
+#include <QDebug>
+#include <QHostInfo>
+#include <QSettings>
 #include <QStringList>
+#include <QtEndian>
 
-void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QString& sshhostkeysFileName, const QString& sshKnownHostsFileName )
+void HostFileUtils::addPuttyKeyToOpenSshKeyFile(const QString &host,
+                                                const QString &sshhostkeysFileName,
+                                                const QString &sshKnownHostsFileName)
 {
     QString puttyKey;
 
 #ifdef Q_OS_WIN32
     // Read the SshHostKey fingerprint form the registry.
-    QSettings puttySshHostKey("HKEY_CURRENT_USER\\Software\\SimonTatham\\PUTTY\\SshHostKeys", QSettings::NativeFormat);
+    QSettings puttySshHostKey("HKEY_CURRENT_USER\\Software\\SimonTatham\\PUTTY\\SshHostKeys",
+                              QSettings::NativeFormat);
     QVariant puttyKeyValue = puttySshHostKey.value(QString("rsa2@22:%2").arg(host));
 
     if (puttyKeyValue.isNull()) {
@@ -44,8 +47,7 @@ void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QStr
 #else
     puttyKey = getPuttyKey(host, sshhostkeysFileName);
 
-    if( puttyKey.isEmpty() )
-    {
+    if (puttyKey.isEmpty()) {
         qDebug() << "no putty key found for host " << host;
         return;
     }
@@ -57,21 +59,21 @@ void HostFileUtils::addPuttyKeyToOpenSshKeyFile( const QString& host, const QStr
     addOpenSshKey(sshKey, host, sshKnownHostsFileName);
 }
 
-QString HostFileUtils::getPuttyKey( const QString& host, const QString& sshhostkeysFileName )
+QString HostFileUtils::getPuttyKey(const QString &host, const QString &sshhostkeysFileName)
 {
-    QStringList allKeys = FileSystemUtils::readLinesFromFile( sshhostkeysFileName );
+    QStringList allKeys = FileSystemUtils::readLinesFromFile(sshhostkeysFileName);
 
-    QString hostSearchPattern = ":" + host + " "; //rsa2@22:host 0x23,0x
+    QString hostSearchPattern = ":" + host + " "; // rsa2@22:host 0x23,0x
 
     foreach (QString key, allKeys)
-        if (key.contains( hostSearchPattern))
+        if (key.contains(hostSearchPattern))
             return key;
 
     qDebug() << "key not found";
     return QString();
 }
 
-QString HostFileUtils::convertPuttyKey( const QString& puttyData, const QString& host )
+QString HostFileUtils::convertPuttyKey(const QString &puttyData, const QString &host)
 {
     // the format of the puttyKeyString is:
     //     0x10001,0xcd7843370db6046...
@@ -79,11 +81,13 @@ QString HostFileUtils::convertPuttyKey( const QString& puttyData, const QString&
     // build the list of subkeys first
     // the first element for openSSH is again the keytype
     QList<QByteArray> subkeys({"ssh-rsa"});
-    for (const QString& entry: puttyData.split(','))
+    for (const QString &entry : puttyData.split(','))
         subkeys.append(QByteArray::fromHex(entry.mid(2).toAscii()));
 
     // the actual key has to be left padded with a 0, but why?
-    Q_ASSERT(subkeys.size() == 3); // make sure we really have only 3 elements, otherwise our assumptions are incorrect
+    Q_ASSERT(
+        subkeys.size()
+        == 3); // make sure we really have only 3 elements, otherwise our assumptions are incorrect
     subkeys[2].insert(0, '\0');
 
     // merge the subkeys, the format expected by OpenSSH is:
@@ -91,10 +95,11 @@ QString HostFileUtils::convertPuttyKey( const QString& puttyData, const QString&
     // where the n's are uint32 in big endian order and the c's are single bytes
     // therefore the "magic" 00 00 00 07 ... at the beginning of each ssh-rsa key type: len("ssh-rsa") = 7
     QByteArray key;
-    for (const auto& entry: subkeys)
-    {
-        quint32 length = qToBigEndian(entry.size()); // make sure the length has the correct byte order
-        key.append(static_cast<const char*>(static_cast<void*>(&length)), 4); // a uint32 is guaranteed to be 4 bytes
+    for (const auto &entry : subkeys) {
+        quint32 length = qToBigEndian(
+            entry.size()); // make sure the length has the correct byte order
+        key.append(static_cast<const char *>(static_cast<void *>(&length)),
+                   4); // a uint32 is guaranteed to be 4 bytes
         key.append(entry);
     }
 
@@ -106,43 +111,39 @@ QString HostFileUtils::convertPuttyKey( const QString& puttyData, const QString&
         .arg(key.toBase64().data());
 }
 
-void HostFileUtils::addOpenSshKey( const QString& openSshKey, const QString& host, const QString& knownHostsFile )
+void HostFileUtils::addOpenSshKey(const QString &openSshKey,
+                                  const QString &host,
+                                  const QString &knownHostsFile)
 {
-    QStringList oldKeys = FileSystemUtils::readLinesFromFile( knownHostsFile );
+    QStringList oldKeys = FileSystemUtils::readLinesFromFile(knownHostsFile);
     QStringList newKeys;
 
     QString hostSearchPattern = host + ",";
     bool added = false;
-    foreach( QString key, oldKeys )
-    {
-        if( key.startsWith( hostSearchPattern ) )
-        {
+    foreach (QString key, oldKeys) {
+        if (key.startsWith(hostSearchPattern)) {
             // replace the key
             newKeys << openSshKey;
             added = true;
-        }
-        else
-        {
+        } else {
             newKeys << key;
         }
     }
-    if( !added )
-    {
+    if (!added) {
         newKeys << openSshKey;
     }
 
-    FileSystemUtils::writeLinesToFile( knownHostsFile, newKeys );
+    FileSystemUtils::writeLinesToFile(knownHostsFile, newKeys);
 }
 
-QString HostFileUtils::getIpAddress( const QString& host )
+QString HostFileUtils::getIpAddress(const QString &host)
 {
-    QHostInfo hostInfo = QHostInfo::fromName( host ); // blocking lookup
+    QHostInfo hostInfo = QHostInfo::fromName(host); // blocking lookup
 
-    if (hostInfo.error() != QHostInfo::NoError)
-    {
+    if (hostInfo.error() != QHostInfo::NoError) {
         qWarning() << "IP address lookup failed:" << hostInfo.errorString();
         return QString();
     }
-    
+
     return hostInfo.addresses().first().toString(); // use the first IP address
 }

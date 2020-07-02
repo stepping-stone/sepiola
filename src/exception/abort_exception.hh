@@ -28,15 +28,15 @@
 class AbortException : public Exception
 {
 public:
-	/**
-	 * Constructs a AbortException with the given message
-	 * @param message the exception's message
-	 */
-	AbortException( const QString& message );
+    /**
+     * Constructs a AbortException with the given message
+     * @param message the exception's message
+     */
+    AbortException(const QString &message);
 };
 
-inline AbortException::AbortException( const QString& message ) : Exception( message ) 
-{
-}
+inline AbortException::AbortException(const QString &message)
+    : Exception(message)
+{}
 
 #endif

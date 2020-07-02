@@ -26,16 +26,13 @@
 
 #include <QSharedMemory>
 
-
 class SingleApplicationGuard
 {
-
 public:
-    SingleApplicationGuard( const QString& key );
+    SingleApplicationGuard(const QString &key);
     ~SingleApplicationGuard();
 
     bool tryToCreateSharedMemory();
-
 
 private:
     void _releaseMemory();
@@ -43,6 +40,5 @@ private:
     const QString _userName;
     const QString _sharedmemKey;
     QSharedMemory _sharedMem;
-
 };
 #endif // SINGLE_APPLICATION_GUARD_HH

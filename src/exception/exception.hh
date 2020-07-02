@@ -31,40 +31,37 @@
 class Exception : public std::exception
 {
 public:
+    /**
+     * Constructs an Exception with the given message
+     * @param message the exception's message
+     */
+    Exception(const QString &message);
 
-	/**
-	 * Constructs an Exception with the given message
-	 * @param message the exception's message
-	 */
-    Exception( const QString& message );
-
-	/**
-	 * Destroys the Exception
-	 */
+    /**
+     * Destroys the Exception
+     */
     virtual ~Exception() throw();
-    
+
     /**
      * Returns the message of the exception
      * @return the message
      */
-	virtual const char* what() const throw();
-	
+    virtual const char *what() const throw();
+
 private:
-	QByteArray message;
+    QByteArray message;
 };
 
-inline Exception::Exception( const QString& message )
+inline Exception::Exception(const QString &message)
 {
-	this->message = message.toLocal8Bit();
+    this->message = message.toLocal8Bit();
 }
 
-inline Exception::~Exception() throw()
-{
-}
+inline Exception::~Exception() throw() {}
 
-inline const char* Exception::what() const throw()
+inline const char *Exception::what() const throw()
 {
-	return message;
+    return message;
 }
 
 #endif

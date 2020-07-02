@@ -22,36 +22,40 @@
 #include <QTime>
 
 /*
- * example: 
+ * example:
  *   DebugTimer::setMarker(); qDebug() <<  "timer marker set at <code position info>";
- *   qDebug() << "<code position info> " << QString::number(DebugTimer::msecSinceLast(true))+"msecs since last time-marker";    
+ *   qDebug() << "<code position info> " << QString::number(DebugTimer::msecSinceLast(true))+"msecs
+ * since last time-marker";
  */
 class DebugTimer
 {
 private:
-	DebugTimer();
+    DebugTimer();
+
 public:
-	static void setMarker();
-	static int msecSinceLast(bool doResetMarker = false);
-	static QTime tmpSetter(bool set = false);
+    static void setMarker();
+    static int msecSinceLast(bool doResetMarker = false);
+    static QTime tmpSetter(bool set = false);
 };
 #endif /*DEBUG_TIMER_HH_*/
 
 inline QTime DebugTimer::tmpSetter(bool set)
 {
-	static QTime t0;
-	if (set) t0 = QTime::currentTime();
-	return t0;
+    static QTime t0;
+    if (set)
+        t0 = QTime::currentTime();
+    return t0;
 }
 
 inline void DebugTimer::setMarker()
 {
-	tmpSetter(true);
+    tmpSetter(true);
 }
 
 inline int DebugTimer::msecSinceLast(bool doResetMarker)
 {
-	int dt = tmpSetter(false).msecsTo(QTime::currentTime());
-	if (doResetMarker) setMarker();
-	return dt;
+    int dt = tmpSetter(false).msecsTo(QTime::currentTime());
+    if (doResetMarker)
+        setMarker();
+    return dt;
 }

@@ -36,58 +36,68 @@
 class At : public AbstractScheduler, public Process
 {
 public:
+    /**
+     * Constructs an At
+     */
+    At();
 
-	/**
-	 * Constructs an At
-	 */
-	At();
+    /**
+     * Destroys the At
+     */
+    virtual ~At();
 
-	/**
-	 * Destroys the At
-	 */
-	virtual ~At();
+    /**
+     * @see AbstractScheduler::isSchedulingOnStartSupported()
+     */
+    virtual bool isSchedulingOnStartSupported();
 
-	/**
-	 * @see AbstractScheduler::isSchedulingOnStartSupported()
-	 */
-	virtual bool isSchedulingOnStartSupported();
+    /**
+     * @see AbstractScheduler::scheduleTask( const QString& execName, const QString& cliArgument,
+     * const QTime& time, const bool days[] )
+     */
+    void scheduleTask(const QString &execName,
+                      const QString &cliArgument,
+                      const QTime &time,
+                      const bool days[]);
 
-	/**
-	 * @see AbstractScheduler::scheduleTask( const QString& execName, const QString& cliArgument, const QTime& time, const bool days[] )
-	 */
-	void scheduleTask( const QString& execName, const QString& cliArgument, const QTime& time, const bool days[] );
+    /**
+     * @see AbstractScheduler::scheduleTask( const QString& execName, const QString& cliArgument,
+     * const int& minutesToDelay )
+     */
+    void scheduleTask(const QString &execName,
+                      const QString &cliArgument,
+                      const int &minutesToDelay);
 
-	/**
-	 * @see AbstractScheduler::scheduleTask( const QString& execName, const QString& cliArgument, const int& minutesToDelay )
-	 */
-	void scheduleTask( const QString& execName, const QString& cliArgument, const int& minutesToDelay );
+    /**
+     * @see AbstractScheduler::updateExistingTask( const QString& execName, const QString&
+     * cliArgument )
+     */
+    virtual bool updateExistingTask(const QString &execName, const QString &cliArgument);
 
-	/**
-	 * @see AbstractScheduler::updateExistingTask( const QString& execName, const QString& cliArgument )
-	 */
-	virtual bool updateExistingTask( const QString& execName, const QString& cliArgument );
+    /**
+     * @see AbstractScheduler::deleteExistingTask( const QString& cliArgument )
+     */
+    virtual void deleteExistingTask(const QString &execName, const QString &cliArgument);
 
-	/**
-	 * @see AbstractScheduler::deleteExistingTask( const QString& cliArgument )
-	 */
-	virtual void deleteExistingTask( const QString& execName, const QString& cliArgument );
-
-	/**
-	 * Tests the scheduleTask method
-	 */
-	static void testAtScheduleTask();
+    /**
+     * Tests the scheduleTask method
+     */
+    static void testAtScheduleTask();
 
 private:
-	static const QString AT_NAME;
+    static const QString AT_NAME;
 
-	static QStringList getWeekdayNames( const QLocale& locale );
+    static QStringList getWeekdayNames(const QLocale &locale);
 
-	QLocale getAtBinaryLocale();
+    QLocale getAtBinaryLocale();
 };
 
-inline void At::scheduleTask( const QString& /*execName*/, const QString& /*cliArgument*/, const int& /*minutesToDelay*/ )
+inline void At::scheduleTask(const QString & /*execName*/,
+                             const QString & /*cliArgument*/,
+                             const int & /*minutesToDelay*/)
 {
-	qWarning() << "Scheduling on start is not supported, test this with AbstractScheduler::isSchedulingOnStartSupported() before calling this method";
+    qWarning() << "Scheduling on start is not supported, test this with "
+                  "AbstractScheduler::isSchedulingOnStartSupported() before calling this method";
 }
 
 #endif

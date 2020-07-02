@@ -21,9 +21,9 @@
 
 #include <QString>
 
+#include "process.hh"
 #include "tools/abstract_metadata.hh"
 #include "tools/abstract_rsync.hh"
-#include "process.hh"
 
 /**
  * The PosixAcl class provides methods for using getfacl and setfacl tools
@@ -32,48 +32,58 @@
 class PosixAcl : public AbstractMetadata, public Process
 {
 public:
+    /**
+     * Constructs a PosixAcl
+     */
+    PosixAcl(const QString &getfacl, const QString &setfacl);
+    /**
+     * Destroys the PosixAcl
+     */
+    virtual ~PosixAcl();
 
-	/**
-	 * Constructs a PosixAcl
-	 */
-    PosixAcl(const QString& getfacl, const QString& setfacl);
-	/**
-	 * Destroys the PosixAcl
-	 */
-	virtual ~PosixAcl();
-
-	/**
-	 * @see AbstractMetadata::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
-	 */
+    /**
+     * @see AbstractMetadata::getMetadata( const QList< QPair<QString,
+     * AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
+     */
     QString getMetadata(
-        const QString& aclFileName,
-        const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems,
-        const FilesystemSnapshot*, QString* warnings);
+        const QString &aclFileName,
+        const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems,
+        const FilesystemSnapshot *,
+        QString *warnings);
 
-	/**
-	 * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
-	 */
-	void mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems );
+    /**
+     * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo&
+     * currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >&
+     * processedItems )
+     */
+    void mergeMetadata(
+        const QFileInfo &newMetadataFileName,
+        const QFileInfo &currentMetadataFileName,
+        const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems);
 
-	/**
-	 * @see AbstractMetadata::setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination )
-	 */
-	void setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination );
+    /**
+     * @see AbstractMetadata::setMetadata( const QFileInfo& metadataFile, const QStringList&
+     * downloadedItems, const QString& downloadDestination )
+     */
+    void setMetadata(const QFileInfo &metadataFile,
+                     const QStringList &downloadedItems,
+                     const QString &downloadDestination);
 
-	/**
-	 * @see AbstractMetadata::extractItems( const QFileInfo& metadataFile )
-	 */
-	QStringList extractItems( const QFileInfo& metadataFile );
+    /**
+     * @see AbstractMetadata::extractItems( const QFileInfo& metadataFile )
+     */
+    QStringList extractItems(const QFileInfo &metadataFile);
 
 protected:
     friend class TestPosixAcl;
-	static QString unescapeOctalCharacters( const QString& escapedString, bool* ok );
+    static QString unescapeOctalCharacters(const QString &escapedString, bool *ok);
 
 private:
-	static const QString ITEM_NAME_PREFIX;
+    static const QString ITEM_NAME_PREFIX;
 
-	void populateMapFromFile( const QFileInfo& aclFileName, QMap<QString, QStringList>* aclMap);
-	void writeMapContentToFile( const QMap<QString, QStringList>& aclMap, const QFileInfo& aclFileName);
+    void populateMapFromFile(const QFileInfo &aclFileName, QMap<QString, QStringList> *aclMap);
+    void writeMapContentToFile(const QMap<QString, QStringList> &aclMap,
+                               const QFileInfo &aclFileName);
 
     const QString getfaclName;
     const QString setfaclName;

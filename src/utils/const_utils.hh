@@ -19,16 +19,14 @@
 #ifndef CONST_UTILS_HH_
 #define CONST_UTILS_HH_
 
-#include <QString>
-#include <QDebug>
 #include <math.h>
+#include <QDebug>
+#include <QString>
 
 class ConstUtils
 {
 public:
-	enum StatusEnum
-	{ STATUS_UNDEFINED=-1, STATUS_OK=0, STATUS_WARNING=1, STATUS_ERROR=2 };
-
+    enum StatusEnum { STATUS_UNDEFINED = -1, STATUS_OK = 0, STATUS_WARNING = 1, STATUS_ERROR = 2 };
 };
 
 #endif /*CONST_UTILS_HH_*/
