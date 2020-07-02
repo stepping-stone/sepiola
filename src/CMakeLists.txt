@@ -383,7 +383,12 @@ ENDIF(Q_WS_WIN)
 
 
 IF(Q_WS_WIN)
-	FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink-*)
+	IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		SET(WIN_DIR windows-x86_64)
+	ELSE()
+		SET(WIN_DIR windows-i386)
+	ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/${WIN_DIR}/plink-*)
 	FILE(GLOB SETACL_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/setacl-*)
 	ADD_CUSTOM_TARGET(copy ALL
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config ${CMAKE_CURRENT_BINARY_DIR}
@@ -473,7 +478,7 @@ ELSE(Q_WS_WIN)
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/libcrypto.so.1.1.1c
             ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c
                 COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c
-                COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.0.1e
+                COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.1.1c
             ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync-*

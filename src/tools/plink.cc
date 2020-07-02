@@ -108,12 +108,32 @@ bool Plink::assertCorrectFingerprint()
 bool Plink::assertCorrectFingerprint(const QString& userName, const QString& serverName, const QString& savedKey)
 {
     qDebug() << "Plink::assertCorrectFingerprint(userName=" << userName << ", serverName=" << serverName << ", savedKey=" << savedKey << ")";
-	QStringList arguments;
-	arguments << "-noagent";
-	arguments << userName + "@" + serverName;
-	arguments << "sh -c \":\"";
+	QStringList arguments({
+		"-noagent",
+		userName + "@" + serverName,
+		StringUtils::quoteText("sh -c ':'", "\"")
+		});
 
+// Workaround for Linux since password prompt does not appear on stdout
+#ifndef Q_OS_WIN32
+	QStringList plinkCommand;
+	plinkCommand << this->plinkName;
+	plinkCommand << arguments;
+	QStringList scriptArguments({
+		"--quiet",
+		"--return",
+		"--log-out",
+		"/dev/null",
+		"--command",
+		plinkCommand.join(" ")
+		});
+#endif
+
+#ifdef Q_OS_WIN32
 	createProcess( this->plinkName, arguments );
+#else
+	createProcess("/bin/script", scriptArguments);
+#endif
 	setProcessChannelMode( QProcess::MergedChannels );
 	start();
 
@@ -226,12 +246,6 @@ bool Plink::generateKeys( const QString& password )
     QString privateOpenSshKeyFileName = settings->getAuthorizedKeyFolderName() + "key.private-openssh";
     QString authorizedKeyFileName = settings->getAuthorizedKeyFolderName() + settings->getAuthorizedKeyFileName();
 
-    QStringList arguments({
-	"-noagent",
-	QString("%1@%2").arg(settings->getServerUserName(), settings->getServerName()),
-	"sh", "-c"
-	});
-
     QStringList shellArguments({
 	QString("echo %1").arg(LOGIN_ECHO_MESSAGE),
 	QString("puttygen -q -t %2 -b %3 -o %1 2>&1").arg(privatePuttyKeyFileName, KEY_TYPE, KEY_LENGTH),
@@ -249,10 +263,38 @@ bool Plink::generateKeys( const QString& password )
 	QString("rm %1").arg(publicKeyFileName)
 	});
 
-    arguments << StringUtils::quoteText(shellArguments.join(";"), "'");
+    QStringList arguments({
+	"-noagent",
+	"-no-antispoof",
+	QString("%1@%2").arg(settings->getServerUserName(), settings->getServerName()),
+#ifdef Q_OS_WIN32
+	"sh", "-c", StringUtils::quoteText(shellArguments.join(";"), "'")
+#else
+	StringUtils::quoteText("sh -c " + StringUtils::quoteText(shellArguments.join(";"), "'"), "\"")
+#endif
+	});
+
+// Workaround for Linux since password prompt does not appear on stdout
+#ifndef Q_OS_WIN32
+    QStringList plinkCommand;
+	plinkCommand << settings->getPlinkName();
+	plinkCommand << arguments;
+    QStringList scriptArguments({
+	"--quiet",
+	"--return",
+	"--log-out",
+	"/dev/null",
+	"--command",
+	plinkCommand.join(" ")
+	});
+#endif
 
     emit infoSignal( QObject::tr( "Log in ..." ) );
+#ifdef Q_OS_WIN32
     createProcess( settings->getPlinkName(), arguments );
+#else
+    createProcess("/bin/script", scriptArguments);
+#endif
     start();
 
     while (true)
