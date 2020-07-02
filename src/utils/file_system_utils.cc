@@ -139,7 +139,13 @@ void FileSystemUtils::convertToLocalPath(QString *path)
     }
 }
 #else
-void FileSystemUtils::convertToLocalPath(QString *) {}
+void FileSystemUtils::convertToLocalPath(QString *path)
+{
+    if (path->size() > 1 && (*path)[0] != '/') {
+        *path = "/" + *path;
+        return;
+    }
+}
 #endif
 
 bool FileSystemUtils::isRoot(const QString &path)
