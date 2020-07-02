@@ -172,7 +172,9 @@ void SettingsForm::onFormChange()
 		this->checkBoxShowHiddenFiles->isChecked() != settings->getShowHiddenFilesAndFolders() ||
 		this->checkBoxKeepDeletedFiles->isChecked() != !settings->getDeleteExtraneousItems() ||
 		this->checkBoxVerboseLogging->isChecked() != settings->getLogDebugMessages() ||
+#ifdef Q_OS_WIN32
 		this->checkBoxUseShadowCopy->isChecked() != settings->getDoSnapshot() ||
+#endif
 		this->spinBoxBandwidthLimit->value() != settings->getBandwidthLimit() ||
 		this->comboBoxLanguage->currentIndex() != this->comboBoxLanguage->findData(settings->getLanguage())
 	)
