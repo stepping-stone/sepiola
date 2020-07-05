@@ -13,37 +13,36 @@
 #include <QtGui/QAbstractItemView>
 #include <QtGui/QPixmap>
 
-class StackedBarView :
-    public QAbstractItemView
+class StackedBarView : public QAbstractItemView
 {
     Q_OBJECT
 
 public:
-    StackedBarView(QWidget* p = 0);
+    StackedBarView(QWidget *p = 0);
 
-    QModelIndex indexAt(const QPoint & point) const;
+    QModelIndex indexAt(const QPoint &point) const;
 
-    void scrollTo(const QModelIndex & index, ScrollHint hint = EnsureVisible);
+    void scrollTo(const QModelIndex &index, ScrollHint hint = EnsureVisible);
 
-    QRect visualRect(const QModelIndex & index) const;
+    QRect visualRect(const QModelIndex &index) const;
 
-    QPixmap legendIcon(const QModelIndex & index) const;
+    QPixmap legendIcon(const QModelIndex &index) const;
 
 protected:
     int horizontalOffset() const;
     int verticalOffset() const;
 
-    bool isIndexHidden(const QModelIndex & index) const;
+    bool isIndexHidden(const QModelIndex &index) const;
 
     QModelIndex moveCursor(CursorAction cursorAction, Qt::KeyboardModifiers modifiers);
 
-    void setSelection(const QRect & rect, QItemSelectionModel::SelectionFlags flags);
+    void setSelection(const QRect &rect, QItemSelectionModel::SelectionFlags flags);
 
-    QRegion visualRegionForSelection(const QItemSelection & selection) const;
+    QRegion visualRegionForSelection(const QItemSelection &selection) const;
 
-    void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent *event);
 
-    bool edit (const QModelIndex&, EditTrigger, QEvent*);
+    bool edit(const QModelIndex &, EditTrigger, QEvent *);
 
 protected slots:
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -21,15 +21,15 @@
 #include "settings/settings.hh"
 #include "tools/abstract_metadata.hh"
 #include "tools/abstract_rsync.hh"
-#include "tools/abstract_ssh.hh"
 #include "tools/abstract_scheduler.hh"
 #include "tools/abstract_snapshot.hh"
+#include "tools/abstract_ssh.hh"
 
 #ifdef Q_OS_WIN32
 #include "tools/at.hh"
+#include "tools/optionalSnapshot.hh"
 #include "tools/schtasks.hh"
 #include "tools/shadow_copy.hh"
-#include "tools/optionalSnapshot.hh"
 #else
 #include "tools/crontab.hh"
 #include "tools/dummy_snapshot.hh"
@@ -50,55 +50,49 @@
 
 #include <memory>
 
-ToolFactory::ToolFactory()
-{
-}
+ToolFactory::ToolFactory() {}
 
-ToolFactory::~ToolFactory()
-{
-}
+ToolFactory::~ToolFactory() {}
 
-AbstractMetadata * ToolFactory::getMetadataImpl()
+AbstractMetadata *ToolFactory::getMetadataImpl()
 {
 #ifdef Q_OS_MAC
-	return new UnixPermissions;
+    return new UnixPermissions;
 #elif defined Q_OS_WIN32
-	return new SetAcl(Settings::getInstance()->getSetAclName());
+    return new SetAcl(Settings::getInstance()->getSetAclName());
 #else
-	return new PosixAcl(Settings::getInstance()->getGetfaclName(), Settings::getInstance()->getSetfaclName());
+    return new PosixAcl(Settings::getInstance()->getGetfaclName(),
+                        Settings::getInstance()->getSetfaclName());
 #endif
-
 }
 
-AbstractRsync * ToolFactory::getRsyncImpl()
+AbstractRsync *ToolFactory::getRsyncImpl()
 {
-	return new Rsync;
+    return new Rsync;
 }
 
-AbstractSsh * ToolFactory::getSshImpl()
+AbstractSsh *ToolFactory::getSshImpl()
 {
-	return new Plink;
+    return new Plink;
 }
 
-AbstractScheduler * ToolFactory::getSchedulerImpl()
+AbstractScheduler *ToolFactory::getSchedulerImpl()
 {
 #ifdef Q_OS_WIN32
-    if ( Schtasks::isSchtasksSupported() )
-    {
+    if (Schtasks::isSchtasksSupported()) {
         return new Schtasks;
     }
     return new At;
 #else
-	return new Crontab;
+    return new Crontab;
 #endif
 }
 
-AbstractSnapshot * ToolFactory::getSnapshotImpl()
+AbstractSnapshot *ToolFactory::getSnapshotImpl()
 {
 #ifdef Q_OS_WIN32
-    return new OptionalSnapshot(shared_ptr<AbstractSnapshot> (new ShadowCopy));
+    return new OptionalSnapshot(shared_ptr<AbstractSnapshot>(new ShadowCopy));
 #else
     return new DummySnapshot;
 #endif
 }
-

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -16,32 +16,33 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QSettings>
-#include <QObject>
-#include <QHostInfo>
+#include <cstdio>
+#include <QCoreApplication>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
-#include <QDebug>
-#include <QCoreApplication>
+#include <QHostInfo>
 #include <QLocale>
-#include <cstdio>
+#include <QObject>
+#include <QSettings>
 #include <QTranslator>
 
+#include "model/scheduled_task.hh"
 #include "settings/platform.hh"
 #include "settings/settings.hh"
-#include "utils/file_system_utils.hh"
-#include "utils/string_utils.hh"
-#include "utils/log_file_utils.hh"
 #include "utils/datatypes.hh"
-#include "model/scheduled_task.hh"
+#include "utils/file_system_utils.hh"
+#include "utils/log_file_utils.hh"
+#include "utils/string_utils.hh"
 
 #include "config.h"
 
 const bool Settings::SHOW_PROGRESS = false;
 
-const QString Settings::EXECUTABLE_NAME = QString( SSBACKUP_EXECUTABLE_NAME );
-const QString Settings::VERSION = QString( SSBACKUP_VERSION );
-const QDate Settings::RELEASE_DATE = QDate::fromString( SSBACKUP_RELEASE_DATE, "yyyy-MM-dd" ); // format must match cmake's: %Y-%m-%d
+const QString Settings::EXECUTABLE_NAME = QString(SSBACKUP_EXECUTABLE_NAME);
+const QString Settings::VERSION = QString(SSBACKUP_VERSION);
+const QDate Settings::RELEASE_DATE
+    = QDate::fromString(SSBACKUP_RELEASE_DATE, "yyyy-MM-dd"); // format must match cmake's: %Y-%m-%d
 
 // [Client]
 const QString Settings::SETTINGS_GROUP_CLIENT = "Client";
@@ -116,438 +117,460 @@ const QString Settings::SETTINGS_LAST_BACKUP_RULES = "LastBackupRules";
 const QString Settings::SETTINGS_LAST_BACKUP_RULES_ITEM = "Item";
 const QString Settings::SETTINGS_LAST_BACKUP_RULES_MODIFIER = "Modifier";
 
-
 // immutable
 const int Settings::MAX_SAVED_LAST_BACKUPS = 10;
 const int Settings::DEFAULT_NUM_OF_LAST_BACKUPS = 3;
 
-Settings* Settings::instance = 0;
+Settings *Settings::instance = 0;
 
-Settings::Settings() :
-    applicationSettings(0),
-    resellerSettings(0),
-    userSettings(0),
-    appData(0),
-    logDebugMessage(false),
-    doSnapshot(true),
-    ignoreReinstall(false),
-    maxLogLines(10000),
-    rsyncTimeout(43200),
-    deleteExtraneousItems(true),
-    showHiddenFilesAndFolders(false),
-    bandwidthLimit(0),
-    nOfLastBackups(0),
-    effectiveUserId(0)
+Settings::Settings()
+    : applicationSettings(0)
+    , resellerSettings(0)
+    , userSettings(0)
+    , appData(0)
+    , logDebugMessage(false)
+    , doSnapshot(true)
+    , ignoreReinstall(false)
+    , maxLogLines(10000)
+    , rsyncTimeout(43200)
+    , deleteExtraneousItems(true)
+    , showHiddenFilesAndFolders(false)
+    , bandwidthLimit(0)
+    , nOfLastBackups(0)
+    , effectiveUserId(0)
 {
-	//TODO: load language name translations after setting the current langauge
-	supportedLanguages << QObject::tr( "English" ); // default language has to be at the top (position zero)
-	supportedLanguages << QObject::tr( "German" );
-	qRegisterMetaType<BackupSelectionHash>("BackupSelectionHash");
-	qRegisterMetaType<ScheduledTask>("ScheduledTask");
-	qRegisterMetaType<StringPairList>("StringPairList");
-	qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
-//	qRegisterMetaType<ScheduleRule::ScheduleType>("ScheduleRule::ScheduleType");
-//	qRegisterMetaType<ScheduleRule::Weekdays>("ScheduleRule::Weekdays");
-	qRegisterMetaTypeStreamOperators<ScheduledTask>("ScheduledTask");
+    // TODO: load language name translations after setting the current langauge
+    supportedLanguages << QObject::tr(
+        "English"); // default language has to be at the top (position zero)
+    supportedLanguages << QObject::tr("German");
+    qRegisterMetaType<BackupSelectionHash>("BackupSelectionHash");
+    qRegisterMetaType<ScheduledTask>("ScheduledTask");
+    qRegisterMetaType<StringPairList>("StringPairList");
+    qRegisterMetaType<ConstUtils::StatusEnum>("ConstUtils::StatusEnum");
+    //	qRegisterMetaType<ScheduleRule::ScheduleType>("ScheduleRule::ScheduleType");
+    //	qRegisterMetaType<ScheduleRule::Weekdays>("ScheduleRule::Weekdays");
+    qRegisterMetaTypeStreamOperators<ScheduledTask>("ScheduledTask");
 }
 
-Settings::~Settings()
+Settings::~Settings() {}
+
+Settings *Settings::getInstance()
 {
+    if (!instance) {
+        instance = new Settings;
+    }
+    return instance;
 }
 
-Settings* Settings::getInstance()
+void Settings::loadSettings(const QFileInfo &configFile,
+                            const QString &resellerAffix,
+                            const QString &appDataAffix)
 {
-	if ( !instance )
-	{
-		instance = new Settings;
-	}
-	return instance;
-}
-
-void Settings::loadSettings( const QFileInfo& configFile, const QString& resellerAffix, const QString& appDataAffix )
-{
-	// qDebug() << "Settings::loadSettings: Loading settings from file <" << configFile.filePath() << ">";
-	QDir homeDir = QDir::home();
-	QString applicationDataDirName = "." + EXECUTABLE_NAME;
-	QString resellerSettingsFileName = configFile.absoluteFilePath() + resellerAffix;
-	if ( !homeDir.exists( applicationDataDirName ) )
-	{
-		homeDir.mkdir( applicationDataDirName );
-	}
-	applicationDataDir = homeDir.absolutePath() + "/" + applicationDataDirName + "/";
-	QString appDataSettingsFileName  = applicationDataDir + configFile.fileName() + appDataAffix;
+    // qDebug() << "Settings::loadSettings: Loading settings from file <" << configFile.filePath() << ">";
+    QDir homeDir = QDir::home();
+    QString applicationDataDirName = "." + EXECUTABLE_NAME;
+    QString resellerSettingsFileName = configFile.absoluteFilePath() + resellerAffix;
+    if (!homeDir.exists(applicationDataDirName)) {
+        homeDir.mkdir(applicationDataDirName);
+    }
+    applicationDataDir = homeDir.absolutePath() + "/" + applicationDataDirName + "/";
+    QString appDataSettingsFileName = applicationDataDir + configFile.fileName() + appDataAffix;
     sshConfigDataDir = this->getApplicationDataDir() + ".ssh" + "/";
 
 #ifndef PORTABLE_INSTALLATION
     applicationBinDir = "/";
 #else
-	applicationBinDir = configFile.absolutePath() + "/";
+    applicationBinDir = configFile.absolutePath() + "/";
 #endif
-	qRegisterMetaType<ScheduledTask>("ScheduledTask");
-	if (applicationSettings != 0) { delete applicationSettings; }
-	applicationSettings = new QSettings( configFile.absoluteFilePath(), QSettings::IniFormat );
-	if (resellerSettings != 0)    { delete resellerSettings; }
-	resellerSettings =    new QSettings( resellerSettingsFileName, QSettings::IniFormat );
-	if (userSettings != 0)        { delete userSettings; }
-	userSettings =        new QSettings( applicationDataDir + configFile.fileName(), QSettings::IniFormat );
-	if (appData != 0)             { delete appData; }
-	appData =             new QSettings( appDataSettingsFileName, QSettings::IniFormat );
+    qRegisterMetaType<ScheduledTask>("ScheduledTask");
+    if (applicationSettings != 0) {
+        delete applicationSettings;
+    }
+    applicationSettings = new QSettings(configFile.absoluteFilePath(), QSettings::IniFormat);
+    if (resellerSettings != 0) {
+        delete resellerSettings;
+    }
+    resellerSettings = new QSettings(resellerSettingsFileName, QSettings::IniFormat);
+    if (userSettings != 0) {
+        delete userSettings;
+    }
+    userSettings = new QSettings(applicationDataDir + configFile.fileName(), QSettings::IniFormat);
+    if (appData != 0) {
+        delete appData;
+    }
+    appData = new QSettings(appDataSettingsFileName, QSettings::IniFormat);
 
     QString sshConfigFileName = this->getSshConfigFileName();
     if (sshConfigFileName.isEmpty()) {
-        qWarning() << "Could not create ssh config file in directory " + this->getSshConfigDataDir();
+        qWarning() << "Could not create ssh config file in directory "
+                          + this->getSshConfigDataDir();
     }
 
-	if ( QFile( resellerSettingsFileName ).exists() )
-	{
-		// qDebug() << "Loading reseller-settings from file <" + resellerSettings->fileName() + ">";
-	}
-	else
-	{
-		// qDebug() << "Information: No reseller-specific settings provided <" + resellerSettingsFileName + "> -> settings are taken from standard config file <" + applicationSettings->fileName() + ">.";
-	}
+    if (QFile(resellerSettingsFileName).exists()) {
+        // qDebug() << "Loading reseller-settings from file <" + resellerSettings->fileName() + ">";
+    } else {
+        // qDebug() << "Information: No reseller-specific settings provided <" +
+        // resellerSettingsFileName + "> -> settings are taken from standard config file <" +
+        // applicationSettings->fileName() + ">.";
+    }
 
-	reloadSettings();
-	installDate = userSettings->value( SETTINGS_INSTALL_DATE ).toDateTime();
-	if ( installDate.isNull() )
-	{
-		saveInstallDate( getInstallDate() );
-	}
+    reloadSettings();
+    installDate = userSettings->value(SETTINGS_INSTALL_DATE).toDateTime();
+    if (installDate.isNull()) {
+        saveInstallDate(getInstallDate());
+    }
 }
 
 void Settings::reloadSettings()
 {
-	// [Client]
-	// qDebug() << "Settings::reloadSettings()";
-	applicationSettings->beginGroup( SETTINGS_GROUP_CLIENT );
-	applicationName = applicationSettings->value( SETTINGS_APPLICATION_FULL_NAME ).toString();
-	logFileName = applicationSettings->value( SETTINGS_LOG_FILE_NAME ).toString();
-	privatePuttyKeyFileName = applicationSettings->value( SETTINGS_PRIVATE_PUTTY_KEY_FILE_NAME ).toString();
-	privateOpenSshKeyFileName = applicationSettings->value( SETTINGS_PRIVATE_OPEN_SSH_KEY_FILE_NAME ).toString();
-	lockFileName = applicationSettings->value( SETTINGS_LOCK_FILE_NAME ).toString();
-	logFileName = applicationSettings->value( SETTINGS_LOG_FILE_NAME ).toString();
-	ignoreReinstall = applicationSettings->value( SETTINGS_IGNORE_REINSTALL ).toBool();
-	maxLogLines = applicationSettings->value( SETTINGS_MAX_LOG_LINES ).toInt();
-	includePatternFileName = applicationSettings->value( SETTINGS_INCLUDE_PATTERN_FILE_NAME ).toString();
-	excludePatternFileName = applicationSettings->value( SETTINGS_EXCLUDE_PATTERN_FILE_NAME ).toString();
-	rsyncTimeout = applicationSettings->value( SETTINGS_RSYNC_TIMEOUT ).toInt();
-	applicationSettings->endGroup();
-	// [Server]
-	applicationSettings->beginGroup( SETTINGS_GROUP_SERVER );
-	defaultServerKey = applicationSettings->value( SETTINGS_SERVER_KEY ).toString();
-	defaultServerName = applicationSettings->value( SETTINGS_HOST ).toString();
-	backupFolderName = applicationSettings->value( SETTINGS_BACKUP_FOLDER_NAME ).toString();
-	metaFolderName = applicationSettings->value( SETTINGS_META_FOLDER_NAME ).toString();
-	backupRootFolder = applicationSettings->value( SETTINGS_BACKUP_ROOT_FOLDER ).toString();
-	restoreRootFolder = applicationSettings->value( SETTINGS_RESTORE_ROOT_FOLDER ).toString();
-	metadataFileName = applicationSettings->value( SETTINGS_METADATA_FILE_NAME ).toString();
-	backupContentFileName = applicationSettings->value( SETTINGS_BACKUP_CONTENT_FILE_NAME ).toString();
-	backupTimeFileName = applicationSettings->value( SETTINGS_BACKUP_TIME_FILE_NAME ).toString();
-	serverQuotaScriptName = applicationSettings->value( SETTINGS_SERVER_QUOTA_SCRIPT_NAME ).toString();
-	authorizedKeyFolderName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FOLDER_NAME ).toString();
-	authorizedKeyFileName = applicationSettings->value( SETTINGS_AUTHORIZED_KEY_FILE_NAME ).toString();
-	quotaModificationUrl = applicationSettings->value( SETTINGS_QUOTA_MODIFICATION_URL ).toString();
-	quotaModificationUrlUidParam = applicationSettings->value( SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM ).toString();
-	applicationSettings->endGroup();
+    // [Client]
+    // qDebug() << "Settings::reloadSettings()";
+    applicationSettings->beginGroup(SETTINGS_GROUP_CLIENT);
+    applicationName = applicationSettings->value(SETTINGS_APPLICATION_FULL_NAME).toString();
+    logFileName = applicationSettings->value(SETTINGS_LOG_FILE_NAME).toString();
+    privatePuttyKeyFileName = applicationSettings->value(SETTINGS_PRIVATE_PUTTY_KEY_FILE_NAME)
+                                  .toString();
+    privateOpenSshKeyFileName = applicationSettings->value(SETTINGS_PRIVATE_OPEN_SSH_KEY_FILE_NAME)
+                                    .toString();
+    lockFileName = applicationSettings->value(SETTINGS_LOCK_FILE_NAME).toString();
+    logFileName = applicationSettings->value(SETTINGS_LOG_FILE_NAME).toString();
+    ignoreReinstall = applicationSettings->value(SETTINGS_IGNORE_REINSTALL).toBool();
+    maxLogLines = applicationSettings->value(SETTINGS_MAX_LOG_LINES).toInt();
+    includePatternFileName = applicationSettings->value(SETTINGS_INCLUDE_PATTERN_FILE_NAME)
+                                 .toString();
+    excludePatternFileName = applicationSettings->value(SETTINGS_EXCLUDE_PATTERN_FILE_NAME)
+                                 .toString();
+    rsyncTimeout = applicationSettings->value(SETTINGS_RSYNC_TIMEOUT).toInt();
+    applicationSettings->endGroup();
+    // [Server]
+    applicationSettings->beginGroup(SETTINGS_GROUP_SERVER);
+    defaultServerKey = applicationSettings->value(SETTINGS_SERVER_KEY).toString();
+    defaultServerName = applicationSettings->value(SETTINGS_HOST).toString();
+    backupFolderName = applicationSettings->value(SETTINGS_BACKUP_FOLDER_NAME).toString();
+    metaFolderName = applicationSettings->value(SETTINGS_META_FOLDER_NAME).toString();
+    backupRootFolder = applicationSettings->value(SETTINGS_BACKUP_ROOT_FOLDER).toString();
+    restoreRootFolder = applicationSettings->value(SETTINGS_RESTORE_ROOT_FOLDER).toString();
+    metadataFileName = applicationSettings->value(SETTINGS_METADATA_FILE_NAME).toString();
+    backupContentFileName = applicationSettings->value(SETTINGS_BACKUP_CONTENT_FILE_NAME).toString();
+    backupTimeFileName = applicationSettings->value(SETTINGS_BACKUP_TIME_FILE_NAME).toString();
+    serverQuotaScriptName = applicationSettings->value(SETTINGS_SERVER_QUOTA_SCRIPT_NAME).toString();
+    authorizedKeyFolderName = applicationSettings->value(SETTINGS_AUTHORIZED_KEY_FOLDER_NAME)
+                                  .toString();
+    authorizedKeyFileName = applicationSettings->value(SETTINGS_AUTHORIZED_KEY_FILE_NAME).toString();
+    quotaModificationUrl = applicationSettings->value(SETTINGS_QUOTA_MODIFICATION_URL).toString();
+    quotaModificationUrlUidParam
+        = applicationSettings->value(SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM).toString();
+    applicationSettings->endGroup();
 
-	// [Executables]
-	applicationSettings->beginGroup( SETTINGS_GROUP_EXECUTABLES );
-	thisApplication = StringUtils::encaps( EXECUTABLE_NAME, "", Platform::EXECUTABLE_SUFFIX );
-	rsync = StringUtils::encaps( applicationSettings->value( SETTINGS_RSYNC ).toString(), "", Platform::EXECUTABLE_SUFFIX );
-	plink = StringUtils::encaps( applicationSettings->value( SETTINGS_PLINK ).toString(), "", Platform::EXECUTABLE_SUFFIX );
-	ssh = StringUtils::encaps( applicationSettings->value( SETTINGS_SSH ).toString(), "", Platform::EXECUTABLE_SUFFIX );
-	getfacl = StringUtils::encaps( applicationSettings->value( SETTINGS_GETFACL ).toString(), "", Platform::EXECUTABLE_SUFFIX );
-	setfacl = StringUtils::encaps( applicationSettings->value( SETTINGS_SETFACL ).toString(), "", Platform::EXECUTABLE_SUFFIX );
-	setacl = StringUtils::encaps( applicationSettings->value( SETTINGS_SETACL ).toString(), "", Platform::EXECUTABLE_SUFFIX );
-	applicationSettings->endGroup();
+    // [Executables]
+    applicationSettings->beginGroup(SETTINGS_GROUP_EXECUTABLES);
+    thisApplication = StringUtils::encaps(EXECUTABLE_NAME, "", Platform::EXECUTABLE_SUFFIX);
+    rsync = StringUtils::encaps(applicationSettings->value(SETTINGS_RSYNC).toString(),
+                                "",
+                                Platform::EXECUTABLE_SUFFIX);
+    plink = StringUtils::encaps(applicationSettings->value(SETTINGS_PLINK).toString(),
+                                "",
+                                Platform::EXECUTABLE_SUFFIX);
+    ssh = StringUtils::encaps(applicationSettings->value(SETTINGS_SSH).toString(),
+                              "",
+                              Platform::EXECUTABLE_SUFFIX);
+    getfacl = StringUtils::encaps(applicationSettings->value(SETTINGS_GETFACL).toString(),
+                                  "",
+                                  Platform::EXECUTABLE_SUFFIX);
+    setfacl = StringUtils::encaps(applicationSettings->value(SETTINGS_SETFACL).toString(),
+                                  "",
+                                  Platform::EXECUTABLE_SUFFIX);
+    setacl = StringUtils::encaps(applicationSettings->value(SETTINGS_SETACL).toString(),
+                                 "",
+                                 Platform::EXECUTABLE_SUFFIX);
+    applicationSettings->endGroup();
 
-	// [Reseller]
-	resellerAddress = resellerSettings->value( SETTINGS_GROUP_RESELLER + "/" + SETTINGS_RESELLER_ADDRESS, QObject::tr( "reseller address (missing)" ) ).toString();
+    // [Reseller]
+    resellerAddress = resellerSettings
+                          ->value(SETTINGS_GROUP_RESELLER + "/" + SETTINGS_RESELLER_ADDRESS,
+                                  QObject::tr("reseller address (missing)"))
+                          .toString();
 
+    resellerSettings->beginGroup(SETTINGS_GROUP_SERVER);
+    serverName = resellerSettings->value(SETTINGS_HOST, defaultServerName).toString();
+    serverKey = resellerSettings->value(SETTINGS_SERVER_KEY, serverKey).toString();
+    backupRootFolder = resellerSettings->value(SETTINGS_BACKUP_ROOT_FOLDER, backupRootFolder)
+                           .toString();
+    restoreRootFolder = resellerSettings->value(SETTINGS_RESTORE_ROOT_FOLDER, restoreRootFolder)
+                            .toString();
+    quotaModificationUrl
+        = resellerSettings->value(SETTINGS_QUOTA_MODIFICATION_URL, quotaModificationUrl).toString();
+    quotaModificationUrlUidParam = resellerSettings
+                                       ->value(SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM,
+                                               quotaModificationUrlUidParam)
+                                       .toString();
+    resellerSettings->endGroup();
 
-	resellerSettings->beginGroup( SETTINGS_GROUP_SERVER );
-	serverName = resellerSettings->value( SETTINGS_HOST, defaultServerName ).toString();
-	serverKey = resellerSettings->value( SETTINGS_SERVER_KEY, serverKey ).toString();
-	backupRootFolder = resellerSettings->value( SETTINGS_BACKUP_ROOT_FOLDER, backupRootFolder ).toString();
-	restoreRootFolder = resellerSettings->value( SETTINGS_RESTORE_ROOT_FOLDER, restoreRootFolder ).toString();
-	quotaModificationUrl = resellerSettings->value( SETTINGS_QUOTA_MODIFICATION_URL, quotaModificationUrl ).toString();
-	quotaModificationUrlUidParam = resellerSettings->value( SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM, quotaModificationUrlUidParam ).toString();
-	resellerSettings->endGroup();
+    applicationName = resellerSettings
+                          ->value(SETTINGS_GROUP_CLIENT + "/" + SETTINGS_APPLICATION_FULL_NAME,
+                                  applicationName)
+                          .toString();
 
-	applicationName = resellerSettings->value( SETTINGS_GROUP_CLIENT + "/" + SETTINGS_APPLICATION_FULL_NAME, applicationName ).toString();
+    serverName = userSettings->value(SETTINGS_HOST, serverName).toString();
+    serverUserName = userSettings->value(SETTINGS_USERNAME).toString();
 
-	serverName = userSettings->value( SETTINGS_HOST, serverName ).toString();
-	serverUserName = userSettings->value( SETTINGS_USERNAME ).toString();
-    
-    language = userSettings->value( SETTINGS_LANGUAGE ).toString();
+    language = userSettings->value(SETTINGS_LANGUAGE).toString();
+    // Default to 'English' if language is not explicity set
+    if (language.length() == 0)
+        language = "en";
 
     // Convert old index values to new language codes
     bool languageIsIndex(false);
     int languageIndex = language.toInt(&languageIsIndex);
-    if ( languageIsIndex )
-    {
+    if (languageIsIndex) {
         qDebug() << "converting deprecated language index to new language code";
         saveLanguage((languageIndex == 1) ? "de" : "en");
     }
 
-	backupPrefix = userSettings->value( SETTINGS_BACKUP_PREFIX ).toString();
-	if ( backupPrefix == "" )
-	{
-		saveBackupPrefix( getLocalHostName() );
-	}
-	serverKey = userSettings->value( SETTINGS_SERVER_KEY, serverKey ).toString();
-	if ( serverKey == "" )
-	{
-		serverKey = defaultServerKey;
-	}
-	privatePuttyKey = userSettings->value( SETTINGS_PRIVATE_PUTTY_KEY ).toString();
-	privateOpenSshKey = userSettings->value( SETTINGS_PRIVATE_OPEN_SSH_KEY ).toString();
-	deleteExtraneousItems = userSettings->value( SETTINGS_DELETE_EXTRANEOUS_ITEMS, true ).toBool();
-	showHiddenFilesAndFolders = userSettings->value( SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, false ).toBool();
-	windowSize = userSettings->value( SETTINGS_WINDOW_SIZE ).toSize();
-	windowPosition = userSettings->value( SETTINGS_WINDOW_POSITION, QPoint( 200, 200 ) ).toPoint();
-    logDebugMessage = userSettings->value( SETTINGS_LOG_DEBUG_MESSAGE ).toBool();
-    doSnapshot = userSettings->value( SETTINGS_DO_SNAPSHOT, true ).toBool();
-	bandwidthLimit = userSettings->value( SETTINGS_BANDWITH_LIMIT ).toInt();
+    backupPrefix = userSettings->value(SETTINGS_BACKUP_PREFIX).toString();
+    if (backupPrefix == "") {
+        saveBackupPrefix(getLocalHostName());
+    }
+    serverKey = userSettings->value(SETTINGS_SERVER_KEY, serverKey).toString();
+    if (serverKey == "") {
+        serverKey = defaultServerKey;
+    }
+    privatePuttyKey = userSettings->value(SETTINGS_PRIVATE_PUTTY_KEY).toString();
+    privateOpenSshKey = userSettings->value(SETTINGS_PRIVATE_OPEN_SSH_KEY).toString();
+    deleteExtraneousItems = userSettings->value(SETTINGS_DELETE_EXTRANEOUS_ITEMS, true).toBool();
+    showHiddenFilesAndFolders = userSettings->value(SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, false)
+                                    .toBool();
+    windowSize = userSettings->value(SETTINGS_WINDOW_SIZE).toSize();
+    windowPosition = userSettings->value(SETTINGS_WINDOW_POSITION, QPoint(200, 200)).toPoint();
+    logDebugMessage = userSettings->value(SETTINGS_LOG_DEBUG_MESSAGE).toBool();
+    doSnapshot = userSettings->value(SETTINGS_DO_SNAPSHOT, true).toBool();
+    bandwidthLimit = userSettings->value(SETTINGS_BANDWITH_LIMIT).toInt();
 
-	// [AppData]
-	appData->beginGroup( SETTINGS_GROUP_APPDATA );
-	int size = appData->beginReadArray( SETTINGS_APPDATA_LASTBACKUPS );
-	lastBackups.clear();
-	for ( int i = 0; i < size; ++i )
-	{
-		appData->setArrayIndex( i );
-		ConstUtils::StatusEnum status = (ConstUtils::StatusEnum)(appData->value( SETTINGS_APPDATA_LASTBACKUP_STATUS ).toInt());
-		status = status==ConstUtils::STATUS_UNDEFINED ? ConstUtils::STATUS_ERROR : status;
-		lastBackups.append( BackupTask( appData->value( SETTINGS_APPDATA_LASTBACKUP_DATE ).toDateTime(), status ) );
-	}
-	appData->endArray();
-	scheduleRule = appData->value( SETTINGS_SCHEDULE_RULE ).value<ScheduledTask>();
+    // [AppData]
+    appData->beginGroup(SETTINGS_GROUP_APPDATA);
+    int size = appData->beginReadArray(SETTINGS_APPDATA_LASTBACKUPS);
+    lastBackups.clear();
+    for (int i = 0; i < size; ++i) {
+        appData->setArrayIndex(i);
+        ConstUtils::StatusEnum status = (ConstUtils::StatusEnum)(
+            appData->value(SETTINGS_APPDATA_LASTBACKUP_STATUS).toInt());
+        status = status == ConstUtils::STATUS_UNDEFINED ? ConstUtils::STATUS_ERROR : status;
+        lastBackups.append(
+            BackupTask(appData->value(SETTINGS_APPDATA_LASTBACKUP_DATE).toDateTime(), status));
+    }
+    appData->endArray();
+    scheduleRule = appData->value(SETTINGS_SCHEDULE_RULE).value<ScheduledTask>();
 
-	qRegisterMetaType< QPair<QString,bool> >("QPair<QString,bool>");
-	size = appData->beginReadArray( SETTINGS_LAST_BACKUP_RULES );
-	lastBackupRules.clear();
-	for ( int i = 0; i < size; ++i )
-	{
-		appData->setArrayIndex( i );
-		bool rule_modifier = appData->value( SETTINGS_LAST_BACKUP_RULES_MODIFIER ).toBool();
-		QString rule_item = appData->value( SETTINGS_LAST_BACKUP_RULES_ITEM ).toString();
-		lastBackupRules.insert( rule_item, rule_modifier );
-	}
-	appData->endArray();
-	appData->endGroup();
+    qRegisterMetaType<QPair<QString, bool>>("QPair<QString,bool>");
+    size = appData->beginReadArray(SETTINGS_LAST_BACKUP_RULES);
+    lastBackupRules.clear();
+    for (int i = 0; i < size; ++i) {
+        appData->setArrayIndex(i);
+        bool rule_modifier = appData->value(SETTINGS_LAST_BACKUP_RULES_MODIFIER).toBool();
+        QString rule_item = appData->value(SETTINGS_LAST_BACKUP_RULES_ITEM).toString();
+        lastBackupRules.insert(rule_item, rule_modifier);
+    }
+    appData->endArray();
+    appData->endGroup();
 
-	// [GUI]
-	appData->beginGroup( SETTINGS_GROUP_GUI );
-	nOfLastBackups = appData->value( SETTINGS_N_OF_SHOWN_LAST_BACKUPS, DEFAULT_NUM_OF_LAST_BACKUPS ).toInt();
-	appData->endGroup();
+    // [GUI]
+    appData->beginGroup(SETTINGS_GROUP_GUI);
+    nOfLastBackups = appData->value(SETTINGS_N_OF_SHOWN_LAST_BACKUPS, DEFAULT_NUM_OF_LAST_BACKUPS)
+                         .toInt();
+    appData->endGroup();
 }
 
 QDateTime Settings::getInstallDate()
 {
-	QFileInfo applicationFile( QCoreApplication::applicationFilePath() );
-	return applicationFile.created();
+    QFileInfo applicationFile(QCoreApplication::applicationFilePath());
+    return applicationFile.created();
 }
 
 bool Settings::isReinstalled()
 {
-	return !ignoreReinstall && (installDate < getInstallDate());
+    return !ignoreReinstall && (installDate < getInstallDate());
 }
 
 bool Settings::isInevitableSettingsMissing()
 {
-	return this->backupPrefix == 0 || this->backupPrefix == "" || this->serverUserName == 0 || this->serverUserName == "";
+    return this->backupPrefix == 0 || this->backupPrefix == "" || this->serverUserName == 0
+           || this->serverUserName == "";
 }
 
 void Settings::deleteSettings()
 {
-	foreach( QString key, userSettings->allKeys() )
-	{
-		userSettings->remove( key );
-	}
-	saveInstallDate( getInstallDate() );
-	reloadSettings();
+    foreach (QString key, userSettings->allKeys()) {
+        userSettings->remove(key);
+    }
+    saveInstallDate(getInstallDate());
+    reloadSettings();
 }
 
 void Settings::keepSettings()
 {
-	saveInstallDate( getInstallDate() );
+    saveInstallDate(getInstallDate());
 }
 
-void Settings::saveInstallDate( const QDateTime& installDate, bool force_write )
+void Settings::saveInstallDate(const QDateTime &installDate, bool force_write)
 {
-	if ( installDate != this->installDate )
-	{
-		userSettings->setValue( SETTINGS_INSTALL_DATE, installDate );
-		this->installDate = installDate;
-	}
-	if ( force_write && this->userSettings )
-	{
-		this->userSettings->sync();
-	}
+    if (installDate != this->installDate) {
+        userSettings->setValue(SETTINGS_INSTALL_DATE, installDate);
+        this->installDate = installDate;
+    }
+    if (force_write && this->userSettings) {
+        this->userSettings->sync();
+    }
 }
 
 QString Settings::getLocalHostName()
 {
-	return QHostInfo::localHostName();
+    return QHostInfo::localHostName();
 }
 
 QString Settings::createPrivatePuttyKeyFile()
 {
-	QString filePath = this->getApplicationDataDir() + this->privatePuttyKeyFileName;
-	if ( createKeyFile( this->privatePuttyKey, filePath ) )
-	{
-		return filePath;
-	}
-	return "";
+    QString filePath = this->getApplicationDataDir() + this->privatePuttyKeyFileName;
+    if (createKeyFile(this->privatePuttyKey, filePath)) {
+        return filePath;
+    }
+    return "";
 }
 
 QString Settings::createPrivateOpenSshKeyFile()
 {
-	QString filePath = this->getApplicationDataDir() + this->privateOpenSshKeyFileName;
-	if ( createKeyFile( this->privateOpenSshKey, filePath ) )
-	{
-		return filePath;
-	}
-	return "";
+    QString filePath = this->getApplicationDataDir() + this->privateOpenSshKeyFileName;
+    if (createKeyFile(this->privateOpenSshKey, filePath)) {
+        return filePath;
+    }
+    return "";
 }
 
-bool Settings::createKeyFile( const QString& key, const QString& keyFilePath )
+bool Settings::createKeyFile(const QString &key, const QString &keyFilePath)
 {
-	if ( key == "" )
-	{
-		qDebug() << "Key has not been generated";
-		return false;
-	}
+    if (key == "") {
+        qDebug() << "Key has not been generated";
+        return false;
+    }
 
-	QFile privateKeyFile( keyFilePath );
-	if ( !privateKeyFile.exists() )
-	{
-		if ( !privateKeyFile.open( QIODevice::WriteOnly ) )
-		{
-			qCritical() << "Can not write to key file: " << keyFilePath;
-			return false;
-		}
-		if ( !privateKeyFile.setPermissions( QFile::ReadOwner | QFile::WriteOwner ) )
-		{
-			qWarning() << "Permission for private key file can not be set";
-		}
-		QTextStream out( &privateKeyFile );
-		out << key;
-		privateKeyFile.close();
-	}
-	return true;
+    QFile privateKeyFile(keyFilePath);
+    if (!privateKeyFile.exists()) {
+        if (!privateKeyFile.open(QIODevice::WriteOnly)) {
+            qCritical() << "Can not write to key file: " << keyFilePath;
+            return false;
+        }
+        if (!privateKeyFile.setPermissions(QFile::ReadOwner | QFile::WriteOwner)) {
+            qWarning() << "Permission for private key file can not be set";
+        }
+        QTextStream out(&privateKeyFile);
+        out << key;
+        privateKeyFile.close();
+    }
+    return true;
 }
 
 void Settings::deletePrivateKeyFiles()
 {
-	FileSystemUtils::removeFile( this->getApplicationDataDir() + this->privatePuttyKeyFileName );
-	FileSystemUtils::removeFile( this->getApplicationDataDir() + this->privateOpenSshKeyFileName );
+    FileSystemUtils::removeFile(this->getApplicationDataDir() + this->privatePuttyKeyFileName);
+    FileSystemUtils::removeFile(this->getApplicationDataDir() + this->privateOpenSshKeyFileName);
 }
 
-void Settings::setServerPassword( const QString& password )
+void Settings::setServerPassword(const QString &password)
 {
-	if ( this->server_password != password )
-	{
-		this->server_password = password;
-	}
+    if (this->server_password != password) {
+        this->server_password = password;
+    }
 }
 
-void Settings::setClientPassword( const QString& password )
+void Settings::setClientPassword(const QString &password)
 {
-	if ( this->client_password != password )
-	{
-		this->client_password = password;
-	}
+    if (this->client_password != password) {
+        this->client_password = password;
+    }
 }
 
-void Settings::setServerUserNameAndPassword( const QString& userName, const QString& password, const bool isUsernameEditable )
+void Settings::setServerUserNameAndPassword(const QString &userName,
+                                            const QString &password,
+                                            const bool isUsernameEditable)
 {
-	this->setServerPassword( password );
-	if ( isUsernameEditable )
-	{
-		this->saveServerUserName( userName );
-	}
+    this->setServerPassword(password);
+    if (isUsernameEditable) {
+        this->saveServerUserName(userName);
+    }
 }
 
-void Settings::setClientUserNameAndPassword( const QString& /*userName*/, const QString& password, const bool /*isUsernameEditable*/ )
+void Settings::setClientUserNameAndPassword(const QString & /*userName*/,
+                                            const QString &password,
+                                            const bool /*isUsernameEditable*/)
 {
-	this->setClientPassword( password );
+    this->setClientPassword(password);
 }
 
-void Settings::savePrivatePuttyKey( const QString& privatePuttyKey )
+void Settings::savePrivatePuttyKey(const QString &privatePuttyKey)
 {
-	if ( this->privatePuttyKey != privatePuttyKey )
-	{
-		this->privatePuttyKey = privatePuttyKey;
-		userSettings->setValue( SETTINGS_PRIVATE_PUTTY_KEY, privatePuttyKey );
-	}
+    if (this->privatePuttyKey != privatePuttyKey) {
+        this->privatePuttyKey = privatePuttyKey;
+        userSettings->setValue(SETTINGS_PRIVATE_PUTTY_KEY, privatePuttyKey);
+    }
 }
 
-void Settings::savePrivateOpenSshKey( const QString& privateOpenSshKey )
+void Settings::savePrivateOpenSshKey(const QString &privateOpenSshKey)
 {
-	if ( this->privateOpenSshKey != privateOpenSshKey )
-	{
-		this->privateOpenSshKey = privateOpenSshKey;
-		userSettings->setValue( SETTINGS_PRIVATE_OPEN_SSH_KEY, privateOpenSshKey );
-	}
+    if (this->privateOpenSshKey != privateOpenSshKey) {
+        this->privateOpenSshKey = privateOpenSshKey;
+        userSettings->setValue(SETTINGS_PRIVATE_OPEN_SSH_KEY, privateOpenSshKey);
+    }
 }
 
-void Settings::saveServerKey( const QString& serverKey )
+void Settings::saveServerKey(const QString &serverKey)
 {
-	if ( this->serverKey != serverKey )
-	{
-		this->serverKey = serverKey;
-		userSettings->setValue( SETTINGS_SERVER_KEY, serverKey );
-	}
+    if (this->serverKey != serverKey) {
+        this->serverKey = serverKey;
+        userSettings->setValue(SETTINGS_SERVER_KEY, serverKey);
+    }
 }
 
-void Settings::saveDeleteExtraneousItems( const bool& deleteExtraneousItems ) {
-	if ( this->deleteExtraneousItems != deleteExtraneousItems )
-	{
-		this->deleteExtraneousItems = deleteExtraneousItems;
-		userSettings->setValue( SETTINGS_DELETE_EXTRANEOUS_ITEMS, deleteExtraneousItems );
-	}
-}
-
-void Settings::saveShowHiddenFilesAndFolders( const bool showHiddenFilesAndFolders ) {
-	if ( this->showHiddenFilesAndFolders != showHiddenFilesAndFolders )
-	{
-		this->showHiddenFilesAndFolders = showHiddenFilesAndFolders;
-		userSettings->setValue( SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, showHiddenFilesAndFolders );
-	}
-}
-
-void Settings::saveServerUserName( const QString &userName )
+void Settings::saveDeleteExtraneousItems(const bool &deleteExtraneousItems)
 {
-	if ( this->serverUserName != userName )
-	{
-		this->serverUserName = userName;
-		userSettings->setValue( SETTINGS_USERNAME, userName );
-		// delete the private key if the username has changed
-		savePrivatePuttyKey( "" );
-		savePrivateOpenSshKey( "" );
-	}
+    if (this->deleteExtraneousItems != deleteExtraneousItems) {
+        this->deleteExtraneousItems = deleteExtraneousItems;
+        userSettings->setValue(SETTINGS_DELETE_EXTRANEOUS_ITEMS, deleteExtraneousItems);
+    }
 }
 
-void Settings::saveLanguage( const QString& language )
+void Settings::saveShowHiddenFilesAndFolders(const bool showHiddenFilesAndFolders)
 {
-	if ( this->language != language )
-	{
-		this->language = language;
-		userSettings->setValue( SETTINGS_LANGUAGE, language );
-	}
+    if (this->showHiddenFilesAndFolders != showHiddenFilesAndFolders) {
+        this->showHiddenFilesAndFolders = showHiddenFilesAndFolders;
+        userSettings->setValue(SETTINGS_SHOW_HIDDEN_FILES_AND_FOLDERS, showHiddenFilesAndFolders);
+    }
 }
 
-void Settings::saveServerName( const QString& serverName )
+void Settings::saveServerUserName(const QString &userName)
 {
-	if ( this->serverName != serverName )
-	{
-		userSettings->setValue( SETTINGS_HOST, serverName );
-		this->serverName = serverName;
-	}
+    if (this->serverUserName != userName) {
+        this->serverUserName = userName;
+        userSettings->setValue(SETTINGS_USERNAME, userName);
+        // delete the private key if the username has changed
+        savePrivatePuttyKey("");
+        savePrivateOpenSshKey("");
+    }
 }
 
+void Settings::saveLanguage(const QString &language)
+{
+    if (this->language != language) {
+        this->language = language;
+        userSettings->setValue(SETTINGS_LANGUAGE, language);
+    }
+}
+
+void Settings::saveServerName(const QString &serverName)
+{
+    if (this->serverName != serverName) {
+        userSettings->setValue(SETTINGS_HOST, serverName);
+        this->serverName = serverName;
+    }
+}
 
 QString Settings::getMetadataFileName()
 {
@@ -556,23 +579,25 @@ QString Settings::getMetadataFileName()
 #elif defined Q_OS_WIN32
     return metadataFileName + "_win";
 #else
-	return metadataFileName + "_unix";
+    return metadataFileName + "_unix";
 #endif
 }
 
-QString Settings::getSshConfigFileName() {
-    QDir sshDir( this->getSshConfigDataDir() );
-    QFile sshConfigFile( this->getSshConfigDataDir() + "config" );
-    if ( !sshDir.exists() ) {
-        if ( sshDir.mkpath(this->getSshConfigDataDir()) ) {
-            if ( sshConfigFile.open(QIODevice::ReadWrite) ) {
+QString Settings::getSshConfigFileName()
+{
+    QDir sshDir(this->getSshConfigDataDir());
+    QFile sshConfigFile(this->getSshConfigDataDir() + "config");
+    if (!sshDir.exists()) {
+        if (sshDir.mkpath(this->getSshConfigDataDir())) {
+            if (sshConfigFile.open(QIODevice::ReadWrite)) {
                 sshConfigFile.close();
                 return sshConfigFile.fileName();
             }
             return QString();
         }
-    } if ( !sshConfigFile.exists() ) {
-        if ( sshConfigFile.open(QIODevice::ReadWrite) ) {
+    }
+    if (!sshConfigFile.exists()) {
+        if (sshConfigFile.open(QIODevice::ReadWrite)) {
             sshConfigFile.close();
             return sshConfigFile.fileName();
         }
@@ -583,163 +608,164 @@ QString Settings::getSshConfigFileName() {
 
 QString Settings::getTempMetadataFileName()
 {
-	return getMetadataFileName() + "_tmp";
+    return getMetadataFileName() + "_tmp";
 }
 
-void Settings::saveBackupPrefix( const QString& backupPrefix )
+void Settings::saveBackupPrefix(const QString &backupPrefix)
 {
-	if ( this->backupPrefix != backupPrefix )
-	{
-		this->backupPrefix = backupPrefix;
-		userSettings->setValue( SETTINGS_BACKUP_PREFIX, backupPrefix );
-	}
+    if (this->backupPrefix != backupPrefix) {
+        this->backupPrefix = backupPrefix;
+        userSettings->setValue(SETTINGS_BACKUP_PREFIX, backupPrefix);
+    }
 }
 
-void Settings::saveWindowSize( QSize size )
+void Settings::saveWindowSize(QSize size)
 {
-	if ( this->windowSize != size )
-	{
-		this->windowSize = size;
-		userSettings->setValue( SETTINGS_WINDOW_SIZE, size );
-	}
+    if (this->windowSize != size) {
+        this->windowSize = size;
+        userSettings->setValue(SETTINGS_WINDOW_SIZE, size);
+    }
 }
 
-void Settings::saveWindowPosition( QPoint position )
+void Settings::saveWindowPosition(QPoint position)
 {
-	if ( this->windowPosition != position )
-	{
-		this->windowPosition = position;
-		userSettings->setValue( SETTINGS_WINDOW_POSITION, position );
-	}
+    if (this->windowPosition != position) {
+        this->windowPosition = position;
+        userSettings->setValue(SETTINGS_WINDOW_POSITION, position);
+    }
 }
 
-void Settings::saveNOfLastBackups( int nOfLastBackups )
+void Settings::saveNOfLastBackups(int nOfLastBackups)
 {
-	if ( this->nOfLastBackups != nOfLastBackups )
-	{
-		nOfLastBackups = std::min( 10, std::max( 0, nOfLastBackups ) );
-		this->nOfLastBackups = nOfLastBackups;
-		appData->setValue( SETTINGS_GROUP_GUI + "/" + SETTINGS_N_OF_SHOWN_LAST_BACKUPS, nOfLastBackups );
-	}
+    if (this->nOfLastBackups != nOfLastBackups) {
+        nOfLastBackups = std::min(10, std::max(0, nOfLastBackups));
+        this->nOfLastBackups = nOfLastBackups;
+        appData->setValue(SETTINGS_GROUP_GUI + "/" + SETTINGS_N_OF_SHOWN_LAST_BACKUPS,
+                          nOfLastBackups);
+    }
 }
 
 /**
  * adds a new Task to the list of last Backup Tasks
- * overwrites the lastBackupTask if its time is equal to the passed BackupTask's backupTime or if passed if it is equal to the passed QDateTime originalStartDateTime (f.ex. to be able to reset time to end of backup)
+ * overwrites the lastBackupTask if its time is equal to the passed BackupTask's backupTime or if
+ * passed if it is equal to the passed QDateTime originalStartDateTime (f.ex. to be able to reset
+ * time to end of backup)
  */
-void Settings::addLastBackup( const BackupTask& lastBackup )
+void Settings::addLastBackup(const BackupTask &lastBackup)
 {
-	if ( this->lastBackups.size() == 0 || !this->lastBackups.at( 0 ).equals( lastBackup ) ) {
-		// identical values are not repeated
-		this->lastBackups.prepend( lastBackup );
-	}
-	this->saveLastBackups();
+    if (this->lastBackups.size() == 0 || !this->lastBackups.at(0).equals(lastBackup)) {
+        // identical values are not repeated
+        this->lastBackups.prepend(lastBackup);
+    }
+    this->saveLastBackups();
 }
 
-void Settings::replaceLastBackup( const BackupTask& newBackupInfo ) {
-	if ( this->lastBackups.size() != 0 ) {
-		this->lastBackups.takeFirst();
-		this->lastBackups.prepend( newBackupInfo );
-	}
-	this->saveLastBackups();
+void Settings::replaceLastBackup(const BackupTask &newBackupInfo)
+{
+    if (this->lastBackups.size() != 0) {
+        this->lastBackups.takeFirst();
+        this->lastBackups.prepend(newBackupInfo);
+    }
+    this->saveLastBackups();
 }
 
 void Settings::saveLastBackups()
 {
-	qDebug() << "Settings::saveLastBackups(...)";
-	qDebug() << "saving lastBackup-settings into file:" << this->appData->fileName();
-	appData->beginGroup( SETTINGS_GROUP_APPDATA );
-	appData->beginWriteArray( SETTINGS_APPDATA_LASTBACKUPS );
-	for ( int i = 0; i < std::min( this->lastBackups.size(), Settings::MAX_SAVED_LAST_BACKUPS ); ++i )
-	{
-		appData->setArrayIndex( i );
-		appData->setValue( SETTINGS_APPDATA_LASTBACKUP_DATE, this->lastBackups.at( i ).getDateTime() );
-		appData->setValue( SETTINGS_APPDATA_LASTBACKUP_STATUS, ( int )this->lastBackups.at( i ).getStatus() );
-	}
-	appData->endArray();
-	appData->endGroup();
-	appData->sync(); // simple fix for the issue, that lastBackups were never persisted in -schedule-runs
+    qDebug() << "Settings::saveLastBackups(...)";
+    qDebug() << "saving lastBackup-settings into file:" << this->appData->fileName();
+    appData->beginGroup(SETTINGS_GROUP_APPDATA);
+    appData->beginWriteArray(SETTINGS_APPDATA_LASTBACKUPS);
+    for (int i = 0; i < std::min(this->lastBackups.size(), Settings::MAX_SAVED_LAST_BACKUPS); ++i) {
+        appData->setArrayIndex(i);
+        appData->setValue(SETTINGS_APPDATA_LASTBACKUP_DATE, this->lastBackups.at(i).getDateTime());
+        appData->setValue(SETTINGS_APPDATA_LASTBACKUP_STATUS,
+                          (int) this->lastBackups.at(i).getStatus());
+    }
+    appData->endArray();
+    appData->endGroup();
+    appData
+        ->sync(); // simple fix for the issue, that lastBackups were never persisted in -schedule-runs
 }
 
-void Settings::saveScheduleRule(const ScheduledTask& scheduleRule)
+void Settings::saveScheduleRule(const ScheduledTask &scheduleRule)
 {
-	if ( !this->scheduleRule.equals(scheduleRule) )
-	{
-		appData->beginGroup( SETTINGS_GROUP_APPDATA );
-		this->scheduleRule = scheduleRule;
+    if (!this->scheduleRule.equals(scheduleRule)) {
+        appData->beginGroup(SETTINGS_GROUP_APPDATA);
+        this->scheduleRule = scheduleRule;
 
-		QVariant var;
-		var.setValue(scheduleRule);
-		appData->setValue( SETTINGS_SCHEDULE_RULE, var );
-		appData->endGroup();
-	}
+        QVariant var;
+        var.setValue(scheduleRule);
+        appData->setValue(SETTINGS_SCHEDULE_RULE, var);
+        appData->endGroup();
+    }
 }
 
-void Settings::saveBackupSelectionRules( const BackupSelectionHash& backupSelectionRules )
+void Settings::saveBackupSelectionRules(const BackupSelectionHash &backupSelectionRules)
 {
-	qDebug() << "Settings::saveBackupSelectionRules(" << backupSelectionRules << ")";
-	this->lastBackupRules = backupSelectionRules;
-	appData->beginGroup( SETTINGS_GROUP_APPDATA );
-	appData->beginWriteArray( SETTINGS_LAST_BACKUP_RULES );
-	QList<QString> items = this->lastBackupRules.keys();
-	int i = 0;
-	foreach ( QString item, items )
-	{
-		appData->setArrayIndex( i );
-		qDebug() << "Settings::saveBackupSelectionRules(...)" << "writing:" << this->lastBackupRules[item] << item;
-		appData->setValue( SETTINGS_LAST_BACKUP_RULES_MODIFIER, this->lastBackupRules[item] );
-		appData->setValue( SETTINGS_LAST_BACKUP_RULES_ITEM, item );
-		i++;
-	}
-	appData->endArray();
-	appData->endGroup();
+    qDebug() << "Settings::saveBackupSelectionRules(" << backupSelectionRules << ")";
+    this->lastBackupRules = backupSelectionRules;
+    appData->beginGroup(SETTINGS_GROUP_APPDATA);
+    appData->beginWriteArray(SETTINGS_LAST_BACKUP_RULES);
+    QList<QString> items = this->lastBackupRules.keys();
+    int i = 0;
+    foreach (QString item, items) {
+        appData->setArrayIndex(i);
+        qDebug() << "Settings::saveBackupSelectionRules(...)"
+                 << "writing:" << this->lastBackupRules[item] << item;
+        appData->setValue(SETTINGS_LAST_BACKUP_RULES_MODIFIER, this->lastBackupRules[item]);
+        appData->setValue(SETTINGS_LAST_BACKUP_RULES_ITEM, item);
+        i++;
+    }
+    appData->endArray();
+    appData->endGroup();
 }
 
 int Settings::getMaxLogLines()
 {
-	return maxLogLines;
+    return maxLogLines;
 }
 
 QString Settings::getDefaultServerName()
 {
-	return defaultServerName;
+    return defaultServerName;
 }
 
 QString Settings::getDefaultServerKey()
 {
-	return defaultServerKey;
+    return defaultServerKey;
 }
 
 QString Settings::getServerName()
 {
-	return serverName;
+    return serverName;
 }
 
 bool Settings::getDeleteExtraneousItems()
 {
-	return deleteExtraneousItems;
+    return deleteExtraneousItems;
 }
 
 bool Settings::getShowHiddenFilesAndFolders()
 {
-	return showHiddenFilesAndFolders;
+    return showHiddenFilesAndFolders;
 }
 
-bool Settings::isCompressedRsyncTraffic() {
-	return false;
+bool Settings::isCompressedRsyncTraffic()
+{
+    return false;
 }
 
 QList<std::pair<QString, QString>> Settings::getAvailableLanguages()
 {
     QList<std::pair<QString, QString>> languages;
     languages << std::make_pair("English", "en"); // the native language
-    
+
     QDir translationDir(getApplicationBinDir());
 
     QRegExp regex("^app_(.*)\\.qm$");
-    QStringList translationFiles(translationDir.entryList(QStringList("app_*.qm"), QDir::Files, QDir::Name));
-    for ( auto l: translationFiles )
-    {
+    QStringList translationFiles(
+        translationDir.entryList(QStringList("app_*.qm"), QDir::Files, QDir::Name));
+    for (auto l : translationFiles) {
         QTranslator translator;
         translator.load(translationDir.filePath(l));
         regex.indexIn(l);
@@ -750,42 +776,42 @@ QList<std::pair<QString, QString>> Settings::getAvailableLanguages()
 
 bool Settings::isLogDebugMessageEnabled()
 {
-	return logDebugMessage;
+    return logDebugMessage;
 }
 
 QString Settings::getPrivatePuttyKey()
 {
-	return privatePuttyKey;
+    return privatePuttyKey;
 }
 
 QString Settings::getPrivateOpenSshKey()
 {
-	return privateOpenSshKey;
+    return privateOpenSshKey;
 }
 
 QString Settings::getBackupTimeFileName()
 {
-	return backupTimeFileName;
+    return backupTimeFileName;
 }
 
 QString Settings::getServerQuotaScriptName()
 {
-	return serverQuotaScriptName;
+    return serverQuotaScriptName;
 }
 
 QString Settings::getLogFileName()
 {
-	return logFileName;
+    return logFileName;
 }
 
 QString Settings::getApplicationBinDir()
 {
-	return applicationBinDir;
+    return applicationBinDir;
 }
 
 QString Settings::getApplicationDataDir()
 {
-	return applicationDataDir;
+    return applicationDataDir;
 }
 
 QString Settings::getSshConfigDataDir()
@@ -795,186 +821,185 @@ QString Settings::getSshConfigDataDir()
 
 QString Settings::getSetAclName()
 {
-	return getApplicationBinDir() + setacl;
+    return getApplicationBinDir() + setacl;
 }
 
 QString Settings::getLockFileName()
 {
-	return lockFileName;
+    return lockFileName;
 }
 
 QString Settings::getThisApplicationFullPathExecutable()
 {
-	return getApplicationBinDir() + thisApplication;
+    return getApplicationBinDir() + thisApplication;
 }
 
 QString Settings::getThisApplicationExecutable()
 {
-	return thisApplication;
+    return thisApplication;
 }
 
 QString Settings::getServerUserName()
 {
-	return serverUserName;
+    return serverUserName;
 }
 
 QString Settings::getServerPassword()
 {
-	return server_password;
+    return server_password;
 }
 
 QString Settings::getClientUserName()
 {
-	return QString(getenv("USER"));
+    return QString(getenv("USER"));
 }
 
 QString Settings::getClientPassword()
 {
-	return client_password;
+    return client_password;
 }
 
 QString Settings::getApplicationName()
 {
-	return applicationName;
+    return applicationName;
 }
 
 QString Settings::getServerKey()
 {
-	return serverKey;
+    return serverKey;
 }
 
 QString Settings::getGetfaclName()
 {
-	return getApplicationBinDir() + getfacl;
+    return getApplicationBinDir() + getfacl;
 }
 
 QString Settings::getSetfaclName()
 {
-	return getApplicationBinDir() + setfacl;
+    return getApplicationBinDir() + setfacl;
 }
 
 QString Settings::getBackupFolderName()
 {
-	return backupFolderName;
+    return backupFolderName;
 }
 
 QString Settings::getMetaFolderName()
 {
-	return metaFolderName;
+    return metaFolderName;
 }
 
 QString Settings::getBackupRootFolder()
 {
-	return backupRootFolder;
+    return backupRootFolder;
 }
 
 QString Settings::getRestoreRootFolder()
 {
-	return restoreRootFolder;
+    return restoreRootFolder;
 }
 
 QString Settings::getAuthorizedKeyFolderName()
 {
-	return authorizedKeyFolderName;
+    return authorizedKeyFolderName;
 }
 
 QString Settings::getAuthorizedKeyFileName()
 {
-	return authorizedKeyFileName;
+    return authorizedKeyFileName;
 }
 
 QString Settings::getQuotaModificationUrl()
 {
-	return quotaModificationUrl;
+    return quotaModificationUrl;
 }
 
 QString Settings::getQuotaModificationUrlUidParam()
 {
-	return quotaModificationUrlUidParam;
+    return quotaModificationUrlUidParam;
 }
 
 QString Settings::getRsyncName()
 {
-	return getApplicationBinDir() + rsync;
+    return getApplicationBinDir() + rsync;
 }
 
 QString Settings::getPlinkName()
 {
-	return getApplicationBinDir() + plink;
+    return getApplicationBinDir() + plink;
 }
 
 QString Settings::getSshName()
 {
-	return getApplicationBinDir() + ssh;
+    return getApplicationBinDir() + ssh;
 }
 
 QString Settings::getLanguage() const
 {
-	return language;
+    return language;
 }
 
 QString Settings::getBackupContentFileName()
 {
-	return backupContentFileName;
+    return backupContentFileName;
 }
 
 QString Settings::getBackupPrefix()
 {
-	return backupPrefix;
+    return backupPrefix;
 }
 
 QString Settings::getLogFileAbsolutePath()
 {
-	return this->getApplicationDataDir() + this->getLogFileName();
+    return this->getApplicationDataDir() + this->getLogFileName();
 }
 
 int Settings::getRsyncTimeout()
 {
-	return rsyncTimeout;
+    return rsyncTimeout;
 }
 
 QSize Settings::getWindowSize()
 {
-	return windowSize;
+    return windowSize;
 }
 
 QPoint Settings::getWindowPosition()
 {
-	return windowPosition;
+    return windowPosition;
 }
 
 QString Settings::getResellerAddress()
 {
-	return resellerAddress;
+    return resellerAddress;
 }
 
 int Settings::getNOfLastBackups() const
 {
-	return nOfLastBackups;
+    return nOfLastBackups;
 }
 
-const QList<BackupTask>& Settings::getLastBackups() const
+const QList<BackupTask> &Settings::getLastBackups() const
 {
-	return lastBackups;
+    return lastBackups;
 }
 
-const ScheduledTask& Settings::getScheduleRule() const
+const ScheduledTask &Settings::getScheduleRule() const
 {
-	return scheduleRule;
+    return scheduleRule;
 }
 
-const BackupSelectionHash& Settings::getLastBackupSelectionRules() const
+const BackupSelectionHash &Settings::getLastBackupSelectionRules() const
 {
-	return lastBackupRules;
+    return lastBackupRules;
 }
 
 void Settings::saveLogDebugMessages(bool logDebugMessage)
 {
-	if (this->logDebugMessage != logDebugMessage)
-	{
-		this->logDebugMessage = logDebugMessage;
-		userSettings->setValue(SETTINGS_LOG_DEBUG_MESSAGE, logDebugMessage);
-	}
+    if (this->logDebugMessage != logDebugMessage) {
+        this->logDebugMessage = logDebugMessage;
+        userSettings->setValue(SETTINGS_LOG_DEBUG_MESSAGE, logDebugMessage);
+    }
 }
 
 bool Settings::getLogDebugMessages() const
@@ -984,8 +1009,7 @@ bool Settings::getLogDebugMessages() const
 
 void Settings::saveDoSnapshot(bool doSnapshot)
 {
-    if (this->doSnapshot != doSnapshot)
-    {
+    if (this->doSnapshot != doSnapshot) {
         this->doSnapshot = doSnapshot;
         userSettings->setValue(SETTINGS_DO_SNAPSHOT, doSnapshot);
     }
@@ -998,11 +1022,10 @@ bool Settings::getDoSnapshot() const
 
 void Settings::saveBandwidthLimit(int bandwidthLimit)
 {
-	if (this->bandwidthLimit != bandwidthLimit)
-	{
-		this->bandwidthLimit = bandwidthLimit;
-		userSettings->setValue(SETTINGS_BANDWITH_LIMIT, bandwidthLimit);
-	}
+    if (this->bandwidthLimit != bandwidthLimit) {
+        this->bandwidthLimit = bandwidthLimit;
+        userSettings->setValue(SETTINGS_BANDWITH_LIMIT, bandwidthLimit);
+    }
 }
 
 int Settings::getBandwidthLimit() const

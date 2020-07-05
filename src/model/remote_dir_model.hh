@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -19,9 +19,9 @@
 #ifndef REMOTE_DIR_MODEL_HH
 #define REMOTE_DIR_MODEL_HH
 
+#include <QFileInfo>
 #include <QStandardItem>
 #include <QStringList>
-#include <QFileInfo>
 
 #include "utils/datatypes.hh"
 
@@ -32,33 +32,31 @@
 class RemoteDirModel : public QStandardItemModel
 {
 public:
+    /**
+     * Constructs a RemoteDirModel with the given items
+     * @param backupContent list of files and directories
+     */
+    RemoteDirModel(QStringList backupContent);
 
-	/**
-	 * Constructs a RemoteDirModel with the given items
-	 * @param backupContent list of files and directories
-	 */
-	RemoteDirModel( QStringList backupContent );
+    /**
+     * Destroys the RemoteDirModel
+     */
+    virtual ~RemoteDirModel();
 
-	/**
-	 * Destroys the RemoteDirModel
-	 */
-	virtual ~RemoteDirModel();
-	
-	Qt::ItemFlags flags(const QModelIndex& index) const;
-	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-	const BackupSelectionHash& getSelectionRules() { return selectionRules; };
-	
-	private:
-		BackupSelectionHash selectionRules;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    const BackupSelectionHash &getSelectionRules() { return selectionRules; };
+
+private:
+    BackupSelectionHash selectionRules;
 };
 
 QString sortKey(QString file);
 
-inline bool fileLessThan(const QString& file1, const QString& file2)
+inline bool fileLessThan(const QString &file1, const QString &file2)
 {
-	return QString::localeAwareCompare(sortKey(file1), sortKey(file2)) < 0;
+    return QString::localeAwareCompare(sortKey(file1), sortKey(file2)) < 0;
 }
 
 #endif
-

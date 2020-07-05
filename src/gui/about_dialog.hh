@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -29,21 +29,20 @@
  */
 class AboutDialog : public QDialog, private Ui::AboutDialog
 {
-	Q_OBJECT
-	static const int MAX_IMAGE_HEIGHT;
-	static const int MAX_IMAGE_WIDTH;
-	
-public:
+    Q_OBJECT
+    static const int MAX_IMAGE_HEIGHT;
+    static const int MAX_IMAGE_WIDTH;
 
-	/**
-	 * Constructs an AboutDialog
-	 */
-	AboutDialog();
-	
-	/**
-	 * Destroys the Aboutdialog
-	 */
-	virtual ~AboutDialog() {}
+public:
+    /**
+     * Constructs an AboutDialog
+     */
+    AboutDialog();
+
+    /**
+     * Destroys the Aboutdialog
+     */
+    virtual ~AboutDialog() {}
 };
 
 #endif

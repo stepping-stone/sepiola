@@ -105,7 +105,7 @@
           </size>
          </property>
          <property name="text">
-          <string>&amp;Backup</string>
+          <string>Backup</string>
          </property>
          <property name="icon">
           <iconset resource="resources/screen.qrc">
@@ -137,7 +137,7 @@
           </size>
          </property>
          <property name="text">
-          <string>&amp;Restore</string>
+          <string>Restore</string>
          </property>
          <property name="icon">
           <iconset resource="resources/screen.qrc">
@@ -169,7 +169,7 @@
           </size>
          </property>
          <property name="text">
-          <string>&amp;Settings</string>
+          <string>Settings</string>
          </property>
          <property name="icon">
           <iconset resource="resources/screen.qrc">
@@ -266,19 +266,19 @@
    </property>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>&amp;Help</string>
+     <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>&amp;File</string>
+     <string>File</string>
     </property>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>&amp;Tools</string>
+     <string>Tools</string>
     </property>
     <addaction name="actionOverview"/>
     <addaction name="actionBackup"/>
@@ -297,7 +297,7 @@
      <normaloff>:/main/exit.png</normaloff>:/main/exit.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Exit</string>
+    <string>Exit</string>
    </property>
   </action>
   <action name="actionOverview">
@@ -306,7 +306,7 @@
      <normaloff>:/main/home.png</normaloff>:/main/home.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Overview</string>
+    <string>Overview</string>
    </property>
   </action>
   <action name="actionBackup">
@@ -315,7 +315,7 @@
      <normaloff>:/main/backup.png</normaloff>:/main/backup.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Backup</string>
+    <string>Backup</string>
    </property>
   </action>
   <action name="actionRestore">
@@ -324,7 +324,7 @@
      <normaloff>:/main/restore.png</normaloff>:/main/restore.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Restore</string>
+    <string>Restore</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -333,7 +333,7 @@
      <normaloff>:/main/settings.png</normaloff>:/main/settings.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Settings</string>
+    <string>Settings</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -342,7 +342,7 @@
      <normaloff>:/main/about.png</normaloff>:/main/about.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;About</string>
+    <string>About</string>
    </property>
    <property name="iconText">
     <string>About</string>
@@ -358,7 +358,7 @@
     </iconset>
    </property>
    <property name="text">
-    <string>&amp;Help Contents</string>
+    <string>Help Contents</string>
    </property>
   </action>
   <action name="actionViewLogfile">
@@ -372,7 +372,7 @@
      <normaloff>:/main/logfile.png</normaloff>:/main/logfile.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Logfile</string>
+    <string>Logfile</string>
    </property>
   </action>
  </widget>

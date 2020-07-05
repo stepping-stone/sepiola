@@ -6,7 +6,7 @@ Sepiola is a genus of bobtail squid comprising around 15 species or a platform i
 
 Thanks to the intuitive and simple graphical user interface, the backup of your precious data is a mere child's play.
 
-[![Continuous Integration status](https://secure.travis-ci.org/stepping-stone/sepiola.png)](http://travis-ci.org/stepping-stone/sepiola)
+[![Build Status](https://travis-ci.org/stepping-stone/sepiola.svg)](https://travis-ci.org/stepping-stone/sepiola)
 
 ## Characteristics
 
@@ -43,6 +43,6 @@ The development follows the [git flow](http://nvie.com/posts/a-successful-git-br
 
 # License & Copyright
 
-Copyright 2015 (c) stepping stone GmbH, Switzerland.
+Copyright (c) 2007-2020 stepping stone AG, Switzerland.
 
 Released under the GPL-2 license.

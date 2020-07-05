@@ -9,27 +9,25 @@
 
 #include "stacked_bar_view.hh"
 
-#include <QtGui/QPen>
-#include <QtGui/QPainter>
 #include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPen>
 #include <QtGui/QScrollBar>
 
-namespace
-{
-    static const int DATA_COLUMN = 0;
-    static const int COLOR_COLUMN = 0;
-}
+namespace {
+static const int DATA_COLUMN = 0;
+static const int COLOR_COLUMN = 0;
+} // namespace
 
-StackedBarView::StackedBarView(QWidget* p) :
-    QAbstractItemView(p),
-    _margin(0),
-    _stackbarHeight(16),
-    _totalValue(0.0),
-    _validItems(0)
-{
-}
+StackedBarView::StackedBarView(QWidget *p)
+    : QAbstractItemView(p)
+    , _margin(0)
+    , _stackbarHeight(16)
+    , _totalValue(0.0)
+    , _validItems(0)
+{}
 
-QModelIndex StackedBarView::indexAt(const QPoint& point) const
+QModelIndex StackedBarView::indexAt(const QPoint &point) const
 {
     if (_validItems == 0)
         return QModelIndex();
@@ -38,20 +36,21 @@ QModelIndex StackedBarView::indexAt(const QPoint& point) const
     int wx = point.x() + horizontalScrollBar()->value() - _margin;
     int wy = point.y() + verticalScrollBar()->value() - _margin;
 
-    if ((wx < 0) || (wx > size().width()-_margin) || (wy < 0) || (wy > size().width()-_margin))
+    if ((wx < 0) || (wx > size().width() - _margin) || (wy < 0) || (wy > size().width() - _margin))
         return QModelIndex();
 
     double start(0.);
 
-    for (int row(start), end(model()->rowCount(rootIndex())); row <= end; ++row)
-    {
+    for (int row(start), end(model()->rowCount(rootIndex())); row <= end; ++row) {
         const QModelIndex valueIndex(model()->index(row, DATA_COLUMN, rootIndex()));
         const double value(model()->data(valueIndex).toDouble());
-        const QString color(model()->data(model()->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
+        const QString color(
+            model()
+                ->data(model()->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole)
+                .toString());
 
-        if (value > 0.0 && !color.isNull())
-        {
-            start += (size().width()-2.*_margin) * (value/_totalValue);
+        if (value > 0.0 && !color.isNull()) {
+            start += (size().width() - 2. * _margin) * (value / _totalValue);
             if (point.x() < start)
                 return valueIndex;
         }
@@ -60,11 +59,9 @@ QModelIndex StackedBarView::indexAt(const QPoint& point) const
     return QModelIndex();
 }
 
-void StackedBarView::scrollTo(const QModelIndex&, ScrollHint)
-{
-}
+void StackedBarView::scrollTo(const QModelIndex &, ScrollHint) {}
 
-QRect StackedBarView::visualRect(const QModelIndex&) const
+QRect StackedBarView::visualRect(const QModelIndex &) const
 {
     return QRect();
 }
@@ -79,10 +76,14 @@ int StackedBarView::verticalOffset() const
     return verticalScrollBar()->value();
 }
 
-bool StackedBarView::isIndexHidden(const QModelIndex& index) const
+bool StackedBarView::isIndexHidden(const QModelIndex &index) const
 {
-    const QString color(model()->data(model()->index(index.row(), COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
-    const double value(model()->data(model()->index(index.row(), DATA_COLUMN, rootIndex())).toDouble());
+    const QString color(
+        model()
+            ->data(model()->index(index.row(), COLOR_COLUMN, rootIndex()), Qt::DecorationRole)
+            .toString());
+    const double value(
+        model()->data(model()->index(index.row(), DATA_COLUMN, rootIndex())).toDouble());
     return (value <= 0.0 || color.isNull());
 }
 
@@ -91,16 +92,14 @@ QModelIndex StackedBarView::moveCursor(CursorAction, Qt::KeyboardModifiers)
     return QModelIndex();
 }
 
-void StackedBarView::setSelection(const QRect &, QItemSelectionModel::SelectionFlags)
-{
-}
+void StackedBarView::setSelection(const QRect &, QItemSelectionModel::SelectionFlags) {}
 
 QRegion StackedBarView::visualRegionForSelection(const QItemSelection &) const
 {
     return QRegion();
 }
 
-void StackedBarView::paintEvent(QPaintEvent* event)
+void StackedBarView::paintEvent(QPaintEvent *event)
 {
     QStyleOptionViewItem option(viewOptions());
 
@@ -115,7 +114,7 @@ void StackedBarView::paintEvent(QPaintEvent* event)
 
     painter.save();
 
-    const double stackbarTotalLength(size().width()-2.*_margin);
+    const double stackbarTotalLength(size().width() - 2. * _margin);
     const QRect barRect(_margin, _margin, stackbarTotalLength, _stackbarHeight);
 
     // Viewport rectangles
@@ -124,32 +123,28 @@ void StackedBarView::paintEvent(QPaintEvent* event)
     painter.drawRect(0, 0, stackbarTotalLength, _stackbarHeight);
     painter.setPen(Qt::NoPen);
 
-    QLinearGradient gradient( QPoint(0, 0), QPoint(0, _stackbarHeight));
+    QLinearGradient gradient(QPoint(0, 0), QPoint(0, _stackbarHeight));
     gradient.setColorAt(0, Qt::white);
     gradient.setColorAt(1, Qt::black);
 
-    if (_validItems > 0)
-    {
+    if (_validItems > 0) {
         double start(0.);
-        QAbstractItemModel * m(model());
+        QAbstractItemModel *m(model());
 
-        for (int row(0), end(m->rowCount(rootIndex())); row <= end; ++row)
-        {
+        for (int row(0), end(m->rowCount(rootIndex())); row <= end; ++row) {
             const double value(m->data(m->index(row, DATA_COLUMN, rootIndex())).toDouble());
-            const QString color(m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
+            const QString color(
+                m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
 
-            if (value > 0.0 && !color.isNull())
-            {
-                const double length(stackbarTotalLength * (value/_totalValue));
+            if (value > 0.0 && !color.isNull()) {
+                const double length(stackbarTotalLength * (value / _totalValue));
                 gradient.setColorAt(0.5, color);
                 painter.setBrush(gradient);
                 painter.drawRect(QRectF(start, 0., length, _stackbarHeight));
                 start += length;
             }
         }
-    }
-    else
-    {
+    } else {
         // draw a black background bar
         gradient.setColorAt(0.5, Qt::black);
         painter.setBrush(gradient);
@@ -166,18 +161,17 @@ void StackedBarView::dataChanged(const QModelIndex &topLeft, const QModelIndex &
     _validItems = 0;
     _totalValue = 0.0;
 
-    QAbstractItemModel * m(model());
+    QAbstractItemModel *m(model());
 
-    for (int row(0), end(m->rowCount(rootIndex())); row <= end; ++row)
-    {
+    for (int row(0), end(m->rowCount(rootIndex())); row <= end; ++row) {
         double value(m->data(m->index(row, DATA_COLUMN, rootIndex())).toDouble());
-        QString color(m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
+        QString color(
+            m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
 
-        if (value > 0.0 && !color.isNull())
-        {
+        if (value > 0.0 && !color.isNull()) {
             _validItems += 1;
             _totalValue += value;
-        }    
+        }
     }
 
     viewport()->update();
@@ -185,18 +179,17 @@ void StackedBarView::dataChanged(const QModelIndex &topLeft, const QModelIndex &
 
 void StackedBarView::rowsInserted(const QModelIndex &parent, int start, int end)
 {
-    QAbstractItemModel * m(model());
+    QAbstractItemModel *m(model());
 
-    for (int row(start); row <= end; ++row)
-    {
+    for (int row(start); row <= end; ++row) {
         const double value(m->data(m->index(row, DATA_COLUMN, rootIndex())).toDouble());
-        const QString color(m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
+        const QString color(
+            m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
 
-        if (value > 0.0 && !color.isNull())
-        {
+        if (value > 0.0 && !color.isNull()) {
             _validItems += 1;
             _totalValue += value;
-        }    
+        }
     }
 
     QAbstractItemView::rowsInserted(parent, start, end);
@@ -204,30 +197,29 @@ void StackedBarView::rowsInserted(const QModelIndex &parent, int start, int end)
 
 void StackedBarView::rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
 {
-    QAbstractItemModel * m(model());
+    QAbstractItemModel *m(model());
 
-    for (int row(start); row <= end; ++row)
-    {
+    for (int row(start); row <= end; ++row) {
         const double value(m->data(m->index(row, DATA_COLUMN, rootIndex())).toDouble());
-        const QString color(m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
+        const QString color(
+            m->data(m->index(row, COLOR_COLUMN, rootIndex()), Qt::DecorationRole).toString());
 
-        if (value > 0.0 && !color.isNull())
-        {
+        if (value > 0.0 && !color.isNull()) {
             _validItems -= 1;
             _totalValue -= value;
-        }    
+        }
     }
 
     QAbstractItemView::rowsAboutToBeRemoved(parent, start, end);
 }
 
-bool StackedBarView::edit(const QModelIndex&, EditTrigger, QEvent*)
+bool StackedBarView::edit(const QModelIndex &, EditTrigger, QEvent *)
 {
     // disable editing for all
     return false;
 }
 
-QPixmap StackedBarView::legendIcon(const QModelIndex & index) const
+QPixmap StackedBarView::legendIcon(const QModelIndex &index) const
 {
     const QColor color = qvariant_cast<QColor>(index.data(Qt::DecorationRole));
 

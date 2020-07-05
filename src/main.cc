@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -16,17 +16,17 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QCoreApplication>
 #include <QApplication>
-#include <QTranslator>
-#include <QLocale>
+#include <QCoreApplication>
 #include <QDebug>
 #include <QFileInfo>
+#include <QLocale>
 #include <QMessageBox>
+#include <QTranslator>
 
-#include <unistd.h>
-#include <signal.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <unistd.h>
 
 #ifdef Q_OS_UNIX
 #include <pwd.h>
@@ -37,76 +37,73 @@
 #endif
 
 #ifdef CMAKE_BUILD_TYPE_DEPLOY
-	#include <QtPlugin>
-	Q_IMPORT_PLUGIN(qsvg)
+#include <QtPlugin>
+Q_IMPORT_PLUGIN(qsvg)
 #endif
 
 #include "cli/cli_manager.hh"
 #include "gui/main_window.hh"
 #include "model/main_model.hh"
-#include "settings/settings.hh"
 #include "settings/platform.hh"
+#include "settings/settings.hh"
 #include "test/test_manager.hh"
-#include "utils/single_application_guard.hh"
 #include "utils/log_file_utils.hh"
+#include "utils/single_application_guard.hh"
 
 #include "config.h"
 
-namespace
-{
+namespace {
 static const QString CONFIG_FILE_NAME = "config";
 static const QString VERSION_ARGUMENT = "-version";
-static const char* DEPENDENCY_MISSING = "Dependent files are missing. Please reinstall the application.\n";
-static const char* SINGLE_APPLICATION_ERROR =
-		"The application is already running. Only one instance of this application can be run concurrently.\n";
-}
+static const char *DEPENDENCY_MISSING
+    = "Dependent files are missing. Please reinstall the application.\n";
+static const char *SINGLE_APPLICATION_ERROR
+    = "The application is already running. Only one instance of this application can be run "
+      "concurrently.\n";
+} // namespace
 
-bool initSettings(QCoreApplication* app)
+bool initSettings(QCoreApplication *app)
 {
 #ifdef PORTABLE_INSTALLATION
-	QString applicationDirPath = app->applicationDirPath();
+    QString applicationDirPath = app->applicationDirPath();
 #else
     QString applicationDirPath = APPLICATION_SHARE_DIR;
 #endif
-	QFileInfo configFile(applicationDirPath, CONFIG_FILE_NAME);
-	if ( !configFile.exists() )
-	{
-		qDebug() << "config file: " + configFile.absoluteFilePath() + " not found.";
-		return false;
-	}
-	Settings::getInstance()->loadSettings(configFile);
-	return true;
+    QFileInfo configFile(applicationDirPath, CONFIG_FILE_NAME);
+    if (!configFile.exists()) {
+        qDebug() << "config file: " + configFile.absoluteFilePath() + " not found.";
+        return false;
+    }
+    Settings::getInstance()->loadSettings(configFile);
+    return true;
 }
 
 void messageHandler(QtMsgType type, const char *msg)
 {
-	if (Settings::getInstance()->isLogDebugMessageEnabled() )
-	{
-		switch (type)
-		{
-		case QtDebugMsg:
-		case QtWarningMsg:
-			fprintf(stdout, "%s%s", msg, Platform::EOL_CHARACTER);
-			fflush(stdout);
-			break;
-		case QtCriticalMsg:
-		case QtFatalMsg:
-			fprintf(stderr, "%s%s", msg, Platform::EOL_CHARACTER);
-			fflush(stderr);
-			break;
-		}
-	}
+    if (Settings::getInstance()->isLogDebugMessageEnabled()) {
+        switch (type) {
+        case QtDebugMsg:
+        case QtWarningMsg:
+            fprintf(stdout, "%s%s", msg, Platform::EOL_CHARACTER);
+            fflush(stdout);
+            break;
+        case QtCriticalMsg:
+        case QtFatalMsg:
+            fprintf(stderr, "%s%s", msg, Platform::EOL_CHARACTER);
+            fflush(stderr);
+            break;
+        }
+    }
 }
 
 bool assertCliDependencies()
 {
-	Settings* settings = Settings::getInstance();
-	QFileInfo plinkFile(settings->getPlinkName() );
-	QFileInfo rsyncFile(settings->getRsyncName() );
+    Settings *settings = Settings::getInstance();
+    QFileInfo plinkFile(settings->getPlinkName());
+    QFileInfo rsyncFile(settings->getRsyncName());
 
     // plink and rsync are required on all platforms
-    if (!plinkFile.exists())
-    {
+    if (!plinkFile.exists()) {
         qDebug() << "plink" << settings->getPlinkName() << "could not be found";
         return false;
     }
@@ -117,44 +114,43 @@ bool assertCliDependencies()
 
     // return if the user chose to use the ssh client instead
     // of plink and the client could not befound
-    QFileInfo sshFile(settings->getSshName() );
-    if (!sshFile.exists())
-    {
+    QFileInfo sshFile(settings->getSshName());
+    if (!sshFile.exists()) {
         qDebug() << "ssh" << settings->getSshName() << "could not be found";
         return false;
     }
 
 #ifdef Q_OS_WIN32
-	QFileInfo setaclFile(settings->getSetAclName() );
-	return setaclFile.exists();
+    QFileInfo setaclFile(settings->getSetAclName());
+    return setaclFile.exists();
 #endif
 
 #ifdef Q_OS_UNIX
-	QFileInfo getfaclFile(settings->getGetfaclName() );
-	QFileInfo setfaclFile(settings->getSetfaclName() );
-	return getfaclFile.exists() && setfaclFile.exists();
+    QFileInfo getfaclFile(settings->getGetfaclName());
+    QFileInfo setfaclFile(settings->getSetfaclName());
+    return getfaclFile.exists() && setfaclFile.exists();
 #endif
 
     return true;
 }
 
-bool isProcessRunning(const int& processId)
+bool isProcessRunning(const int &processId)
 {
 #ifdef Q_OS_UNIX
-	return (processId != 0 ) && ( !kill(processId, 0) );
+    return (processId != 0) && (!kill(processId, 0));
 #else
-	return ( processId != 0) && ( GetProcessVersion( processId ) != 0 );
+    return (processId != 0) && (GetProcessVersion(processId) != 0);
 #endif
 }
 
 bool assertSingleApplication()
 {
-    Settings* settings = Settings::getInstance();
+    Settings *settings = Settings::getInstance();
     QString userName = settings->getClientUserName();
 
-    //The userName is neede to create a shared memory segment for each user.
-    //This allows each user to run one instance of the sepiola application.
-    static SingleApplicationGuard singleApp( userName );
+    // The userName is neede to create a shared memory segment for each user.
+    // This allows each user to run one instance of the sepiola application.
+    static SingleApplicationGuard singleApp(userName);
     if (singleApp.tryToCreateSharedMemory())
         return true;
 
@@ -164,8 +160,10 @@ bool assertSingleApplication()
 void setHomeDir()
 {
 #ifdef Q_OS_UNIX
-	uid_t userId = geteuid(); // get the real user ID of the current process
-	setenv("HOME", getpwuid( userId )->pw_dir, 1); // set the HOME environment variable to the real home directory
+    uid_t userId = geteuid(); // get the real user ID of the current process
+    setenv("HOME",
+           getpwuid(userId)->pw_dir,
+           1); // set the HOME environment variable to the real home directory
 #endif
 }
 
@@ -207,132 +205,145 @@ void createConsole()
 }
 #endif
 
+// Console for debugging purposes on Windows
+// (you need to call 'Console();' in main function)
+#if 0
+void Console()
+{
+	AllocConsole();
+	FILE *pFileCon = NULL;
+	pFileCon = freopen("CONOUT$", "w", stdout);
+
+	COORD coordInfo;
+	coordInfo.X = 130;
+	coordInfo.Y = 9000;
+
+	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coordInfo);
+	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),ENABLE_QUICK_EDIT_MODE| ENABLE_EXTENDED_FLAGS);
+}
+#endif
+
 int main(int argc, char *argv[])
 {
-	setHomeDir();
+    // Console();
+    setHomeDir();
 
-	if (CliManager::isNoopApplication(argc, argv) )
-	{
-		return 0;
-	}
+    if (CliManager::isNoopApplication(argc, argv)) {
+        return 0;
+    }
 
-	if (CliManager::isHelpApplication(argc, argv) )
-	{
-		QCoreApplication app(argc, argv);
-		if ( !initSettings( &app) || !assertCliDependencies() )
-		{
-			fprintf( stderr, "%s", DEPENDENCY_MISSING);
-			return -1;
-		}
-		CliManager::printUsage(argc, argv);
-		return 0;
-	}
+    if (CliManager::isHelpApplication(argc, argv)) {
+        QCoreApplication app(argc, argv);
+        if (!initSettings(&app) || !assertCliDependencies()) {
+            fprintf(stderr, "%s", DEPENDENCY_MISSING);
+            return -1;
+        }
+        CliManager::printUsage(argc, argv);
+        return 0;
+    }
 
-	if (TestManager::isTestApplication(argc, argv) )
-	{
-		// run the test(s) and exit
-		QCoreApplication app(argc, argv);
-		if ( !initSettings( &app) || !assertCliDependencies() )
-		{
-			fprintf( stderr, "%s", DEPENDENCY_MISSING);
-			return -1;
-		}
-		LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
-		qInstallMsgHandler(messageHandler);
-		TestManager::run(argc, argv);
-		app.exit();
-		LogFileUtils::getInstance()->close();
-		return 0;
-	}
+    if (TestManager::isTestApplication(argc, argv)) {
+        // run the test(s) and exit
+        QCoreApplication app(argc, argv);
+        if (!initSettings(&app) || !assertCliDependencies()) {
+            fprintf(stderr, "%s", DEPENDENCY_MISSING);
+            return -1;
+        }
+        LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(),
+                                          Settings::getInstance()->getMaxLogLines());
+        qInstallMsgHandler(messageHandler);
+        TestManager::run(argc, argv);
+        app.exit();
+        LogFileUtils::getInstance()->close();
+        return 0;
+    }
 
-	if (CliManager::isCliApplication(argc, argv) )
-	{
-		// run the command line version
-		QCoreApplication app(argc, argv);
-		if ( !initSettings( &app) || !assertCliDependencies() )
-		{
-			fprintf( stderr, "%s", DEPENDENCY_MISSING);
-			return -1;
-		}
-		if ( !assertSingleApplication() )
-		{
-			fprintf( stderr, "%s", SINGLE_APPLICATION_ERROR);
-			return -1;
-		}
-		LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
-		qInstallMsgHandler(messageHandler);
-		CliManager cliManager;
-		cliManager.runCli(argc, argv);
-		app.exit();
-		LogFileUtils::getInstance()->close();
-		return 0;
-	}
-	if (CliManager::isScheduleApplication(argc, argv) )
-	{
-		// run the scheduled job
-		QCoreApplication app(argc, argv);
-		if ( !initSettings( &app) || !assertCliDependencies() )
-		{
-			fprintf( stderr, "%s", DEPENDENCY_MISSING);
-			return -1;
-		}
-		if ( !assertSingleApplication() )
-		{
-			fprintf( stderr, "%s", SINGLE_APPLICATION_ERROR);
-			return -1;
-		}
-		LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
-		qInstallMsgHandler(messageHandler);
-		CliManager::runSchedule();
-		app.exit();
-		LogFileUtils::getInstance()->close();
-		return 0;
-	}
+    if (CliManager::isCliApplication(argc, argv)) {
+        // run the command line version
+        QCoreApplication app(argc, argv);
+        if (!initSettings(&app) || !assertCliDependencies()) {
+            fprintf(stderr, "%s", DEPENDENCY_MISSING);
+            return -1;
+        }
+        if (!assertSingleApplication()) {
+            fprintf(stderr, "%s", SINGLE_APPLICATION_ERROR);
+            return -1;
+        }
+        LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(),
+                                          Settings::getInstance()->getMaxLogLines());
+        qInstallMsgHandler(messageHandler);
+        CliManager cliManager;
+        cliManager.runCli(argc, argv);
+        app.exit();
+        LogFileUtils::getInstance()->close();
+        return 0;
+    }
+    if (CliManager::isScheduleApplication(argc, argv)) {
+        // run the scheduled job
+        QCoreApplication app(argc, argv);
+        if (!initSettings(&app) || !assertCliDependencies()) {
+            fprintf(stderr, "%s", DEPENDENCY_MISSING);
+            return -1;
+        }
+        if (!assertSingleApplication()) {
+            fprintf(stderr, "%s", SINGLE_APPLICATION_ERROR);
+            return -1;
+        }
+        LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(),
+                                          Settings::getInstance()->getMaxLogLines());
+        qInstallMsgHandler(messageHandler);
+        CliManager::runSchedule();
+        app.exit();
+        LogFileUtils::getInstance()->close();
+        return 0;
+    }
 
-	// run with gui
-	QApplication app(argc, argv);
-	qInstallMsgHandler(messageHandler);
-	if ( !initSettings( &app) || !assertCliDependencies())
-	{
-		QMessageBox::critical( 0, "Dependency missing", DEPENDENCY_MISSING);
-		return -1;
-	}
-	if ( !assertSingleApplication() )
-	{
-		QMessageBox::critical( 0, "Application is already running", SINGLE_APPLICATION_ERROR);
-		return -1;
-	}
-	//createConsole();
-	LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(), Settings::getInstance()->getMaxLogLines());
-	MainModel model;
+    // run with gui
+    QApplication app(argc, argv);
+    qInstallMsgHandler(messageHandler);
+    if (!initSettings(&app) || !assertCliDependencies()) {
+        QMessageBox::critical(0, "Dependency missing", DEPENDENCY_MISSING);
+        return -1;
+    }
+    if (!assertSingleApplication()) {
+        QMessageBox::critical(0, "Application is already running", SINGLE_APPLICATION_ERROR);
+        return -1;
+    }
+    // createConsole();
+    LogFileUtils::getInstance()->open(Settings::getInstance()->getLogFileAbsolutePath(),
+                                      Settings::getInstance()->getMaxLogLines());
+    MainModel model;
 
-	Settings* settings = Settings::getInstance();
+    Settings *settings = Settings::getInstance();
 
-	QTranslator appTranslator, qtTranslator;
-	appTranslator.load("app_" + settings->getLanguage(), settings->getApplicationBinDir());
+    QTranslator appTranslator, qtTranslator;
+    appTranslator.load("app_" + settings->getLanguage(), settings->getApplicationBinDir());
     qtTranslator.load("qt_" + settings->getLanguage(), settings->getApplicationBinDir());
-	app.installTranslator(&appTranslator);
-	app.installTranslator(&qtTranslator);
+    app.installTranslator(&appTranslator);
+    app.installTranslator(&qtTranslator);
 
-	MainWindow mainWindow( &model);
-	QObject::connect( &mainWindow, SIGNAL( writeLog( const QString& ) ), LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ));
+    MainWindow mainWindow(&model);
+    QObject::connect(&mainWindow,
+                     SIGNAL(writeLog(const QString &)),
+                     LogFileUtils::getInstance(),
+                     SLOT(writeLog(const QString &)));
 
-	int result = 0;
-	if (CliManager::isUpdateOnlyApplication(argc, argv) )
-	{
-		LogFileUtils::getInstance()->writeLog(QObject::tr("Update started") );
-		// set update date
-		Settings* settings = Settings::getInstance();
-		settings->saveInstallDate( settings->getInstallDate(), true );
-	}
-	else
-	{
-		mainWindow.show();
-		LogFileUtils::getInstance()->writeLog(QObject::tr("Application started") );
-		result = app.exec();
-		LogFileUtils::getInstance()->writeLog(QObject::tr("Application closed") );
-	}
-	LogFileUtils::getInstance()->close();
-	QObject::disconnect( &mainWindow, SIGNAL( writeLog( const QString& ) ), LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ));
-	return result;
+    int result = 0;
+    if (CliManager::isUpdateOnlyApplication(argc, argv)) {
+        LogFileUtils::getInstance()->writeLog(QObject::tr("Update started"));
+        // set update date
+        Settings *settings = Settings::getInstance();
+        settings->saveInstallDate(settings->getInstallDate(), true);
+    } else {
+        mainWindow.show();
+        LogFileUtils::getInstance()->writeLog(QObject::tr("Application started"));
+        result = app.exec();
+        LogFileUtils::getInstance()->writeLog(QObject::tr("Application closed"));
+    }
+    LogFileUtils::getInstance()->close();
+    QObject::disconnect(&mainWindow,
+                        SIGNAL(writeLog(const QString &)),
+                        LogFileUtils::getInstance(),
+                        SLOT(writeLog(const QString &)));
+    return result;
 }

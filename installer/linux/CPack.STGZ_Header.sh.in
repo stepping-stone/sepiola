@@ -142,7 +142,7 @@ linux_app_icon_resource_name="@CPACK_SSBACKUP_EXECUTABLE_NAME@_icon"
 if [ "x${interactive}x" = "xTRUEx" ]
 then
   echo ""
-  echo "Do you want to install a desktop-icon?"
+  echo "Do you want to install a desktop-icon? [Yn]: "
   read line leftover
   cpack_install_desktop_icon=TRUE
   case ${line} in

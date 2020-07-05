@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -16,43 +16,41 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QStringList>
 #include <QLocale>
+#include <QStringList>
 
 #include "model/restore_name.hh"
 
-RestoreName::RestoreName( const QString& absoluteDirName, const QDate& date  )
+RestoreName::RestoreName(const QString &absoluteDirName, const QDate &date)
 {
-	this->absoluteDirName = absoluteDirName;
-	this->text = QLocale::system().toString(date, QLocale::LongFormat);
-	this->date = date;
+    this->absoluteDirName = absoluteDirName;
+    this->text = QLocale::system().toString(date, QLocale::LongFormat);
+    this->date = date;
 }
 
-RestoreName::~RestoreName()
-{
-}
+RestoreName::~RestoreName() {}
 
 QString RestoreName::getAbsoluteDirName() const
 {
-	return this->absoluteDirName;	
+    return this->absoluteDirName;
 }
 
 QString RestoreName::getText() const
 {
-	return this->text;
+    return this->text;
 }
 
 QDate RestoreName::getDate() const
 {
-	return this->date;
+    return this->date;
 }
 
-bool RestoreName::operator<( const RestoreName& other) const
+bool RestoreName::operator<(const RestoreName &other) const
 {
-	return other.getDate() < this->getDate();
+    return other.getDate() < this->getDate();
 }
 
-bool RestoreName::operator==( const RestoreName& other) const
+bool RestoreName::operator==(const RestoreName &other) const
 {
-	return other.getDate() == this->getDate();
+    return other.getDate() == this->getDate();
 }

@@ -201,7 +201,7 @@
         <bool>true</bool>
        </property>
        <property name="text" >
-        <string>&amp;Pause</string>
+        <string>Pause</string>
        </property>
       </widget>
      </item>
@@ -211,7 +211,7 @@
         <bool>true</bool>
        </property>
        <property name="text" >
-        <string>&amp;Abort</string>
+        <string>Abort</string>
        </property>
       </widget>
      </item>
@@ -221,7 +221,7 @@
         <bool>false</bool>
        </property>
        <property name="text" >
-        <string>C&amp;lose</string>
+        <string>Close</string>
        </property>
       </widget>
      </item>

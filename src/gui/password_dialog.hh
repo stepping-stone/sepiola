@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -30,33 +30,35 @@
  */
 class PasswordDialog : public QDialog, private Ui::PasswordDialog
 {
-	Q_OBJECT
-	
+    Q_OBJECT
+
 public:
-	/**
-	 * Constructs a PasswordDialog
-	 * @param username name of the user
-	 * @param isUsernameEditable indicates if the user is allowed to change the username
-	 */
-	PasswordDialog( const QString& username, const bool& isUsernameEditable );
-	
-	/**
-	 * Destroys the PasswordDialog
-	 */
-	virtual ~PasswordDialog();
-	void setDialogMessage(const QString& msg);
+    /**
+     * Constructs a PasswordDialog
+     * @param username name of the user
+     * @param isUsernameEditable indicates if the user is allowed to change the username
+     */
+    PasswordDialog(const QString &username, const bool &isUsernameEditable);
+
+    /**
+     * Destroys the PasswordDialog
+     */
+    virtual ~PasswordDialog();
+    void setDialogMessage(const QString &msg);
 
 signals:
-	void abort();
-	void processPasswordReturnValues(const QString& username, const QString& password, const bool isUsernameEditable);
-	
+    void abort();
+    void processPasswordReturnValues(const QString &username,
+                                     const QString &password,
+                                     const bool isUsernameEditable);
+
 private slots:
-	void on_btnOk_clicked();
-	void on_btnCancel_clicked();
-	void reject();
+    void on_btnOk_clicked();
+    void on_btnCancel_clicked();
+    void reject();
 
 private:
-	bool isUsernameEditable;
+    bool isUsernameEditable;
 };
 
 #endif

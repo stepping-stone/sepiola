@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -19,7 +19,11 @@
 #ifndef UNIX_PERMISSIONS_HH
 #define UNIX_PERMISSIONS_HH
 
+#include <QString>
+#include <QStringList>
+
 #include "tools/abstract_metadata.hh"
+#include "tools/filesystem_snapshot.hh"
 #include "tools/process.hh"
 
 /**
@@ -30,55 +34,59 @@
 class UnixPermissions : public AbstractMetadata, public Process
 {
 public:
+    /**
+     * @see AbstractMetadata::getMetadata( const QList< QPair<QString,
+     * AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
+     */
+    virtual QString getMetadata(
+        const QString &metadataFileName,
+        const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems,
+        const FilesystemSnapshot *,
+        QString *warnings = nullptr);
 
-	/**
-	 * Constructs a UnixPermissions
-	 */
-	UnixPermissions();
+    /**
+     * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo&
+     * currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >&
+     * processedItems )
+     */
+    void mergeMetadata(
+        const QFileInfo &newMetadataFileName,
+        const QFileInfo &currentMetadataFileName,
+        const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems);
 
-	/**
-	 * Destroys the UnixPermissions
-	 */
-	virtual ~UnixPermissions();
+    /**
+     * @see AbstractMetadata::setMetadata( const QFileInfo& metadataFile, const QStringList&
+     * downloadedItems, const QString& downloadDestination )
+     */
+    void setMetadata(const QFileInfo &metadataFile,
+                     const QStringList &downloadedItems,
+                     const QString &downloadDestination);
 
-	/**
-	 * @see AbstractMetadata::getMetadata( const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
-	 */
-	QString getMetadata( const QString& metadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* warnings = 0 );
+    /**
+     * @see AbstractMetadata::extractItems( const QFileInfo& metadataFile )
+     */
+    QStringList extractItems(const QFileInfo &metadataFile);
 
-	/**
-	 * @see AbstractMetadata::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
-	 */
-	void mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems );
+    /**
+     * Tests the getMetadata method
+     */
+    static void testGetMetadata();
 
-	/**
-	 * @see AbstractMetadata::setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination )
-	 */
-	void setMetadata( const QFileInfo& metadataFile, const QStringList& downloadedItems, const QString& downloadDestination );
+    /**
+     * Tests the insertMetadata method
+     */
+    static void testInsertMetadata();
 
-	/**
-	 * @see AbstractMetadata::extractItems( const QFileInfo& metadataFile )
-	 */
-	QStringList extractItems( const QFileInfo& metadataFile );
-
-	/**
-	 * Tests the getMetadata method
-	 */
-	static void testGetMetadata();
-
-	/**
-	 * Tests the insertMetadata method
-	 */
-	static void testInsertMetadata();
-
-	/**
-	 * Tests the setMetadata method
-	 */
-	static void testSetMetadata();
+    /**
+     * Tests the setMetadata method
+     */
+    static void testSetMetadata();
 
 private:
-	void populateMapFromFile( const QFileInfo& metadataFileName, QMap<QString, QStringList>* metadataMap);
-	void writeMapContentToFile( const QMap<QString, QStringList>& metadataMap, const QFileInfo& metadataFileName );
+    void populateMapFromFile(const QFileInfo &metadataFileName,
+                             QMap<QString, QStringList> *metadataMap);
+    void writeMapContentToFile(const QMap<QString, QStringList> &metadataMap,
+                               const QFileInfo &metadataFileName);
 };
 
 #endif

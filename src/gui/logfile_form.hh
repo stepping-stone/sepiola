@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -31,25 +31,24 @@ class MainModel;
  */
 class LogfileForm : public QWidget, private Ui::LogfileForm
 {
-	Q_OBJECT
-	
-public:
+    Q_OBJECT
 
-	/**
-	 * Constructs a LogfileForm which is a child of parent with a given model
-	 */
-	LogfileForm( QWidget *parent, MainModel *model );
-	
-	/**
-	 * Destroys the LogfileForm
-	 */
-	virtual ~LogfileForm();
-	
-	/**
-	 * Appends new log lines
-	 * @param logfileLines lines to set
-	 */
-	void appendLines( const QStringList& logfileLines );
+public:
+    /**
+     * Constructs a LogfileForm which is a child of parent with a given model
+     */
+    LogfileForm(QWidget *parent, MainModel *model);
+
+    /**
+     * Destroys the LogfileForm
+     */
+    virtual ~LogfileForm();
+
+    /**
+     * Appends new log lines
+     * @param logfileLines lines to set
+     */
+    void appendLines(const QStringList &logfileLines);
 };
 
 #endif

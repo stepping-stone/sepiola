@@ -1,5 +1,5 @@
 SetACL stdin patch - Patch that allows to specify files to process on standard input
-Copyright (C) 2007, 2008  stepping stone GmbH
+Copyright (c) 2007-2020 stepping stone AG
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License

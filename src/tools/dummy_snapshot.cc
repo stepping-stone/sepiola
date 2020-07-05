@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -34,35 +34,35 @@ void DummySnapshot::createSnapshotObject()
 {
     // Nothing to do here, simply send the signal that the object has been
     // created
-    emit sendSnapshotObjectCreated( SNAPSHOT_SUCCESS );
+    emit sendSnapshotObjectCreated(SNAPSHOT_SUCCESS);
 }
 
 void DummySnapshot::initializeSnapshot()
 {
     // Simply send the snapshot initialized signal (do nothing at all)
-    emit sendSnapshotInitialized( SNAPSHOT_SUCCESS );
+    emit sendSnapshotInitialized(SNAPSHOT_SUCCESS);
 }
 
 void DummySnapshot::addFilesToSnapshot(const BackupSelectionHash includeRules)
 {
     // Create a new FilesystemSnapshotPathMapper object and add the includeRules
     QString partition = "/";
-    FilesystemSnapshotPathMapper mapper(partition,includeRules);
+    FilesystemSnapshotPathMapper mapper(partition, includeRules);
 
     // As the partition is /, the snapshotpath will also be /
     mapper.setSnapshotPath(partition);
 
     // Add the newly created FilesystemSnapshotPathMapper to our mappers list
-    this->snapshotPathMappers.insert(partition,mapper);
+    this->snapshotPathMappers.insert(partition, mapper);
 
     // Send the signal that the files are added to the snapshot set
-    emit sendFilesAddedToSnapshot( SNAPSHOT_SUCCESS );
+    emit sendFilesAddedToSnapshot(SNAPSHOT_SUCCESS);
 }
 
 void DummySnapshot::takeSnapshot()
 {
     // Again, no action needed, just send the signal that the snapshot is taken
-    emit sendSnapshotTaken( SNAPSHOT_SUCCESS );
+    emit sendSnapshotTaken(SNAPSHOT_SUCCESS);
 }
 
 void DummySnapshot::checkCleanup()
@@ -74,10 +74,10 @@ void DummySnapshot::cleanupSnapshot()
 {
     // Nothing to do as nothing was done while taking the snapshot, just send
     // the signal to continue
-    emit sendSnapshotCleandUp( SNAPSHOT_SUCCESS );
+    emit sendSnapshotCleandUp(SNAPSHOT_SUCCESS);
 }
 
-const SnapshotMapper& DummySnapshot::getSnapshotPathMappers() const
+const SnapshotMapper &DummySnapshot::getSnapshotPathMappers() const
 {
     return this->snapshotPathMappers;
 }

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -31,33 +31,33 @@
  */
 class PatternDialog : public QDialog, private Ui::PatternDialog
 {
-	Q_OBJECT
-	
+    Q_OBJECT
+
 public:
-	/**
-	 * Constructs a PatternDialog
-	 */
-	PatternDialog( const QString& title, const QString& label, const QStringList& patternList );
-	
-	/**
-	 * Destroys the PatternDialog
-	 */
-	virtual ~PatternDialog();
+    /**
+     * Constructs a PatternDialog
+     */
+    PatternDialog(const QString &title, const QString &label, const QStringList &patternList);
+
+    /**
+     * Destroys the PatternDialog
+     */
+    virtual ~PatternDialog();
 
 signals:
-	void getPatternList( const QStringList& patternList );
+    void getPatternList(const QStringList &patternList);
 
 private slots:
-	void accept();
-	void reject();
-	void on_btnAdd_clicked();
-	void on_btnEdit_clicked();
-	void on_btnRemove_clicked();
-	void addPattern( const QString& pattern );
-	void editPattern( const int& position, const QString& text );
+    void accept();
+    void reject();
+    void on_btnAdd_clicked();
+    void on_btnEdit_clicked();
+    void on_btnRemove_clicked();
+    void addPattern(const QString &pattern);
+    void editPattern(const int &position, const QString &text);
 
 private:
-	QStringList patternList;	
+    QStringList patternList;
 };
 
 #endif

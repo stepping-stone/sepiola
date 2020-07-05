@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -16,200 +16,206 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QtAlgorithms>
 #include <QTime>
+#include <QtAlgorithms>
 
 #include "model/scheduled_task.hh"
 
 /**
  * Constructor for "Never"-Scheduler
  */
-ScheduledTask::ScheduledTask() :
-	type(ScheduleRule::NEVER),
-	timeToRun(QTime()),
-	minutesAfterStartup(0)
-{
-}
+ScheduledTask::ScheduledTask()
+    : type(ScheduleRule::NEVER)
+    , timeToRun(QTime())
+    , minutesAfterStartup(0)
+{}
 
 /**
  * Constructor for Weekdays-Scheduler
  */
-ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time) :
-	type(ScheduleRule::AT_WEEKDAYS_AND_TIME),
-	weekdays(w),
-	timeToRun(time),
-	minutesAfterStartup(0)
-{
-}
+ScheduledTask::ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time)
+    : type(ScheduleRule::AT_WEEKDAYS_AND_TIME)
+    , weekdays(w)
+    , timeToRun(time)
+    , minutesAfterStartup(0)
+{}
 
 /**
  * Constructor for AfterBoot-Scheduler
  */
-ScheduledTask::ScheduledTask(int minutes) :
-	type(ScheduleRule::AFTER_BOOT),
-	minutesAfterStartup(minutes)
-{
-}
+ScheduledTask::ScheduledTask(int minutes)
+    : type(ScheduleRule::AFTER_BOOT)
+    , minutesAfterStartup(minutes)
+{}
 
 /**
  * Copy-constructor
  */
-ScheduledTask::ScheduledTask(const ScheduledTask& task)
+ScheduledTask::ScheduledTask(const ScheduledTask &task)
 {
-	this->type = task.getType();
-	this->weekdays = task.getWeekdays();
-	this->timeToRun = task.getTimeToRun();
-	this->minutesAfterStartup = task.getMinutesAfterStartup();
+    this->type = task.getType();
+    this->weekdays = task.getWeekdays();
+    this->timeToRun = task.getTimeToRun();
+    this->minutesAfterStartup = task.getMinutesAfterStartup();
 }
 
 ScheduledTask::~ScheduledTask() {}
 
 ScheduleRule::ScheduleType ScheduledTask::getType() const
 {
-	return this->type;
+    return this->type;
 }
 
 void ScheduledTask::setType(ScheduleRule::ScheduleType type)
 {
-	this->type = type;
+    this->type = type;
 }
 
 QSet<ScheduleRule::Weekdays> ScheduledTask::getWeekdays() const
 {
-	return this->weekdays;
+    return this->weekdays;
 }
 
 QVector<bool> ScheduledTask::getWeekdaysArray() const
 {
-	QVector<bool> days;
-	for (int i = 0; i < 7; i++) {
-		days.append(weekdays.contains((ScheduleRule::Weekdays)i));
-	}
-	return days;
+    QVector<bool> days;
+    for (int i = 0; i < 7; i++) {
+        days.append(weekdays.contains((ScheduleRule::Weekdays) i));
+    }
+    return days;
 }
 
 void ScheduledTask::setWeekdays(QSet<ScheduleRule::Weekdays> weekdays)
 {
-	this->weekdays = weekdays;
+    this->weekdays = weekdays;
 }
 
 void ScheduledTask::setWeekdays(QSet<int> weekdaysInt)
 {
-	QList<int> wdIntList = weekdaysInt.toList();
-	weekdays.clear();
-	for (int i = 0; i < wdIntList.size(); i++) {
-		weekdays.insert((ScheduleRule::Weekdays)wdIntList.at(i));
-	}
+    QList<int> wdIntList = weekdaysInt.toList();
+    weekdays.clear();
+    for (int i = 0; i < wdIntList.size(); i++) {
+        weekdays.insert((ScheduleRule::Weekdays) wdIntList.at(i));
+    }
 }
 
 void ScheduledTask::clearWeekdays()
 {
-	this->weekdays.clear();
+    this->weekdays.clear();
 }
 
 void ScheduledTask::addWeekday(ScheduleRule::Weekdays newWeekday)
 {
-	this->weekdays.insert(newWeekday);
+    this->weekdays.insert(newWeekday);
 }
 
 QTime ScheduledTask::getTimeToRun() const
 {
-	return this->timeToRun;
+    return this->timeToRun;
 }
 
 void ScheduledTask::setTimeToRun(QTime timeToRun)
 {
-	this->timeToRun = timeToRun;
+    this->timeToRun = timeToRun;
 }
 
 int ScheduledTask::getMinutesAfterStartup() const
 {
-	return this->minutesAfterStartup;
+    return this->minutesAfterStartup;
 }
 
 void ScheduledTask::setMinutesAfterStartup(int minutesAfterStartup)
 {
-	this->minutesAfterStartup = minutesAfterStartup;
+    this->minutesAfterStartup = minutesAfterStartup;
 }
 
 QString ScheduledTask::toString() const
 {
-	switch (this->type)
-	{
-		case ScheduleRule::NEVER:
-        {
-            return QString(QObject::tr("never"));
-        }
+    switch (this->type) {
+    case ScheduleRule::NEVER: {
+        return QString(QObject::tr("never"));
+    }
 
-		case ScheduleRule::AT_WEEKDAYS_AND_TIME:
-		{
-			if (weekdays.size() > 0) {
-				//QString tok = ", ";
-				QList<ScheduleRule::Weekdays> wdList = weekdays.toList();
-				QList<QDateTime> nextBackupDatesList;
-				const QDateTime now = QDateTime::currentDateTime();
-				const int wd_now = now.date().dayOfWeek();
-				//qStableSort(wdList.begin(), wdList.end());
-				//QString wdStr = "";
-				for (int i = 0; i < wdList.size(); i++)
-				{
-					QDateTime nextBkup = QDateTime::currentDateTime();
-					nextBkup.setTime(this->timeToRun);
-					int daysDiff = (wdList.at(i)+1-wd_now+7) % 7; // ScheduleRule::Weekdays starts at Monday=0 -> +1
-					if (daysDiff == 0 && (nextBkup.time() < now.time())) { daysDiff = daysDiff + 7; }
-					nextBkup = nextBkup.addDays( daysDiff );
-					nextBackupDatesList.append(nextBkup);
-				}
-				//wdStr.chop(tok.length());
-				qStableSort(nextBackupDatesList.begin(), nextBackupDatesList.end());
-
-				// full info (not desired by stst
-				// return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"), nextBackupDatesList.at(0).toString());
-				return QObject::tr("%1").arg(nextBackupDatesList.at(0).toString("dddd,\tdd.MM.yyyy  hh:mm"));
-            } else {
-    			return QObject::tr("no weekdays selected");
+    case ScheduleRule::AT_WEEKDAYS_AND_TIME: {
+        if (weekdays.size() > 0) {
+            // QString tok = ", ";
+            QList<ScheduleRule::Weekdays> wdList = weekdays.toList();
+            QList<QDateTime> nextBackupDatesList;
+            const QDateTime now = QDateTime::currentDateTime();
+            const int wd_now = now.date().dayOfWeek();
+            // qStableSort(wdList.begin(), wdList.end());
+            // QString wdStr = "";
+            for (int i = 0; i < wdList.size(); i++) {
+                QDateTime nextBkup = QDateTime::currentDateTime();
+                nextBkup.setTime(this->timeToRun);
+                int daysDiff = (wdList.at(i) + 1 - wd_now + 7)
+                               % 7; // ScheduleRule::Weekdays starts at Monday=0 -> +1
+                if (daysDiff == 0 && (nextBkup.time() < now.time())) {
+                    daysDiff = daysDiff + 7;
+                }
+                nextBkup = nextBkup.addDays(daysDiff);
+                nextBackupDatesList.append(nextBkup);
             }
-		}
+            // wdStr.chop(tok.length());
+            qStableSort(nextBackupDatesList.begin(), nextBackupDatesList.end());
 
-		case ScheduleRule::AFTER_BOOT:
-        {
-            return QObject::tr("%1 minutes after startup").arg(this->minutesAfterStartup);
+            // full info (not desired by stst
+            // return QObject::tr("%3 (on %1 at %2)").arg(wdStr, this->timeToRun.toString("hh:mm"),
+            // nextBackupDatesList.at(0).toString());
+            return QObject::tr("%1").arg(
+                nextBackupDatesList.at(0).toString("dddd,\tdd.MM.yyyy  hh:mm"));
+        } else {
+            return QObject::tr("no weekdays selected");
         }
-	}
-	return QString();
+    }
+
+    case ScheduleRule::AFTER_BOOT: {
+        return QObject::tr("%1 minutes after startup").arg(this->minutesAfterStartup);
+    }
+    }
+    return QString();
 }
 
-bool ScheduledTask::equals(const ScheduledTask& scheduledTask) const
+bool ScheduledTask::equals(const ScheduledTask &scheduledTask) const
 {
-	if (this->getType() == scheduledTask.getType()) {
-		switch (type) {
-			case ScheduleRule::NEVER: return(true); break;
-			case ScheduleRule::AFTER_BOOT: return(this->getMinutesAfterStartup() == scheduledTask.getMinutesAfterStartup()); break;
-			case ScheduleRule::AT_WEEKDAYS_AND_TIME: return(this->getTimeToRun() == scheduledTask.getTimeToRun() && this->getWeekdays() == scheduledTask.getWeekdays()); break;
-			default: return false;
-		}
-		return false;
-	} else {
-		return false;
-	}
+    if (this->getType() == scheduledTask.getType()) {
+        switch (type) {
+        case ScheduleRule::NEVER:
+            return (true);
+            break;
+        case ScheduleRule::AFTER_BOOT:
+            return (this->getMinutesAfterStartup() == scheduledTask.getMinutesAfterStartup());
+            break;
+        case ScheduleRule::AT_WEEKDAYS_AND_TIME:
+            return (this->getTimeToRun() == scheduledTask.getTimeToRun()
+                    && this->getWeekdays() == scheduledTask.getWeekdays());
+            break;
+        default:
+            return false;
+        }
+        return false;
+    } else {
+        return false;
+    }
 }
 
-QDataStream &operator<<(QDataStream &out, const ScheduledTask& sched)
+QDataStream &operator<<(QDataStream &out, const ScheduledTask &sched)
 {
-	out << sched.getType() << sched.getWeekdays() << sched.getTimeToRun() << sched.getMinutesAfterStartup();
-	return(out);
+    out << sched.getType() << sched.getWeekdays() << sched.getTimeToRun()
+        << sched.getMinutesAfterStartup();
+    return (out);
 }
 
-QDataStream &operator>>(QDataStream &in, ScheduledTask& sched)
+QDataStream &operator>>(QDataStream &in, ScheduledTask &sched)
 {
-	int type;
-	QSet<int> weekdays;
-	QTime timeToRun;
-	int minutesAfterStartup;
-	in >> type >> weekdays >> timeToRun >> minutesAfterStartup;
-	sched.setType((ScheduleRule::ScheduleType)type);
-	sched.setWeekdays(weekdays);
-	sched.setTimeToRun(timeToRun);
-	sched.setMinutesAfterStartup(minutesAfterStartup);
-	return(in);
+    int type;
+    QSet<int> weekdays;
+    QTime timeToRun;
+    int minutesAfterStartup;
+    in >> type >> weekdays >> timeToRun >> minutesAfterStartup;
+    sched.setType((ScheduleRule::ScheduleType) type);
+    sched.setWeekdays(weekdays);
+    sched.setTimeToRun(timeToRun);
+    sched.setMinutesAfterStartup(minutesAfterStartup);
+    return (in);
 }

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -26,10 +26,10 @@
 #include <QStringList>
 #include <QThread>
 
-#include "tools/abstract_rsync.hh"
-#include "utils/progress_task.hh"
 #include "model/scheduled_task.hh"
+#include "tools/abstract_rsync.hh"
 #include "utils/const_utils.hh"
+#include "utils/progress_task.hh"
 
 // forward declarations
 class FilesystemSnapshot;
@@ -40,85 +40,91 @@ class FilesystemSnapshot;
  */
 class BackupThread : public QThread
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	/**
-	 * Creates a BackupThread
-	 * @param items List of items to backup
-	 * @param includePatternList Pattern list for include files
-	 * @param excludePatternList Pattern list for exclude files
-	 * @param setDeleteFlag indicates whether extraneous files should be deleted
-	 */
-	BackupThread( const BackupSelectionHash& includeRules, FilesystemSnapshot* snapshot = NULL );
+    /**
+     * Creates a BackupThread
+     * @param items List of items to backup
+     * @param includePatternList Pattern list for include files
+     * @param excludePatternList Pattern list for exclude files
+     * @param setDeleteFlag indicates whether extraneous files should be deleted
+     */
+    BackupThread(const BackupSelectionHash &includeRules, FilesystemSnapshot *snapshot = NULL);
 
-	/**
-	 * Destroys the BackupThread
-	 */
-	virtual ~BackupThread();
+    /**
+     * Destroys the BackupThread
+     */
+    virtual ~BackupThread();
 
-	void startInCurrentThread();
+    void startInCurrentThread();
     void uploadSchedulerXML(ScheduledTask schedule);
     void setLastBackupState(ConstUtils::StatusEnum status);
 
 signals:
-	void showCriticalMessageBox( const QString& message );
-	void finishProgressDialog();
-	void abort_rsync();
-	void updateOverviewFormLastBackupsInfo();
-	void infoSignal( const QString& text );
-	void errorSignal( const QString& text );
-	void backupFinished();
+    void showCriticalMessageBox(const QString &message);
+    void finishProgressDialog();
+    void abort_rsync();
+    void updateOverviewFormLastBackupsInfo();
+    void infoSignal(const QString &text);
+    void errorSignal(const QString &text);
+    void backupFinished();
 
-	void progressSignal( const QString& taskText, float percentFinished, const QDateTime& timeRemaining, StringPairList infos = StringPairList());
-	void finalStatusSignal( ConstUtils::StatusEnum status );
+    void progressSignal(const QString &taskText,
+                        float percentFinished,
+                        const QDateTime &timeRemaining,
+                        StringPairList infos = StringPairList());
+    void finalStatusSignal(ConstUtils::StatusEnum status);
 
 public slots:
-	void rsyncDryrunProgressHandler(const QString&, long, long);
-	void rsyncUploadProgressHandler(const QString& filename, float traffic, quint64 bytesRead, quint64 bytesWritten);
-	void updateInformationToDisplay(StringPairList vars = StringPairList());
-	void abortBackupProcess();
+    void rsyncDryrunProgressHandler(const QString &, long, long);
+    void rsyncUploadProgressHandler(const QString &filename,
+                                    float traffic,
+                                    quint64 bytesRead,
+                                    quint64 bytesWritten);
+    void updateInformationToDisplay(StringPairList vars = StringPairList());
+    void abortBackupProcess();
     void prepareServerDirectories();
 
 protected:
-
-	/**
-	 * Runs the backup process
-	 */
-	void run();
+    /**
+     * Runs the backup process
+     */
+    void run();
 
 private:
-	static const QString TASKNAME_PREPARE_DIRECTORIES;
-	static const QString TASKNAME_ESTIMATE_BACKUP_SIZE;
-	static const QString TASKNAME_FILE_UPLOAD;
-	static const QString TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT;
-	static const QString TASKNAME_UPLOAD_METADATA;
-	static const QString TASKNAME_METAINFO;
+    static const QString TASKNAME_PREPARE_DIRECTORIES;
+    static const QString TASKNAME_ESTIMATE_BACKUP_SIZE;
+    static const QString TASKNAME_FILE_UPLOAD;
+    static const QString TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT;
+    static const QString TASKNAME_UPLOAD_METADATA;
+    static const QString TASKNAME_METAINFO;
     static const long MIN_BACKUP_ID;
-	void checkAbortState();
-	quint64 estimateBackupSize( const QString& src, const QString& destination );
-	void updateBackupContentFile( const QFileInfo& backupContentFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& backupList );
-	QString createCurrentBackupTimeFile();
-	ConstUtils::StatusEnum getLastBackupState();
+    void checkAbortState();
+    quint64 estimateBackupSize(const QString &src, const QString &destination);
+    void updateBackupContentFile(
+        const QFileInfo &backupContentFileName,
+        const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &backupList);
+    QString createCurrentBackupTimeFile();
+    ConstUtils::StatusEnum getLastBackupState();
     void uploadBackupStartedXML(long id);
     void uploadBackupEndedXML(long id, int success);
 
-
     std::shared_ptr<AbstractRsync> rsync;
-	bool isAborted;
-	QStringList items;
-	BackupSelectionHash includeRules;
-	QStringList includePatternList;
-	QStringList excludePatternList;
-	bool setDeleteFlag;
-	bool compressedUpload;
-	int bandwidthLimit;
-	QDateTime backupStartDateTime;
-	ConstUtils::StatusEnum backupCurrentStatus;
-	ProgressTask pt;
+    bool isAborted;
+    QStringList items;
+    BackupSelectionHash includeRules;
+    QStringList includePatternList;
+    QStringList excludePatternList;
+    bool setDeleteFlag;
+    bool compressedUpload;
+    int bandwidthLimit;
+    QDateTime backupStartDateTime;
+    ConstUtils::StatusEnum backupCurrentStatus;
+    ProgressTask pt;
     int currentTaskNr;
     long backupID;
-    FilesystemSnapshot* fsSnapshot;
+    FilesystemSnapshot *fsSnapshot;
 };
 
 #endif
