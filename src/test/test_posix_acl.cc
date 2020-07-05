@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -41,7 +41,7 @@ void TestPosixAcl::getMetadata()
 {
     QString desiredDestinationFile("/tmp/getMetadata.test");
 
-    QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> > processedItems;
+    QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> processedItems;
     processedItems << qMakePair(QString("/etc/hosts"), AbstractRsync::TRANSFERRED);
 
     PosixAcl posixAcl("/bin/getfacl", "/bin/setfacl");
@@ -50,9 +50,6 @@ void TestPosixAcl::getMetadata()
     QCOMPARE(desiredDestinationFile, destinationFile);
 }
 
-void TestPosixAcl::setMetadata()
-{
-
-}
+void TestPosixAcl::setMetadata() {}
 
 QTEST_MAIN(TestPosixAcl)

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -19,11 +19,11 @@
 #ifndef LOG_FILE_UTILS_HH
 #define LOG_FILE_UTILS_HH
 
-#include <QObject>
 #include <QFile>
-#include <QTextStream>
-#include <QStringList>
 #include <QMutex>
+#include <QObject>
+#include <QStringList>
+#include <QTextStream>
 
 /**
  * The LogFileUtils class provides convenience methods for reading and writing the
@@ -32,51 +32,50 @@
  */
 class LogFileUtils : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public slots:
 
-	/**
-	 * Writes the given message to the log file
-	 * @param message text to write to the log file
-	 */
-	void writeLog( const QString& message );
+    /**
+     * Writes the given message to the log file
+     * @param message text to write to the log file
+     */
+    void writeLog(const QString &message);
 
 public:
+    /**
+     * Gets a LogFileUtils instance
+     * @return a LogFileUtils instance
+     */
+    static LogFileUtils *getInstance();
 
-	/**
-	 * Gets a LogFileUtils instance
-	 * @return a LogFileUtils instance
-	 */
-	static LogFileUtils* getInstance();
+    /**
+     * Opens the log file
+     */
+    void open(const QString &logfilePath, int maxLines);
 
-	/**
-	 * Opens the log file
-	 */
-	void open( const QString& logfilePath, int maxLines );
+    /**
+     * Gets a list of new log lines
+     */
+    QStringList getNewLines();
 
-	/**
-	 * Gets a list of new log lines
-	 */
-	QStringList getNewLines();
+    /**
+     * Closes the log file
+     */
+    void close();
 
-	/**
-	 * Closes the log file
-	 */
-	void close();
+    static void logToHex(const QString &string);
 
-	static void logToHex( const QString& string );
-
-	static void logToHex( const QByteArray& data );
+    static void logToHex(const QByteArray &data);
 
 private:
-	LogFileUtils();
-	virtual ~LogFileUtils();
+    LogFileUtils();
+    virtual ~LogFileUtils();
 
-	static LogFileUtils* instance;
-	QFile* logFile;
-	QTextStream output;
-	QStringList newLines;
-	QMutex mutex;
+    static LogFileUtils *instance;
+    QFile *logFile;
+    QTextStream output;
+    QStringList newLines;
+    QMutex mutex;
 };
 #endif

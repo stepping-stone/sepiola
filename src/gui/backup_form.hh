@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -21,10 +21,10 @@
 
 #include "ui_backup_form.h"
 
-#include <QWidget>
 #include <QString>
 #include <QStringList>
 #include <QTime>
+#include <QWidget>
 
 // Forward declarations
 class MainModel;
@@ -36,48 +36,47 @@ class LocalDirModel;
  */
 class BackupForm : public QWidget, private Ui::BackupForm
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
+    /**
+     * Constructs a BackupForm which is a child of parent with a given model
+     */
+    BackupForm(QWidget *parent, MainModel *model);
 
-	/**
-	 * Constructs a BackupForm which is a child of parent with a given model
-	 */
-	BackupForm ( QWidget *parent, MainModel *model );
-
-	/**
-	 * Destroys the BackupForm
-	 */
-	virtual ~BackupForm();
+    /**
+     * Destroys the BackupForm
+     */
+    virtual ~BackupForm();
 
 private:
-	QStringList getSelectedFilesAndDirs();
-	QString patternListToString( QStringList patternList );
+    QStringList getSelectedFilesAndDirs();
+    QString patternListToString(QStringList patternList);
 
 private slots:
-	void runBackupNow();
-	void save();
-	void reset();
-	void reload();
-	void on_radioButtonNoSchedule_clicked();
-	void on_radioButtonMinutesAfterBooting_clicked();
-	void on_radioButtonDaily_clicked();
-	void schedule();
+    void runBackupNow();
+    void save();
+    void reset();
+    void reload();
+    void on_radioButtonNoSchedule_clicked();
+    void on_radioButtonMinutesAfterBooting_clicked();
+    void on_radioButtonDaily_clicked();
+    void schedule();
 
 public slots:
-	void showHiddenFilesAndFolders(bool show);
+    void showHiddenFilesAndFolders(bool show);
 
 signals:
-	void updateOverviewFormScheduleInfo();
-	void updateOverviewFormLastBackupsInfo();
+    void updateOverviewFormScheduleInfo();
+    void updateOverviewFormLastBackupsInfo();
 
 private:
-	void disableScheduleOptions();
-	void expandSelectedBranches();
+    void disableScheduleOptions();
+    void expandSelectedBranches();
 
-	static const QTime default_schedule_time;
-	static const int default_schedule_minutesAfterStartup;
-	MainModel* model;
-	LocalDirModel* localDirModel;
+    static const QTime default_schedule_time;
+    static const int default_schedule_minutesAfterStartup;
+    MainModel *model;
+    LocalDirModel *localDirModel;
 };
 
 #endif

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -33,47 +33,45 @@ class AbstractSnapshot;
 class ToolFactory
 {
 public:
+    /**
+     * Constructs a ToolFactory
+     */
+    ToolFactory();
 
-	/**
-	 * Constructs a ToolFactory
-	 */
-	ToolFactory();
+    /**
+     * Destroys the ToolFactory
+     */
+    virtual ~ToolFactory();
 
-	/**
-	 * Destroys the ToolFactory
-	 */
-	virtual ~ToolFactory();
+    /**
+     * Returns an AbstractAcl implementation
+     * @return an acl implementation
+     */
+    static AbstractMetadata *getMetadataImpl();
 
-	/**
-	 * Returns an AbstractAcl implementation
-	 * @return an acl implementation
-	 */
-	static AbstractMetadata * getMetadataImpl();
+    /**
+     * Returns an AbstractRsync implementation
+     * @return an rsync implementation
+     */
+    static AbstractRsync *getRsyncImpl();
 
-	/**
-	 * Returns an AbstractRsync implementation
-	 * @return an rsync implementation
-	 */
-	static AbstractRsync * getRsyncImpl();
+    /**
+     * Returns an AbstractSsh implementation
+     * @return a ssh implementation
+     */
+    static AbstractSsh *getSshImpl();
 
-	/**
-	 * Returns an AbstractSsh implementation
-	 * @return a ssh implementation
-	 */
-	static AbstractSsh * getSshImpl();
-
-	/**
-	 * Returns an AbstractScheduler implementation
-	 * @return a scheduler implementation
-	 */
-	static AbstractScheduler * getSchedulerImpl();
+    /**
+     * Returns an AbstractScheduler implementation
+     * @return a scheduler implementation
+     */
+    static AbstractScheduler *getSchedulerImpl();
 
     /**
      * Returns an AbstractSnapshot implementation
      * @return a snapshot implementation
      */
-    static AbstractSnapshot * getSnapshotImpl();
-
+    static AbstractSnapshot *getSnapshotImpl();
 };
 
 #endif

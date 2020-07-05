@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -16,14 +16,14 @@
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <iostream>
 #include <cstdio>
+#include <iostream>
 
 //#include <QStringList>
 #include <QDebug>
-#include <QWaitCondition>
-#include <QMutex>
 #include <QEventLoop>
+#include <QMutex>
+#include <QWaitCondition>
 
 #ifdef Q_OS_UNIX
 #include <termios.h>
@@ -31,7 +31,6 @@
 #ifdef Q_OS_WIN32
 #include <windows.h>
 #endif
-
 
 #include "cli/cli_manager.hh"
 #include "exception/login_exception.hh"
@@ -50,332 +49,360 @@ const QString CliManager::EXCLUDE_PATTERN_FILE_ARGUMENT = "-excludeFile=";
 const QString CliManager::BACKUP_LIST_FILE_ARGUMENT = "-backupFile=";
 const QString CliManager::DELETE_ARGUMENT = "-delete";
 
-CliManager::CliManager()
+CliManager::CliManager() {}
+
+CliManager::~CliManager() {}
+
+bool CliManager::hasArgument(int argc, char *argv[], const QString &argumentName)
 {
+    for (int i = 1; i < argc; i++) {
+        if (argumentName.compare(argv[i]) == 0) {
+            return true;
+        }
+    }
+    return false;
 }
 
-CliManager::~CliManager()
+bool CliManager::isNoopApplication(int argc, char *argv[])
 {
+    return hasArgument(argc, argv, NOOP_ARGUMENT);
 }
 
-bool CliManager::hasArgument( int argc, char* argv[], const QString& argumentName )
+bool CliManager::isHelpApplication(int argc, char *argv[])
 {
-	for ( int i=1; i<argc; i++ )
-	{
-		if ( argumentName.compare( argv[i] ) == 0 )
-		{
-			return true;
-		}
-	}
-	return false;
+    return hasArgument(argc, argv, HELP_ARGUMENT);
 }
 
-bool CliManager::isNoopApplication( int argc, char* argv[] )
+void CliManager::printUsage(int /*argc*/, char *argv[])
 {
-	return hasArgument( argc, argv, NOOP_ARGUMENT );
+    QString usage;
+    usage.append(Settings::getInstance()->getThisApplicationFullPathExecutable() + " Version "
+                 + Settings::VERSION + "\n");
+    usage.append("Copyright (c) 2007-2020 stepping stone AG\n");
+    usage.append("Usage: ");
+    usage.append(argv[0]);
+    usage.append(" [Options]\n\n");
+    usage.append("Options\n");
+    usage.append(" --help\t\t\tshow this help\n");
+    usage.append(" " + SCHEDULE_ARGUMENT + "\t\trun the scheduled job now\n");
+    usage.append(" " + CLI_ARGUMENT
+                 + "\t\t\trun the application without a graphical user interface\n");
+    usage.append("The following options only apply to " + CLI_ARGUMENT + " argument:\n");
+    usage.append(" " + BACKUP_LIST_FILE_ARGUMENT + "\t\tfile containing a list items to backup\n");
+    usage.append(" [" + DELETE_ARGUMENT + "]\t\tdelete extraneous files on the server\n");
+    std::cout << usage.toUtf8().data();
 }
 
-bool CliManager::isHelpApplication( int argc, char* argv[] )
+bool CliManager::isCliApplication(int argc, char *argv[])
 {
-	return hasArgument( argc, argv, HELP_ARGUMENT );
+    return hasArgument(argc, argv, CLI_ARGUMENT);
 }
 
-void CliManager::printUsage( int /*argc*/, char* argv[] )
+bool CliManager::isScheduleApplication(int argc, char *argv[])
 {
-	QString usage;
-	usage.append( Settings::getInstance()->getThisApplicationFullPathExecutable() + " Version " + Settings::VERSION + "\n" );
-	usage.append( "Copyright (C) 2007 by stepping stone GmbH\n" );
-	usage.append( "Usage: " );
-	usage.append( argv[0] );
-	usage.append( " [Options]\n\n" );
-	usage.append( "Options\n" );
-	usage.append( " --help\t\t\tshow this help\n" );
-	usage.append( " " + SCHEDULE_ARGUMENT + "\t\trun the scheduled job now\n" );
-	usage.append( " " + CLI_ARGUMENT + "\t\t\trun the application without a graphical user interface\n" );
-	usage.append( "The following options only apply to " + CLI_ARGUMENT + " argument:\n" );
-	usage.append( " " + BACKUP_LIST_FILE_ARGUMENT + "\t\tfile containing a list items to backup\n" );
-	usage.append( " [" + DELETE_ARGUMENT + "]\t\tdelete extraneous files on the server\n" );
-	std::cout << usage.toUtf8().data();
+    return hasArgument(argc, argv, SCHEDULE_ARGUMENT);
 }
 
-bool CliManager::isCliApplication( int argc, char* argv[] )
+bool CliManager::isUpdateOnlyApplication(int argc, char *argv[])
 {
-	return hasArgument( argc, argv, CLI_ARGUMENT );
-}
-
-bool CliManager::isScheduleApplication( int argc, char* argv[] )
-{
-	return hasArgument( argc, argv, SCHEDULE_ARGUMENT );
-}
-
-bool CliManager::isUpdateOnlyApplication( int argc, char* argv[] )
-{
-	return hasArgument( argc, argv, UPDATE_ONLY_ARGUMENT );
+    return hasArgument(argc, argv, UPDATE_ONLY_ARGUMENT);
 }
 
 void CliManager::runSchedule()
 {
-	Settings* settings = Settings::getInstance();
+    Settings *settings = Settings::getInstance();
 
-	// int delay = settings->getSchedulerDelay();
-	int delay = settings->getScheduleRule().getMinutesAfterStartup();
-	// TODO qDebug() << "CliManager::runSchedule: delay aus scheduledTask herauslesen, wei geht das unter Linux (delay=0?)";
+    // int delay = settings->getSchedulerDelay();
+    int delay = settings->getScheduleRule().getMinutesAfterStartup();
+    // TODO qDebug() << "CliManager::runSchedule: delay aus scheduledTask herauslesen, wei geht das
+    // unter Linux (delay=0?)";
 
-	if ( delay > 0 )
-	{
-		qDebug() << "Starting schedule job in " << delay << " minute(s)";
-		QWaitCondition waitCondition;
-		QMutex mutex;
-		mutex.lock();
-		waitCondition.wait( &mutex, delay * 1000 * 60 );
-		qDebug() << "Starting schedule job now";
-	}
+    if (delay > 0) {
+        qDebug() << "Starting schedule job in " << delay << " minute(s)";
+        QWaitCondition waitCondition;
+        QMutex mutex;
+        mutex.lock();
+        waitCondition.wait(&mutex, delay * 1000 * 60);
+        qDebug() << "Starting schedule job now";
+    }
 
-	BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
-	qDebug() << "backupRules:" << backupRules;
-	MainModel mainModel;
+    BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
+    qDebug() << "backupRules:" << backupRules;
+    MainModel mainModel;
 
-	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    QObject::connect(&mainModel,
+                     SIGNAL(infoSignal(const QString &)),
+                     LogFileUtils::getInstance(),
+                     SLOT(writeLog(const QString &)));
+    QObject::connect(&mainModel,
+                     SIGNAL(errorSignal(const QString &)),
+                     LogFileUtils::getInstance(),
+                     SLOT(writeLog(const QString &)));
 
-	QEventLoop loop;
-	loop.connect( &mainModel, SIGNAL( backupFinished() ), SLOT( quit() ));
-	mainModel.backup( backupRules, true );
-	loop.exec();
+    QEventLoop loop;
+    loop.connect(&mainModel, SIGNAL(backupFinished()), SLOT(quit()));
+    mainModel.backup(backupRules, true);
+    loop.exec();
 
-	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    QObject::disconnect(&mainModel,
+                        SIGNAL(infoSignal(const QString &)),
+                        LogFileUtils::getInstance(),
+                        SLOT(writeLog(const QString &)));
+    QObject::disconnect(&mainModel,
+                        SIGNAL(errorSignal(const QString &)),
+                        LogFileUtils::getInstance(),
+                        SLOT(writeLog(const QString &)));
 }
 
 /*void CliManager::runCli_withFileList( int argc, char* argv[] )
 {
-	if ( !assertArguments( argc, argv ) )
-	{
-		printUsage( argc, argv );
-		return;
-	}
+    if ( !assertArguments( argc, argv ) )
+    {
+        printUsage( argc, argv );
+        return;
+    }
 
-	QStringList includePatternList;
-	QStringList excludePatternList;
-	QStringList backupList;
-	bool deleteExtraneousItems = hasArgument( argc, argv, DELETE_ARGUMENT );
+    QStringList includePatternList;
+    QStringList excludePatternList;
+    QStringList backupList;
+    bool deleteExtraneousItems = hasArgument( argc, argv, DELETE_ARGUMENT );
 
 
-	QString backupListFileName = getArgumentsValue( argc, argv, BACKUP_LIST_FILE_ARGUMENT );
-	backupList = FileSystemUtils::readLinesFromFile( backupListFileName, "UTF-8" );
+    QString backupListFileName = getArgumentsValue( argc, argv, BACKUP_LIST_FILE_ARGUMENT );
+    backupList = FileSystemUtils::readLinesFromFile( backupListFileName, "UTF-8" );
 
-	if ( hasArgumentValue( argc, argv, INCLUDE_PATTERN_FILE_ARGUMENT ) )
-	{
-		QString includeFileName = getArgumentsValue( argc, argv, INCLUDE_PATTERN_FILE_ARGUMENT );
-		includePatternList = FileSystemUtils::readLinesFromFile( includeFileName, "UTF-8" );
-	}
-	if ( hasArgumentValue( argc, argv, EXCLUDE_PATTERN_FILE_ARGUMENT ) )
-	{
-		QString excludeFileName = getArgumentsValue( argc, argv, EXCLUDE_PATTERN_FILE_ARGUMENT );
-		excludePatternList = FileSystemUtils::readLinesFromFile( excludeFileName, "UTF-8" );
-	}
-	MainModel mainModel;
-	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-						this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-						this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
-						this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
-						this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
-						this, SLOT( askForPassword() ) );
-	QObject::connect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
-						this, SLOT( askForPassword() ) );
+    if ( hasArgumentValue( argc, argv, INCLUDE_PATTERN_FILE_ARGUMENT ) )
+    {
+        QString includeFileName = getArgumentsValue( argc, argv, INCLUDE_PATTERN_FILE_ARGUMENT );
+        includePatternList = FileSystemUtils::readLinesFromFile( includeFileName, "UTF-8" );
+    }
+    if ( hasArgumentValue( argc, argv, EXCLUDE_PATTERN_FILE_ARGUMENT ) )
+    {
+        QString excludeFileName = getArgumentsValue( argc, argv, EXCLUDE_PATTERN_FILE_ARGUMENT );
+        excludePatternList = FileSystemUtils::readLinesFromFile( excludeFileName, "UTF-8" );
+    }
+    MainModel mainModel;
+    QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+                        this, SLOT( printInfoMessage( const QString& ) ) );
+    QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+                        this, SLOT( printErrorMessage( const QString& ) ) );
+    QObject::connect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
+                        this, SLOT( printInfoMessage( const QString& ) ) );
+    QObject::connect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
+                        this, SLOT( printErrorMessage( const QString& ) ) );
+    QObject::connect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString&
+) ), this, SLOT( askForPassword() ) ); QObject::connect( &mainModel, SIGNAL( askForClientPassword(
+const QString&, bool, int*, const QString& ) ), this, SLOT( askForPassword() ) );
 
-	// log file signals/slots
-	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-							LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    // log file signals/slots
+    QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+                            LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+                            LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 
-	mainModel.backup( backupList, includePatternList, excludePatternList, deleteExtraneousItems, true );
+    mainModel.backup( backupList, includePatternList, excludePatternList, deleteExtraneousItems, true );
 
-	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-							 this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-							 this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
-							 this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
-							 this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
-							 this, SLOT( askForPassword() ) );
-	QObject::disconnect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
-							 this, SLOT( askForPassword() ) );
+    QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+                             this, SLOT( printInfoMessage( const QString& ) ) );
+    QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+                             this, SLOT( printErrorMessage( const QString& ) ) );
+    QObject::disconnect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
+                             this, SLOT( printInfoMessage( const QString& ) ) );
+    QObject::disconnect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
+                             this, SLOT( printErrorMessage( const QString& ) ) );
+    QObject::disconnect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const
+QString& ) ), this, SLOT( askForPassword() ) ); QObject::disconnect( &mainModel, SIGNAL(
+askForClientPassword( const QString&, bool, int*, const QString& ) ), this, SLOT( askForPassword() ) );
 
-	// log file signals/slots
-	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-								 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    // log file signals/slots
+    QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
+                                 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
+                                 LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
 }*/
 
-void CliManager::runCli( int argc, char* argv[] )
+void CliManager::runCli(int argc, char *argv[])
 {
-	if ( !assertArguments( argc, argv ) )
-	{
-		printUsage( argc, argv );
-		return;
-	}
+    if (!assertArguments(argc, argv)) {
+        printUsage(argc, argv);
+        return;
+    }
 
-	Settings* settings = Settings::getInstance();
-	BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
+    Settings *settings = Settings::getInstance();
+    BackupSelectionHash backupRules = settings->getLastBackupSelectionRules();
 
-	MainModel mainModel;
-	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-					   this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-					   this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
-					   this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
-					   this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
-					   this, SLOT( askForPassword() ) );
-	QObject::connect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
-					   this, SLOT( askForPassword() ) );
+    MainModel mainModel;
+    QObject::connect(&mainModel,
+                     SIGNAL(infoSignal(const QString &)),
+                     this,
+                     SLOT(printInfoMessage(const QString &)));
+    QObject::connect(&mainModel,
+                     SIGNAL(errorSignal(const QString &)),
+                     this,
+                     SLOT(printErrorMessage(const QString &)));
+    QObject::connect(&mainModel,
+                     SIGNAL(showInformationMessageBox(const QString &)),
+                     this,
+                     SLOT(printInfoMessage(const QString &)));
+    QObject::connect(&mainModel,
+                     SIGNAL(showCriticalMessageBox(const QString &)),
+                     this,
+                     SLOT(printErrorMessage(const QString &)));
+    QObject::connect(&mainModel,
+                     SIGNAL(askForServerPassword(const QString &, bool, int *, const QString &)),
+                     this,
+                     SLOT(askForPassword()));
+    QObject::connect(&mainModel,
+                     SIGNAL(askForClientPassword(const QString &, bool, int *, const QString &)),
+                     this,
+                     SLOT(askForPassword()));
 
-	// log file signals/slots
-	QObject::connect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-					   LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::connect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-					   LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    // log file signals/slots
+    QObject::connect(&mainModel,
+                     SIGNAL(infoSignal(const QString &)),
+                     LogFileUtils::getInstance(),
+                     SLOT(writeLog(const QString &)));
+    QObject::connect(&mainModel,
+                     SIGNAL(errorSignal(const QString &)),
+                     LogFileUtils::getInstance(),
+                     SLOT(writeLog(const QString &)));
 
-	mainModel.backup( backupRules, true );
+    mainModel.backup(backupRules, true);
 
-	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-						  this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-						  this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( showInformationMessageBox( const QString& ) ),
-						  this, SLOT( printInfoMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( showCriticalMessageBox( const QString& ) ),
-						  this, SLOT( printErrorMessage( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( askForServerPassword( const QString&, bool, int*, const QString& ) ),
-						  this, SLOT( askForPassword() ) );
-	QObject::disconnect( &mainModel, SIGNAL( askForClientPassword( const QString&, bool, int*, const QString& ) ),
-						  this, SLOT( askForPassword() ) );
+    QObject::disconnect(&mainModel,
+                        SIGNAL(infoSignal(const QString &)),
+                        this,
+                        SLOT(printInfoMessage(const QString &)));
+    QObject::disconnect(&mainModel,
+                        SIGNAL(errorSignal(const QString &)),
+                        this,
+                        SLOT(printErrorMessage(const QString &)));
+    QObject::disconnect(&mainModel,
+                        SIGNAL(showInformationMessageBox(const QString &)),
+                        this,
+                        SLOT(printInfoMessage(const QString &)));
+    QObject::disconnect(&mainModel,
+                        SIGNAL(showCriticalMessageBox(const QString &)),
+                        this,
+                        SLOT(printErrorMessage(const QString &)));
+    QObject::disconnect(&mainModel,
+                        SIGNAL(askForServerPassword(const QString &, bool, int *, const QString &)),
+                        this,
+                        SLOT(askForPassword()));
+    QObject::disconnect(&mainModel,
+                        SIGNAL(askForClientPassword(const QString &, bool, int *, const QString &)),
+                        this,
+                        SLOT(askForPassword()));
 
-	// log file signals/slots
-	QObject::disconnect( &mainModel, SIGNAL( infoSignal( const QString& ) ),
-						  LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
-	QObject::disconnect( &mainModel, SIGNAL( errorSignal( const QString& ) ),
-						  LogFileUtils::getInstance(), SLOT( writeLog( const QString& ) ) );
+    // log file signals/slots
+    QObject::disconnect(&mainModel,
+                        SIGNAL(infoSignal(const QString &)),
+                        LogFileUtils::getInstance(),
+                        SLOT(writeLog(const QString &)));
+    QObject::disconnect(&mainModel,
+                        SIGNAL(errorSignal(const QString &)),
+                        LogFileUtils::getInstance(),
+                        SLOT(writeLog(const QString &)));
 }
 
-void CliManager::printInfoMessage( const QString& message )
+void CliManager::printInfoMessage(const QString &message)
 {
-	std::cout << message.toUtf8().data() << "\n";
+    std::cout << message.toUtf8().data() << "\n";
 }
 
-void CliManager::printErrorMessage( const QString& message )
+void CliManager::printErrorMessage(const QString &message)
 {
-	std::cerr << message.toUtf8().data() << "\n";
+    std::cerr << message.toUtf8().data() << "\n";
 }
 
 void CliManager::askForPassword()
 {
-	QTextStream cin( stdin, QIODevice::ReadOnly );
-	QTextStream cout( stdout, QIODevice::WriteOnly );
+    QTextStream cin(stdin, QIODevice::ReadOnly);
+    QTextStream cout(stdout, QIODevice::WriteOnly);
 
+    cout << "Enter username: " << flush;
+    QString username;
+    cin >> username;
 
-	cout << "Enter username: " << flush;
-	QString username;
-	cin >> username;
+    cout << "Enter password: " << flush;
+    QString password = readPassword();
 
-	cout << "Enter password: " << flush;
-	QString password = readPassword();
-
-	Settings* settings = Settings::getInstance();
-	settings->saveServerUserName( username );
-	settings->setServerPassword( password );
+    Settings *settings = Settings::getInstance();
+    settings->saveServerUserName(username);
+    settings->setServerPassword(password);
 }
 
 QString CliManager::readPassword()
 {
-	#ifdef Q_OS_UNIX
-		struct termios oldTermios, newTermios;
+#ifdef Q_OS_UNIX
+    struct termios oldTermios, newTermios;
 
-		// Turn echoing off and fail if we can't.
-		if ( tcgetattr ( 0, &oldTermios ) != 0)
-		{
-			qWarning() << "Can not turn off password echoing";
-		}
-		newTermios = oldTermios;
-		newTermios.c_lflag &= ~ECHO;
-		if ( tcsetattr( 0, TCSAFLUSH, &newTermios ) != 0 )
-		{
-			qWarning() << "Can not turn off password echoing";
-		}
-	#endif
+    // Turn echoing off and fail if we can't.
+    if (tcgetattr(0, &oldTermios) != 0) {
+        qWarning() << "Can not turn off password echoing";
+    }
+    newTermios = oldTermios;
+    newTermios.c_lflag &= ~ECHO;
+    if (tcsetattr(0, TCSAFLUSH, &newTermios) != 0) {
+        qWarning() << "Can not turn off password echoing";
+    }
+#endif
 
-		// Turn echoing off and info not able to.
-	#ifdef Q_OS_WIN32
-		HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
-		DWORD fdwOldMode;
-		if (hStdin == INVALID_HANDLE_VALUE || !GetConsoleMode(hStdin, &fdwOldMode) || !SetConsoleMode(hStdin, fdwOldMode & ~ENABLE_ECHO_INPUT)) {
-			qWarning() << QObject::tr("Caution: Cannot turn off the password echoing! Password will be shown when typed.");
-		}
-	#endif
+    // Turn echoing off and info not able to.
+#ifdef Q_OS_WIN32
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD fdwOldMode;
+    if (hStdin == INVALID_HANDLE_VALUE || !GetConsoleMode(hStdin, &fdwOldMode)
+        || !SetConsoleMode(hStdin, fdwOldMode & ~ENABLE_ECHO_INPUT)) {
+        qWarning() << QObject::tr(
+            "Caution: Cannot turn off the password echoing! Password will be shown when typed.");
+    }
+#endif
 
-	// Read the password.
-	QString password;
-	QTextStream cin( stdin, QIODevice::ReadOnly );
-	cin >> password;
+    // Read the password.
+    QString password;
+    QTextStream cin(stdin, QIODevice::ReadOnly);
+    cin >> password;
 
-	#ifdef Q_OS_WIN32
-		SetConsoleMode(hStdin, fdwOldMode);
-	#endif
+#ifdef Q_OS_WIN32
+    SetConsoleMode(hStdin, fdwOldMode);
+#endif
 
-	#ifdef Q_OS_UNIX
-		// Restore terminal.
-		(void) tcsetattr( 0, TCSAFLUSH, &oldTermios );
-	#endif
+#ifdef Q_OS_UNIX
+    // Restore terminal.
+    (void) tcsetattr(0, TCSAFLUSH, &oldTermios);
+#endif
 
-	return password;
+    return password;
 }
 
-bool CliManager::assertArguments( int argc, char* argv[] )
+bool CliManager::assertArguments(int argc, char *argv[])
 {
-	return hasArgumentValue( argc, argv, BACKUP_LIST_FILE_ARGUMENT );
+    return hasArgumentValue(argc, argv, BACKUP_LIST_FILE_ARGUMENT);
 }
 
-bool CliManager::hasArgumentValue( int argc, char* argv[], const QString& argumentName  )
+bool CliManager::hasArgumentValue(int argc, char *argv[], const QString &argumentName)
 {
-	bool result = false;
-	for ( int i=1; i<argc; i++ )
-	{
-		QString argument = argv[i];
-		if ( argument.startsWith( argumentName ) && argument.size() > argumentName.size() )
-		{
-			result = true;
-			break;
-		}
-	}
-	return result;
+    bool result = false;
+    for (int i = 1; i < argc; i++) {
+        QString argument = argv[i];
+        if (argument.startsWith(argumentName) && argument.size() > argumentName.size()) {
+            result = true;
+            break;
+        }
+    }
+    return result;
 }
 
-QString CliManager::getArgumentsValue( int argc, char* argv[], const QString& argumentName )
+QString CliManager::getArgumentsValue(int argc, char *argv[], const QString &argumentName)
 {
-	for ( int i=1; i<argc; i++ )
-	{
-		QString argument = argv[i];
-		if ( argument.startsWith( argumentName ) )
-		{
-			return argument.mid( argumentName.size() , argument.size() - argumentName.size() );
-		}
-	}
-	QString message = "No value for argument " + argumentName + " found";
-	std::cerr << message.toUtf8().data();
-	return "";
+    for (int i = 1; i < argc; i++) {
+        QString argument = argv[i];
+        if (argument.startsWith(argumentName)) {
+            return argument.mid(argumentName.size(), argument.size() - argumentName.size());
+        }
+    }
+    QString message = "No value for argument " + argumentName + " found";
+    std::cerr << message.toUtf8().data();
+    return "";
 }

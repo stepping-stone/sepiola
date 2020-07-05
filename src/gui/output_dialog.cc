@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -17,84 +17,79 @@
 */
 
 #include <QCloseEvent>
-#include <QTimer>
 #include <QDebug>
+#include <QTimer>
 
 #include "gui/output_dialog.hh"
-#include "settings/settings.hh"
 #include "settings/platform.hh"
+#include "settings/settings.hh"
 #include "utils/debug_timer.hh"
 
-OutputDialog::OutputDialog( const QString& title )
+OutputDialog::OutputDialog(const QString &title)
 {
-	setupUi ( this );
-	setWindowTitle( title );
-	setAttribute( Qt::WA_DeleteOnClose );
+    setupUi(this);
+    setWindowTitle(title);
+    setAttribute(Qt::WA_DeleteOnClose);
 
-	this->labelError->setVisible( false );
-	this->textEditError->setVisible( false );
-	this->isErrorVisible = false;
-	this->lastUpdate = QTime::currentTime();
+    this->labelError->setVisible(false);
+    this->textEditError->setVisible(false);
+    this->isErrorVisible = false;
+    this->lastUpdate = QTime::currentTime();
 }
 
-OutputDialog::~OutputDialog()
-{
-}
+OutputDialog::~OutputDialog() {}
 
-void OutputDialog::appendInfo( const QString& info )
+void OutputDialog::appendInfo(const QString &info)
 {
-	const int msecs_to_wait_for_flush = 500;
-	QTime currentTime = QTime::currentTime();
-	this->outputCache.append( info );
-	if ( this->lastUpdate.addMSecs(msecs_to_wait_for_flush) <= currentTime )
-	{
-		// update, but only after a second, such that following messages ariving in the next second are also flushed
-		this->lastUpdate = QTime::currentTime();
-		QTimer::singleShot(msecs_to_wait_for_flush, this, SLOT(flushCache()));
-	}
-	else
-	{
-		// add a new line
-        this->outputCache.append( Platform::EOL_CHARACTER );
-	}
+    const int msecs_to_wait_for_flush = 500;
+    QTime currentTime = QTime::currentTime();
+    this->outputCache.append(info);
+    if (this->lastUpdate.addMSecs(msecs_to_wait_for_flush) <= currentTime) {
+        // update, but only after a second, such that following messages ariving in the next second
+        // are also flushed
+        this->lastUpdate = QTime::currentTime();
+        QTimer::singleShot(msecs_to_wait_for_flush, this, SLOT(flushCache()));
+    } else {
+        // add a new line
+        this->outputCache.append(Platform::EOL_CHARACTER);
+    }
 }
 
 void OutputDialog::flushCache()
 {
-	this->textEditOutput->append( this->outputCache  );
-	this->outputCache.clear();
+    this->textEditOutput->append(this->outputCache);
+    this->outputCache.clear();
 }
 
-void OutputDialog::appendError( const QString& error )
+void OutputDialog::appendError(const QString &error)
 {
-	if ( !this->isErrorVisible )
-	{
-		this->labelError->setVisible( true );
-		this->textEditError->setVisible( true );
-		this->isErrorVisible = true;
-	}
-	this->textEditError->append( error  );
+    if (!this->isErrorVisible) {
+        this->labelError->setVisible(true);
+        this->textEditError->setVisible(true);
+        this->isErrorVisible = true;
+    }
+    this->textEditError->append(error);
 }
 
 void OutputDialog::on_btnCancel_clicked()
 {
-	if (emit abort()) {
-		qDebug() << "OutputDialog::on_btnCancel_clicked(): switching Button-visibility";
-		this->btnClose->setEnabled(true);
-		this->btnCancel->setEnabled(false);
-	}
+    if (emit abort()) {
+        qDebug() << "OutputDialog::on_btnCancel_clicked(): switching Button-visibility";
+        this->btnClose->setEnabled(true);
+        this->btnCancel->setEnabled(false);
+    }
 }
 
 void OutputDialog::finished()
 {
-	flushCache();
-	this->btnClose->setEnabled( true );
-	this->btnCancel->setEnabled( false );
-	emit refreshLastBackupOverview();
+    flushCache();
+    this->btnClose->setEnabled(true);
+    this->btnCancel->setEnabled(false);
+    emit refreshLastBackupOverview();
 }
 
-void OutputDialog::closeEvent( QCloseEvent * event )
+void OutputDialog::closeEvent(QCloseEvent *event)
 {
-	if (!this->btnClose->isEnabled()) event->ignore();
+    if (!this->btnClose->isEnabled())
+        event->ignore();
 }
-

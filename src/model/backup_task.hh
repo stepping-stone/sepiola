@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -20,35 +20,33 @@
 #define BACKUPTASK_H_
 
 #include <QDateTime>
-#include <QString>
 #include <QMap>
+#include <QString>
 
 #include "utils/const_utils.hh"
 
-
-
 class BackupTask
 {
-	public:
-		BackupTask();
-		BackupTask( const BackupTask& newBackupTask );
-		BackupTask( const QDateTime& bT, ConstUtils::StatusEnum s);
-		~BackupTask();
+public:
+    BackupTask();
+    BackupTask(const BackupTask &newBackupTask);
+    BackupTask(const QDateTime &bT, ConstUtils::StatusEnum s);
+    ~BackupTask();
 
-		static QString getStatusText( ConstUtils::StatusEnum status );
-		QString getStatusText() const;
-		ConstUtils::StatusEnum getStatus() const;
-		void setStatus( const ConstUtils::StatusEnum& status );
-		QDateTime getDateTime() const;
-		void setDateTime( const QDateTime& backupTime );
-		QString toString() const;
-		bool equals( const BackupTask& bTask ) const;
-		bool equalDateTime( const BackupTask& bTask ) const;
+    static QString getStatusText(ConstUtils::StatusEnum status);
+    QString getStatusText() const;
+    ConstUtils::StatusEnum getStatus() const;
+    void setStatus(const ConstUtils::StatusEnum &status);
+    QDateTime getDateTime() const;
+    void setDateTime(const QDateTime &backupTime);
+    QString toString() const;
+    bool equals(const BackupTask &bTask) const;
+    bool equalDateTime(const BackupTask &bTask) const;
 
-	private:
-		QDateTime backupTime;
-		ConstUtils::StatusEnum status;
-		static QMap<ConstUtils::StatusEnum, QString> map_statusText;
+private:
+    QDateTime backupTime;
+    ConstUtils::StatusEnum status;
+    static QMap<ConstUtils::StatusEnum, QString> map_statusText;
 };
 
 #endif /*BACKUPTASK_H_*/

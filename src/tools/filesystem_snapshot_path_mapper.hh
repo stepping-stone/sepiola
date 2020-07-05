@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -26,14 +26,13 @@ class QString;
 class FilesystemSnapshotPathMapper
 {
 public:
-
     /**
      * Constructs the FilesystemSnapshotPathMapper
      * @param The partition (mount point)
      * @param A BackupSelectionHash which contains all files (with relative file
      * path) on this partition
      */
-    FilesystemSnapshotPathMapper(const QString& _partition, const BackupSelectionHash& includeRules);
+    FilesystemSnapshotPathMapper(const QString &_partition, const BackupSelectionHash &includeRules);
 
     /**
      * Constructs an empty FilesystemSnapshotPathMapper
@@ -50,59 +49,59 @@ public:
      * Returns the partition name (mount point)
      * @return The partition name (mount point)
      */
-    const QString& getPartition() const;
+    const QString &getPartition() const;
 
     /**
      * Returns all files on the given partition
      * @return All files on the given partition
      */
-    const BackupSelectionHash& getRelativeIncludes() const;
+    const BackupSelectionHash &getRelativeIncludes() const;
 
     /**
      * Returns the local snapshot path for the given partition
      * @return The local snapshot path for the given partition
      */
-    const QString& getSnapshotPath() const;
+    const QString &getSnapshotPath() const;
 
     /**
      * Returns the local snapshot path in unc format for the given partition
      * @return The local snapshot path in unc format for the given partition
      */
-    const QString& getSnapshotUncPath() const;
+    const QString &getSnapshotUncPath() const;
 
     // Setters
     /**
      * Sets the partition name (mount point)
      * @param The partition name (mount point)
      */
-    void setPartition(const QString& partition);
+    void setPartition(const QString &partition);
 
     /**
      * Sets the absolute snapshot path in cygwin format (/proc/sys/device/HarddiskVolumeShadowCopy)
      * for the given partition
      * @param The local snapshot path for the given partition
      */
-    void setSnapshotPath(const QString& snapshotPath);
+    void setSnapshotPath(const QString &snapshotPath);
 
     /**
-     * Sets the absolute snapshot path in unc format (\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy)
-     * for the given partition
+     * Sets the absolute snapshot path in unc format
+     * (\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy) for the given partition
      * @param The absolute snapshot path in unc format for the given partition
      */
-    void setSnapshotUncPath(const QString& snapshotUncPath);
+    void setSnapshotUncPath(const QString &snapshotUncPath);
 
     /**
      * Converts a local Windows path to absolut unc path for the given partition
      * @param The absolute unc path for the given partition
      */
-    const QString& toAbsUncPath(QString& path) const;
+    const QString &toAbsUncPath(QString &path) const;
 
     /**
      * Add a single file to the relativeInclude list of this mapper object
      * @param The relative filename (relative concerning the partition)
      * @param Whether to backup this file or not
      */
-    void addFileToRelativeIncludes( QString filename, bool backup );
+    void addFileToRelativeIncludes(QString filename, bool backup);
 
 private:
     QString partition;

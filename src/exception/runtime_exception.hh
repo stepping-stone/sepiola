@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -27,15 +27,15 @@
 class RuntimeException : public Exception
 {
 public:
-	/**
-	 * Constructs a RuntimeException with the given message
-	 * @param message the exception's message
-	 */
-	RuntimeException( const QString& message );
+    /**
+     * Constructs a RuntimeException with the given message
+     * @param message the exception's message
+     */
+    RuntimeException(const QString &message);
 };
 
-inline RuntimeException::RuntimeException( const QString& message ) : Exception( message ) 
-{
-}
+inline RuntimeException::RuntimeException(const QString &message)
+    : Exception(message)
+{}
 
 #endif /*RUNTIME_EXCEPTION_HH_*/

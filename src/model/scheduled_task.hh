@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -19,52 +19,49 @@
 #ifndef SCHEDULEDTASK_H_
 #define SCHEDULEDTASK_H_
 
-#include <QVector>
-#include <QSet>
-#include <QTime>
 #include <QDataStream>
 #include <QMetaType>
+#include <QSet>
+#include <QTime>
+#include <QVector>
 
 namespace ScheduleRule {
-enum ScheduleType
-{ AFTER_BOOT, AT_WEEKDAYS_AND_TIME, NEVER};
-enum Weekdays
-{ MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY};
-}
+enum ScheduleType { AFTER_BOOT, AT_WEEKDAYS_AND_TIME, NEVER };
+enum Weekdays { MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY };
+} // namespace ScheduleRule
 
 class ScheduledTask
 {
-	public:
+public:
+    ScheduledTask();
+    ScheduledTask(const ScheduledTask &task);
+    ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time);
+    ScheduledTask(int minutes);
 
-		ScheduledTask();
-		ScheduledTask(const ScheduledTask& task);
-		ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time);
-		ScheduledTask(int minutes);
+    ~ScheduledTask();
+    ScheduleRule::ScheduleType getType() const;
+    void setType(ScheduleRule::ScheduleType type);
+    QSet<ScheduleRule::Weekdays> getWeekdays() const;
+    QVector<bool> getWeekdaysArray() const;
+    void setWeekdays(QSet<ScheduleRule::Weekdays> weekdays);
+    void setWeekdays(QSet<int> weekdaysInt);
+    void clearWeekdays();
+    void addWeekday(ScheduleRule::Weekdays newWeekday);
+    QTime getTimeToRun() const;
+    void setTimeToRun(QTime timeToRun);
+    int getMinutesAfterStartup() const;
+    void setMinutesAfterStartup(int minutesAfterStartup);
+    QString toString() const;
+    bool equals(const ScheduledTask &scheduledTask) const;
 
-		~ScheduledTask();
-		ScheduleRule::ScheduleType getType() const;
-		void setType(ScheduleRule::ScheduleType type);
-		QSet<ScheduleRule::Weekdays> getWeekdays() const;
-		QVector<bool> getWeekdaysArray() const;
-		void setWeekdays(QSet<ScheduleRule::Weekdays> weekdays);
-		void setWeekdays(QSet<int> weekdaysInt);
-		void clearWeekdays();
-		void addWeekday(ScheduleRule::Weekdays newWeekday);
-		QTime getTimeToRun() const;
-		void setTimeToRun(QTime timeToRun);
-		int getMinutesAfterStartup() const;
-		void setMinutesAfterStartup(int minutesAfterStartup);
-		QString toString() const;
-		bool equals(const ScheduledTask& scheduledTask) const;
-		
-	private:
-		ScheduleRule::ScheduleType type;
-		QSet<ScheduleRule::Weekdays> weekdays;
-		QTime timeToRun;
-		int minutesAfterStartup;
+private:
+    ScheduleRule::ScheduleType type;
+    QSet<ScheduleRule::Weekdays> weekdays;
+    QTime timeToRun;
+    int minutesAfterStartup;
 };
-QDataStream &operator<<(QDataStream &out, const ScheduledTask& sched);
-QDataStream &operator>>(QDataStream &in, ScheduledTask& sched);
+QDataStream &operator<<(QDataStream &out, const ScheduledTask &sched);
+QDataStream &operator>>(QDataStream &in, ScheduledTask &sched);
 
 Q_DECLARE_METATYPE(ScheduledTask)
 Q_DECLARE_METATYPE(ScheduleRule::ScheduleType)

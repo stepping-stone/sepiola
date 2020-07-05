@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -19,8 +19,8 @@
 #ifndef ABSTRACT_SNAPSHOT_HH_
 #define ABSTRACT_SNAPSHOT_HH_
 
-#include <QList>
 #include <QHash>
+#include <QList>
 #include <QString>
 
 #include "tools/abstract_informing_process.hh"
@@ -32,7 +32,7 @@
 #define SNAPSHOT_CANNOT_CREATE_SNAPSHOT 3
 #define SNAPSHOR_CANNOT_MOUNT_SNAPSHOT 4
 
-typedef QHash<QString,FilesystemSnapshotPathMapper> SnapshotMapper;
+typedef QHash<QString, FilesystemSnapshotPathMapper> SnapshotMapper;
 
 /**
  * The AbstractSnapshot class provides methods for using a snapshot object
@@ -43,14 +43,12 @@ class AbstractSnapshot : public AbstractInformingProcess
     Q_OBJECT
 
 public:
-
     /**
      * Destroys the AbstractScheduler
      */
     virtual ~AbstractSnapshot();
 
-
-    virtual const SnapshotMapper& getSnapshotPathMappers() const = 0;
+    virtual const SnapshotMapper &getSnapshotPathMappers() const = 0;
 
     /**
      * Checks if there is something to clean up
@@ -115,7 +113,7 @@ public slots:
      * @param The BackupSelectionHash which defines all files which are later
      * backed-up
      */
-    virtual void addFilesToSnapshot( const BackupSelectionHash includeRules ) = 0;
+    virtual void addFilesToSnapshot(const BackupSelectionHash includeRules) = 0;
 
     /**
      * Executes the snapshot
@@ -128,8 +126,6 @@ public slots:
     virtual void cleanupSnapshot() = 0;
 };
 
-inline AbstractSnapshot::~AbstractSnapshot()
-{
-}
+inline AbstractSnapshot::~AbstractSnapshot() {}
 
 #endif /* ABSTRACT_SNAPSHOT_HH_ */

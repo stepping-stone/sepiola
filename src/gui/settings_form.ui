@@ -164,7 +164,7 @@ default-button to use the system-settings.</string>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Defa&amp;ult</string>
+         <string>Default</string>
         </property>
        </widget>
       </item>
@@ -438,7 +438,7 @@ p, li { white-space: pre-wrap; }
        <widget class="QCheckBox" name="checkBoxKeepDeletedFiles">
         <property name="text">
          <string>Keep locally deleted files on the server forever
-(it is recommended not to choose this option, as your backups would grow very big very rapidly)</string>
+(not recommended, as your backups would grow very big very rapidly)</string>
         </property>
        </widget>
       </item>
@@ -495,7 +495,7 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Kilobytes/Second</string>
+         <string>Kilobytes/Second (0 = no limit)</string>
         </property>
        </widget>
       </item>

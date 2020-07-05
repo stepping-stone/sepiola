@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -19,31 +19,34 @@
 #ifndef LOCAL_DIR_MODEL_HH
 #define LOCAL_DIR_MODEL_HH
 
-#include <QFileSystemModel>
 #include <QDir>
-#include <QStringList>
+#include <QFileSystemModel>
 #include <QSet>
+#include <QStringList>
 
 #include "utils/datatypes.hh"
 
 /**
  * The LocalDirModel class represents a local file system
  * @author Dominic Sydler, sydler@puzzle.ch
- * @source http://www.qtcentre.org/forum/f-qt-programming-2/t-qdirmodelqtreeview-and-checkable-items-6957.html
+ * @source
+ * http://www.qtcentre.org/forum/f-qt-programming-2/t-qdirmodelqtreeview-and-checkable-items-6957.html
  */
 
 class LocalDirModel : public QFileSystemModel
 {
-public:	
-	Qt::ItemFlags flags(const QModelIndex& index) const;
-	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-	const BackupSelectionHash& getSelectionRules() { return selectionRules; };
-	void setSelectionRules( const BackupSelectionHash& selectionRules ) { this->selectionRules = selectionRules; };
-	
+public:
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    const BackupSelectionHash &getSelectionRules() { return selectionRules; };
+    void setSelectionRules(const BackupSelectionHash &selectionRules)
+    {
+        this->selectionRules = selectionRules;
+    };
+
 private:
-	BackupSelectionHash selectionRules;
+    BackupSelectionHash selectionRules;
 };
 
 #endif /* LOCAL_DIR_MODEL_HH */
-

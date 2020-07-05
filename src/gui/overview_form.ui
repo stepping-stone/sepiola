@@ -1004,7 +1004,7 @@ Next Backup</string>
      <item>
       <widget class="QPushButton" name="btnBackupNow">
        <property name="text">
-        <string>B&amp;ackup now</string>
+        <string>Backup now</string>
        </property>
       </widget>
      </item>

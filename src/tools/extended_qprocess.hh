@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2010-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -24,24 +24,23 @@
 class ExtendedQProcess : public QProcess
 {
 public:
-	void resetError();
-	bool hasError();
+    void resetError();
+    bool hasError();
 
 private:
-	QString noErrorString;
+    QString noErrorString;
 };
 
 inline void ExtendedQProcess::resetError()
 {
-	// There's no way to reset error, so reset errorString only.
-	setErrorString("");
-	this->noErrorString = errorString();
+    // There's no way to reset error, so reset errorString only.
+    setErrorString("");
+    this->noErrorString = errorString();
 }
 
 inline bool ExtendedQProcess::hasError()
 {
-	return errorString() != this->noErrorString;
+    return errorString() != this->noErrorString;
 }
 
 #endif
-

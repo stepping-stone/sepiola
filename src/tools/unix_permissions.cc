@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -28,177 +28,171 @@
 #include "utils/extended_file.hh"
 #include "utils/unicode_text_stream.hh"
 
-UnixPermissions::UnixPermissions()
+QString UnixPermissions::getMetadata(
+    const QString &metadataFileName,
+    const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems,
+    const FilesystemSnapshot *,
+    QString *)
 {
+    qDebug() << "UnixPermissions::getMetadata( processedItems )";
+
+    // metadata format: filename \n owner \n group \n permission
+    QFile metadataFile(metadataFileName);
+    if (!metadataFile.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can not write to file: " << metadataFileName;
+        return metadataFileName;
+    }
+
+    UnicodeTextStream out(&metadataFile);
+
+    for (int i = 0; i < processedItems.size(); i++) {
+        QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> processedItem = processedItems.at(i);
+        if (processedItem.second != AbstractRsync::DELETED) {
+            qDebug() << "Getting metadata for " << processedItem.first;
+            // emit infoSignal( QObject::tr( "Getting metadata for %1" ).arg( processedItem.first ) );
+            ExtendedFile fileInfo(processedItem.first);
+            QString fileName = fileInfo.fileName();
+            QString owner = fileInfo.owner();
+            QString group = fileInfo.group();
+            int permissions = fileInfo.permissions();
+            out << fileName << "\n" << owner << "\n" << group << "\n" << permissions << "\n\n";
+        }
+    }
+    metadataFile.close();
+    return metadataFileName;
 }
 
-UnixPermissions::~UnixPermissions()
+void UnixPermissions::mergeMetadata(
+    const QFileInfo &newMetadataFileName,
+    const QFileInfo &currentMetadataFileName,
+    const QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> &processedItems)
 {
+    qDebug() << "UnixPermissions::mergeMetadata( " << newMetadataFileName.absoluteFilePath() << ", "
+             << currentMetadataFileName.absoluteFilePath() << ")";
+
+    QMap<QString, QStringList> metadataMap; // key: file or dir name, value: acl data (four lines)
+
+    // read all metadata from the current metadata file and put them in a map
+    populateMapFromFile(currentMetadataFileName, &metadataMap);
+
+    // delete all metadata for deleted items
+    for (int i = 0; i < processedItems.size(); i++) {
+        QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> processedItem = processedItems.at(i);
+        if (processedItem.second == AbstractRsync::DELETED) {
+            metadataMap.remove(processedItem.first);
+        }
+    }
+
+    // read all metadata from the new metadata file and put them in the map. if there is already an
+    // entry, replace it
+    populateMapFromFile(newMetadataFileName, &metadataMap);
+
+    writeMapContentToFile(metadataMap, currentMetadataFileName);
 }
 
-QString UnixPermissions::getMetadata(const QString& metadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems, QString* /*warnings*/ )
+void UnixPermissions::setMetadata(const QFileInfo &metadataFileName,
+                                  const QStringList &downloadedItems,
+                                  const QString &downloadDestination)
 {
-	qDebug() << "UnixPermissions::getMetadata( processedItems )";
+    qDebug() << "UnixPermissions::setMetadata( " << metadataFileName.absoluteFilePath() << ", "
+             << downloadedItems << " )";
 
-	// metadata format: filename \n owner \n group \n permission
-	QFile metadataFile( metadataFileName );
-	if ( !metadataFile.open( QIODevice::WriteOnly ) )
-	{
-		qWarning() << "Can not write to file: " << metadataFileName;
-		return metadataFileName;
-	}
+    QMap<QString, QStringList> *metadataMap
+        = new QMap<QString, QStringList>(); // key: file or dir name, value meta data (four lines)
+    populateMapFromFile(metadataFileName, metadataMap);
 
-	UnicodeTextStream out( &metadataFile );
-
-	for( int i=0; i<processedItems.size(); i++ )
-	{
-		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>  processedItem = processedItems.at( i );
-		if( processedItem.second != AbstractRsync::DELETED )
-		{
-			qDebug() << "Getting metadata for " << processedItem.first;
-			//emit infoSignal( QObject::tr( "Getting metadata for %1" ).arg( processedItem.first ) );
-			ExtendedFile fileInfo( processedItem.first );
-			QString fileName = fileInfo.fileName();
-			QString owner = fileInfo.owner();
-			QString group = fileInfo.group();
-			int permissions = fileInfo.permissions();
-			out << fileName << "\n" << owner << "\n" << group << "\n" << permissions << "\n\n";
-		}
-	}
-	metadataFile.close();
-	return metadataFileName;
+    QString errors;
+    foreach (QString itemName, metadataMap->keys()) {
+        if (downloadedItems.contains(
+                itemName.right(itemName.size() - 1))) // itemName without prepended slash
+        {
+            QString fileName;
+            if (downloadDestination != "/") {
+                fileName = downloadDestination + itemName;
+            } else {
+                fileName = itemName;
+            }
+            // set metadata
+            qDebug() << "setting meta data for " << fileName;
+            emit infoSignal(QObject::tr("Setting metadata for %1").arg(fileName));
+            ExtendedFile file(fileName);
+            QStringList metadata = metadataMap->value(itemName);
+            QString owner = metadata.at(1);
+            QString group = metadata.at(2);
+            int permissions = QVariant(metadata.at(3)).toInt();
+            QFlags<QFile::Permission> permission(permissions);
+            file.setPermissions(permission);
+            if (!file.setOwnerAndGroup(owner, group) && geteuid() == 0) {
+                errors.append(QObject::tr("Cannot change owner/group for %1\n").arg(fileName));
+            }
+        }
+    }
+    if (errors != "") {
+        qWarning() << "Error occurred while setting permissionss: " << errors;
+        throw ProcessException(QObject::tr("Error occurred while setting permissions:\n") + errors);
+    }
 }
 
-void UnixPermissions::mergeMetadata( const QFileInfo& newMetadataFileName, const QFileInfo& currentMetadataFileName, const QList< QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE> >& processedItems )
+QStringList UnixPermissions::extractItems(const QFileInfo &metadataFile)
 {
-	qDebug() << "UnixPermissions::mergeMetadata( " << newMetadataFileName.absoluteFilePath() << ", " << currentMetadataFileName.absoluteFilePath() << ")";
+    qDebug() << "UnixPermissions::extractItems( " << metadataFile.absoluteFilePath() << " )";
 
-	QMap<QString, QStringList> metadataMap; // key: file or dir name, value: acl data (four lines)
-
-	// read all metadata from the current metadata file and put them in a map
-	populateMapFromFile( currentMetadataFileName, &metadataMap );
-
-	// delete all metadata for deleted items
-	for( int i=0; i<processedItems.size(); i++ )
-	{
-		QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>  processedItem = processedItems.at( i );
-		if( processedItem.second == AbstractRsync::DELETED )
-		{
-			metadataMap.remove( processedItem.first );
-		}
-	}
-
-	// read all metadata from the new metadata file and put them in the map. if there is already an entry, replace it
-	populateMapFromFile( newMetadataFileName, &metadataMap );
-
-	writeMapContentToFile( metadataMap, currentMetadataFileName );
+    QMap<QString, QStringList> *metadataMap
+        = new QMap<QString, QStringList>(); // key: file or dir name, value: acl data (four lines)
+    populateMapFromFile(metadataFile, metadataMap);
+    return metadataMap->keys();
 }
 
-void UnixPermissions::setMetadata( const QFileInfo& metadataFileName, const QStringList& downloadedItems, const QString& downloadDestination )
+void UnixPermissions::populateMapFromFile(const QFileInfo &metadataFileName,
+                                          QMap<QString, QStringList> *metadataMap)
 {
-	qDebug() << "UnixPermissions::setMetadata( " << metadataFileName.absoluteFilePath() << ", " << downloadedItems << " )";
+    qDebug() << "UnixPermissions::populateMapFromFile( " << metadataFileName.absoluteFilePath()
+             << ", metadataMap )";
 
-	QMap<QString, QStringList>* metadataMap = new QMap<QString, QStringList>(); // key: file or dir name, value meta data (four lines)
-	populateMapFromFile( metadataFileName, metadataMap );
+    QFile metadataFile(metadataFileName.absoluteFilePath());
+    if (!metadataFile.open(QIODevice::ReadOnly)) {
+        qWarning() << "Can not read file " << metadataFileName.absoluteFilePath();
+        return;
+    }
 
-	QString errors;
-	foreach ( QString itemName, metadataMap->keys() )
-	{
-		if ( downloadedItems.contains( itemName.right( itemName.size() -1 ) ) ) // itemName without prepended slash
-		{
-			QString fileName;
-			if ( downloadDestination != "/" )
-			{
-				fileName = downloadDestination + itemName;
-			}
-			else
-			{
-				fileName = itemName;
-			}
-			// set metadata
-			qDebug() << "setting meta data for " << fileName;
-			emit infoSignal( QObject::tr( "Setting metadata for %1" ).arg( fileName ) );
-			ExtendedFile file( fileName );
-			QStringList metadata = metadataMap->value( itemName );
-			QString owner = metadata.at( 1 );
-			QString group = metadata.at( 2 );
-			int permissions = QVariant( metadata.at( 3 ) ).toInt();
-			QFlags<QFile::Permission> permission( permissions );
-			file.setPermissions( permission );
-			if( !file.setOwnerAndGroup( owner, group ) && geteuid() == 0 )
-			{
-				errors.append( QObject::tr( "Cannot change owner/group for %1\n" ).arg( fileName ) );
-			}
-		}
-	}
-	if ( errors != "" )
-	{
-		qWarning() << "Error occurred while setting permissionss: " << errors;
-		throw ProcessException( QObject::tr( "Error occurred while setting permissions:\n" ) + errors );
-	}
-
+    UnicodeTextStream in(&metadataFile);
+    while (!in.atEnd()) {
+        QString fileName = in.readLine();
+        QStringList metadata;
+        metadata << fileName;
+        metadata << in.readLine(); // owner
+        metadata << in.readLine(); // group
+        metadata << in.readLine(); // permissions
+        metadataMap->insert(fileName, metadata);
+        in.readLine(); // empty line
+    }
+    metadataFile.close();
 }
 
-QStringList UnixPermissions::extractItems( const QFileInfo& metadataFile )
+void UnixPermissions::writeMapContentToFile(const QMap<QString, QStringList> &metadataMap,
+                                            const QFileInfo &metadataFileName)
 {
-	qDebug() << "UnixPermissions::extractItems( " << metadataFile.absoluteFilePath() << " )";
+    qDebug() << "UnixPermissions::writeMapContentToFile( metadataMap, "
+             << metadataFileName.absoluteFilePath() << " )";
 
-	QMap<QString, QStringList>* metadataMap = new QMap<QString, QStringList>(); // key: file or dir name, value: acl data (four lines)
-	populateMapFromFile( metadataFile, metadataMap );
-	return metadataMap->keys();
-}
-
-void UnixPermissions::populateMapFromFile( const QFileInfo& metadataFileName, QMap<QString, QStringList>* metadataMap )
-{
-	qDebug() << "UnixPermissions::populateMapFromFile( " << metadataFileName.absoluteFilePath() << ", metadataMap )";
-
-	QFile metadataFile( metadataFileName.absoluteFilePath() );
-	if ( !metadataFile.open( QIODevice::ReadOnly ) )
-	{
-		qWarning() << "Can not read file " << metadataFileName.absoluteFilePath();
-		return;
-	}
-
-	UnicodeTextStream in( &metadataFile );
-	while ( !in.atEnd() )
-	{
-		QString fileName = in.readLine();
-		QStringList metadata;
-		metadata << fileName;
-		metadata << in.readLine(); // owner
-		metadata << in.readLine(); // group
-		metadata <<	in.readLine(); // permissions
-		metadataMap->insert( fileName, metadata );
-		in.readLine(); // empty line
-	}
-	metadataFile.close();
-}
-
-void UnixPermissions::writeMapContentToFile( const QMap<QString, QStringList>& metadataMap, const QFileInfo& metadataFileName )
-{
-	qDebug() << "UnixPermissions::writeMapContentToFile( metadataMap, " << metadataFileName.absoluteFilePath() << " )";
-
-	// if the file already exists, delete and recreate the acl file, then write the content of the map to the file
-	QFile metadataFile( metadataFileName.absoluteFilePath() );
-	if ( metadataFile.exists() )
-	{
-		metadataFile.remove();
-	}
-	if ( !metadataFile.open( QIODevice::WriteOnly ) )
-	{
-		qWarning() << "Can not write to file " << metadataFileName.absoluteFilePath();
-		return;
-	}
-	UnicodeTextStream out( &metadataFile );
-	QList<QString> metadataKeys = metadataMap.keys();
-	foreach ( QString metadataKey, metadataKeys )
-	{
-		QStringList metadataValues = metadataMap.value( metadataKey );
-		foreach( QString metadataValue, metadataValues )
-		{
-			out << metadataValue << "\n";
-		}
-		out << "\n";
-	}
-	metadataFile.close();
+    // if the file already exists, delete and recreate the acl file, then write the content of the
+    // map to the file
+    QFile metadataFile(metadataFileName.absoluteFilePath());
+    if (metadataFile.exists()) {
+        metadataFile.remove();
+    }
+    if (!metadataFile.open(QIODevice::WriteOnly)) {
+        qWarning() << "Can not write to file " << metadataFileName.absoluteFilePath();
+        return;
+    }
+    UnicodeTextStream out(&metadataFile);
+    QList<QString> metadataKeys = metadataMap.keys();
+    foreach (QString metadataKey, metadataKeys) {
+        QStringList metadataValues = metadataMap.value(metadataKey);
+        foreach (QString metadataValue, metadataValues) {
+            out << metadataValue << "\n";
+        }
+        out << "\n";
+    }
+    metadataFile.close();
 }

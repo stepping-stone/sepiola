@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -18,19 +18,17 @@
 
 #include "gui/logfile_form.hh"
 
-LogfileForm::LogfileForm( QWidget* parent, MainModel* /*model*/) : QWidget ( parent )
+LogfileForm::LogfileForm(QWidget *parent, MainModel * /*model*/)
+    : QWidget(parent)
 {
-	setupUi( this );
+    setupUi(this);
 }
 
-LogfileForm::~LogfileForm()
-{
-}
+LogfileForm::~LogfileForm() {}
 
-void LogfileForm::appendLines( const QStringList& logfileLines )
+void LogfileForm::appendLines(const QStringList &logfileLines)
 {
-	foreach( QString line, logfileLines )
-	{
-		this->textEditLogfile->append( line );
-	}
+    foreach (QString line, logfileLines) {
+        this->textEditLogfile->append(line);
+    }
 }

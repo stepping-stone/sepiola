@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -19,15 +19,15 @@
 #ifndef DATATYPES_HH
 #define DATATYPES_HH
 
-#include <QMetaType>
 #include <QHash>
-#include <QString>
-#include <QPair>
 #include <QList>
+#include <QMetaType>
+#include <QPair>
+#include <QString>
 
-typedef QList<QPair<QString,QString> > StringPairList;
-Q_DECLARE_METATYPE( StringPairList )
-typedef QHash<QString,bool> BackupSelectionHash;
-Q_DECLARE_METATYPE( BackupSelectionHash )
+typedef QList<QPair<QString, QString>> StringPairList;
+Q_DECLARE_METATYPE(StringPairList)
+typedef QHash<QString, bool> BackupSelectionHash;
+Q_DECLARE_METATYPE(BackupSelectionHash)
 
 #endif /*DATATYPES_HH*/

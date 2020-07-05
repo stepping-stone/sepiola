@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -28,15 +28,15 @@
 class AbortException : public Exception
 {
 public:
-	/**
-	 * Constructs a AbortException with the given message
-	 * @param message the exception's message
-	 */
-	AbortException( const QString& message );
+    /**
+     * Constructs a AbortException with the given message
+     * @param message the exception's message
+     */
+    AbortException(const QString &message);
 };
 
-inline AbortException::AbortException( const QString& message ) : Exception( message ) 
-{
-}
+inline AbortException::AbortException(const QString &message)
+    : Exception(message)
+{}
 
 #endif

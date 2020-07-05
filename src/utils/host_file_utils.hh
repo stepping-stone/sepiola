@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017  stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -29,7 +29,6 @@
 class HostFileUtils
 {
 public:
-
     /**
      * Copy a Putty host key to the OpenSSH known_hosts file.
      * @param[in] host  Hostname for which to copy the key
@@ -40,8 +39,10 @@ public:
      * in Puttys sshhostkeys, converts it to the OpenSSH format and writes it
      * to OpenSSHs known_hosts file.
      */
-	static void addPuttyKeyToOpenSshKeyFile( const QString& host, const QString& sshhostkeysFileName, const QString& sshKnownHostsFileName );
-	
+    static void addPuttyKeyToOpenSshKeyFile(const QString &host,
+                                            const QString &sshhostkeysFileName,
+                                            const QString &sshKnownHostsFileName);
+
     /**
      * Gets the putty key for a given host.
      * @param[in] host  The hostname for which to retrieve the key
@@ -50,7 +51,7 @@ public:
      * @return The key if found, otherwise a null string
      *
      */
-	static QString getPuttyKey( const QString& host, const QString& ssHhostKeysFileName );
+    static QString getPuttyKey(const QString &host, const QString &ssHhostKeysFileName);
 
     /**
      * Convert the given Putty key to the OpenSSH key format.
@@ -60,7 +61,7 @@ public:
      * @return OpenSSH known_hosts key format string
      *
      */
-	static QString convertPuttyKey( const QString& puttyKey, const QString& host );
+    static QString convertPuttyKey(const QString &puttyKey, const QString &host);
 
     /**
      * Add the given key to the host file.
@@ -69,16 +70,18 @@ public:
      * @param[in] knownHostsFile  Path to the known_hosts file
      *
      */
-	static void addOpenSshKey( const QString& openSshKey, const QString& host, const QString& knownHostsFile );
-	
+    static void addOpenSshKey(const QString &openSshKey,
+                              const QString &host,
+                              const QString &knownHostsFile);
+
     /**
      * Lookup the IP address for the given host name.
-     * @param[in] host  The host to look the IP up for 
+     * @param[in] host  The host to look the IP up for
      *
      * @return The first IP found for the hostname or a null string if something went wrong.
      *
      * This is basically a wrapper around QHostInfo::fromName.
      */
-	static QString getIpAddress( const QString& host );
+    static QString getIpAddress(const QString &host);
 };
 #endif

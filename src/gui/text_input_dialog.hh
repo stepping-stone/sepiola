@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -30,30 +30,33 @@
  */
 class TextInputDialog : public QDialog, private Ui::TextInputDialog
 {
-	Q_OBJECT
-	
+    Q_OBJECT
+
 public:
-	/**
-	 * Constructs a TextInputDialog
-	 */
-	TextInputDialog( const QString& title, const QString& label, const QString& text = "", const int& position = 0 );
-	
-	/**
-	 * Destroys the TextInputDialog
-	 */
-	virtual ~TextInputDialog();
+    /**
+     * Constructs a TextInputDialog
+     */
+    TextInputDialog(const QString &title,
+                    const QString &label,
+                    const QString &text = "",
+                    const int &position = 0);
+
+    /**
+     * Destroys the TextInputDialog
+     */
+    virtual ~TextInputDialog();
 
 signals:
-	void textEntered( const QString& text );
-	void textEdited( const int& position, const QString& text );
+    void textEntered(const QString &text);
+    void textEdited(const int &position, const QString &text);
 
 private slots:
-	void accept();
-	void reject();
+    void accept();
+    void reject();
 
-private:	
-	QString text;
-	int position;
+private:
+    QString text;
+    int position;
 };
 
 #endif

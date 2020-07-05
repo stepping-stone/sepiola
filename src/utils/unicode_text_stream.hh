@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -25,19 +25,17 @@
  */
 class UnicodeTextStream : public QTextStream
 {
-	
 public:
-	UnicodeTextStream( QIODevice* device );
-	virtual ~UnicodeTextStream();
+    UnicodeTextStream(QIODevice *device);
+    virtual ~UnicodeTextStream();
 };
 
-inline UnicodeTextStream::UnicodeTextStream( QIODevice* device ) : QTextStream( device )
+inline UnicodeTextStream::UnicodeTextStream(QIODevice *device)
+    : QTextStream(device)
 {
-	this->setCodec( "UTF-8" );	
+    this->setCodec("UTF-8");
 }
 
-inline UnicodeTextStream::~UnicodeTextStream()
-{
-}
+inline UnicodeTextStream::~UnicodeTextStream() {}
 
 #endif

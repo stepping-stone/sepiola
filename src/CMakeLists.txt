@@ -1,5 +1,5 @@
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007, 2017  stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -383,7 +383,12 @@ ENDIF(Q_WS_WIN)
 
 
 IF(Q_WS_WIN)
-	FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/plink-*)
+	IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+		SET(WIN_DIR windows-x86_64)
+	ELSE()
+		SET(WIN_DIR windows-i386)
+	ENDIF(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	FILE(GLOB PLINK_BIN ${PROJECT_SOURCE_DIR}/tools/${WIN_DIR}/plink-*)
 	FILE(GLOB SETACL_BIN ${PROJECT_SOURCE_DIR}/tools/windows-i386/setacl-*)
 	ADD_CUSTOM_TARGET(copy ALL
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/config/config ${CMAKE_CURRENT_BINARY_DIR}
@@ -470,11 +475,11 @@ ELSE(Q_WS_WIN)
             ${CMAKE_CURRENT_BINARY_DIR}/ssh
 		COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/ssh
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/libcrypto.so.1.0.1e
-            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e
-                COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e
-                COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.0.1e
-            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.10
+            ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/libcrypto.so.1.1.1c
+            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c
+                COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c
+                COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.1.1c
+            ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/rsync-*
             ${CMAKE_CURRENT_BINARY_DIR}/rsync
@@ -504,8 +509,8 @@ ELSE(Q_WS_WIN)
 	INSTALL(FILES ${translation_binaries} DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/plink                 DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ssh                   DESTINATION ${APP_DIR})
-        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.0.1e   DESTINATION ${APP_DIR})
-        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.10       DESTINATION ${APP_DIR})
+        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1.1c   DESTINATION ${APP_DIR})
+        INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libcrypto.so.1.1      DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/rsync                 DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/getfacl               DESTINATION ${APP_DIR})
 	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setfacl               DESTINATION ${APP_DIR})

@@ -1,6 +1,6 @@
 /*
 #| sepiola - Open Source Online Backup Client
-#| Copyright (C) 2007-2017 stepping stone GmbH
+#| Copyright (c) 2007-2020 stepping stone AG
 #|
 #| This program is free software; you can redistribute it and/or
 #| modify it under the terms of the GNU General Public License
@@ -18,43 +18,40 @@
 
 #include <QDebug>
 
-#include "settings/settings.hh"
 #include "gui/password_dialog.hh"
+#include "settings/settings.hh"
 #include "utils/log_file_utils.hh"
 
-PasswordDialog::PasswordDialog( const QString& username, const bool& isUsernameEditable )
+PasswordDialog::PasswordDialog(const QString &username, const bool &isUsernameEditable)
 {
-	setupUi ( this );
-	
-	this->lineEditUsername->setText( username );
-	this->isUsernameEditable = isUsernameEditable;
-	if ( !isUsernameEditable )
-	{
-		this->lineEditUsername->setEnabled( false );
-	}
+    setupUi(this);
+
+    this->lineEditUsername->setText(username);
+    this->isUsernameEditable = isUsernameEditable;
+    if (!isUsernameEditable) {
+        this->lineEditUsername->setEnabled(false);
+    }
 }
 
-PasswordDialog::~PasswordDialog()
-{
-}
+PasswordDialog::~PasswordDialog() {}
 
-void PasswordDialog::setDialogMessage(const QString& msg)
+void PasswordDialog::setDialogMessage(const QString &msg)
 {
-	this->labelMessage->setText(msg);
+    this->labelMessage->setText(msg);
 }
 
 void PasswordDialog::on_btnOk_clicked()
 {
-	emit processPasswordReturnValues(this->lineEditUsername->text(), this->lineEditPassword->text(), isUsernameEditable);
-	this->done(Accepted);
+    emit processPasswordReturnValues(this->lineEditUsername->text(),
+                                     this->lineEditPassword->text(),
+                                     isUsernameEditable);
+    this->done(Accepted);
 }
 
 void PasswordDialog::on_btnCancel_clicked()
 {
-	this->done(Rejected);
-	emit abort();
+    this->done(Rejected);
+    emit abort();
 }
 
-void PasswordDialog::reject()
-{
-}
+void PasswordDialog::reject() {}
