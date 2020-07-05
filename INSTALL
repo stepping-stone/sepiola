@@ -27,10 +27,10 @@ Requirements:
    * PATH must contain qmake and g++
 
 Requirements provided in the tools archive:
-   * rsync 2.6.9, unpatched
-   * getfacl/setfacl 2.2.47, unpatched
-   * openssh 4.7, unpatched
-   * putty 0.60, patched
+   * rsync 3.1.2, unpatched
+   * getfacl/setfacl 2.2.53, unpatched
+   * openssh 8.2p1, unpatched
+   * putty 0.74, unpatched
 
 
 Mac OS X
@@ -60,8 +60,9 @@ Requirements:
    * PATH must contain qmake and MinGW bin directory
 
 Requirements provided in the tools archive:
-   * rsync 2.6.9, patched
-   * putty 0.60, patched
+   * rsync 3.1.2, unpatched
+   * openssh 8.2p1, unpatched
+   * putty 0.74, unpatched
    * SetACL 2.0.2.0, patched
 
 
