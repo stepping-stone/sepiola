@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.0] - 2020-07-05
+
+### Added
+
+- pre-commit: add minimal config
+
+### Changed
+
+- Update versions in INSTALL file
+- Follow "Keep a Changelog" standard
+- Ensure path on Linux is absolute
+- Update bundled acl tools for Linux to 2.2.53
+- Reformat all code based on new .clang-format config
+- Fix settings form on Linux where snapshot is disabled
+- Update bundled plink to 0.74
+- Update bundled rsync to 3.1.2 and ssh to 8.2p1
+- Add working console snippet for Windows
+- Disconnect signals after finishing with backup
+- Fix issues with user names containing spaces
+- Mind '/cygdrive' prefix in set acl process
+- Fix restore to original path by omitting dir times
+- Fix destination check for restore process
+- Disable save and discard button in settings form until form has been changed
+- Merge duplicate translations
+- Fix question formatting in Linux installer
+- Enhance wording and translation in GUI
+- Add hint about upload bandwidth limitation
+- Default to 'English' if language is not explicity set
+- Update copyright
+- unix_permissions: fix compilation regression from snapshot introduction
+- fix build failure with clang
+- README: fix URL of travis-ci.com badge
+- README: switch to travis-ci.com badge
+
 ## [2.5.0] - 2018-05-03
 
 ### Changed
@@ -65,7 +99,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated translation
 - Several build system updates and fixes
 
-[unreleased]: https://github.com/stepping-stone/sepiola/compare/v2.5.0...HEAD
+[unreleased]: https://github.com/stepping-stone/sepiola/compare/v2.6.0...HEAD
+[2.5.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.2.0...v2.4.0
 [2.2.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.1.2...v2.2.0
