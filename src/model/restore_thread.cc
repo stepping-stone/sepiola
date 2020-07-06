@@ -53,8 +53,10 @@ RestoreThread::~RestoreThread()
                         this,
                         SIGNAL(errorSignal(const QString &)));
     QObject::disconnect(this, SIGNAL(abort()), rsync.get(), SLOT(abort()));
-    // QObject::disconnect( rsync.get(), SIGNAL( trafficInfoSignal( const QString&, float, quint64,
-    // quint64 ) ), 					 this, SLOT( rsyncUploadProgressHandler( const QString&, float, quint64, quint64 ) ) );
+    // QObject::disconnect(rsync.get(),
+    //                     SIGNAL(trafficInfoSignal(const QString &, float, quint64, quint64)),
+    //                     this,
+    //                     SLOT(rsyncUploadProgressHandler(const QString &, float, quint64, quint64)));
 }
 
 void RestoreThread::init()
@@ -70,9 +72,10 @@ void RestoreThread::init()
                      this,
                      SIGNAL(infoSignal(const QString &)));
     QObject::connect(this, SIGNAL(abort()), rsync.get(), SLOT(abort()));
-    // QObject::connect( rsync.get(), SIGNAL( trafficInfoSignal( const QString&, float, quint64,
-    // quint64 ) ), 				  this, SLOT( rsyncUploadProgressHandler( const QString&, float, quint64, quint64 )
-    //) );
+    // QObject::connect(rsync.get(),
+    //                  SIGNAL(trafficInfoSignal(const QString &, float, quint64, quint64)),
+    //                  this,
+    //                  SLOT(rsyncUploadProgressHandler(const QString &, float, quint64, quint64)));
     // TODO: this is copied from BackupThread -> adapt as needed, as well as the above disconnection
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }

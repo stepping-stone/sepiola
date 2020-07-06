@@ -95,7 +95,8 @@ QList<QPair<QString, AbstractRsync::ITEMIZE_CHANGE_TYPE>> Rsync::upload(
 
     arguments << getRsyncSshArguments();
     if (setDeleteFlag) {
-        arguments << "--del"; // << "--delete-excluded"; // TODO: perhaps --delete-excluded is necessary
+        arguments << "--del"; // << "--delete-excluded";
+                              // TODO: perhaps --delete-excluded is necessary
                               // (temporary inserted [ds] on 2009-08-12, resulted in program-abortion),
                               // --del solely doesn't delete files excluded from backup-selection
     }
