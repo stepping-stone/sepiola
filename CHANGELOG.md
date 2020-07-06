@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.6.1] - 2020-07-06
+
+### Changed
+
+- Fix translation of version in about dialog
+- README: Fix the URL of the travis-ci.com badge
+
 ## [2.6.0] - 2020-07-05
 
 ### Added
@@ -99,8 +106,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated translation
 - Several build system updates and fixes
 
-[unreleased]: https://github.com/stepping-stone/sepiola/compare/v2.6.0...HEAD
-[2.5.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.5.0...v2.6.0
+[unreleased]: https://github.com/stepping-stone/sepiola/compare/v2.6.1...HEAD
+[2.6.1]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.6.0...v2.6.1
+[2.6.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.2.0...v2.4.0
 [2.2.0]: https://github.com/olivierlacan/keep-a-changelog/compare/v2.1.2...v2.2.0
