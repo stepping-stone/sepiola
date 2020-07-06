@@ -42,8 +42,8 @@
         <location filename="../gui/about_dialog.cc" line="32"/>
         <source>%1
 Version %2</source>
-        <translation>%1 Version %2 {1
-?}</translation>
+        <translation>%1
+Version %2</translation>
     </message>
 </context>
 <context>
