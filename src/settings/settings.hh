@@ -195,6 +195,7 @@ public:
     QString getThisApplicationExecutable();
     QString getRsyncName();
     QString getPlinkName();
+    QString getScriptName();
     QString getSshName();
     QString getGetfaclName();
     QString getSetfaclName();
@@ -301,6 +302,7 @@ private:
     static const QString SETTINGS_GROUP_EXECUTABLES;
     static const QString SETTINGS_RSYNC;
     static const QString SETTINGS_PLINK;
+    static const QString SETTINGS_SCRIPT;
     static const QString SETTINGS_SSH;
     static const QString SETTINGS_GETFACL;
     static const QString SETTINGS_SETFACL;
@@ -389,6 +391,7 @@ private:
     QString thisApplication;
     QString rsync;
     QString plink;
+    QString script;
     QString ssh;
     QString getfacl;
     QString setfacl;

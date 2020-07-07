@@ -540,6 +540,9 @@ else(Q_WS_WIN)
             ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/setfacl-*
             ${CMAKE_CURRENT_BINARY_DIR}/setfacl
         COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/setfacl
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/script-* ${CMAKE_CURRENT_BINARY_DIR}/script
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/script
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/${LINUX_ICON_FILE}
                 ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png)
 
@@ -560,6 +563,7 @@ else(Q_WS_WIN)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/rsync DESTINATION ${APP_DIR})
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/getfacl DESTINATION ${APP_DIR})
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/setfacl DESTINATION ${APP_DIR})
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/script DESTINATION ${APP_DIR})
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png
             DESTINATION ${RESOURCE_DIR})
 endif(Q_WS_WIN)

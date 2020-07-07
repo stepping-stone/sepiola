@@ -96,6 +96,7 @@ private:
     static const QString KEY_TYPE;
 
     const QString plinkName;
+    const QString scriptName;
 
     static QString extractKey(const QStringList &keyLines,
                               const QString &startLine,
