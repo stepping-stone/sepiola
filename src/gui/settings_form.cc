@@ -34,11 +34,11 @@ SettingsForm::SettingsForm(QWidget *parent, MainModel *model)
     foreach (QAbstractButton *button, buttons) {
         switch (this->buttonBox->buttonRole(button)) {
         case QDialogButtonBox::AcceptRole:
-            button->setText(tr("Save"));
+            button->setText(tr("S&ave"));
             button->setDisabled(true);
             break;
         case QDialogButtonBox::RejectRole:
-            button->setText(tr("Discard"));
+            button->setText(tr("D&iscard"));
             button->setDisabled(true);
             break;
         default:

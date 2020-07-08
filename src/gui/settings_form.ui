@@ -164,7 +164,7 @@ default-button to use the system-settings.</string>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Default</string>
+         <string>Defa&amp;ult</string>
         </property>
        </widget>
       </item>
