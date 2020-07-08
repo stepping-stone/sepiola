@@ -207,7 +207,11 @@ void BackupThread::run()
             // Add to each processed file the partition again for the upcoming
             // tasks
             foreach (UploadedFile item, relativeProcessedItems) {
-                UploadedFile file(mapper.getPartition() + item.first, item.second);
+                QString itemPrefix = mapper.getPartition();
+                if (mapper.getPartition() == item.first.at(0)) {
+                    itemPrefix = "";
+                }
+                UploadedFile file(itemPrefix + item.first, item.second);
                 processedItems.append(file);
             }
         }
