@@ -149,19 +149,19 @@ FilesystemSnapshot::~FilesystemSnapshot()
     QObject::disconnect(this->snapshot,
                         SIGNAL(sendSnapshotObjectCreated(int)),
                         this,
-                        SLOT(this->snapshotObjectCreated(int)));
+                        SLOT(snapshotObjectCreated(int)));
     QObject::disconnect(this->snapshot,
                         SIGNAL(sendSnapshotInitialized(int)),
                         this,
-                        SLOT(this->snapshotInitialized(int)));
+                        SLOT(snapshotInitialized(int)));
     QObject::disconnect(this->snapshot,
                         SIGNAL(sendFilesAddedToSnapshot(int)),
                         this,
-                        SLOT(this->filesAddedToSnapshot(int)));
+                        SLOT(filesAddedToSnapshot(int)));
     QObject::disconnect(this->snapshot,
                         SIGNAL(sendSnapshotTaken(int)),
                         this,
-                        SLOT(this->snapshotTaken(int)));
+                        SLOT(snapshotTaken(int)));
 
     // Delete the snapshot thread
     delete this->snapshotThread;

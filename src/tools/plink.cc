@@ -47,6 +47,7 @@ const QString Plink::KEY_TYPE = "dsa";
 
 Plink::Plink()
     : plinkName(Settings::getInstance()->getPlinkName())
+    , scriptName(Settings::getInstance()->getScriptName())
 {}
 
 Plink::~Plink() {}
@@ -74,7 +75,7 @@ bool Plink::loginWithKey()
                                                  // doesn't work lonely so
     arguments << settings->getServerUserName() + "@" + settings->getServerName();
     arguments << "sh -c " + StringUtils::quoteText("echo " + LOGIN_ECHO_MESSAGE, "'");
-    createProcess(settings->getPlinkName(), arguments);
+    createProcess(this->plinkName, arguments);
     setProcessChannelMode(QProcess::MergedChannels);
     start();
     waitForReadyRead();
@@ -122,7 +123,7 @@ bool Plink::assertCorrectFingerprint(const QString &userName,
 #ifdef Q_OS_WIN32
     createProcess(this->plinkName, arguments);
 #else
-    createProcess("/bin/script", scriptArguments);
+    createProcess(this->scriptName, scriptArguments);
 #endif
     setProcessChannelMode(QProcess::MergedChannels);
     start();
@@ -213,7 +214,7 @@ void Plink::uploadToMetaFolder(const QFileInfo &file, bool append)
     arguments << settings->getBackupRootFolder() + settings->getBackupPrefix() + "/"
                      + settings->getMetaFolderName() + "/" + file.fileName();
 
-    createProcess(settings->getPlinkName(), arguments);
+    createProcess(this->plinkName, arguments);
     setStandardInputFile(file.absoluteFilePath());
     start();
     waitForFinished();
@@ -267,7 +268,7 @@ bool Plink::generateKeys(const QString &password)
 // Workaround for Linux since password prompt does not appear on stdout
 #ifndef Q_OS_WIN32
     QStringList plinkCommand;
-    plinkCommand << settings->getPlinkName();
+    plinkCommand << this->plinkName;
     plinkCommand << arguments;
     QStringList scriptArguments(
         {"--quiet", "--return", "--log-out", "/dev/null", "--command", plinkCommand.join(" ")});
@@ -275,9 +276,9 @@ bool Plink::generateKeys(const QString &password)
 
     emit infoSignal(QObject::tr("Log in ..."));
 #ifdef Q_OS_WIN32
-    createProcess(settings->getPlinkName(), arguments);
+    createProcess(this->plinkName, arguments);
 #else
-    createProcess("/bin/script", scriptArguments);
+    createProcess(this->scriptName, scriptArguments);
 #endif
     start();
 
@@ -403,7 +404,7 @@ QList<int> Plink::getServerQuotaValues()
     arguments << settings->getServerUserName() + "@" + settings->getServerName();
     arguments << settings->getServerQuotaScriptName();
 
-    createProcess(settings->getPlinkName(), arguments);
+    createProcess(this->plinkName, arguments);
     start();
     waitForFinished();
 

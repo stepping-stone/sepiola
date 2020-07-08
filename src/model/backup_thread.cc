@@ -43,7 +43,7 @@
 #include "utils/unicode_text_stream.hh"
 
 const QString BackupThread::TASKNAME_PREPARE_DIRECTORIES = "preparing server directories";
-const QString BackupThread::TASKNAME_ESTIMATE_BACKUP_SIZE = "estimating backup size";
+const QString BackupThread::TASKNAME_ESTIMATE_BACKUP_SIZE = QT_TR_NOOP("estimating backup size");
 const QString BackupThread::TASKNAME_FILE_UPLOAD = "file upload";
 const QString BackupThread::TASKNAME_DOWNLOAD_CURRENT_BACKUP_CONTENT
     = "downloading current backup content file";
@@ -174,7 +174,7 @@ void BackupThread::run()
                                                            + settings->getBackupFolderName() + "/",
                                                        "'");
         this->pt.debugIsCorrectCurrentTask(TASKNAME_ESTIMATE_BACKUP_SIZE);
-        emit infoSignal(QObject::tr(QString(TASKNAME_ESTIMATE_BACKUP_SIZE).toLocal8Bit()));
+        emit infoSignal(tr(qPrintable(TASKNAME_ESTIMATE_BACKUP_SIZE)));
         quint64 backupSize = 1;
         if (Settings::SHOW_PROGRESS) {
             backupSize = this->estimateBackupSize(source, destination);
@@ -207,7 +207,11 @@ void BackupThread::run()
             // Add to each processed file the partition again for the upcoming
             // tasks
             foreach (UploadedFile item, relativeProcessedItems) {
-                UploadedFile file(mapper.getPartition() + item.first, item.second);
+                QString itemPrefix = mapper.getPartition();
+                if (mapper.getPartition() == item.first.at(0)) {
+                    itemPrefix = "";
+                }
+                UploadedFile file(itemPrefix + item.first, item.second);
                 processedItems.append(file);
             }
         }

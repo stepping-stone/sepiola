@@ -77,6 +77,7 @@ const QString Settings::SETTINGS_QUOTA_MODIFICATION_URL_UID_PARAM = "QuotaModifi
 const QString Settings::SETTINGS_GROUP_EXECUTABLES = "Executables";
 const QString Settings::SETTINGS_RSYNC = "Rsync";
 const QString Settings::SETTINGS_PLINK = "Plink";
+const QString Settings::SETTINGS_SCRIPT = "Script";
 const QString Settings::SETTINGS_SSH = "Ssh";
 const QString Settings::SETTINGS_GETFACL = "Getfacl";
 const QString Settings::SETTINGS_SETFACL = "Setfacl";
@@ -271,6 +272,9 @@ void Settings::reloadSettings()
     plink = StringUtils::encaps(applicationSettings->value(SETTINGS_PLINK).toString(),
                                 "",
                                 Platform::EXECUTABLE_SUFFIX);
+    script = StringUtils::encaps(applicationSettings->value(SETTINGS_SCRIPT).toString(),
+                                 "",
+                                 Platform::EXECUTABLE_SUFFIX);
     ssh = StringUtils::encaps(applicationSettings->value(SETTINGS_SSH).toString(),
                               "",
                               Platform::EXECUTABLE_SUFFIX);
@@ -927,6 +931,11 @@ QString Settings::getRsyncName()
 QString Settings::getPlinkName()
 {
     return getApplicationBinDir() + plink;
+}
+
+QString Settings::getScriptName()
+{
+    return getApplicationBinDir() + script;
 }
 
 QString Settings::getSshName()

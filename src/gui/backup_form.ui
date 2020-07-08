@@ -46,7 +46,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="labelTitleFilesAndFolders">
+    <widget class="QLabel" name="labelTitleSchedule">
      <property name="font">
       <font>
        <pointsize>13</pointsize>
@@ -290,7 +290,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="labelTitleFilesAndFolders">
+      <widget class="QLabel" name="labelTitleSelectFilesAndFolders">
        <property name="text">
         <string>Select which files and folders you want to back up:</string>
        </property>

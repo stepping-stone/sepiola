@@ -31,6 +31,7 @@ QuotaModificationUrlUidParam=$UID$
 [Executables]
 Getfacl=getfacl
 Plink=plink
+Script=script
 Ssh=ssh
 Rsync=rsync
 Setfacl=setfacl

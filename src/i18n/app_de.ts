@@ -35,8 +35,8 @@
     </message>
     <message>
         <location filename="../gui/about_dialog.ui" line="103"/>
-        <source>OK</source>
-        <translation>OK</translation>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../gui/about_dialog.cc" line="32"/>
@@ -50,13 +50,13 @@ Version %2</translation>
     <name>BackupForm</name>
     <message>
         <location filename="../gui/backup_form.cc" line="50"/>
-        <source>Save</source>
-        <translation>Speichern</translation>
+        <source>S&amp;ave</source>
+        <translation>S&amp;peichern</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.cc" line="53"/>
-        <source>Discard</source>
-        <translation>Verwerfen</translation>
+        <source>D&amp;iscard</source>
+        <translation>V&amp;erwerfen</translation>
     </message>
     <message>
         <location filename="../gui/backup_form.cc" line="118"/>
@@ -225,22 +225,27 @@ Version %2</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="204"/>
-        <source>Pause</source>
-        <translation>Pause</translation>
+        <source>&amp;Pause</source>
+        <translation>&amp;Pause</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="214"/>
-        <source>Abort</source>
-        <translation>Abbrechen</translation>
+        <source>&amp;Abort</source>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/backup_progress_dialog.ui" line="224"/>
-        <source>Close</source>
-        <translation>Schliessen</translation>
+        <source>C&amp;lose</source>
+        <translation>S&amp;chliessen</translation>
     </message>
 </context>
 <context>
     <name>BackupThread</name>
+    <message>
+        <location filename="../model/backup_thread.cc" line="46"/>
+        <source>estimating backup size</source>
+        <translation>Schätzung der Grösse des Backups</translation>
+    </message>
     <message>
         <location filename="../model/backup_thread.cc" line="140"/>
         <source>Creating/validating server directories</source>
@@ -502,52 +507,56 @@ Version %2</translation>
     <message>
         <location filename="../gui/main_window.ui" line="108"/>
         <location filename="../gui/main_window.ui" line="318"/>
-        <source>Backup</source>
-        <translation>Backup</translation>
+        <source>&amp;Backup</source>
+        <translation>&amp;Backup</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="140"/>
         <location filename="../gui/main_window.ui" line="327"/>
-        <source>Restore</source>
-        <translation>Wiederherstellen</translation>
+        <source>&amp;Restore</source>
+        <translation>&amp;Wiederherstellen</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="172"/>
         <location filename="../gui/main_window.ui" line="336"/>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
+        <source>&amp;Settings</source>
+        <translation>&amp;Einstellungen</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="269"/>
-        <source>Help</source>
-        <translation>Hilfe</translation>
+        <source>&amp;Help</source>
+        <translation>&amp;Hilfe</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="275"/>
-        <source>File</source>
-        <translation>Datei</translation>
+        <source>&amp;File</source>
+        <translation>&amp;Datei</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="281"/>
-        <source>Tools</source>
-        <translation>Werkzeuge</translation>
+        <source>&amp;Tools</source>
+        <translation>Wer&amp;kzeuge</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="300"/>
-        <source>Exit</source>
-        <translation>Beenden</translation>
+        <source>E&amp;xit</source>
+        <translation>Bee&amp;nden</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="345"/>
+        <source>&amp;About</source>
+        <translation>&amp;Info</translation>
+    </message>
+    <message>
         <location filename="../gui/main_window.ui" line="348"/>
-        <location filename="../gui/main_window.ui" line="351"/>
+        <location filename="../gui/main_window.ui" line="348"/>
         <source>About</source>
         <translation>Info</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="361"/>
-        <source>Help Contents</source>
-        <translation>Hilfe Inhalte</translation>
+        <source>&amp;Help Contents</source>
+        <translation>&amp;Hilfe Inhalte</translation>
     </message>
     <message>
         <location filename="../gui/main_window.ui" line="20"/>
@@ -569,8 +578,8 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
     <message>
         <location filename="../gui/main_window.ui" line="204"/>
         <location filename="../gui/main_window.ui" line="375"/>
-        <source>Logfile</source>
-        <translation>Logdatei</translation>
+        <source>&amp;Logfile</source>
+        <translation>&amp;Logdatei</translation>
     </message>
     <message>
         <location filename="../gui/main_window.cc" line="99"/>
@@ -585,8 +594,8 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
     <message>
         <location filename="../gui/main_window.ui" line="76"/>
         <location filename="../gui/main_window.ui" line="309"/>
-        <source>Overview</source>
-        <translation>Übersicht</translation>
+        <source>&amp;Overview</source>
+        <translation>&amp;Übersicht</translation>
     </message>
 </context>
 <context>
@@ -608,13 +617,13 @@ Möchten Sie Ihre Einstellungen beibehalten?</translation>
     </message>
     <message>
         <location filename="../gui/output_dialog.ui" line="87"/>
-        <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/output_dialog.ui" line="97"/>
-        <source>Close</source>
-        <translation>Schliessen</translation>
+        <source>C&amp;lose</source>
+        <translation>&amp;Schliessen</translation>
     </message>
 </context>
 <context>
@@ -708,8 +717,8 @@ Next Backup</source>
     </message>
     <message>
         <location filename="../gui/overview_form.ui" line="1007"/>
-        <source>Backup now</source>
-        <translation>Backup jetzt starten</translation>
+        <source>B&amp;ackup now</source>
+        <translation>B&amp;ackup jetzt starten</translation>
     </message>
 </context>
 <context>
@@ -731,13 +740,13 @@ Next Backup</source>
     </message>
     <message>
         <location filename="../gui/password_dialog.ui" line="72"/>
-        <source>OK</source>
-        <translation>OK</translation>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
     </message>
     <message>
         <location filename="../gui/password_dialog.ui" line="79"/>
-        <source>Cancel</source>
-        <translation>Abbrechen</translation>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/password_dialog.ui" line="31"/>
@@ -748,10 +757,14 @@ Next Backup</source>
 <context>
     <name>PatternDialog</name>
     <message>
-        <location filename="../gui/pattern_dialog.cc" line="70"/>
-        <location filename="../gui/pattern_dialog.ui" line="29"/>
+        <location filename="../gui/pattern_dialog.cc" line="69"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../gui/pattern_dialog.ui" line="29"/>
+        <source>&amp;Add</source>
+        <translation>&amp;Hinzufügen</translation>
     </message>
     <message>
         <location filename="../gui/pattern_dialog.cc" line="70"/>
@@ -770,14 +783,18 @@ Next Backup</source>
     </message>
     <message>
         <location filename="../gui/pattern_dialog.ui" line="43"/>
-        <source>Remove</source>
-        <translation>Entfernen</translation>
+        <source>&amp;Remove</source>
+        <translation>&amp;Entfernen</translation>
     </message>
     <message>
         <location filename="../gui/pattern_dialog.cc" line="84"/>
-        <location filename="../gui/pattern_dialog.ui" line="36"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
+    </message>
+    <message>
+        <location filename="../gui/pattern_dialog.ui" line="36"/>
+        <source>&amp;Edit</source>
+        <translation>&amp;Bearbeiten</translation>
     </message>
     <message>
         <location filename="../gui/pattern_dialog.cc" line="84"/>
@@ -1194,8 +1211,8 @@ Stellen Sie sicher, dass Sie über genügend Rechte verfügen. Starten Sie die A
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="52"/>
-        <source>Refresh</source>
-        <translation>Aktualisieren</translation>
+        <source>&amp;Refresh</source>
+        <translation>&amp;Aktualisieren</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="102"/>
@@ -1209,23 +1226,23 @@ Stellen Sie sicher, dass Sie über genügend Rechte verfügen. Starten Sie die A
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="251"/>
-        <source>Full Restore (restore all files)</source>
-        <translation>Vollständige Wiederherstellung</translation>
+        <source>F&amp;ull Restore (restore all files)</source>
+        <translation>V&amp;ollständige Wiederherstellung</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="261"/>
-        <source>Restore selected files and folder</source>
-        <translation>Wiederherstellung der ausgewählten Dateien und Ordner</translation>
+        <source>Restore selected &amp;files and folder</source>
+        <translation>Wiederherstellung der ausgewählten &amp;Dateien und Ordner</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="312"/>
-        <source>Restore to custom location</source>
-        <translation>Wiederherstellung an Alternativpfad</translation>
+        <source>Restore to &amp;custom location</source>
+        <translation>Wiederherstellung an &amp;Alternativpfad</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="319"/>
-        <source>Restore to original location</source>
-        <translation>Wiederherstellung an Originalpfad</translation>
+        <source>Restore to &amp;original location</source>
+        <translation>Wiederherstellung an &amp;Originalpfad</translation>
     </message>
     <message>
         <location filename="../gui/restore_form.ui" line="139"/>
@@ -1366,8 +1383,8 @@ Wollen Sie Ihre vorherigen Einstellungen wiederherstellen?</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.cc" line="37"/>
-        <source>Save</source>
-        <translation>Speichern</translation>
+        <source>S&amp;ave</source>
+        <translation>S&amp;peichern</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.cc" line="116"/>
@@ -1376,13 +1393,13 @@ Wollen Sie Ihre vorherigen Einstellungen wiederherstellen?</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.ui" line="167"/>
-        <source>Default</source>
-        <translation>Standard</translation>
+        <source>Defa&amp;ult</source>
+        <translation>St&amp;andard</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.cc" line="40"/>
-        <source>Discard</source>
-        <translation>Verwerfen</translation>
+        <source>D&amp;iscard</source>
+        <translation>V&amp;erwerfen</translation>
     </message>
     <message>
         <location filename="../gui/settings_form.cc" line="146"/>
@@ -1512,7 +1529,6 @@ p, li { white-space: pre-wrap; }
     <name>TrafficProgressDialog</name>
     <message>
         <location filename="../gui/traffic_progress_dialog.cc" line="105"/>
-        <location filename="../gui/traffic_progress_dialog.ui" line="435"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -1589,13 +1605,18 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="425"/>
-        <source>Pause</source>
-        <translation>Pause</translation>
+        <source>&amp;Pause</source>
+        <translation>&amp;Pause</translation>
+    </message>
+    <message>
+        <location filename="../gui/traffic_progress_dialog.ui" line="435"/>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Abbrechen</translation>
     </message>
     <message>
         <location filename="../gui/traffic_progress_dialog.ui" line="445"/>
-        <source>Close</source>
-        <translation>Schliessen</translation>
+        <source>C&amp;lose</source>
+        <translation>S&amp;chliessen</translation>
     </message>
 </context>
 </TS>

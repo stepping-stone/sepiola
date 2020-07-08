@@ -20,6 +20,7 @@
 #define FILESYSTEM_SNAPSHOT_HH_
 
 #include "tools/abstract_snapshot.hh"
+#include <QObject>
 
 // Forward declarations
 class QThread;

@@ -49,7 +49,7 @@
      <item>
       <widget class="QPushButton" name="btnRefresh">
        <property name="text">
-        <string>Refresh</string>
+        <string>&amp;Refresh</string>
        </property>
       </widget>
      </item>
@@ -248,7 +248,7 @@
         <item>
          <widget class="QRadioButton" name="radioButtonFull">
           <property name="text">
-           <string>Full Restore (restore all files)</string>
+           <string>F&amp;ull Restore (restore all files)</string>
           </property>
           <property name="checked">
            <bool>false</bool>
@@ -258,7 +258,7 @@
         <item>
          <widget class="QRadioButton" name="radioButtonCustom">
           <property name="text">
-           <string>Restore selected files and folder</string>
+           <string>Restore selected &amp;files and folder</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -309,14 +309,14 @@
        <item>
         <widget class="QPushButton" name="btnBrowseAndRestore">
          <property name="text">
-          <string>Restore to custom location</string>
+          <string>Restore to &amp;custom location</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnRestore">
          <property name="text">
-          <string>Restore to original location</string>
+          <string>Restore to &amp;original location</string>
          </property>
         </widget>
        </item>

@@ -56,7 +56,7 @@
      <property name="title">
       <string/>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayoutSettings">
       <property name="leftMargin">
        <number>6</number>
       </property>
@@ -164,7 +164,7 @@ default-button to use the system-settings.</string>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Default</string>
+         <string>Defa&amp;ult</string>
         </property>
        </widget>
       </item>

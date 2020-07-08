@@ -46,10 +46,10 @@ BackupForm::BackupForm(QWidget *parent, MainModel *model)
     foreach (QAbstractButton *button, buttons) {
         switch (this->buttonBox->buttonRole(button)) {
         case QDialogButtonBox::AcceptRole:
-            button->setText(tr("Save"));
+            button->setText(tr("S&ave"));
             break;
         case QDialogButtonBox::RejectRole:
-            button->setText(tr("Discard"));
+            button->setText(tr("D&iscard"));
             break;
         default:
             qWarning() << "Found unexpected button";
