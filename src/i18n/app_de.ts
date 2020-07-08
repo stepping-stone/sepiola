@@ -242,6 +242,11 @@ Version %2</translation>
 <context>
     <name>BackupThread</name>
     <message>
+        <location filename="../model/backup_thread.cc" line="46"/>
+        <source>estimating backup size</source>
+        <translation>Schätzung der Grösse des Backups</translation>
+    </message>
+    <message>
         <location filename="../model/backup_thread.cc" line="140"/>
         <source>Creating/validating server directories</source>
         <translation>Server Verzeichnisse werden erstellt und überprüft</translation>
