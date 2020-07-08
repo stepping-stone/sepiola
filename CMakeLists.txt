@@ -67,9 +67,9 @@ if(GIT_DESC)
     string(REGEX REPLACE "^([0-9\\-]+) .*" "\\1" SSBACKUP_RELEASE_DATE "${GIT_COMMIT_DATE}")
 else()
     set(CPACK_PACKAGE_VERSION_MAJOR 2)
-    set(CPACK_PACKAGE_VERSION_MINOR 6)
-    set(CPACK_PACKAGE_VERSION_PATCH 1)
-    set(SSBACKUP_RELEASE_DATE "2020-07-06")
+    set(CPACK_PACKAGE_VERSION_MINOR 7)
+    set(CPACK_PACKAGE_VERSION_PATCH 0)
+    set(SSBACKUP_RELEASE_DATE "2020-07-08")
 endif()
 
 # set automatically by CMake, but we need it early
