@@ -130,7 +130,7 @@
      <property name="title">
       <string>Support</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayoutAbout">
       <item row="0" column="0">
        <widget class="QLabel" name="labelSupport">
         <property name="text">
