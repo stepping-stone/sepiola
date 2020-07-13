@@ -210,6 +210,7 @@ void createConsole()
 #if 0
 void Console()
 {
+#ifdef Q_OS_WIN32
 	AllocConsole();
 	FILE *pFileCon = NULL;
 	pFileCon = freopen("CONOUT$", "w", stdout);
@@ -220,6 +221,7 @@ void Console()
 
 	SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), coordInfo);
 	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE),ENABLE_QUICK_EDIT_MODE| ENABLE_EXTENDED_FLAGS);
+#endif
 }
 #endif
 
