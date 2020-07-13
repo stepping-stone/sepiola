@@ -68,8 +68,8 @@ if(GIT_DESC)
 else()
     set(CPACK_PACKAGE_VERSION_MAJOR 2)
     set(CPACK_PACKAGE_VERSION_MINOR 7)
-    set(CPACK_PACKAGE_VERSION_PATCH 0)
-    set(SSBACKUP_RELEASE_DATE "2020-07-08")
+    set(CPACK_PACKAGE_VERSION_PATCH 1)
+    set(SSBACKUP_RELEASE_DATE "2020-07-13")
 endif()
 
 # set automatically by CMake, but we need it early

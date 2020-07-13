@@ -14,8 +14,6 @@
 #| along with this program; if not, write to the Free Software
 #| Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-
-
 Linux
 =====
 
@@ -31,6 +29,7 @@ Requirements provided in the tools archive:
    * getfacl/setfacl 2.2.53, unpatched
    * openssh 8.2p1, unpatched
    * putty 0.74, unpatched
+   * script (from util-linux) 2.35.2, unpatched
 
 
 Mac OS X
