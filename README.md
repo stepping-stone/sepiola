@@ -23,6 +23,13 @@ Sepiola uses Secure Shell (SSH) for the data transfer. This means, that all tran
 
 To permit a password-free login, Sepiola creates a Secure Shell Public/Private key pair after the first start of the programme. The public key is copied onto the server. From now on, you will not receive a password request any more and your password is not stored any where on your system.
 
+# Requirements
+
+Qt 4 is required on Linux. More specifically, the following libraries:
+* libQtCore.so.4
+* libQtGui.so.4
+* libQtNetwork.so.4
+
 # Third-party software components
 
 Sepiola uses a set of open source tools, some patched some unpatched.
