@@ -1,10 +1,10 @@
 # Copyright (c) 2012 Petroules Corporation. All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-# 
+#
 #     Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 #     Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Based on the Qt 5 processor detection code, so should be very accurate
@@ -14,7 +14,8 @@
 # Regarding POWER/PowerPC, just as is noted in the Qt source,
 # "There are many more known variants/revisions that we do not handle/detect."
 
-set(archdetect_c_code "
+set(archdetect_c_code
+    "
 #if defined(__arm__) || defined(__TARGET_ARCH_ARM)
     #if defined(__ARM_ARCH_7__) \\
         || defined(__ARM_ARCH_7A__) \\
@@ -117,13 +118,10 @@ function(target_architecture output_var)
         # way, we can detect the correct target architecture even when cross-compiling,
         # since the program itself never needs to be run (only the compiler/preprocessor)
         try_run(
-            run_result_unused
-            compile_result_unused
-            "${CMAKE_BINARY_DIR}"
+            run_result_unused compile_result_unused "${CMAKE_BINARY_DIR}"
             "${CMAKE_BINARY_DIR}/arch.c"
             COMPILE_OUTPUT_VARIABLE ARCH
-            CMAKE_FLAGS CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-        )
+            CMAKE_FLAGS CMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES})
 
         # Parse the architecture name from the compiler output
         string(REGEX MATCH "cmake_ARCH ([a-zA-Z0-9_]+)" ARCH "${ARCH}")
@@ -134,10 +132,12 @@ function(target_architecture output_var)
         # If we are compiling with an unknown architecture this variable should
         # already be set to "unknown" but in the case that it's empty (i.e. due
         # to a typo in the code), then set it to unknown
-        if (NOT ARCH)
+        if(NOT ARCH)
             set(ARCH unknown)
         endif()
     endif()
 
-    set(${output_var} "${ARCH}" PARENT_SCOPE)
+    set(${output_var}
+        "${ARCH}"
+        PARENT_SCOPE)
 endfunction()

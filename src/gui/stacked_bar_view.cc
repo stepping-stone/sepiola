@@ -154,7 +154,9 @@ void StackedBarView::paintEvent(QPaintEvent *event)
     painter.restore();
 }
 
-void StackedBarView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &)
+void StackedBarView::dataChanged(const QModelIndex &topLeft,
+                                 const QModelIndex &bottomRight,
+                                 const QVector<int> &)
 {
     QAbstractItemView::dataChanged(topLeft, bottomRight);
 

@@ -43,6 +43,7 @@ SettingsForm::SettingsForm(QWidget *parent, MainModel *model)
             break;
         default:
             qWarning() << "Found unexpected button";
+            break;
         }
     }
     Settings *settings = Settings::getInstance();

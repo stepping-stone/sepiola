@@ -34,11 +34,6 @@ class ScheduledTask
 {
 public:
     ScheduledTask();
-    ScheduledTask(const ScheduledTask &task);
-    ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time);
-    ScheduledTask(int minutes);
-
-    ScheduledTask();
     ScheduledTask(QSet<ScheduleRule::Weekdays> w, QTime time);
     ScheduledTask(int minutes);
 

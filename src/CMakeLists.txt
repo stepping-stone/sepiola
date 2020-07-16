@@ -519,9 +519,9 @@ else(WIN32)
         COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/script
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
                 ${PROJECT_SOURCE_DIR}/tools/${LINUX_DIR}/script-* ${CMAKE_CURRENT_BINARY_DIR}/script
-        COMMAND
-            chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/script ${PROJECT_SOURCE_DIR}/${LINUX_ICON_FILE}
-            ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png)
+        COMMAND chmod u+x ${CMAKE_CURRENT_BINARY_DIR}/script
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/${LINUX_ICON_FILE}
+                ${CMAKE_CURRENT_BINARY_DIR}/${SSBACKUP_EXECUTABLE_NAME}.png)
 
     install(FILES ${PROJECT_SOURCE_DIR}/config/config DESTINATION ${APP_DIR})
     if(DEFINED RESELLER)
