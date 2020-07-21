@@ -94,40 +94,14 @@ include_directories(. ${CMAKE_CURRENT_BINARY_DIR} ${OS_HEADER_DIRECTORIES})
 
 include_directories(SYSTEM ${OS_HEADER_DIRECTORIES})
 
-find_program(
-    QT_LUPDATE
-    NAMES lupdate-qt5 lupdate
-    PATHS $ENV{QTDIR}/bin
-    DOC "Path to the lupdate program")
-
 set(translation_sources ${translation_sources} i18n/app_de.ts)
 
-# Update translations (note that lupdate target write to source directory)
-if(QT_LUPDATE)
-    # Update all translations and remove obsolete strings
-    add_custom_target(
-        lupdate
-        ${QT_LUPDATE} -noobsolete ${translate_files} -ts ${translation_sources}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-
-    # Create template.ts to be used for new translations
-    add_custom_command(
-        OUTPUT template.ts
-        COMMAND ${QT_LUPDATE} -noobsolete ${translate_files} -ts template.ts
-        DEPENDS ${translate_files})
-    add_custom_target(create-ts-template DEPENDS template.ts)
-else(QT_LUPDATE)
-    message(STATUS "lupdate could not be found. You will not be able to update the translations.")
-endif(QT_LUPDATE)
-
-# Build translations
+# Update and build translations
 if(Qt5LinguistTools_FOUND)
-    qt5_create_translation(translation_binaries ${CMAKE_SOURCE_DIR} ${translation_sources})
-
-    # Finish off with a command that builds *.qm
-    add_custom_target(lrelease ALL DEPENDS ${translation_binaries})
+    qt5_create_translation(translation_binaries ${CMAKE_SOURCE_DIR} ${translation_sources} OPTIONS -extensions ui,cc,hh OPTIONS -no-obsolete)
+    add_custom_target(create-translation ALL DEPENDS ${translation_binaries})
 else()
-    message(STATUS "lrelease could not be found. You're losing the localisation.")
+    message(STATUS "Qt5LinguistTools not found. You're losing the localisation.")
 endif()
 
 set(qt_translations "${QT_TRANSLATIONS_PATH}/qt_de.qm")
@@ -141,7 +115,6 @@ foreach(qt_translation ${qt_translations})
     set(qms ${qms} ${qm})
     set(translation_binaries ${translation_binaries} ${qm})
 endforeach(qt_translation)
-
 # Finish off with a command that builds *.qm
 add_custom_target(copy-qt-translation ALL DEPENDS ${qms})
 
