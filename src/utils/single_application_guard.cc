@@ -76,7 +76,6 @@ bool SingleApplicationGuard::tryToCreateSharedMemory()
 
 void SingleApplicationGuard::_releaseMemory()
 {
-    _sharedMem.lock();
     if (_sharedMem.isAttached())
         _sharedMem.detach();
     _sharedMem.unlock();
