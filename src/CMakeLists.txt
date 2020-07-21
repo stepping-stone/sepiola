@@ -125,7 +125,7 @@ if(Qt5LinguistTools_FOUND)
     qt5_create_translation(translation_binaries ${CMAKE_SOURCE_DIR} ${translation_sources})
 
     # Finish off with a command that builds *.qm
-    add_custom_target(lrelease ALL DEPENDS ${QM_FILES})
+    add_custom_target(lrelease ALL DEPENDS ${translation_binaries})
 else()
     message(STATUS "lrelease could not be found. You're losing the localisation.")
 endif()
