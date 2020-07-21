@@ -50,7 +50,7 @@ MainModel::MainModel()
     , remoteDirModel(nullptr)
     , spaceUsageModel(new SpaceUsageModel(this))
     , isLoginAborted(false)
-    , fsSnapshot(new FilesystemSnapshot())
+    , fsSnapshot(nullptr)
     , backupThread(nullptr)
     , startInThisThread(true)
 {}
@@ -182,6 +182,8 @@ void MainModel::backup(const BackupSelectionHash &includeRules, const bool &star
     }
 
     this->startInThisThread = startInCurrentThread;
+
+    this->fsSnapshot = new FilesystemSnapshot();
 
     // Set the include rules for the filesystem snapshot object
     this->fsSnapshot->setIncludeRules(includeRules);
