@@ -171,7 +171,6 @@ qt5_wrap_cpp(
     tools/rsync.hh
     settings/settings.hh
     utils/log_file_utils.hh
-    utils/single_application_guard.hh
     model/backup_thread.hh
     model/main_model.hh
     model/restore_thread.hh

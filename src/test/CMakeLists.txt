@@ -47,7 +47,7 @@ endif(UNIX)
 
 # All-platform tests
 
-qt5_wrap_cpp(test_host_file_utils_MOC test_host_file_utils.hh ../utils/host_file_utils.hh)
+qt5_wrap_cpp(test_host_file_utils_MOC test_host_file_utils.hh)
 
 add_executable(test_host_file_utils test_host_file_utils.cc ${test_host_file_utils_MOC}
                                     ../utils/host_file_utils.cc ../utils/file_system_utils.cc)
