@@ -273,6 +273,7 @@ void Process::terminate()
             qProcess->kill();
         }
 #endif
+        mutex.unlock();
     }
 }
 
