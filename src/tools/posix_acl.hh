@@ -31,6 +31,8 @@
  */
 class PosixAcl : public AbstractMetadata, public Process
 {
+    Q_OBJECT
+
 public:
     /**
      * Constructs a PosixAcl

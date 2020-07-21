@@ -169,6 +169,7 @@ qt5_wrap_cpp(
     tools/dummy_snapshot.hh
     tools/filesystem_snapshot.hh
     tools/rsync.hh
+    tools/posix_acl.hh
     settings/settings.hh
     utils/log_file_utils.hh
     model/backup_thread.hh
