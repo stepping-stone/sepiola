@@ -25,10 +25,11 @@ To permit a password-free login, Sepiola creates a Secure Shell Public/Private k
 
 # Requirements
 
-Qt 4 is required on Linux. More specifically, the following libraries:
-* libQtCore.so.4
-* libQtGui.so.4
-* libQtNetwork.so.4
+Qt 5 is required on Linux. More specifically, the following libraries:
+* libQt5Core.so.5
+* libQt5Gui.so.5
+* libQt5Widgets.so.5
+* libQt5Network.so.5
 
 # Third-party software components
 

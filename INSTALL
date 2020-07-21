@@ -19,9 +19,9 @@ Linux
 
 Requirements:
    * Linux distribution with glibc 2.3 or later
-   * QT 4.0.0 or later
-   * CMake 2.4 or later
-   * GCC 4 C++ compiler, other C++ compilers may work too
+   * Qt 5.0.0 or later
+   * CMake 3.14 or later
+   * GCC C++ compiler, other C++ compilers may work too
    * PATH must contain qmake and g++
 
 Requirements provided in the tools archive:
@@ -37,8 +37,8 @@ Mac OS X
 
 Requirements:
    * Mac OS X 10.3.9 or later
-   * QT 4.0.0 or later
-   * CMake 2.4 or later
+   * Qt 5.0.0 or later
+   * CMake 3.14 or later
    * XCode 2.0 or later
    * PATH must contain qmake and g++
 
@@ -53,8 +53,8 @@ Windows
 
 Requirements:
    * Windows 2000 or later
-   * QT 4.0.0 or later
-   * CMake 2.4 or later
+   * QT 5.0.0 or later
+   * CMake 3.14 or later
    * MinGW 3.4.2 or later
    * PATH must contain qmake and MinGW bin directory
 
@@ -62,7 +62,7 @@ Requirements provided in the tools archive:
    * rsync 3.1.2, unpatched
    * openssh 8.2p1, unpatched
    * putty 0.74, unpatched
-   * SetACL 2.0.2.0, patched
+   * SetACL 2.0.3.0, patched
 
 
 All platforms
