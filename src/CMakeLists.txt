@@ -142,7 +142,6 @@ qt5_wrap_cpp(
     tools/dummy_snapshot.hh
     tools/filesystem_snapshot.hh
     tools/rsync.hh
-    tools/posix_acl.hh
     settings/settings.hh
     utils/log_file_utils.hh
     model/backup_thread.hh
@@ -250,7 +249,8 @@ if(WIN32)
 elseif(APPLE)
     list(APPEND BASE_SOURCE_FILES tools/crontab.cc tools/unix_permissions.cc)
 elseif(UNIX)
-    list(APPEND BASE_SOURCE_FILES tools/crontab.cc tools/posix_acl.cc)
+    qt5_wrap_cpp(sepiola_lin_MOC tools/posix_acl.hh)
+    list(APPEND BASE_SOURCE_FILES tools/crontab.cc tools/posix_acl.cc ${sepiola_lin_MOC})
 endif(WIN32)
 
 add_library(sepiola_base_objects OBJECT ${BASE_SOURCE_FILES})
