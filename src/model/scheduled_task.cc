@@ -79,7 +79,7 @@ void ScheduledTask::setWeekdays(QSet<ScheduleRule::Weekdays> weekdays)
 
 void ScheduledTask::setWeekdays(QSet<int> weekdaysInt)
 {
-    QList<int> wdIntList = weekdaysInt.toList();
+    QList<int> wdIntList = weekdaysInt.values();
     weekdays.clear();
     for (int i = 0; i < wdIntList.size(); i++) {
         weekdays.insert((ScheduleRule::Weekdays) wdIntList.at(i));
@@ -126,7 +126,7 @@ QString ScheduledTask::toString() const
     case ScheduleRule::AT_WEEKDAYS_AND_TIME: {
         if (weekdays.size() > 0) {
             // QString tok = ", ";
-            QList<ScheduleRule::Weekdays> wdList = weekdays.toList();
+            QList<ScheduleRule::Weekdays> wdList = weekdays.values();
             QList<QDateTime> nextBackupDatesList;
             const QDateTime now = QDateTime::currentDateTime();
             const int wd_now = now.date().dayOfWeek();
