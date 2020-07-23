@@ -32,7 +32,7 @@ pipeline {
               }
             }
             steps {
-              sh 'cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+              sh 'cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
             }
           }
           stage('linux32'){
@@ -42,7 +42,7 @@ pipeline {
               }
             }
             steps {
-              sh 'CFLAGS="-m32" CXXFLAGS="-m32" /bin/setarch i686 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+              sh 'CFLAGS="-m32" CXXFLAGS="-m32" /bin/setarch i686 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
             }
           }
           stage('windows64'){
@@ -52,7 +52,7 @@ pipeline {
               }
             }
             steps {
-              sh 'mingw64-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+              sh 'mingw64-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
             }
           }
           stage('windows32'){
@@ -62,7 +62,7 @@ pipeline {
               }
             }
             steps {
-              sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+              sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYP}" .'
             }
           }
           stage('Build'){
