@@ -62,7 +62,7 @@ pipeline {
               }
             }
             steps {
-              sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYP}" .'
+              sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
             }
           }
           stage('Build'){
