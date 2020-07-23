@@ -25,6 +25,11 @@ pipeline {
           }
         }
         stages {
+          stage('Clean'){
+            steps {
+              sh 'git clean -fdx'
+            }
+          }
           stage('linux64'){
             when {
               expression {
