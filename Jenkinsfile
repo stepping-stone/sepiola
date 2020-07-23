@@ -43,7 +43,7 @@ pipeline {
             }
 	  }
           steps {
-            sh 'CFLAGS='-m32' CXXFLAGS='-m32' /bin/setarch i686 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+            sh 'CFLAGS="-m32" CXXFLAGS="-m32" /bin/setarch i686 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
           }
         }
         stage('windows64'){
