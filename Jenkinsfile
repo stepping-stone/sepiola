@@ -13,13 +13,68 @@ pipeline {
       }
     }
     stage('Build'){
-      steps {
-        sh 'cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="Release" .'
-        sh 'make package'
+      matrix {
+        axes {
+          axis {
+            name 'PLATFORM'
+            values 'linux64', 'linux32', 'windows64', 'windows32'
+          }
+          axis {
+            name 'BUILDTYPE'
+            values 'Release', 'Debug'
+          }
+        }
       }
-      post {
-        always {
-          archiveArtifacts artifacts: 'sepiola*.sh', onlyIfSuccessful: true
+      stages {
+        stage('linux64'){
+	  when {
+            expression {
+              PLATFORM == 'linux64'
+            }
+	  }
+          steps {
+            sh 'cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+          }
+        }
+        stage('linux32'){
+	  when {
+            expression {
+              PLATFORM == 'linux32'
+            }
+	  }
+          steps {
+            sh 'CFLAGS='-m32' CXXFLAGS='-m32' /bin/setarch i686 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+          }
+        }
+        stage('windows64'){
+	  when {
+            expression {
+              PLATFORM == 'windows64'
+            }
+	  }
+          steps {
+            sh 'mingw64-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+          }
+        }
+        stage('windows32'){
+	  when {
+            expression {
+              PLATFORM == 'windows32'
+            }
+	  }
+          steps {
+            sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
+          }
+        }
+        stage('build'){
+          steps {
+            sh 'make package'
+          }
+          post {
+            always {
+              archiveArtifacts artifacts: 'sepiola-*.*', onlyIfSuccessful: true
+            }
+          }
         }
       }
     }
