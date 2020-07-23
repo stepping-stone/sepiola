@@ -98,7 +98,15 @@ set(translation_sources ${translation_sources} i18n/app_de.ts)
 
 # Update and build translations
 if(Qt5LinguistTools_FOUND)
-    qt5_create_translation(translation_binaries ${CMAKE_SOURCE_DIR} ${translation_sources} OPTIONS -extensions ui,cc,hh OPTIONS -no-obsolete)
+    qt5_create_translation(
+        translation_binaries
+        ${CMAKE_SOURCE_DIR}
+        ${translation_sources}
+        OPTIONS
+        -extensions
+        ui,cc,hh
+        OPTIONS
+        -no-obsolete)
     add_custom_target(create-translation ALL DEPENDS ${translation_binaries})
 else()
     message(STATUS "Qt5LinguistTools not found. You're losing the localisation.")
