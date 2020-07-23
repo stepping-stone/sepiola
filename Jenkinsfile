@@ -12,7 +12,7 @@ pipeline {
         checkout scm
       }
     }
-    stage('Build'){
+    stage('ConfigureAndBuild'){
       matrix {
         axes {
           axis {
@@ -66,7 +66,7 @@ pipeline {
             sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${PLATFORM}" .'
           }
         }
-        stage('build'){
+        stage('Build'){
           steps {
             sh 'make package'
           }
