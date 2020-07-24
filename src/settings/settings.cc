@@ -386,7 +386,7 @@ void Settings::reloadSettings()
 QDateTime Settings::getInstallDate()
 {
     QFileInfo applicationFile(QCoreApplication::applicationFilePath());
-    return applicationFile.birthTime();
+    return applicationFile.created();
 }
 
 bool Settings::isReinstalled()
