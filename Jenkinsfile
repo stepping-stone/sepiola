@@ -7,11 +7,6 @@ pipeline {
     }
   }
   stages {
-    stage('Checkout'){
-      steps {
-        checkout scm
-      }
-    }
     stage('ConfigureAndBuild'){
       matrix {
         axes {
@@ -25,9 +20,18 @@ pipeline {
           }
         }
         stages {
+          stage('Checkout'){
+            steps {
+              ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                checkout scm
+              }
+            }
+          }
           stage('Clean'){
             steps {
-              sh 'git clean -fdx'
+              ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                sh 'git clean -fdx'
+              }
             }
           }
           stage('linux64'){
@@ -37,7 +41,9 @@ pipeline {
               }
             }
             steps {
-              sh 'cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
+              ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                sh 'cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
+              }
             }
           }
           stage('linux32'){
@@ -47,7 +53,9 @@ pipeline {
               }
             }
             steps {
-              sh 'CFLAGS="-m32" CXXFLAGS="-m32" /bin/setarch i686 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
+              ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                sh 'CFLAGS="-m32" CXXFLAGS="-m32" /bin/setarch i686 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" -DQT_TRANSLATIONS_PATH="/usr/share/qt5/translations" .'
+              }
             }
           }
           stage('windows64'){
@@ -57,7 +65,9 @@ pipeline {
               }
             }
             steps {
-              sh 'mingw64-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
+              ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                sh 'mingw64-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" -DQT_TRANSLATIONS_PATH="/usr/share/qt5/translations" .'
+              }
             }
           }
           stage('windows32'){
@@ -67,16 +77,22 @@ pipeline {
               }
             }
             steps {
-              sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" .'
+              ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                sh 'mingw32-cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE="${BUILDTYPE}" -DQT_TRANSLATIONS_PATH="/usr/share/qt5/translations" .'
+              }
             }
           }
           stage('Build'){
             steps {
-              sh 'make package'
+              ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                sh 'make package'
+              }
             }
             post {
               always {
-                archiveArtifacts artifacts: 'sepiola-*.*', onlyIfSuccessful: true
+                ws("${env.WORKSPACE}/${PLATFORM}-${BUILDTYPE}"){
+                  archiveArtifacts artifacts: 'sepiola-*.*', onlyIfSuccessful: true
+                }
               }
             }
           }
